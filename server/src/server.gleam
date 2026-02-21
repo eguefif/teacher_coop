@@ -1,9 +1,7 @@
-import gleam/dynamic/decode
 import gleam/erlang/process
-import gleam/http.{Options, Post}
-import gleam/io
+import gleam/http.{Post}
 import mist
-import shared/user.{user_decoder}
+import server/user.{handle_request_user}
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
 
@@ -33,19 +31,7 @@ fn handle_request(req: Request) -> Response {
   use req <- app_middleware(req)
 
   case req.method, wisp.path_segments(req) {
-    Post, ["signup"] -> create_user(req)
+    Post, ["signup"] -> handle_request_user(req)
     _, _ -> wisp.not_found()
-  }
-}
-
-fn create_user(req: Request) -> Response {
-  use json <- wisp.require_json(req)
-
-  case decode.run(json, user_decoder()) {
-    Ok(user) -> {
-      io.print("New user: " <> user.full_name)
-      wisp.ok()
-    }
-    Error(_) -> wisp.unprocessable_content()
   }
 }
