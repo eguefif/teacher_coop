@@ -1,26 +1,26 @@
 import argus
 import gleam/dynamic/decode
 import gleam/http.{Post}
-import gleam/io
+import pog
 import server/sql
 import shared/user.{type User, UserForm, user_form_decoder}
 import wisp.{type Request, type Response}
 
-pub fn handle_request_user(req: Request) -> Response {
+pub fn handle_request_user(db: pog.Connection, req: Request) -> Response {
   case req.method, wisp.path_segments(req) {
-    Post, ["signup"] -> create_user(req)
+    Post, ["signup"] -> create_user(db, req)
     _, _ -> wisp.not_found()
   }
 }
 
-fn create_user(req: Request) -> Response {
+fn create_user(db: pog.Connection, req: Request) -> Response {
   use json <- wisp.require_json(req)
 
   case decode.run(json, user_form_decoder()) {
     Ok(user) -> {
       let assert UserForm(_, _, password) = user
       let user = UserForm(..user, password: hash_password(password))
-      io.print("user hash: " <> user.password)
+      create_user_db(db, user)
       wisp.ok()
     }
     Error(_) -> wisp.unprocessable_content()
@@ -34,7 +34,10 @@ fn hash_password(password: String) -> String {
   hashes.encoded_hash
 }
 
-fn create_user_db(user: User) -> Bool {
+fn create_user_db(db: pog.Connection, user: User) -> Bool {
   let assert UserForm(full_name, email, password) = user
-  sql.create_user(full_name, email, password)
+  case sql.create_user(db, full_name, email, password) {
+    Ok(_) -> True
+    Error(_) -> False
+  }
 }
