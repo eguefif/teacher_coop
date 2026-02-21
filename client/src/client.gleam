@@ -1,5 +1,4 @@
 import gleam/http/response.{type Response}
-import gleam/io
 import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
@@ -7,7 +6,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 import rsvp
-import shared/user.{type User, User}
+import shared/user.{type User, UserForm}
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -17,11 +16,11 @@ pub fn main() -> Nil {
 }
 
 type Model {
-  UserForm(full_name: String, email: String, password: String)
+  VisitorData(user_form: User)
 }
 
 fn init(_args) -> #(Model, Effect(Msg)) {
-  #(UserForm("", "", ""), effect.none())
+  #(VisitorData(UserForm("", "", "")), effect.none())
 }
 
 type Msg {
@@ -31,6 +30,10 @@ type Msg {
   UserTypedPassword(String)
   VisitorCreatedAccount
 }
+
+// TODO: update frontend with new shared type
+// TODO: Test sql logic backend
+// TODO: Improve project setup with just
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
