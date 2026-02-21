@@ -2,6 +2,7 @@ import argus
 import gleam/dynamic/decode
 import gleam/http.{Post}
 import gleam/io
+import server/sql
 import shared/user.{type User, UserForm, user_form_decoder}
 import wisp.{type Request, type Response}
 
@@ -34,5 +35,6 @@ fn hash_password(password: String) -> String {
 }
 
 fn create_user_db(user: User) -> Bool {
-  todo
+  let assert UserForm(full_name, email, password) = user
+  sql.create_user(full_name, email, password)
 }

@@ -7,9 +7,10 @@ import wisp/wisp_mist
 
 pub fn main() -> Nil {
   wisp.configure_logger()
+  let db = init_db()
   let secret_key_base = wisp.random_string(64)
   let assert Ok(_) =
-    handle_request
+    handle_request(db, _)
     |> wisp_mist.handler(secret_key_base)
     |> mist.new
     |> mist.port(3000)
@@ -27,7 +28,7 @@ fn app_middleware(req: Request, next: fn(Request) -> Response) -> Response {
   next(req)
 }
 
-fn handle_request(req: Request) -> Response {
+fn handle_request(db: req: Request) -> Response {
   use req <- app_middleware(req)
 
   case req.method, wisp.path_segments(req) {
