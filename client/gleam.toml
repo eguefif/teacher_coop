@@ -26,3 +26,6 @@ lustre_dev_tools = ">= 2.3.4 and < 3.0.0"
 
 [tools.lustre.dev]
 proxy = { from = "/api", to = "http://127.0.0.1:3000/" }
+
+[tools.lustre.html]
+stylesheets = [{ href = "/app.css" }]

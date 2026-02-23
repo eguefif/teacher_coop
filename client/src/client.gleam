@@ -38,6 +38,16 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 }
 
 fn view(model: Model) -> Element(Msg) {
+  html.html([], [head(model), body(model)])
+}
+
+fn head(_model: Model) -> Element(Msg) {
+  html.head([], [
+    html.title([], "Teacher Coop"),
+  ])
+}
+
+fn body(model: Model) -> Element(Msg) {
   case model {
     Visitor -> {
       let visitor_element = visitor.element()

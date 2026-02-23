@@ -1,10 +1,12 @@
-import lustre/attribute.{type Attribute}
 import lustre/element.{type Element}
 import lustre/element/html
+import shared/form.{type Form}
 
-// TODO: find a way to have a css file with variables
-// TODO: Create an input style
-pub fn input(attributes: List(Attribute(msg))) -> Element(msg) {
-  let styles = [#()]
-  html.input([attribute.class("lustre-ui-input"), ..attributes])
+pub fn input(
+  form: Form,
+  is type_: String,
+  name name: String,
+  label label: String,
+) -> Element(msg) {
+  html.div([], [html.label([], [html.text(label), html.text(" :")])])
 }
