@@ -1,6 +1,8 @@
 import argus
 import gleam/dynamic/decode
 import gleam/http.{Post}
+import gleam/io
+import gleam/string
 import pog
 import server/sql
 import shared/user.{type User, UserForm, user_form_decoder}
@@ -38,6 +40,9 @@ fn create_user_db(db: pog.Connection, user: User) -> Bool {
   let assert UserForm(full_name, email, password) = user
   case sql.create_user(db, full_name, email, password) {
     Ok(_) -> True
-    Error(_) -> False
+    Error(error) -> {
+      //TODO: Handle error
+      False
+    }
   }
 }

@@ -17,3 +17,6 @@ client:
 # Source environment variables from init_env.sh
 env:
     source ./init_env.sh
+
+psql:
+  psql -h 0.0.0.0 -p 5432 -Uadmin -d teacher_coop
