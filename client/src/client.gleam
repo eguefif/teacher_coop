@@ -50,8 +50,7 @@ fn head(_model: Model) -> Element(Msg) {
 fn body(model: Model) -> Element(Msg) {
   case model {
     Visitor -> {
-      let visitor_element = visitor.element()
-      html.div([], [visitor_element])
+      visitor.element()
     }
     User -> {
       html.div([], [html.text("Welcome back!")])

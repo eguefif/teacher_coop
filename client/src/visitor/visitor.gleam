@@ -24,6 +24,7 @@ pub fn element() -> Element(msg) {
 
 type Model {
   VisitorData(Form)
+  Visitor(search: String)
 }
 
 pub type Msg {
@@ -35,7 +36,7 @@ pub type Msg {
 }
 
 fn init(_args) -> #(Model, Effect(Msg)) {
-  #(VisitorData(SignUpData("", "", "", "", "", "")), effect.none())
+  #(Visitor(""), effect.none())
 }
 
 // TODO: use gleam form
@@ -46,7 +47,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     ServerCreatedAccount(Ok(_)) -> #(model, effect.none())
     ServerCreatedAccount(Error(_)) -> #(model, effect.none())
     UserTypedFullName(text) -> {
-      let VisitorData(signup_data) = model
+      let assert VisitorData(signup_data) = model
       case string.length(text) < 50 {
         True -> #(
           VisitorData(
@@ -67,7 +68,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
     }
     UserTypedPassword(text) -> {
-      let VisitorData(signup_data) = model
+      let assert VisitorData(signup_data) = model
       case is_valid_password(text) {
         True -> #(
           VisitorData(
@@ -88,7 +89,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
     }
     UserTypedEmail(text) -> {
-      let VisitorData(signup_data) = model
+      let assert VisitorData(signup_data) = model
       case is_valid_email(text) {
         True -> #(
           VisitorData(SignUpData(..signup_data, email: text, email_error: "")),
@@ -142,6 +143,77 @@ fn create_user(user: User) -> Effect(Msg) {
 
 fn view(model: Model) -> Element(Msg) {
   let styles = [
+    #("max-width", "100%"),
+    #("margin", "auto 16px"),
+    #("display", "flex"),
+    #("flex-direction", "column"),
+    #("align-items", "center"),
+    #("gap", "32px"),
+  ]
+
+  html.div([attribute.styles(styles)], [
+    header_view(model),
+    case model {
+      Visitor(_) -> search_view(model)
+      VisitorData(_) -> signup_form_view(model)
+    },
+  ])
+}
+
+fn header_view(model: Model) -> Element(Msg) {
+  let styles = [
+    #("background", "var(--color-surface)"),
+    #("display", "flex"),
+    #("flex-direction", "row"),
+    #("justify-content", "space-between"),
+    #("align-items", "center"),
+    #("width", "840px"),
+    #("border-radius", "40px"),
+    #("margin", "16px auto"),
+    #("padding", "12px 24px"),
+  ]
+
+  html.div([attribute.styles(styles)], [
+    html.h2([], [html.text("Teacher Coop")]),
+    header_button(model),
+  ])
+}
+
+fn header_button(_model: Model) -> Element(Msg) {
+  let styles = [
+    #("background", "var(--color-surface)"),
+    #("display", "flex"),
+    #("flex-direction", "row"),
+    #("gap", "20px"),
+  ]
+  html.div([attribute.styles(styles)], [
+    html.a([], [html.text("Signup")]),
+    html.a([], [html.text("Login")]),
+  ])
+}
+
+fn search_view(_model: Model) {
+  let wrapper_styles = [#("max-width", "840px"), #("margin", "16px auto")]
+  let input_styles = [
+    #("width", "100%"),
+    #("padding", "16px 24px"),
+    #("font-size", "1.1rem"),
+    #("border", "2px solid var(--color-surface)"),
+    #("border-radius", "16px"),
+    #("outline", "none"),
+    #("box-sizing", "border-box"),
+  ]
+
+  html.div([attribute.styles(wrapper_styles)], [
+    html.input([
+      attribute.styles(input_styles),
+      attribute.placeholder("Search..."),
+    ]),
+  ])
+}
+
+fn signup_form_view(model: Model) -> Element(Msg) {
+  let styles = [
     #("margin", "0 auto"),
     #("display", "flex"),
     #("flex-direction", "column"),
@@ -162,8 +234,8 @@ fn view(model: Model) -> Element(Msg) {
   ])
 }
 
-fn signup_form_view(model: Model) -> Element(Msg) {
-  let VisitorData(form) = model
+fn signup_inputs_view(model: Model) -> Element(Msg) {
+  let assert VisitorData(form) = model
   let styles = [
     #("display", "flex"),
     #("flex-direction", "column"),
