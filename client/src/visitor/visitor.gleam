@@ -1,4 +1,6 @@
+//import formal/form
 import gleam/http/response.{type Response}
+import gleam/regexp
 import gleam/string
 import lustre
 import lustre/attribute
@@ -36,8 +38,9 @@ fn init(_args) -> #(Model, Effect(Msg)) {
   #(VisitorData(SignUpData("", "", "", "", "", "")), effect.none())
 }
 
-// TODO: Handle form error in frontend
-// TODO: Handle server return
+// TODO: use gleam form
+// TODO: css does not work input function does not work
+// TODO: Test error handling
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
     ServerCreatedAccount(Ok(_)) -> #(model, effect.none())
@@ -86,7 +89,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     }
     UserTypedEmail(text) -> {
       let VisitorData(signup_data) = model
-      case is_valid_password(text) {
+      case is_valid_email(text) {
         True -> #(
           VisitorData(SignUpData(..signup_data, email: text, email_error: "")),
           effect.none(),
@@ -119,8 +122,16 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   }
 }
 
-fn is_valid_password(_password) -> Bool {
-  True
+fn is_valid_password(password: String) -> Bool {
+  let has_length = string.length(password) >= 6
+  let assert Ok(symbol_re) = regexp.from_string("[^a-zA-Z0-9]")
+  let has_symbol = regexp.check(symbol_re, password)
+  has_length && has_symbol
+}
+
+fn is_valid_email(email: String) -> Bool {
+  let assert Ok(email_re) = regexp.from_string("^[^@]+@[^@]+\\.[^@]+$")
+  regexp.check(email_re, email)
 }
 
 fn create_user(user: User) -> Effect(Msg) {
@@ -131,21 +142,21 @@ fn create_user(user: User) -> Effect(Msg) {
 
 fn view(model: Model) -> Element(Msg) {
   let styles = [
-    #("max-width", "30ch"),
     #("margin", "0 auto"),
     #("display", "flex"),
     #("flex-direction", "column"),
-    #("gap", "1em"),
+    #("align-items", "center"),
+    #("gap", "16px"),
   ]
 
   html.div([attribute.styles(styles)], [
     html.h1([], [
       html.text("Signup"),
-      signup_form_view(model),
-      html.div([], [
-        html.button([event.on_click(VisitorCreatedAccount)], [
-          html.text("Create Account"),
-        ]),
+    ]),
+    signup_form_view(model),
+    html.div([], [
+      html.button([event.on_click(VisitorCreatedAccount)], [
+        html.text("Create Account"),
       ]),
     ]),
   ])
@@ -153,10 +164,15 @@ fn view(model: Model) -> Element(Msg) {
 
 fn signup_form_view(model: Model) -> Element(Msg) {
   let VisitorData(form) = model
-  html.div([], [
+  let styles = [
+    #("display", "flex"),
+    #("flex-direction", "column"),
+    #("gap", "8px"),
+  ]
+  html.div([attribute.styles(styles)], [
     input(form, "text", "full-name", "Full Name"),
     input(form, "password", "password", "Password"),
-    input(form, "password", "password-confirm", "Password Confirmation"),
+    input(form, "password", "password-confirm", "Confirmation"),
     input(form, "email", "email", "Email"),
   ])
 }

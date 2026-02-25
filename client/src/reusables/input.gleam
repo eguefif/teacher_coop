@@ -1,3 +1,4 @@
+import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 import shared/form.{type Form}
@@ -8,5 +9,17 @@ pub fn input(
   name name: String,
   label label: String,
 ) -> Element(msg) {
-  html.div([], [html.label([], [html.text(label), html.text(" :")])])
+  let styles = [
+    #("display", "flex"),
+    #("flex-direction", "row"),
+    #("justify-content", "space-between"),
+    #("gap", "12px"),
+  ]
+
+  html.div([attribute.styles(styles)], [
+    html.label([], [
+      html.text(label),
+    ]),
+    html.input([]),
+  ])
 }
