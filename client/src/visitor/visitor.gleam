@@ -1,6 +1,5 @@
-//import formal/form
+import formal/form.{type Form}
 import gleam/http/response.{type Response}
-import gleam/regexp
 import gleam/string
 import lustre
 import lustre/attribute
@@ -10,8 +9,7 @@ import lustre/element/html
 import lustre/event
 import reusables/input.{input}
 import rsvp
-import shared/form.{type Form, SignUpData}
-import shared/user.{type User, UserForm}
+import shared/user.{type User}
 
 pub fn register() -> Result(Nil, lustre.Error) {
   let component = lustre.component(init, update, view, [])
@@ -23,15 +21,28 @@ pub fn element() -> Element(msg) {
 }
 
 type Model {
-  VisitorData(Form)
+  VisitorSignup(Form(SignupForm))
+  VisitorLogin(Form(LoginForm))
   Visitor(search: String)
+  User(String)
 }
 
+type SignupForm {
+  SignupForm(fullname: String, password: String, email: String)
+}
+
+type LoginForm {
+  LoginForm(email: String, password: String)
+}
+
+// TODO: normalize use of Visitor and User
+// We should only used User all the time but make the difference between
+// logged in user and visitor user
 pub type Msg {
   ServerCreatedAccount(Result(Response(String), rsvp.Error))
-  UserTypedFullName(String)
-  UserTypedEmail(String)
-  UserTypedPassword(String)
+  UserClickedOnSignup
+  UserClickedOnLogin
+  UserClickedOnHome
   VisitorCreatedAccount
 }
 
@@ -39,100 +50,50 @@ fn init(_args) -> #(Model, Effect(Msg)) {
   #(Visitor(""), effect.none())
 }
 
-// TODO: use gleam form
-// TODO: css does not work input function does not work
-// TODO: Test error handling
+// UPDATE -------------------------------------------------------------------------------------
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
+    UserClickedOnHome -> #(Visitor(""), effect.none())
+    UserClickedOnLogin -> #(VisitorLogin(new_login_form()), effect.none())
+    UserClickedOnSignup -> #(VisitorSignup(new_signup_form()), effect.none())
     ServerCreatedAccount(Ok(_)) -> #(model, effect.none())
     ServerCreatedAccount(Error(_)) -> #(model, effect.none())
-    UserTypedFullName(text) -> {
-      let assert VisitorData(signup_data) = model
-      case string.length(text) < 50 {
-        True -> #(
-          VisitorData(
-            SignUpData(..signup_data, full_name: text, name_error: ""),
-          ),
-          effect.none(),
-        )
-        False -> #(
-          VisitorData(
-            SignUpData(
-              ..signup_data,
-              full_name: text,
-              name_error: "Full name must be less than 50",
-            ),
-          ),
-          effect.none(),
-        )
-      }
-    }
-    UserTypedPassword(text) -> {
-      let assert VisitorData(signup_data) = model
-      case is_valid_password(text) {
-        True -> #(
-          VisitorData(
-            SignUpData(..signup_data, password: text, password_error: ""),
-          ),
-          effect.none(),
-        )
-        False -> #(
-          VisitorData(
-            SignUpData(
-              ..signup_data,
-              password: text,
-              password_error: "Passord must be 6 characters long and contain a symbol",
-            ),
-          ),
-          effect.none(),
-        )
-      }
-    }
-    UserTypedEmail(text) -> {
-      let assert VisitorData(signup_data) = model
-      case is_valid_email(text) {
-        True -> #(
-          VisitorData(SignUpData(..signup_data, email: text, email_error: "")),
-          effect.none(),
-        )
-        False -> #(
-          VisitorData(
-            SignUpData(
-              ..signup_data,
-              email: text,
-              email_error: "Email should contain a @ and a full domain name",
-            ),
-          ),
-          effect.none(),
-        )
-      }
-    }
-    VisitorCreatedAccount -> {
-      case model {
-        VisitorData(SignUpData(
-          full_name:,
-          email:,
-          password:,
-          name_error: "",
-          email_error: "",
-          password_error: "",
-        )) -> #(model, create_user(UserForm(full_name:, email:, password:)))
-        _ -> #(model, effect.none())
-      }
-    }
+    VisitorCreatedAccount -> #(model, effect.none())
   }
 }
 
-fn is_valid_password(password: String) -> Bool {
-  let has_length = string.length(password) >= 6
-  let assert Ok(symbol_re) = regexp.from_string("[^a-zA-Z0-9]")
-  let has_symbol = regexp.check(symbol_re, password)
-  has_length && has_symbol
+fn new_login_form() -> Form(LoginForm) {
+  let check_password = fn(password) {
+    case string.length(password) >= 3 {
+      True -> Ok(password)
+      False -> Error("Password's length must be greater than 3")
+    }
+  }
+  form.new({
+    use email <- form.field("email", { form.parse_email })
+    use password <- form.field("password", {
+      form.parse_string |> form.check(check_password)
+    })
+    form.success(LoginForm(email:, password:))
+  })
 }
 
-fn is_valid_email(email: String) -> Bool {
-  let assert Ok(email_re) = regexp.from_string("^[^@]+@[^@]+\\.[^@]+$")
-  regexp.check(email_re, email)
+fn new_signup_form() -> Form(SignupForm) {
+  let check_password = fn(password) {
+    case string.length(password) >= 3 {
+      True -> Ok(password)
+      False -> Error("Password's length must be greater than 3")
+    }
+    // TODO: Add regexp to check password, must have at least one non alphabetic
+  }
+  form.new({
+    use fullname <- form.field("fullname", { form.parse_string })
+    use email <- form.field("email", { form.parse_email })
+    use password <- form.field("password", {
+      form.parse_string |> form.check(check_password)
+    })
+    form.success(SignupForm(fullname:, email:, password:))
+  })
 }
 
 fn create_user(user: User) -> Effect(Msg) {
@@ -140,6 +101,8 @@ fn create_user(user: User) -> Effect(Msg) {
   let url = "/api/signup"
   rsvp.post(url, body, rsvp.expect_ok_response(ServerCreatedAccount))
 }
+
+// VIEW ---------------------------------------------------------------------------------------
 
 fn view(model: Model) -> Element(Msg) {
   let styles = [
@@ -155,8 +118,22 @@ fn view(model: Model) -> Element(Msg) {
     header_view(model),
     case model {
       Visitor(_) -> search_view(model)
-      VisitorData(_) -> signup_form_view(model)
+      VisitorSignup(signup_form) -> signup_form_view(signup_form)
+      VisitorLogin(login_form) -> login_form_view(login_form)
+      User(user) ->
+        html.div([attribute.style("margin", "auto")], [
+          html.text("Welcome" <> user),
+        ])
     },
+  ])
+}
+
+fn login_form_view(login_form: Form(LoginForm)) -> Element(Msg) {
+  html.div([], [
+    html.h1([], [html.text("Login")]),
+    input(login_form, "email", "login_email", "Login"),
+    input(login_form, "password", "login_password", "Password"),
+    html.a([], [html.text("Login")]),
   ])
 }
 
@@ -174,7 +151,11 @@ fn header_view(model: Model) -> Element(Msg) {
   ]
 
   html.div([attribute.styles(styles)], [
-    html.h2([], [html.text("Teacher Coop")]),
+    html.h2([], [
+      html.a([event.on_click(UserClickedOnHome)], [
+        html.text("Teacher Coop"),
+      ]),
+    ]),
     header_button(model),
   ])
 }
@@ -187,8 +168,9 @@ fn header_button(_model: Model) -> Element(Msg) {
     #("gap", "20px"),
   ]
   html.div([attribute.styles(styles)], [
-    html.a([], [html.text("Signup")]),
-    html.a([], [html.text("Login")]),
+    html.a([event.on_click(UserClickedOnHome)], [html.text("Search")]),
+    html.a([event.on_click(UserClickedOnSignup)], [html.text("Signup")]),
+    html.a([event.on_click(UserClickedOnLogin)], [html.text("Login")]),
   ])
 }
 
@@ -212,7 +194,7 @@ fn search_view(_model: Model) {
   ])
 }
 
-fn signup_form_view(model: Model) -> Element(Msg) {
+fn signup_form_view(signup_form: Form(SignupForm)) -> Element(Msg) {
   let styles = [
     #("margin", "0 auto"),
     #("display", "flex"),
@@ -225,7 +207,7 @@ fn signup_form_view(model: Model) -> Element(Msg) {
     html.h1([], [
       html.text("Signup"),
     ]),
-    signup_form_view(model),
+    signup_inputs_view(signup_form),
     html.div([], [
       html.button([event.on_click(VisitorCreatedAccount)], [
         html.text("Create Account"),
@@ -234,17 +216,16 @@ fn signup_form_view(model: Model) -> Element(Msg) {
   ])
 }
 
-fn signup_inputs_view(model: Model) -> Element(Msg) {
-  let assert VisitorData(form) = model
+fn signup_inputs_view(signup_form: Form(SignupForm)) -> Element(Msg) {
   let styles = [
     #("display", "flex"),
     #("flex-direction", "column"),
     #("gap", "8px"),
   ]
   html.div([attribute.styles(styles)], [
-    input(form, "text", "full-name", "Full Name"),
-    input(form, "password", "password", "Password"),
-    input(form, "password", "password-confirm", "Confirmation"),
-    input(form, "email", "email", "Email"),
+    input(signup_form, "text", "fullname", "Full Name"),
+    input(signup_form, "password", "password", "Password"),
+    input(signup_form, "password", "confirm", "Confirmation"),
+    input(signup_form, "email", "email", "Email"),
   ])
 }
