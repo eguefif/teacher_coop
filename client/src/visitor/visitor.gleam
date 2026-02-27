@@ -7,6 +7,7 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+import reusables/button.{button}
 import reusables/input.{input}
 import rsvp
 import shared/user.{type User}
@@ -208,11 +209,7 @@ fn signup_form_view(signup_form: Form(SignupForm)) -> Element(Msg) {
       html.text("Signup"),
     ]),
     signup_inputs_view(signup_form),
-    html.div([], [
-      html.button([event.on_click(VisitorCreatedAccount)], [
-        html.text("Create Account"),
-      ]),
-    ]),
+    html.div([], [button(VisitorCreatedAccount, "Create")]),
   ])
 }
 
