@@ -1,0 +1,34 @@
+{
+  "nav": {
+    "brand": "Teacher Coop",
+    "search": "Rechercher",
+    "signup": "S'inscrire",
+    "login": "Se connecter"
+  },
+  "search": {
+    "placeholder": "Rechercher..."
+  },
+  "signup": {
+    "title": "Inscription",
+    "fullname": "Nom complet",
+    "password": "Mot de passe",
+    "confirm": "Confirmation",
+    "email": "Email",
+    "submit": "Créer"
+  },
+  "login": {
+    "title": "Connexion",
+    "email": "Identifiant",
+    "password": "Mot de passe",
+    "submit": "Se connecter"
+  },
+  "user": {
+    "welcome": "Bienvenue {name} !"
+  },
+  "validation": {
+    "password": {
+      "too_short": "Le mot de passe doit contenir au moins 3 caractères",
+      "no_special_char": "Le mot de passe doit contenir au moins un caractère non alphabétique"
+    }
+  }
+}

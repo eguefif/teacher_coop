@@ -2,9 +2,11 @@ import formal/form.{type Form}
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
+import lustre/event
 
 pub fn input(
   form: Form(form),
+  event event: fn(String) -> msg,
   is type_: String,
   name name: String,
   label label: String,
@@ -20,6 +22,11 @@ pub fn input(
     html.label([attribute.for(name)], [
       html.text(label),
     ]),
-    html.input([attribute.type_(type_), attribute.id(name)]),
+    html.input([
+      // Is the problem because I nested Msg type like Msg(SignupMSG(String)) ?
+      event.on_input(event),
+      attribute.type_(type_),
+      attribute.id(name),
+    ]),
   ])
 }
