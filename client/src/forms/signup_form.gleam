@@ -1,14 +1,11 @@
 import formal/form.{type Form}
 import g18n
-import gleam/http/response.{type Response}
 import gleam/io
 import gleam/string
-import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
-import lustre/event
 import reusables/button.{button}
 import reusables/input.{input}
 import rsvp

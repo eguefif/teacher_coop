@@ -5,7 +5,7 @@ import lustre/element/html
 import lustre/event
 
 pub fn input(
-  form: Form(form),
+  _form: Form(form),
   event event: fn(String) -> msg,
   is type_: String,
   name name: String,

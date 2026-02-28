@@ -1,25 +1,26 @@
 import formal/form.{type Form}
+import forms/login
 import forms/signup_form
 import g18n
 import gleam/result
 import gleam/uri.{type Uri}
+import header
 import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
-import lustre/event
 import modem
-import reusables/input.{input}
+import search
 import shared/translations.{fr_translator}
 
 // TODO: finish create account logic
-// - [ ] Localisation
+// - [x] Localisation
 // - [ ] Do validation on_input
 // - [ ] Do validation on_submit
 // - [ ] Change the submit logic from button to form
 // - [ ] Use http call to create user
-// - [ ] Effect on page browser route push
+// - [x] Effect on page browser route push
 // - [ ] Authentication with backend and cookie session
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -30,18 +31,15 @@ pub fn main() -> Nil {
 }
 
 // Model ---------------------------------------------------------------------------------------
+
 type Model {
   Visitor(
     signup_form: Form(signup_form.SignupForm),
-    login_form: Form(LoginForm),
+    login_form: Form(login.LoginForm),
     search: String,
     route: Route,
     translator: g18n.Translator,
   )
-}
-
-type LoginForm {
-  LoginForm(email: String, password: String)
 }
 
 type Route {
@@ -68,13 +66,12 @@ fn init(_) -> #(Model, Effect(Msg)) {
         _ -> Search
       }
     }
-  let signup_form = signup_form.init()
   #(
     Visitor(
-      signup_form:,
+      signup_form: signup_form.init(),
       search: "",
-      login_form: new_login_form(),
-      route: Search,
+      login_form: login.init(),
+      route:,
       translator: fr_translator(),
     ),
     modem.init(on_url_change),
@@ -90,14 +87,7 @@ fn on_url_change(uri: Uri) -> Msg {
   }
 }
 
-fn new_login_form() -> Form(LoginForm) {
-  form.new({
-    use email <- form.field("email", { form.parse_email })
-    use password <- form.field("password", { form.parse_string })
-
-    form.success(LoginForm(email:, password:))
-  })
-}
+// Update ---------------------------------------------------------------------------------------
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
@@ -116,6 +106,8 @@ fn update_route(model: Model, route: Route) -> #(Model, Effect(Msg)) {
   #(Visitor(..model, route:), effect.none())
 }
 
+// View ---------------------------------------------------------------------------------------
+
 fn view(model: Model) -> Element(Msg) {
   let styles = [
     #("max-width", "100%"),
@@ -127,9 +119,9 @@ fn view(model: Model) -> Element(Msg) {
   ]
 
   html.div([attribute.styles(styles)], [
-    header_view(model),
+    header.view(model.translator),
     case model.route {
-      Search -> search_view(model)
+      Search -> search.view(model.translator)
       Signup ->
         signup_form.signup_view(
           model.signup_form,
@@ -137,83 +129,7 @@ fn view(model: Model) -> Element(Msg) {
           fn(signup_msg) { VisitorEditSignupForm(signup_msg) },
           VisitorSubmitedSignupForm,
         )
-      Login -> login_form_view(model)
+      Login -> login.view(model.translator)
     },
-  ])
-}
-
-fn login_form_view(model: Model) -> Element(Msg) {
-  html.div([], [
-    html.h1([], [html.text(g18n.translate(model.translator, "login.title"))]),
-    // TODO: Add event in input
-    //input(model.login_form, "email", "login_email", "Login"),
-    //input(model.login_form, "password", "login_password", "Password"),
-    html.a([], [html.text(g18n.translate(model.translator, "login.submit"))]),
-  ])
-}
-
-fn header_view(model: Model) -> Element(Msg) {
-  let styles = [
-    #("background", "var(--color-surface)"),
-    #("display", "flex"),
-    #("flex-direction", "row"),
-    #("justify-content", "space-between"),
-    #("align-items", "center"),
-    #("width", "840px"),
-    #("border-radius", "40px"),
-    #("margin", "16px auto"),
-    #("padding", "12px 24px"),
-  ]
-
-  html.div([attribute.styles(styles)], [
-    html.h2([], [
-      html.a([attribute.href("/")], [
-        html.text(g18n.translate(model.translator, "nav.brand")),
-      ]),
-    ]),
-    header_button(model),
-  ])
-}
-
-fn header_button(model: Model) -> Element(Msg) {
-  let styles = [
-    #("background", "var(--color-surface)"),
-    #("display", "flex"),
-    #("flex-direction", "row"),
-    #("gap", "20px"),
-  ]
-  html.div([attribute.styles(styles)], [
-    html.a([attribute.href("/")], [
-      html.text(g18n.translate(model.translator, "nav.search")),
-    ]),
-    html.a([attribute.href("/signup")], [
-      html.text(g18n.translate(model.translator, "nav.signup")),
-    ]),
-    html.a([attribute.href("/login")], [
-      html.text(g18n.translate(model.translator, "nav.login")),
-    ]),
-  ])
-}
-
-fn search_view(model: Model) {
-  let wrapper_styles = [#("max-width", "840px"), #("margin", "16px auto")]
-  let input_styles = [
-    #("width", "100%"),
-    #("padding", "16px 24px"),
-    #("font-size", "1.1rem"),
-    #("border", "2px solid var(--color-surface)"),
-    #("border-radius", "16px"),
-    #("outline", "none"),
-    #("box-sizing", "border-box"),
-  ]
-
-  html.div([attribute.styles(wrapper_styles)], [
-    html.input([
-      attribute.styles(input_styles),
-      attribute.placeholder(g18n.translate(
-        model.translator,
-        "search.placeholder",
-      )),
-    ]),
   ])
 }
