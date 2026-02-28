@@ -24,11 +24,15 @@ pub type SignupForm {
     error_email: String,
     error_password: String,
     error_confirmation: String,
+    valid_fullname: Bool,
+    valid_email: Bool,
+    valid_password: Bool,
+    valid_confirmation: Bool,
   )
 }
 
 pub fn init() -> SignupForm {
-  SignupForm("", "", "", "", "", "", "", "")
+  SignupForm("", "", "", "", "", "", "", "", False, False, False, False)
 }
 
 // Update ---------------------------------------------------------------------------------------
@@ -40,6 +44,10 @@ pub type Msg {
   VisitorUpdateEmail(String)
   VisitorUpdatePassword(String)
   VisitorUpdateConfirmation(String)
+  VisitorFinishUpdatedFullname
+  VisitorFinishUpdatedEmail
+  VisitorFinishUpdatedPassword
+  VisitorFinishUpdatedConfirmation
 }
 
 pub fn signup_update(
@@ -51,31 +59,61 @@ pub fn signup_update(
     VisitorSubmitedSignupForm -> #(signup_form, handle_create_user(signup_form))
 
     // Input Validation on_input
-    VisitorUpdateFullname(fullname) ->
-      validate_fullname(translator, signup_form, fullname)
-    VisitorUpdateEmail(email) -> validate_email(translator, signup_form, email)
-    VisitorUpdatePassword(password) ->
-      validate_password(translator, signup_form, password)
+    VisitorUpdateFullname(fullname) -> update_fullname(signup_form, fullname)
+    VisitorUpdateEmail(email) -> update_email(signup_form, email)
+    VisitorUpdatePassword(password) -> update_password(signup_form, password)
     VisitorUpdateConfirmation(confirmation) ->
-      validate_confirmation(translator, signup_form, confirmation)
+      update_confirmation(signup_form, confirmation)
+    VisitorFinishUpdatedFullname -> validate_fullname(translator, signup_form)
+    VisitorFinishUpdatedEmail -> validate_email(translator, signup_form)
+    VisitorFinishUpdatedPassword -> validate_password(translator, signup_form)
+    VisitorFinishUpdatedConfirmation ->
+      validate_confirmation(translator, signup_form)
   }
+}
+
+fn update_email(
+  signup_form: SignupForm,
+  email: String,
+) -> #(SignupForm, Effect(msg)) {
+  #(SignupForm(..signup_form, email:, error_email: ""), effect.none())
+}
+
+fn update_confirmation(
+  signup_form: SignupForm,
+  confirmation: String,
+) -> #(SignupForm, Effect(msg)) {
+  #(SignupForm(..signup_form, confirmation:, error_email: ""), effect.none())
+}
+
+fn update_password(
+  signup_form: SignupForm,
+  password: String,
+) -> #(SignupForm, Effect(msg)) {
+  #(SignupForm(..signup_form, password:, error_email: ""), effect.none())
+}
+
+fn update_fullname(
+  signup_form: SignupForm,
+  fullname: String,
+) -> #(SignupForm, Effect(msg)) {
+  #(SignupForm(..signup_form, fullname:, error_email: ""), effect.none())
 }
 
 fn validate_fullname(
   translator: g18n.Translator,
   signup_form: SignupForm,
-  fullname: String,
 ) -> #(SignupForm, Effect(msg)) {
-  case string.length(fullname) > 3 {
+  case string.length(signup_form.fullname) > 3 {
     True -> #(
-      SignupForm(..signup_form, fullname:, error_fullname: ""),
+      SignupForm(..signup_form, error_fullname: "", valid_fullname: True),
       effect.none(),
     )
     False -> #(
       SignupForm(
         ..signup_form,
-        fullname: fullname,
         error_fullname: g18n.translate(translator, "signup.error_fullname"),
+        valid_fullname: False,
       ),
       effect.none(),
     )
@@ -85,16 +123,18 @@ fn validate_fullname(
 fn validate_email(
   translator: g18n.Translator,
   signup_form: SignupForm,
-  email: String,
 ) -> #(SignupForm, Effect(msg)) {
   let assert Ok(re) = regexp.from_string("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
-  case regexp.check(re, email) {
-    True -> #(SignupForm(..signup_form, email:, error_email: ""), effect.none())
+  case regexp.check(re, signup_form.email) {
+    True -> #(
+      SignupForm(..signup_form, error_email: "", valid_email: True),
+      effect.none(),
+    )
     False -> #(
       SignupForm(
         ..signup_form,
-        email:,
         error_email: g18n.translate(translator, "signup.error_email"),
+        valid_email: False,
       ),
       effect.none(),
     )
@@ -104,19 +144,21 @@ fn validate_email(
 fn validate_password(
   translator: g18n.Translator,
   signup_form: SignupForm,
-  password: String,
 ) -> #(SignupForm, Effect(msg)) {
   let assert Ok(re) = regexp.from_string("[^a-zA-Z0-9]")
-  case string.length(password) > 3 && regexp.check(re, password) {
+  case
+    string.length(signup_form.password) > 3
+    && regexp.check(re, signup_form.password)
+  {
     True -> #(
-      SignupForm(..signup_form, password:, error_password: ""),
+      SignupForm(..signup_form, error_password: "", valid_password: True),
       effect.none(),
     )
     False -> #(
       SignupForm(
         ..signup_form,
-        password:,
         error_password: g18n.translate(translator, "signup.error_password"),
+        valid_password: False,
       ),
       effect.none(),
     )
@@ -126,21 +168,24 @@ fn validate_password(
 fn validate_confirmation(
   translator: g18n.Translator,
   signup_form: SignupForm,
-  confirmation: String,
 ) -> #(SignupForm, Effect(msg)) {
-  case confirmation == signup_form.password {
+  case signup_form.confirmation == signup_form.password {
     True -> #(
-      SignupForm(..signup_form, confirmation:, error_confirmation: ""),
+      SignupForm(
+        ..signup_form,
+        error_confirmation: "",
+        valid_confirmation: True,
+      ),
       effect.none(),
     )
     False -> #(
       SignupForm(
         ..signup_form,
-        confirmation:,
         error_confirmation: g18n.translate(
           translator,
           "signup.error_confirmation",
         ),
+        valid_confirmation: False,
       ),
       effect.none(),
     )
@@ -194,7 +239,9 @@ pub fn view(
       input(
         signup_form.fullname,
         signup_form.error_fullname,
+        signup_form.valid_fullname,
         fn(s) { visitor_edit_signup_form(VisitorUpdateFullname(s)) },
+        visitor_edit_signup_form(VisitorFinishUpdatedFullname),
         "text",
         "fullname",
         g18n.translate(translator, "signup.fullname"),
@@ -202,7 +249,9 @@ pub fn view(
       input(
         signup_form.password,
         signup_form.error_password,
+        signup_form.valid_password,
         fn(s) { visitor_edit_signup_form(VisitorUpdatePassword(s)) },
+        visitor_edit_signup_form(VisitorFinishUpdatedPassword),
         "password",
         "password",
         g18n.translate(translator, "signup.password"),
@@ -210,7 +259,9 @@ pub fn view(
       input(
         signup_form.confirmation,
         signup_form.error_confirmation,
+        signup_form.valid_confirmation,
         fn(s) { visitor_edit_signup_form(VisitorUpdateConfirmation(s)) },
+        visitor_edit_signup_form(VisitorFinishUpdatedConfirmation),
         "password",
         "confirm",
         g18n.translate(translator, "signup.confirm"),
@@ -218,7 +269,9 @@ pub fn view(
       input(
         signup_form.email,
         signup_form.error_email,
+        signup_form.valid_email,
         fn(s) { visitor_edit_signup_form(VisitorUpdateEmail(s)) },
+        visitor_edit_signup_form(VisitorFinishUpdatedEmail),
         "email",
         "email",
         g18n.translate(translator, "signup.email"),
