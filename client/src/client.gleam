@@ -1,12 +1,15 @@
 import formal/form.{type Form}
 import forms/signup_form
 import g18n
+import gleam/result
+import gleam/uri.{type Uri}
 import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+import modem
 import reusables/input.{input}
 import shared/translations.{fr_translator}
 
@@ -48,14 +51,23 @@ type Route {
 }
 
 type Msg {
-  VisitorClickedOnSignup
+  OnRouteChange(Route)
   VisitorEditSignupForm(signup_form.Msg)
   VisitorSubmitedSignupForm
-  VisitorClickedOnHome
-  VisitorClickedOnLogin
 }
 
 fn init(_) -> #(Model, Effect(Msg)) {
+  let route =
+    modem.initial_uri()
+    |> result.map(fn(u) { uri.path_segments(u.path) })
+    |> fn(path) {
+      case path {
+        Ok(["search"]) -> Search
+        Ok(["login"]) -> Login
+        Ok(["signup"]) -> Search
+        _ -> Search
+      }
+    }
   let signup_form = signup_form.init()
   #(
     Visitor(
@@ -65,8 +77,17 @@ fn init(_) -> #(Model, Effect(Msg)) {
       route: Search,
       translator: fr_translator(),
     ),
-    effect.none(),
+    modem.init(on_url_change),
   )
+}
+
+fn on_url_change(uri: Uri) -> Msg {
+  case uri.path_segments(uri.path) {
+    ["search"] -> OnRouteChange(Search)
+    ["login"] -> OnRouteChange(Login)
+    ["signup"] -> OnRouteChange(Signup)
+    _ -> OnRouteChange(Search)
+  }
 }
 
 fn new_login_form() -> Form(LoginForm) {
@@ -80,7 +101,7 @@ fn new_login_form() -> Form(LoginForm) {
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
-    VisitorClickedOnSignup -> update_route(model, Signup)
+    OnRouteChange(route) -> update_route(model, route)
     VisitorSubmitedSignupForm ->
       signup_form.signup_update(
         model,
@@ -88,8 +109,6 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       )
     VisitorEditSignupForm(signup_msg) ->
       signup_form.signup_update(model, signup_msg)
-    VisitorClickedOnHome -> update_route(model, Search)
-    VisitorClickedOnLogin -> update_route(model, Login)
   }
 }
 
@@ -148,7 +167,7 @@ fn header_view(model: Model) -> Element(Msg) {
 
   html.div([attribute.styles(styles)], [
     html.h2([], [
-      html.a([event.on_click(VisitorClickedOnHome)], [
+      html.a([attribute.href("/")], [
         html.text(g18n.translate(model.translator, "nav.brand")),
       ]),
     ]),
@@ -164,13 +183,13 @@ fn header_button(model: Model) -> Element(Msg) {
     #("gap", "20px"),
   ]
   html.div([attribute.styles(styles)], [
-    html.a([event.on_click(VisitorClickedOnHome)], [
+    html.a([attribute.href("/")], [
       html.text(g18n.translate(model.translator, "nav.search")),
     ]),
-    html.a([event.on_click(VisitorClickedOnSignup)], [
+    html.a([attribute.href("/signup")], [
       html.text(g18n.translate(model.translator, "nav.signup")),
     ]),
-    html.a([event.on_click(VisitorClickedOnLogin)], [
+    html.a([attribute.href("/login")], [
       html.text(g18n.translate(model.translator, "nav.login")),
     ]),
   ])
@@ -191,9 +210,10 @@ fn search_view(model: Model) {
   html.div([attribute.styles(wrapper_styles)], [
     html.input([
       attribute.styles(input_styles),
-      attribute.placeholder(
-        g18n.translate(model.translator, "search.placeholder") <> "...",
-      ),
+      attribute.placeholder(g18n.translate(
+        model.translator,
+        "search.placeholder",
+      )),
     ]),
   ])
 }
