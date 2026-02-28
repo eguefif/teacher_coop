@@ -10,6 +10,14 @@ import lustre/event
 import reusables/input.{input}
 import shared/translations.{fr_translator}
 
+// TODO: finish create account logic
+// - [ ] Localisation
+// - [ ] Do validation on_input
+// - [ ] Do validation on_submit
+// - [ ] Change the submit logic from button to form
+// - [ ] Use http call to create user
+// - [ ] Effect on page browser route push
+// - [ ] Authentication with backend and cookie session
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
 
@@ -106,20 +114,22 @@ fn view(model: Model) -> Element(Msg) {
       Signup ->
         signup_form.signup_view(
           model.signup_form,
+          model.translator,
           fn(signup_msg) { VisitorEditSignupForm(signup_msg) },
           VisitorSubmitedSignupForm,
         )
-      Login -> login_form_view(model.login_form)
+      Login -> login_form_view(model)
     },
   ])
 }
 
-fn login_form_view(_login_form: Form(LoginForm)) -> Element(Msg) {
+fn login_form_view(model: Model) -> Element(Msg) {
   html.div([], [
-    html.h1([], [html.text("Login")]),
-    //input(login_form, "email", "login_email", "Login"),
-    //input(login_form, "password", "login_password", "Password"),
-    html.a([], [html.text("Login")]),
+    html.h1([], [html.text(g18n.translate(model.translator, "login.title"))]),
+    // TODO: Add event in input
+    //input(model.login_form, "email", "login_email", "Login"),
+    //input(model.login_form, "password", "login_password", "Password"),
+    html.a([], [html.text(g18n.translate(model.translator, "login.submit"))]),
   ])
 }
 
@@ -139,14 +149,14 @@ fn header_view(model: Model) -> Element(Msg) {
   html.div([attribute.styles(styles)], [
     html.h2([], [
       html.a([event.on_click(VisitorClickedOnHome)], [
-        html.text("Teacher Coop"),
+        html.text(g18n.translate(model.translator, "nav.brand")),
       ]),
     ]),
     header_button(model),
   ])
 }
 
-fn header_button(_model: Model) -> Element(Msg) {
+fn header_button(model: Model) -> Element(Msg) {
   let styles = [
     #("background", "var(--color-surface)"),
     #("display", "flex"),
@@ -154,13 +164,19 @@ fn header_button(_model: Model) -> Element(Msg) {
     #("gap", "20px"),
   ]
   html.div([attribute.styles(styles)], [
-    html.a([event.on_click(VisitorClickedOnHome)], [html.text("Search")]),
-    html.a([event.on_click(VisitorClickedOnSignup)], [html.text("Signup")]),
-    html.a([event.on_click(VisitorClickedOnLogin)], [html.text("Login")]),
+    html.a([event.on_click(VisitorClickedOnHome)], [
+      html.text(g18n.translate(model.translator, "nav.search")),
+    ]),
+    html.a([event.on_click(VisitorClickedOnSignup)], [
+      html.text(g18n.translate(model.translator, "nav.signup")),
+    ]),
+    html.a([event.on_click(VisitorClickedOnLogin)], [
+      html.text(g18n.translate(model.translator, "nav.login")),
+    ]),
   ])
 }
 
-fn search_view(_model: Model) {
+fn search_view(model: Model) {
   let wrapper_styles = [#("max-width", "840px"), #("margin", "16px auto")]
   let input_styles = [
     #("width", "100%"),
@@ -175,7 +191,9 @@ fn search_view(_model: Model) {
   html.div([attribute.styles(wrapper_styles)], [
     html.input([
       attribute.styles(input_styles),
-      attribute.placeholder("Search..."),
+      attribute.placeholder(
+        g18n.translate(model.translator, "search.placeholder") <> "...",
+      ),
     ]),
   ])
 }

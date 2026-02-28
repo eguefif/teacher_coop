@@ -1,4 +1,5 @@
 import formal/form.{type Form}
+import g18n
 import gleam/http/response.{type Response}
 import gleam/io
 import gleam/string
@@ -94,6 +95,7 @@ fn create_user(user: User) -> Effect(msg) {
 
 pub fn signup_view(
   signup_form: Form(SignupForm),
+  translator: g18n.Translator,
   visitor_edit_signup_form: fn(Msg) -> msg,
   visitor_submited_signup_form: msg,
 ) -> Element(msg) {
@@ -113,7 +115,7 @@ pub fn signup_view(
 
   html.div([attribute.styles(styles)], [
     html.h1([], [
-      html.text("Signup"),
+      html.text(g18n.translate(translator, "signup.title")),
     ]),
     html.div([attribute.styles(inputs_div_styles)], [
       input(
@@ -121,30 +123,33 @@ pub fn signup_view(
         fn(s) { visitor_edit_signup_form(VisitorUpdateFullname(s)) },
         "text",
         "fullname",
-        "Full Name",
+        g18n.translate(translator, "signup.fullname"),
       ),
       input(
         signup_form,
         fn(s) { visitor_edit_signup_form(VisitorUpdatePassword(s)) },
         "password",
         "password",
-        "Password",
+        g18n.translate(translator, "signup.password"),
       ),
       input(
         signup_form,
         fn(s) { visitor_edit_signup_form(VisitorUpdateConfirmation(s)) },
         "password",
         "confirm",
-        "Confirmation",
+        g18n.translate(translator, "signup.confirm"),
       ),
       input(
         signup_form,
         fn(s) { visitor_edit_signup_form(VisitorUpdateEmail(s)) },
         "email",
         "email",
-        "Email",
+        g18n.translate(translator, "signup.email"),
       ),
     ]),
-    button(visitor_submited_signup_form, "Create"),
+    button(
+      visitor_submited_signup_form,
+      g18n.translate(translator, "signup.submit"),
+    ),
   ])
 }
