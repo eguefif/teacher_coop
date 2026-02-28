@@ -4,7 +4,6 @@ import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 
-// TODO: Improve styling, the form is not centered with the button
 pub fn input(
   text: String,
   error: String,
@@ -16,29 +15,26 @@ pub fn input(
   label label: String,
 ) -> Element(msg) {
   let wrapper_styles = [
+    #("position", "relative"),
     #("display", "flex"),
+    #("max-width", "300px"),
     #("flex-direction", "column"),
     #("gap", "4px"),
+    #("padding-bottom", "2.5rem"),
   ]
-  let #(input_style, message_element) = case is_valid, string.length(error) > 0 {
-    _, True -> #(
-      "input-error",
-      html.p([attribute.class("input-error-message visible")], [
-        html.text(error),
-      ]),
-    )
-    True, False -> #(
-      "input-valid",
-      html.p([attribute.class("input-valid-message visible")], []),
-    )
-    False, False -> #("", html.p([], []))
+  let has_error = string.length(error) > 0
+  let input_class = case is_valid, has_error {
+    _, True -> "input-error"
+    True, False -> "input-valid"
+    False, False -> ""
   }
 
   let row_styles = [
+    #("position", "relative"),
     #("display", "flex"),
+    #("width", "100%"),
     #("flex-direction", "row"),
     #("align-items", "center"),
-    #("gap", "12px"),
   ]
 
   html.div([attribute.styles(wrapper_styles)], [
@@ -52,9 +48,26 @@ pub fn input(
         attribute.type_(type_),
         attribute.id(name),
         attribute.value(text),
-        attribute.class(input_style),
+        attribute.class(input_class),
       ]),
-      message_element,
+      html.p(
+        [
+          attribute.class(case is_valid {
+            True -> "input-valid-message visible"
+            False -> "input-valid-message"
+          }),
+        ],
+        [],
+      ),
     ]),
+    html.div(
+      [
+        attribute.class(case has_error {
+          True -> "input-error-message visible"
+          False -> "input-error-message"
+        }),
+      ],
+      [html.text(error)],
+    ),
   ])
 }

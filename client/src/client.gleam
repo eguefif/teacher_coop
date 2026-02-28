@@ -16,7 +16,7 @@ import shared/translations.{fr_translator}
 
 // TODO: finish create account logic
 // - [x] Localisation
-// - [ ] Do validation on_input
+// - [x] Do validation on_input
 // - [ ] Do validation on_submit
 // - [ ] Change the submit logic from button to form
 // - [ ] Use http call to create user
@@ -56,7 +56,7 @@ fn init(_) -> #(Model, Effect(Msg)) {
       case path {
         Ok(["search"]) -> Search
         Ok(["login"]) -> Login
-        Ok(["signup"]) -> Search
+        Ok(["signup"]) -> Signup
         _ -> Search
       }
     }

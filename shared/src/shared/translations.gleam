@@ -19,12 +19,8 @@ pub fn fr_translations() -> g18n.Translations {
     "Les mots de passe ne correspondent pas.",
   )
   |> g18n.add_translation(
-    "signup.error_email_at",
-    "Votre adresse couriel ne contient pas de @.",
-  )
-  |> g18n.add_translation(
-    "signup.error_email_domain",
-    "Le nom de domaine de votre adresse couriel ne contient pas de point.",
+    "signup.error_email",
+    "Votre adresse couriel est invalide.",
   )
   |> g18n.add_translation(
     "signup.error_fullname",

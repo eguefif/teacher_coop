@@ -94,12 +94,14 @@ textarea.input-error:focus {
 }
 
 .input-error-message {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   font-size: 0.8rem;
   margin: 0;
   visibility: hidden;
   color: var(--color-danger);
-  width: 250px;
-  flex-shrink: 0;
 }
 
 .input-error-message.visible {
@@ -107,16 +109,18 @@ textarea.input-error:focus {
 }
 
 .input-error-message.visible::before {
-  content: "✕ ";
+  content: "x ";
 }
 
 .input-valid-message {
+  position: absolute;
+  right: -1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 0.8rem;
   margin: 0;
   visibility: hidden;
   color: var(--color-success);
-  width: 250px;
-  flex-shrink: 0;
 }
 
 .input-valid-message.visible {
