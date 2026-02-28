@@ -71,6 +71,17 @@ textarea::placeholder {
   color: var(--color-text-muted);
 }
 
+input.input-error,
+textarea.input-error {
+  border-color: var(--color-danger);
+}
+
+input.input-error:focus,
+textarea.input-error:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(232, 95, 79, 0.3);
+}
+
 input:disabled,
 textarea:disabled {
   background-color: var(--color-bg);

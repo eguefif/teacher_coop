@@ -14,6 +14,26 @@ pub fn fr_translations() -> g18n.Translations {
   |> g18n.add_translation("search.placeholder", "Rechercher...")
   |> g18n.add_translation("signup.confirm", "Confirmation")
   |> g18n.add_translation("signup.email", "Email")
+  |> g18n.add_translation(
+    "signup.error_confirmation",
+    "Les mots de passe ne correspondent pas.",
+  )
+  |> g18n.add_translation(
+    "signup.error_email_at",
+    "Votre adresse couriel ne contient pas de @.",
+  )
+  |> g18n.add_translation(
+    "signup.error_email_domain",
+    "Le nom de domaine de votre adresse couriel ne contient pas de point.",
+  )
+  |> g18n.add_translation(
+    "signup.error_fullname",
+    "Votre nom complet doit contenir au moins 3 charactères.",
+  )
+  |> g18n.add_translation(
+    "signup.error_password",
+    "Votre mot de passe doit contenir au moins 3 charactères et un chifre/symbole.",
+  )
   |> g18n.add_translation("signup.fullname", "Nom complet")
   |> g18n.add_translation("signup.password", "Mot de passe")
   |> g18n.add_translation("signup.submit", "Créer")
@@ -51,6 +71,16 @@ pub fn en_translations() -> g18n.Translations {
   |> g18n.add_translation("search.placeholder", "Search...")
   |> g18n.add_translation("signup.confirm", "Confirmation")
   |> g18n.add_translation("signup.email", "Email")
+  |> g18n.add_translation("signup.error_confirmation", "Passwords do not match")
+  |> g18n.add_translation("signup.error_email", "Your email address is invalid")
+  |> g18n.add_translation(
+    "signup.error_fullname",
+    "Your full name must contain at least 3 characters.",
+  )
+  |> g18n.add_translation(
+    "signup.error_password",
+    "Your password must contain at least 3 characters and one digit/symbol",
+  )
   |> g18n.add_translation("signup.fullname", "Full Name")
   |> g18n.add_translation("signup.password", "Password")
   |> g18n.add_translation("signup.submit", "Create")

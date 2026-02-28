@@ -14,7 +14,12 @@
     "password": "Mot de passe",
     "confirm": "Confirmation",
     "email": "Email",
-    "submit": "Créer"
+    "submit": "Créer",
+    "error_fullname": "Votre nom complet doit contenir au moins 3 charactères.",
+    "error_password": "Votre mot de passe doit contenir au moins 3 charactères et un chifre/symbole.",
+    "error_confirmation": "Les mots de passe ne correspondent pas.",
+    "error_email_at": "Votre adresse couriel ne contient pas de @.",
+    "error_email_domain": "Le nom de domaine de votre adresse couriel ne contient pas de point."
   },
   "login": {
     "title": "Connexion",

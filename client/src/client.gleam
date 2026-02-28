@@ -34,7 +34,7 @@ pub fn main() -> Nil {
 
 type Model {
   Visitor(
-    signup_form: Form(signup_form.SignupForm),
+    signup_form: signup_form.SignupForm,
     login_form: Form(login.LoginForm),
     search: String,
     route: Route,
@@ -46,12 +46,6 @@ type Route {
   Signup
   Login
   Search
-}
-
-type Msg {
-  OnRouteChange(Route)
-  VisitorEditSignupForm(signup_form.Msg)
-  VisitorSubmitedSignupForm
 }
 
 fn init(_) -> #(Model, Effect(Msg)) {
@@ -89,17 +83,28 @@ fn on_url_change(uri: Uri) -> Msg {
 
 // Update ---------------------------------------------------------------------------------------
 
+type Msg {
+  OnRouteChange(Route)
+  VisitorEditSignupForm(signup_form.Msg)
+  VisitorSubmitedSignupForm
+}
+
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
     OnRouteChange(route) -> update_route(model, route)
     VisitorSubmitedSignupForm ->
-      signup_form.signup_update(
-        model,
-        signup_form.VisitorCreatedAccount(model.signup_form),
-      )
-    VisitorEditSignupForm(signup_msg) ->
-      signup_form.signup_update(model, signup_msg)
+      update_signup(model, signup_form.VisitorSubmitedSignupForm)
+    VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
   }
+}
+
+fn update_signup(
+  model: Model,
+  signup_msg: signup_form.Msg,
+) -> #(Model, Effect(Msg)) {
+  let #(signup_form, effect) =
+    signup_form.signup_update(model.translator, model.signup_form, signup_msg)
+  #(Visitor(..model, signup_form:), effect)
 }
 
 fn update_route(model: Model, route: Route) -> #(Model, Effect(Msg)) {
@@ -123,7 +128,7 @@ fn view(model: Model) -> Element(Msg) {
     case model.route {
       Search -> search.view(model.translator)
       Signup ->
-        signup_form.signup_view(
+        signup_form.view(
           model.signup_form,
           model.translator,
           fn(signup_msg) { VisitorEditSignupForm(signup_msg) },

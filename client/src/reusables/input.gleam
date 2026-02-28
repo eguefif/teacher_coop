@@ -1,11 +1,12 @@
-import formal/form.{type Form}
+import gleam/string
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 
 pub fn input(
-  _form: Form(form),
+  text: String,
+  error: String,
   event event: fn(String) -> msg,
   is type_: String,
   name name: String,
@@ -27,6 +28,15 @@ pub fn input(
       event.on_input(event),
       attribute.type_(type_),
       attribute.id(name),
+      attribute.value(text),
+      attribute.class(case string.length(error) > 0 {
+        True -> "input-error"
+        False -> ""
+      }),
     ]),
+    case string.length(error) > 0 {
+      True -> html.text(error)
+      False -> html.text("")
+    },
   ])
 }

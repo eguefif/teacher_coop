@@ -1,6 +1,7 @@
-import formal/form.{type Form}
 import g18n
 import gleam/io
+import gleam/list
+import gleam/regexp
 import gleam/string
 import lustre/attribute
 import lustre/effect.{type Effect}
@@ -11,72 +12,147 @@ import reusables/input.{input}
 import rsvp
 import shared/user.{type User, UserForm}
 
+// Model ---------------------------------------------------------------------------------------
+
 pub type SignupForm {
-  SignupForm(fullname: String, email: String, password: String)
+  SignupForm(
+    fullname: String,
+    email: String,
+    password: String,
+    confirmation: String,
+    error_fullname: String,
+    error_email: String,
+    error_password: String,
+    error_confirmation: String,
+  )
 }
 
+pub fn init() -> SignupForm {
+  SignupForm("", "", "", "", "", "", "", "")
+}
+
+// Update ---------------------------------------------------------------------------------------
+
 pub type Msg {
-  VisitorCreatedAccount(Form(SignupForm))
+  VisitorSubmitedSignupForm
+
   VisitorUpdateFullname(String)
   VisitorUpdateEmail(String)
   VisitorUpdatePassword(String)
   VisitorUpdateConfirmation(String)
 }
 
-pub fn signup_update(model: model, msg: Msg) -> #(model, Effect(msg)) {
+pub fn signup_update(
+  translator: g18n.Translator,
+  signup_form: SignupForm,
+  msg: Msg,
+) -> #(SignupForm, Effect(msg)) {
   case msg {
-    VisitorCreatedAccount(form) -> #(model, handle_create_user(form))
-    VisitorUpdateFullname(fullname) -> validate_fullname(model, fullname)
-    VisitorUpdateEmail(email) -> validate_email(model, email)
-    VisitorUpdatePassword(password) -> validate_password(model, password)
+    VisitorSubmitedSignupForm -> #(signup_form, handle_create_user(signup_form))
+
+    // Input Validation on_input
+    VisitorUpdateFullname(fullname) ->
+      validate_fullname(translator, signup_form, fullname)
+    VisitorUpdateEmail(email) -> validate_email(translator, signup_form, email)
+    VisitorUpdatePassword(password) ->
+      validate_password(translator, signup_form, password)
     VisitorUpdateConfirmation(confirmation) ->
-      validate_confirmation(model, confirmation)
+      validate_confirmation(translator, signup_form, confirmation)
+  }
+}
+
+fn validate_fullname(
+  translator: g18n.Translator,
+  signup_form: SignupForm,
+  fullname: String,
+) -> #(SignupForm, Effect(msg)) {
+  case string.length(fullname) > 3 {
+    True -> #(
+      SignupForm(..signup_form, fullname:, error_fullname: ""),
+      effect.none(),
+    )
+    False -> #(
+      SignupForm(
+        ..signup_form,
+        fullname: fullname,
+        error_fullname: g18n.translate(translator, "signup.error_fullname"),
+      ),
+      effect.none(),
+    )
+  }
+}
+
+fn validate_email(
+  translator: g18n.Translator,
+  signup_form: SignupForm,
+  email: String,
+) -> #(SignupForm, Effect(msg)) {
+  let assert Ok(re) = regexp.from_string("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
+  case regexp.check(re, email) {
+    True -> #(SignupForm(..signup_form, email:, error_email: ""), effect.none())
+    False -> #(
+      SignupForm(
+        ..signup_form,
+        email:,
+        error_email: g18n.translate(translator, "signup.error_email"),
+      ),
+      effect.none(),
+    )
+  }
+}
+
+fn validate_password(
+  translator: g18n.Translator,
+  signup_form: SignupForm,
+  password: String,
+) -> #(SignupForm, Effect(msg)) {
+  let assert Ok(re) = regexp.from_string("[^a-zA-Z0-9]")
+  case string.length(password) > 3 && regexp.check(re, password) {
+    True -> #(
+      SignupForm(..signup_form, password:, error_password: ""),
+      effect.none(),
+    )
+    False -> #(
+      SignupForm(
+        ..signup_form,
+        password:,
+        error_password: g18n.translate(translator, "signup.error_password"),
+      ),
+      effect.none(),
+    )
   }
 }
 
 fn validate_confirmation(
-  model: model,
+  translator: g18n.Translator,
+  signup_form: SignupForm,
   confirmation: String,
-) -> #(model, Effect(msg)) {
-  todo
-}
-
-fn validate_password(model: model, password: String) -> #(model, Effect(msg)) {
-  todo
-}
-
-fn validate_email(model: model, email: String) -> #(model, Effect(msg)) {
-  todo
-}
-
-fn validate_fullname(model: model, fullname: String) -> #(model, Effect(msg)) {
-  todo
-}
-
-pub fn init() -> Form(SignupForm) {
-  let check_password = fn(password) {
-    case string.length(password) >= 3 {
-      True -> Ok(password)
-      False -> Error("Password's length must be greater than 3")
-    }
-    // TODO: Add regexp to check password, must have at least one non alphabetic
+) -> #(SignupForm, Effect(msg)) {
+  case confirmation == signup_form.password {
+    True -> #(
+      SignupForm(..signup_form, confirmation:, error_confirmation: ""),
+      effect.none(),
+    )
+    False -> #(
+      SignupForm(
+        ..signup_form,
+        confirmation:,
+        error_confirmation: g18n.translate(
+          translator,
+          "signup.error_confirmation",
+        ),
+      ),
+      effect.none(),
+    )
   }
-  form.new({
-    use fullname <- form.field("fullname", { form.parse_string })
-    use email <- form.field("email", { form.parse_email })
-    use password <- form.field("password", {
-      form.parse_string |> form.check(check_password)
-    })
-    form.success(SignupForm(fullname:, email:, password:))
-  })
 }
 
-fn handle_create_user(_form: Form(SignupForm)) -> Effect(msg) {
+fn handle_create_user(form: SignupForm) -> Effect(msg) {
   // Run the form validation and handle return in case
   create_user(UserForm(
-    full_name: "Emmanuel",
-    email: "eguefif@gmail.com",
-    password: "password",
+    full_name: form.fullname,
+    email: form.email,
+    password: form.password,
   ))
 }
 
@@ -90,8 +166,8 @@ fn create_user(user: User) -> Effect(msg) {
 
 // VIEW ---------------------------------------------------------------------------------------
 
-pub fn signup_view(
-  signup_form: Form(SignupForm),
+pub fn view(
+  signup_form: SignupForm,
   translator: g18n.Translator,
   visitor_edit_signup_form: fn(Msg) -> msg,
   visitor_submited_signup_form: msg,
@@ -116,28 +192,32 @@ pub fn signup_view(
     ]),
     html.div([attribute.styles(inputs_div_styles)], [
       input(
-        signup_form,
+        signup_form.fullname,
+        signup_form.error_fullname,
         fn(s) { visitor_edit_signup_form(VisitorUpdateFullname(s)) },
         "text",
         "fullname",
         g18n.translate(translator, "signup.fullname"),
       ),
       input(
-        signup_form,
+        signup_form.password,
+        signup_form.error_password,
         fn(s) { visitor_edit_signup_form(VisitorUpdatePassword(s)) },
         "password",
         "password",
         g18n.translate(translator, "signup.password"),
       ),
       input(
-        signup_form,
+        signup_form.confirmation,
+        signup_form.error_confirmation,
         fn(s) { visitor_edit_signup_form(VisitorUpdateConfirmation(s)) },
         "password",
         "confirm",
         g18n.translate(translator, "signup.confirm"),
       ),
       input(
-        signup_form,
+        signup_form.email,
+        signup_form.error_email,
         fn(s) { visitor_edit_signup_form(VisitorUpdateEmail(s)) },
         "email",
         "email",
