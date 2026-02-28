@@ -1,4 +1,5 @@
 import g18n
+import gleam/http/response
 import gleam/io
 import gleam/list
 import gleam/regexp
@@ -38,6 +39,7 @@ pub fn init() -> SignupForm {
 // Update ---------------------------------------------------------------------------------------
 
 pub type Msg {
+  ServerCreatedAccount(Result(response.Response(String), rsvp.Error))
   VisitorSubmitedSignupForm
 
   VisitorUpdateFullname(String)
@@ -54,9 +56,9 @@ pub fn signup_update(
   translator: g18n.Translator,
   signup_form: SignupForm,
   msg: Msg,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   case msg {
-    VisitorSubmitedSignupForm -> #(signup_form, handle_create_user(signup_form))
+    VisitorSubmitedSignupForm -> handle_create_user(signup_form)
 
     // Input Validation on_input
     VisitorUpdateFullname(fullname) -> update_fullname(signup_form, fullname)
@@ -69,41 +71,43 @@ pub fn signup_update(
     VisitorFinishUpdatedPassword -> validate_password(translator, signup_form)
     VisitorFinishUpdatedConfirmation ->
       validate_confirmation(translator, signup_form)
+
+    ServerCreatedAccount(_) -> #(signup_form, effect.none())
   }
 }
 
 fn update_email(
   signup_form: SignupForm,
   email: String,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   #(SignupForm(..signup_form, email:, error_email: ""), effect.none())
 }
 
 fn update_confirmation(
   signup_form: SignupForm,
   confirmation: String,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   #(SignupForm(..signup_form, confirmation:, error_email: ""), effect.none())
 }
 
 fn update_password(
   signup_form: SignupForm,
   password: String,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   #(SignupForm(..signup_form, password:, error_email: ""), effect.none())
 }
 
 fn update_fullname(
   signup_form: SignupForm,
   fullname: String,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   #(SignupForm(..signup_form, fullname:, error_email: ""), effect.none())
 }
 
 fn validate_fullname(
   translator: g18n.Translator,
   signup_form: SignupForm,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   case string.length(signup_form.fullname) > 3 {
     True -> #(
       SignupForm(..signup_form, error_fullname: "", valid_fullname: True),
@@ -123,7 +127,7 @@ fn validate_fullname(
 fn validate_email(
   translator: g18n.Translator,
   signup_form: SignupForm,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   let assert Ok(re) = regexp.from_string("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
   case regexp.check(re, signup_form.email) {
     True -> #(
@@ -144,7 +148,7 @@ fn validate_email(
 fn validate_password(
   translator: g18n.Translator,
   signup_form: SignupForm,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   let assert Ok(re) = regexp.from_string("[^a-zA-Z0-9]")
   case
     string.length(signup_form.password) > 3
@@ -168,7 +172,7 @@ fn validate_password(
 fn validate_confirmation(
   translator: g18n.Translator,
   signup_form: SignupForm,
-) -> #(SignupForm, Effect(msg)) {
+) -> #(SignupForm, Effect(Msg)) {
   case signup_form.confirmation == signup_form.password {
     True -> #(
       SignupForm(
@@ -192,21 +196,31 @@ fn validate_confirmation(
   }
 }
 
-fn handle_create_user(form: SignupForm) -> Effect(msg) {
+fn handle_create_user(form: SignupForm) -> #(SignupForm, Effect(Msg)) {
   // Run the form validation and handle return in case
-  create_user(UserForm(
-    full_name: form.fullname,
-    email: form.email,
-    password: form.password,
-  ))
+  case
+    form.valid_fullname
+    && form.valid_email
+    && form.valid_password
+    && form.valid_confirmation
+  {
+    True -> #(
+      form,
+      create_user(UserForm(
+        full_name: form.fullname,
+        email: form.email,
+        password: form.password,
+      )),
+    )
+    False -> #(form, effect.none())
+  }
 }
 
-fn create_user(user: User) -> Effect(msg) {
-  let _body = user.user_form_to_json(user)
+fn create_user(user: User) -> Effect(Msg) {
+  let body = user.user_form_to_json(user)
   let url = "/api/signup"
   io.println(url <> ": Creating user")
-  effect.none()
-  // rsvp.post(url, body, rsvp.expect_ok_response(ServerCreatedAccount))
+  rsvp.post(url, body, rsvp.expect_ok_response(ServerCreatedAccount))
 }
 
 // VIEW ---------------------------------------------------------------------------------------

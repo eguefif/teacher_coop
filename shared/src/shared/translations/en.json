@@ -18,7 +18,9 @@
     "error_fullname": "Your full name must contain at least 3 characters.",
     "error_password": "Your password must contain at least 3 characters and one digit/symbol",
     "error_confirmation": "Passwords do not match",
-    "error_email": "Your email address is invalid"
+    "error_email": "Your email address is invalid",
+    "account_created": "Your account has been successfully created",
+    "error_account_created": "An error occurred while creating your account."
   },
   "login": {
     "title": "Login",

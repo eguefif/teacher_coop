@@ -18,7 +18,9 @@
     "error_fullname": "Votre nom complet doit contenir au moins 3 charactères.",
     "error_password": "Votre mot de passe doit contenir au moins 3 charactères et un chifre/symbole.",
     "error_confirmation": "Les mots de passe ne correspondent pas.",
-    "error_email": "Votre adresse couriel est invalide."
+    "error_email": "Votre adresse couriel est invalide.",
+    "account_created": "Votre compte a bien été créé",
+    "error_account_created": "Une erreur a eu lieu lors de la création de votre compte."
   },
   "login": {
     "title": "Connexion",

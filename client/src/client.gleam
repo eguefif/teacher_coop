@@ -4,6 +4,9 @@ import forms/signup_form
 import g18n
 import gleam/result
 import gleam/uri.{type Uri}
+import grille_pain
+import grille_pain/lustre/toast
+import grille_pain/toast/level
 import header
 import lustre
 import lustre/attribute
@@ -17,12 +20,14 @@ import shared/translations.{fr_translator}
 // TODO: finish create account logic
 // - [x] Localisation
 // - [x] Do validation on_input
-// - [ ] Do validation on_submit
-// - [ ] Change the submit logic from button to form
-// - [ ] Use http call to create user
+// - [x] Do validation on_submit
+// - [x] Add toaster to confirm user creation
 // - [x] Effect on page browser route push
+// - [ ] Use http call to create user: return error
+// - [ ] Change the submit logic from button to form
 // - [ ] Authentication with backend and cookie session
 pub fn main() -> Nil {
+  let assert Ok(_) = grille_pain.simple()
   let app = lustre.application(init, update, view)
 
   let assert Ok(_) = lustre.start(app, "#app", Nil)
@@ -92,6 +97,17 @@ type Msg {
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
     OnRouteChange(route) -> update_route(model, route)
+    VisitorEditSignupForm(signup_form.ServerCreatedAccount(Ok(_))) -> {
+      toast.success(g18n.translate(model.translator, "signup.account_created"))
+      update_route(model, Search)
+    }
+    VisitorEditSignupForm(signup_form.ServerCreatedAccount(Error(_))) -> {
+      toast.error(g18n.translate(
+        model.translator,
+        "signup.error_account_created",
+      ))
+      update_route(model, Search)
+    }
     VisitorSubmitedSignupForm ->
       update_signup(model, signup_form.VisitorSubmitedSignupForm)
     VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
@@ -104,7 +120,7 @@ fn update_signup(
 ) -> #(Model, Effect(Msg)) {
   let #(signup_form, effect) =
     signup_form.signup_update(model.translator, model.signup_form, signup_msg)
-  #(Visitor(..model, signup_form:), effect)
+  #(Visitor(..model, signup_form:), effect.map(effect, VisitorEditSignupForm))
 }
 
 fn update_route(model: Model, route: Route) -> #(Model, Effect(Msg)) {
