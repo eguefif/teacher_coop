@@ -114,7 +114,6 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     VisitorSubmitedSignupForm ->
       update_signup(model, signup_form.VisitorSubmitedSignupForm)
     VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
-    VisitorEditLoginForm(login_msg) -> update_login(model, login_msg)
     VisitorSubmitedLoginForm ->
       update_login(model, login.VisitorSubmitedLoginForm)
   }

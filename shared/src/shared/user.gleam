@@ -11,6 +11,7 @@ pub type User {
     password: String,
     confirmed: Bool,
   )
+  User(id: Int, fullname: String, email: String)
 }
 
 pub fn user_form_decoder() -> decode.Decoder(User) {

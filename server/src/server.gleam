@@ -1,12 +1,18 @@
 import envoy
 import gleam/erlang/process
+import gleam/float
 import gleam/http.{Post}
+import gleam/time/timestamp
 import mist
 import pog
-import server/session_controller.{handle_request_login}
+import server/session.{type CurrentSession, CurrentSession}
+import server/session_controller.{handle_request_login, try_get_session}
 import server/user_controller.{handle_request_user}
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
+import youid/uuid
+
+// TODO: Create session on successfull signup
 
 pub fn main() -> Nil {
   wisp.configure_logger()
@@ -22,18 +28,36 @@ pub fn main() -> Nil {
   process.sleep_forever()
 }
 
-fn app_middleware(req: Request, next: fn(Request) -> Response) -> Response {
+fn app_middleware(
+  db: pog.Connection,
+  req: Request,
+  next: fn(#(Request, CurrentSession)) -> Response,
+) -> Response {
   let req = wisp.method_override(req)
   use <- wisp.log_request(req)
   use <- wisp.rescue_crashes
   use req <- wisp.handle_head(req)
+  let session = try_get_session(db, req)
 
-  next(req)
+  let response = next(#(req, session))
+  case session {
+    CurrentSession(id, expiration, _) ->
+      response
+      |> wisp.set_cookie(
+        req,
+        "sessionId",
+        uuid.to_string(id),
+        wisp.Signed,
+        float.round(timestamp.to_unix_seconds(expiration)),
+      )
+    _ -> response
+  }
 }
 
 fn handle_request(db: pog.Connection, req: Request) -> Response {
-  use req <- app_middleware(req)
+  use #(req, _session) <- app_middleware(db, req)
 
+  // TODO: Refactor, have one route for signup and login
   case req.method, wisp.path_segments(req) {
     Post, ["signup"] -> handle_request_user(db, req)
     Post, ["login"] -> handle_request_login(db, req)

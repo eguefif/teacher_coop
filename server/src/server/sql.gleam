@@ -7,6 +7,7 @@
 import gleam/dynamic/decode
 import gleam/time/timestamp.{type Timestamp}
 import pog
+import youid/uuid.{type Uuid}
 
 /// A row you get from running the `create_session` query
 /// defined in `./src/server/sql/create_session.sql`.
@@ -16,7 +17,7 @@ import pog
 ///
 pub type CreateSessionRow {
   CreateSessionRow(
-    id: Int,
+    id: Uuid,
     user_id: Int,
     created_at: Timestamp,
     expiration_at: Timestamp,
@@ -35,7 +36,7 @@ pub fn create_session(
   arg_2: Timestamp,
 ) -> Result(pog.Returned(CreateSessionRow), pog.QueryError) {
   let decoder = {
-    use id <- decode.field(0, decode.int)
+    use id <- decode.field(0, uuid_decoder())
     use user_id <- decode.field(1, decode.int)
     use created_at <- decode.field(2, pog.timestamp_decoder())
     use expiration_at <- decode.field(3, pog.timestamp_decoder())
@@ -129,7 +130,7 @@ WHERE email = $1;
 ///
 pub type GetSessionByUserIdRow {
   GetSessionByUserIdRow(
-    id: Int,
+    id: Uuid,
     user_id: Int,
     created_at: Timestamp,
     expiration_at: Timestamp,
@@ -147,7 +148,7 @@ pub fn get_session_by_user_id(
   arg_1: Int,
 ) -> Result(pog.Returned(GetSessionByUserIdRow), pog.QueryError) {
   let decoder = {
-    use id <- decode.field(0, decode.int)
+    use id <- decode.field(0, uuid_decoder())
     use user_id <- decode.field(1, decode.int)
     use created_at <- decode.field(2, pog.timestamp_decoder())
     use expiration_at <- decode.field(3, pog.timestamp_decoder())
@@ -255,4 +256,72 @@ WHERE
   |> pog.parameter(pog.int(arg_1))
   |> pog.returning(decoder)
   |> pog.execute(db)
+}
+
+/// A row you get from running the `get_user_by_session_id` query
+/// defined in `./src/server/sql/get_user_by_session_id.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v4.6.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type GetUserBySessionIdRow {
+  GetUserBySessionIdRow(
+    expiration_at: Timestamp,
+    id: Int,
+    full_name: String,
+    email: String,
+  )
+}
+
+/// Runs the `get_user_by_session_id` query
+/// defined in `./src/server/sql/get_user_by_session_id.sql`.
+///
+/// > 🐿️ This function was generated automatically using v4.6.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn get_user_by_session_id(
+  db: pog.Connection,
+  arg_1: Uuid,
+) -> Result(pog.Returned(GetUserBySessionIdRow), pog.QueryError) {
+  let decoder = {
+    use expiration_at <- decode.field(0, pog.timestamp_decoder())
+    use id <- decode.field(1, decode.int)
+    use full_name <- decode.field(2, decode.string)
+    use email <- decode.field(3, decode.string)
+    decode.success(GetUserBySessionIdRow(
+      expiration_at:,
+      id:,
+      full_name:,
+      email:,
+    ))
+  }
+
+  "SELECT
+    sessions.expiration_at,
+    users.id,
+    users.full_name,
+    users.email
+FROM
+    sessions
+    INNER JOIN users ON users.id = sessions.user_id
+WHERE
+    sessions.id = $1;
+
+"
+  |> pog.query
+  |> pog.parameter(pog.text(uuid.to_string(arg_1)))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+// --- Encoding/decoding utils -------------------------------------------------
+
+/// A decoder to decode `Uuid`s coming from a Postgres query.
+///
+fn uuid_decoder() {
+  use bit_array <- decode.then(decode.bit_array)
+  case uuid.from_bit_array(bit_array) {
+    Ok(uuid) -> decode.success(uuid)
+    Error(_) -> decode.failure(uuid.v7(), "Uuid")
+  }
 }
