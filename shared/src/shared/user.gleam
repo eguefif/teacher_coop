@@ -5,7 +5,7 @@ pub type User {
   UserForm(full_name: String, email: String, password: String)
   UserLoginForm(email: String, password: String)
   UserDB(
-    id: String,
+    id: Int,
     full_name: String,
     email: String,
     password: String,

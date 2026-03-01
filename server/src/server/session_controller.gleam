@@ -7,7 +7,6 @@ import server/sql.{GetUserByEmailRow, get_user_by_email}
 import server/user_controller.{hash_password}
 import shared/user.{UserLoginForm, user_login_form_decoder}
 import wisp.{type Request, type Response}
-import youid/uuid
 
 pub fn handle_request_login(db: pog.Connection, req: Request) -> Response {
   case req.method, wisp.path_segments(req) {
@@ -39,7 +38,7 @@ fn check_password(
   db: pog.Connection,
   email: String,
   password_check: String,
-) -> Option(uuid.Uuid) {
+) -> Option(Int) {
   case get_user_by_email(db, email) {
     Ok(pog.Returned(_row_count, rows)) -> {
       case rows {

@@ -23,3 +23,9 @@ psql:
 
 g18n:
   cd shared && gleam run -m g18n/dev generate --nested
+
+squirrel:
+  cd server && gleam run -m squirrel
+
+migrate:
+  cd server && gleam run -m cigogne up
