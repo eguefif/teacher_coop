@@ -1,8 +1,7 @@
 import argus
 import gleam/dynamic/decode
 import gleam/http.{Post}
-import gleam/io
-import gleam/string
+import gleam/option.{type Option, None, Some}
 import pog
 import server/sql
 import shared/user.{type User, UserForm, user_form_decoder}
@@ -22,27 +21,41 @@ fn create_user(db: pog.Connection, req: Request) -> Response {
     Ok(user) -> {
       let assert UserForm(_, _, password) = user
       let user = UserForm(..user, password: hash_password(password))
-      create_user_db(db, user)
-      wisp.ok()
+      case create_user_db(db, user) {
+        Ok(_) -> wisp.ok()
+        Error(_) -> wisp.internal_server_error()
+      }
     }
     Error(_) -> wisp.unprocessable_content()
   }
 }
 
-fn hash_password(password: String) -> String {
+pub fn hash_password(password: String) -> String {
   // Safety: we want the process to crash if the hash does not work
   let assert Ok(hashes) =
     argus.hasher() |> argus.hash(password, argus.gen_salt())
   hashes.encoded_hash
 }
 
-fn create_user_db(db: pog.Connection, user: User) -> Bool {
+fn create_user_db(
+  db: pog.Connection,
+  user: User,
+) -> Result(pog.Returned(sql.CreateUserRow), pog.QueryError) {
   let assert UserForm(full_name, email, password) = user
-  case sql.create_user(db, full_name, email, password) {
-    Ok(_) -> True
-    Error(error) -> {
-      //TODO: Handle error
-      False
-    }
+  sql.create_user(db, full_name, email, password)
+}
+
+pub fn check_password(
+  db: pog.Connection,
+  email: String,
+  password_check: String,
+) -> Option(Int) {
+  let hashed_password = hash_password(password_check)
+
+  case sql.get_user_by_email(db, email) {
+    Ok(pog.Returned(_, [sql.GetUserByEmailRow(id, _, _, password)]))
+      if password == hashed_password
+    -> Some(id)
+    _ -> None
   }
 }

@@ -26,7 +26,8 @@
     "title": "Connexion",
     "email": "Identifiant",
     "password": "Mot de passe",
-    "submit": "Se connecter"
+    "submit": "Se connecter",
+    "error": "Votre mot de passe ou email est incorrect."
   },
   "user": {
     "welcome": "Bienvenue {name} !"

@@ -3,10 +3,13 @@ import gleam/erlang/process
 import gleam/http.{Post}
 import mist
 import pog
-import server/user.{handle_request_user}
+import server/auth_controller
+import server/middleware
+import server/user_controller
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
 
+// TODO: Handle session in Client
 pub fn main() -> Nil {
   wisp.configure_logger()
   let db = init_db()
@@ -21,20 +24,12 @@ pub fn main() -> Nil {
   process.sleep_forever()
 }
 
-fn app_middleware(req: Request, next: fn(Request) -> Response) -> Response {
-  let req = wisp.method_override(req)
-  use <- wisp.log_request(req)
-  use <- wisp.rescue_crashes
-  use req <- wisp.handle_head(req)
-
-  next(req)
-}
-
 fn handle_request(db: pog.Connection, req: Request) -> Response {
-  use req <- app_middleware(req)
+  use #(req, _session) <- middleware.app_middleware(db, req)
 
   case req.method, wisp.path_segments(req) {
-    Post, ["signup"] -> handle_request_user(db, req)
+    Post, ["signup"] -> user_controller.handle_request_user(db, req)
+    _, ["auth"] -> auth_controller.handle_request_login(db, req)
     _, _ -> wisp.not_found()
   }
 }

@@ -1,4 +1,3 @@
-import formal/form.{type Form}
 import forms/login
 import forms/signup_form
 import g18n
@@ -17,12 +16,6 @@ import search
 import shared/translations.{fr_translator}
 
 // TODO: finish create account logic
-// - [x] Localisation
-// - [x] Do validation on_input
-// - [x] Do validation on_submit
-// - [x] Add toaster to confirm user creation
-// - [x] Effect on page browser route push
-// - [x] Use http call to create user: return error
 // - [ ] Authentication with backend and cookie session
 pub fn main() -> Nil {
   let assert Ok(_) = grille_pain.simple()
@@ -38,7 +31,7 @@ pub fn main() -> Nil {
 type Model {
   Visitor(
     signup_form: signup_form.SignupForm,
-    login_form: Form(login.LoginForm),
+    login_form: login.LoginForm,
     search: String,
     route: Route,
     translator: g18n.Translator,
@@ -90,6 +83,8 @@ type Msg {
   OnRouteChange(Route)
   VisitorEditSignupForm(signup_form.Msg)
   VisitorSubmitedSignupForm
+  VisitorEditLoginForm(login.Msg)
+  VisitorSubmitedLoginForm
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -110,9 +105,17 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         )),
       )
     }
+    VisitorEditLoginForm(login.ServerCreatedSession(Ok(_))) -> {
+      #(update_route(model, Search), effect.none())
+    }
+    VisitorEditLoginForm(error_msg) -> {
+      update_login(model, error_msg)
+    }
     VisitorSubmitedSignupForm ->
       update_signup(model, signup_form.VisitorSubmitedSignupForm)
     VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
+    VisitorSubmitedLoginForm ->
+      update_login(model, login.VisitorSubmitedLoginForm)
   }
 }
 
@@ -123,6 +126,12 @@ fn update_signup(
   let #(signup_form, effect) =
     signup_form.signup_update(model.translator, model.signup_form, signup_msg)
   #(Visitor(..model, signup_form:), effect.map(effect, VisitorEditSignupForm))
+}
+
+fn update_login(model: Model, login_msg: login.Msg) -> #(Model, Effect(Msg)) {
+  let #(login_form, effect) =
+    login.update(model.translator, model.login_form, login_msg)
+  #(Visitor(..model, login_form:), effect.map(effect, VisitorEditLoginForm))
 }
 
 fn update_route(model: Model, route: Route) -> Model {
@@ -145,14 +154,26 @@ fn view(model: Model) -> Element(Msg) {
     header.view(model.translator),
     case model.route {
       Search -> search.view(model.translator)
-      Signup ->
-        signup_form.view(
-          model.signup_form,
-          model.translator,
-          fn(signup_msg) { VisitorEditSignupForm(signup_msg) },
-          VisitorSubmitedSignupForm,
-        )
-      Login -> login.view(model.translator)
+      Signup -> signup_view(model)
+      Login -> login_view(model)
     },
   ])
+}
+
+fn signup_view(model: Model) -> Element(Msg) {
+  signup_form.view(
+    model.signup_form,
+    model.translator,
+    fn(signup_msg) { VisitorEditSignupForm(signup_msg) },
+    VisitorSubmitedSignupForm,
+  )
+}
+
+fn login_view(model: Model) -> Element(Msg) {
+  login.view(
+    model.login_form,
+    model.translator,
+    fn(login_msg) { VisitorEditLoginForm(login_msg) },
+    VisitorSubmitedLoginForm,
+  )
 }
