@@ -4,6 +4,8 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 
 ## TODO:
 - [ ] Improve justfile and create a just db-buil
+- [ ] Handle session in frontend Client
+- [ ] Setup a staging environement to test on my homeserver
 
 ## Architecture
 
@@ -44,7 +46,7 @@ The client proxies `/api` requests to the backend (port 3000) via the Lustre dev
 docker compose up -d
 ```
 
-This starts a PostgreSQL 17 instance on port 5432 with:
+This starts a PostgreSQL 18 instance on port 5432 with:
 - **User:** `admin`
 - **Password:** `12345`
 - **Database:** `teacher_coop`
@@ -57,38 +59,3 @@ source init_env.sh
 
 This exports `DATABASE_URL=postgres://admin:12345@127.0.0.1:5432/teacher_coop`.
 
-### 3. Run migrations
-
-Migrations are managed by [Cigogne](https://hexdocs.pm/cigogne/) and live in `server/priv/migrations/`.
-
-```sh
-cd server
-gleam run -m cigogne migrate
-```
-
-### 4. Regenerate SQL query modules (if needed)
-
-[Squirrel](https://hexdocs.pm/squirrel/) generates type-safe Gleam functions from `.sql` files. Re-run this whenever you add or modify a query file:
-
-```sh
-cd server
-gleam run -m squirrel
-```
-
-### 5. Start the backend
-
-```sh
-cd server
-gleam run
-```
-
-The server listens on `http://127.0.0.1:3000`.
-
-### 6. Start the frontend
-
-```sh
-cd client
-gleam run -m lustre/dev start
-```
-
-The Lustre dev server starts with hot-reload. API requests prefixed with `/api` are proxied to the backend.
