@@ -50,19 +50,12 @@ pub fn check_password(
   email: String,
   password_check: String,
 ) -> Option(Int) {
+  let hashed_password = hash_password(password_check)
+
   case sql.get_user_by_email(db, email) {
-    Ok(pog.Returned(_row_count, rows)) -> {
-      case rows {
-        [sql.GetUserByEmailRow(id, _, _, password)] -> {
-          let hashed_password = hash_password(password_check)
-          case password == hashed_password {
-            True -> Some(id)
-            False -> None
-          }
-        }
-        _ -> None
-      }
-    }
-    Error(_) -> None
+    Ok(pog.Returned(_, [sql.GetUserByEmailRow(id, _, _, password)]))
+      if password == hashed_password
+    -> Some(id)
+    _ -> None
   }
 }

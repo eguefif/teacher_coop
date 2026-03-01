@@ -336,6 +336,34 @@ WHERE
   |> pog.execute(db)
 }
 
+/// Runs the `update_session_expiration_at_by_id` query
+/// defined in `./src/server/sql/update_session_expiration_at_by_id.sql`.
+///
+/// > 🐿️ This function was generated automatically using v4.6.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn update_session_expiration_at_by_id(
+  db: pog.Connection,
+  arg_1: Timestamp,
+  arg_2: Uuid,
+) -> Result(pog.Returned(Nil), pog.QueryError) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  "UPDATE
+    sessions
+SET
+    expiration_at = $1
+WHERE
+    id = $2;
+
+"
+  |> pog.query
+  |> pog.parameter(pog.timestamp(arg_1))
+  |> pog.parameter(pog.text(uuid.to_string(arg_2)))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
 // --- Encoding/decoding utils -------------------------------------------------
 
 /// A decoder to decode `Uuid`s coming from a Postgres query.
