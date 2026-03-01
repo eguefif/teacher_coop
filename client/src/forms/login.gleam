@@ -119,7 +119,7 @@ fn update_email(form: LoginForm, email: String) -> #(LoginForm, Effect(Msg)) {
 fn handle_login(form: LoginForm) -> #(LoginForm, Effect(Msg)) {
   let user = UserLoginForm(email: form.email, password: form.password)
   let body = user.user_login_form_to_json(user)
-  let url = "/api/login"
+  let url = "/api/session"
   io.println("Hey")
   #(form, rsvp.post(url, body, rsvp.expect_ok_response(ServerCreatedSession)))
 }

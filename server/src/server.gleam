@@ -6,8 +6,8 @@ import gleam/time/timestamp
 import mist
 import pog
 import server/session.{type CurrentSession, CurrentSession}
-import server/session_controller.{handle_request_login, try_get_session}
-import server/user_controller.{handle_request_user}
+import server/session_controller
+import server/user_controller
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
 import youid/uuid
@@ -28,6 +28,17 @@ pub fn main() -> Nil {
   process.sleep_forever()
 }
 
+fn handle_request(db: pog.Connection, req: Request) -> Response {
+  use #(req, _session) <- app_middleware(db, req)
+
+  // TODO: Refactor, have one route for signup and login
+  case req.method, wisp.path_segments(req) {
+    Post, ["signup"] -> user_controller.handle_request_user(db, req)
+    Post, ["session"] -> session_controller.handle_request_login(db, req)
+    _, _ -> wisp.not_found()
+  }
+}
+
 fn app_middleware(
   db: pog.Connection,
   req: Request,
@@ -37,9 +48,10 @@ fn app_middleware(
   use <- wisp.log_request(req)
   use <- wisp.rescue_crashes
   use req <- wisp.handle_head(req)
-  let session = try_get_session(db, req)
+  let session = session_controller.try_get_session(db, req)
 
   let response = next(#(req, session))
+
   case session {
     CurrentSession(id, expiration, _) ->
       response
@@ -51,17 +63,6 @@ fn app_middleware(
         float.round(timestamp.to_unix_seconds(expiration)),
       )
     _ -> response
-  }
-}
-
-fn handle_request(db: pog.Connection, req: Request) -> Response {
-  use #(req, _session) <- app_middleware(db, req)
-
-  // TODO: Refactor, have one route for signup and login
-  case req.method, wisp.path_segments(req) {
-    Post, ["signup"] -> handle_request_user(db, req)
-    Post, ["login"] -> handle_request_login(db, req)
-    _, _ -> wisp.not_found()
   }
 }
 

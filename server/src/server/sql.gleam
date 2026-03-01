@@ -100,6 +100,28 @@ RETURNING
   |> pog.execute(db)
 }
 
+/// Runs the `delete_session_where_id` query
+/// defined in `./src/server/sql/delete_session_where_id.sql`.
+///
+/// > 🐿️ This function was generated automatically using v4.6.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn delete_session_where_id(
+  db: pog.Connection,
+  arg_1: Uuid,
+) -> Result(pog.Returned(Nil), pog.QueryError) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  "DELETE FROM sessions
+WHERE id = $1;
+
+"
+  |> pog.query
+  |> pog.parameter(pog.text(uuid.to_string(arg_1)))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
 /// delete user by email
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
