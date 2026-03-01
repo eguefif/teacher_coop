@@ -3,7 +3,8 @@ import gleam/erlang/process
 import gleam/http.{Post}
 import mist
 import pog
-import server/user.{handle_request_user}
+import server/session_controller.{handle_request_login}
+import server/user_controller.{handle_request_user}
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
 
@@ -35,6 +36,7 @@ fn handle_request(db: pog.Connection, req: Request) -> Response {
 
   case req.method, wisp.path_segments(req) {
     Post, ["signup"] -> handle_request_user(db, req)
+    Post, ["login"] -> handle_request_login(db, req)
     _, _ -> wisp.not_found()
   }
 }
