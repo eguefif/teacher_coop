@@ -4,6 +4,10 @@ import g18n/locale
 pub fn fr_translations() -> g18n.Translations {
   g18n.new_translations()
   |> g18n.add_translation("login.email", "Identifiant")
+  |> g18n.add_translation(
+    "login.error",
+    "Votre mot de passe ou email est incorrect.",
+  )
   |> g18n.add_translation("login.password", "Mot de passe")
   |> g18n.add_translation("login.submit", "Se connecter")
   |> g18n.add_translation("login.title", "Connexion")
@@ -65,6 +69,7 @@ pub fn fr_translator() -> g18n.Translator {
 pub fn en_translations() -> g18n.Translations {
   g18n.new_translations()
   |> g18n.add_translation("login.email", "Login")
+  |> g18n.add_translation("login.error", "Your password or email is incorrect.")
   |> g18n.add_translation("login.password", "Password")
   |> g18n.add_translation("login.submit", "Login")
   |> g18n.add_translation("login.title", "Login")

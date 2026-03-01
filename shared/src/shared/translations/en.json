@@ -26,7 +26,8 @@
     "title": "Login",
     "email": "Login",
     "password": "Password",
-    "submit": "Login"
+    "submit": "Login",
+    "error": "Your password or email is incorrect."
   },
   "user": {
     "welcome": "Welcome {name}!"
