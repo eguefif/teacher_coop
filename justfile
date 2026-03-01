@@ -15,7 +15,7 @@ client:
     cd client && gleam run -m lustre/dev start
 
 # Source environment variables from init_env.sh
-env:
+init-env:
     source ./init_env.sh
 
 psql:

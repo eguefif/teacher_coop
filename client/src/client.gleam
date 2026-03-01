@@ -6,7 +6,6 @@ import gleam/result
 import gleam/uri.{type Uri}
 import grille_pain
 import grille_pain/lustre/toast
-import grille_pain/toast/level
 import header
 import lustre
 import lustre/attribute
@@ -23,8 +22,7 @@ import shared/translations.{fr_translator}
 // - [x] Do validation on_submit
 // - [x] Add toaster to confirm user creation
 // - [x] Effect on page browser route push
-// - [ ] Use http call to create user: return error
-// - [ ] Change the submit logic from button to form
+// - [x] Use http call to create user: return error
 // - [ ] Authentication with backend and cookie session
 pub fn main() -> Nil {
   let assert Ok(_) = grille_pain.simple()
@@ -96,17 +94,21 @@ type Msg {
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
-    OnRouteChange(route) -> update_route(model, route)
+    OnRouteChange(route) -> #(update_route(model, route), effect.none())
     VisitorEditSignupForm(signup_form.ServerCreatedAccount(Ok(_))) -> {
-      toast.success(g18n.translate(model.translator, "signup.account_created"))
-      update_route(model, Search)
+      #(
+        update_route(model, Search),
+        toast.success(g18n.translate(model.translator, "signup.account_created")),
+      )
     }
     VisitorEditSignupForm(signup_form.ServerCreatedAccount(Error(_))) -> {
-      toast.error(g18n.translate(
-        model.translator,
-        "signup.error_account_created",
-      ))
-      update_route(model, Search)
+      #(
+        update_route(model, Search),
+        toast.error(g18n.translate(
+          model.translator,
+          "signup.error_account_created",
+        )),
+      )
     }
     VisitorSubmitedSignupForm ->
       update_signup(model, signup_form.VisitorSubmitedSignupForm)
@@ -123,8 +125,8 @@ fn update_signup(
   #(Visitor(..model, signup_form:), effect.map(effect, VisitorEditSignupForm))
 }
 
-fn update_route(model: Model, route: Route) -> #(Model, Effect(Msg)) {
-  #(Visitor(..model, route:), effect.none())
+fn update_route(model: Model, route: Route) -> Model {
+  Visitor(..model, route:)
 }
 
 // View ---------------------------------------------------------------------------------------

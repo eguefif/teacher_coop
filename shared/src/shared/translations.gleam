@@ -12,8 +12,16 @@ pub fn fr_translations() -> g18n.Translations {
   |> g18n.add_translation("nav.search", "Rechercher")
   |> g18n.add_translation("nav.signup", "S'inscrire")
   |> g18n.add_translation("search.placeholder", "Rechercher...")
+  |> g18n.add_translation(
+    "signup.account_created",
+    "Votre compte a bien été créé",
+  )
   |> g18n.add_translation("signup.confirm", "Confirmation")
   |> g18n.add_translation("signup.email", "Email")
+  |> g18n.add_translation(
+    "signup.error_account_created",
+    "Une erreur a eu lieu lors de la création de votre compte.",
+  )
   |> g18n.add_translation(
     "signup.error_confirmation",
     "Les mots de passe ne correspondent pas.",
@@ -65,8 +73,16 @@ pub fn en_translations() -> g18n.Translations {
   |> g18n.add_translation("nav.search", "Search")
   |> g18n.add_translation("nav.signup", "Signup")
   |> g18n.add_translation("search.placeholder", "Search...")
+  |> g18n.add_translation(
+    "signup.account_created",
+    "Your account has been successfully created",
+  )
   |> g18n.add_translation("signup.confirm", "Confirmation")
   |> g18n.add_translation("signup.email", "Email")
+  |> g18n.add_translation(
+    "signup.error_account_created",
+    "An error occurred while creating your account.",
+  )
   |> g18n.add_translation("signup.error_confirmation", "Passwords do not match")
   |> g18n.add_translation("signup.error_email", "Your email address is invalid")
   |> g18n.add_translation(

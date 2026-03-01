@@ -1,7 +1,7 @@
 import g18n
 import gleam/http/response
 import gleam/io
-import gleam/list
+import gleam/option
 import gleam/regexp
 import gleam/string
 import lustre/attribute
@@ -12,6 +12,9 @@ import reusables/button.{button}
 import reusables/input.{input}
 import rsvp
 import shared/user.{type User, UserForm}
+
+// TODO:: need to have responsivness, text is not well display when reduced window
+// TODO: When correcting an input after the first time, we should validate anytime a user change
 
 // Model ---------------------------------------------------------------------------------------
 
@@ -249,51 +252,53 @@ pub fn view(
     html.h1([], [
       html.text(g18n.translate(translator, "signup.title")),
     ]),
-    html.div([attribute.styles(inputs_div_styles)], [
-      input(
-        signup_form.fullname,
-        signup_form.error_fullname,
-        signup_form.valid_fullname,
-        fn(s) { visitor_edit_signup_form(VisitorUpdateFullname(s)) },
-        visitor_edit_signup_form(VisitorFinishUpdatedFullname),
-        "text",
-        "fullname",
-        g18n.translate(translator, "signup.fullname"),
-      ),
-      input(
-        signup_form.password,
-        signup_form.error_password,
-        signup_form.valid_password,
-        fn(s) { visitor_edit_signup_form(VisitorUpdatePassword(s)) },
-        visitor_edit_signup_form(VisitorFinishUpdatedPassword),
-        "password",
-        "password",
-        g18n.translate(translator, "signup.password"),
-      ),
-      input(
-        signup_form.confirmation,
-        signup_form.error_confirmation,
-        signup_form.valid_confirmation,
-        fn(s) { visitor_edit_signup_form(VisitorUpdateConfirmation(s)) },
-        visitor_edit_signup_form(VisitorFinishUpdatedConfirmation),
-        "password",
-        "confirm",
-        g18n.translate(translator, "signup.confirm"),
-      ),
-      input(
-        signup_form.email,
-        signup_form.error_email,
-        signup_form.valid_email,
-        fn(s) { visitor_edit_signup_form(VisitorUpdateEmail(s)) },
-        visitor_edit_signup_form(VisitorFinishUpdatedEmail),
-        "email",
-        "email",
-        g18n.translate(translator, "signup.email"),
+    html.form([], [
+      html.div([attribute.styles(inputs_div_styles)], [
+        input(
+          signup_form.fullname,
+          signup_form.error_fullname,
+          signup_form.valid_fullname,
+          fn(s) { visitor_edit_signup_form(VisitorUpdateFullname(s)) },
+          visitor_edit_signup_form(VisitorFinishUpdatedFullname),
+          "text",
+          "fullname",
+          g18n.translate(translator, "signup.fullname"),
+        ),
+        input(
+          signup_form.password,
+          signup_form.error_password,
+          signup_form.valid_password,
+          fn(s) { visitor_edit_signup_form(VisitorUpdatePassword(s)) },
+          visitor_edit_signup_form(VisitorFinishUpdatedPassword),
+          "password",
+          "password",
+          g18n.translate(translator, "signup.password"),
+        ),
+        input(
+          signup_form.confirmation,
+          signup_form.error_confirmation,
+          signup_form.valid_confirmation,
+          fn(s) { visitor_edit_signup_form(VisitorUpdateConfirmation(s)) },
+          visitor_edit_signup_form(VisitorFinishUpdatedConfirmation),
+          "password",
+          "confirm",
+          g18n.translate(translator, "signup.confirm"),
+        ),
+        input(
+          signup_form.email,
+          signup_form.error_email,
+          signup_form.valid_email,
+          fn(s) { visitor_edit_signup_form(VisitorUpdateEmail(s)) },
+          visitor_edit_signup_form(VisitorFinishUpdatedEmail),
+          "email",
+          "email",
+          g18n.translate(translator, "signup.email"),
+        ),
+      ]),
+      button(
+        option.Some(visitor_submited_signup_form),
+        g18n.translate(translator, "signup.submit"),
       ),
     ]),
-    button(
-      visitor_submited_signup_form,
-      g18n.translate(translator, "signup.submit"),
-    ),
   ])
 }
