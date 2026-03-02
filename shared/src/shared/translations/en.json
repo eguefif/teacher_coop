@@ -3,7 +3,9 @@
     "brand": "Teacher Coop",
     "search": "Search",
     "signup": "Signup",
-    "login": "Login"
+    "login": "Login",
+    "logout": "Logout",
+    "workspace": "Workspace"
   },
   "search": {
     "placeholder": "Search..."
@@ -27,7 +29,8 @@
     "email": "Login",
     "password": "Password",
     "submit": "Login",
-    "error": "Your password or email is incorrect."
+    "error": "Your password or email is incorrect.",
+    "logout": "Disconnection successful"
   },
   "user": {
     "welcome": "Welcome {name}!"

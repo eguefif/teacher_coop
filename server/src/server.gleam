@@ -1,6 +1,7 @@
 import envoy
 import gleam/erlang/process
 import gleam/http.{Post}
+import gleam/string
 import mist
 import pog
 import server/auth_controller
@@ -25,11 +26,11 @@ pub fn main() -> Nil {
 }
 
 fn handle_request(db: pog.Connection, req: Request) -> Response {
-  use #(req, _session) <- middleware.app_middleware(db, req)
+  use #(req, session) <- middleware.app_middleware(db, req)
 
   case req.method, wisp.path_segments(req) {
     Post, ["signup"] -> user_controller.handle_request_user(db, req)
-    _, ["auth"] -> auth_controller.handle_request_login(db, req)
+    _, ["auth", _] -> auth_controller.handle_request_login(db, req, session)
     _, _ -> wisp.not_found()
   }
 }

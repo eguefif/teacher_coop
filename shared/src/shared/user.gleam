@@ -43,3 +43,19 @@ pub fn user_login_form_to_json(user: User) -> json.Json {
     #("password", json.string(password)),
   ])
 }
+
+pub fn user_decoder() -> decode.Decoder(User) {
+  use id <- decode.field("id", decode.int)
+  use fullname <- decode.field("fullname", decode.string)
+  use email <- decode.field("email", decode.string)
+  decode.success(User(id:, fullname:, email:))
+}
+
+pub fn user_to_json(user: User) -> json.Json {
+  let assert User(id, fullname, email) = user
+  json.object([
+    #("id", json.int(id)),
+    #("fullname", json.string(fullname)),
+    #("email", json.string(email)),
+  ])
+}

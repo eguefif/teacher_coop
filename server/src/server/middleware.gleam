@@ -1,4 +1,6 @@
 import gleam/float
+import gleam/io
+import gleam/string
 import gleam/time/timestamp
 import pog
 import server/session.{type CurrentSession, CurrentSession}
@@ -15,6 +17,7 @@ pub fn app_middleware(
   use <- wisp.rescue_crashes
   use req <- wisp.handle_head(req)
   let session = get_session(db, req)
+  io.println(string.inspect(session))
 
   let response = next(#(req, session))
   add_session_to_response(req, response, session)
@@ -27,6 +30,8 @@ fn get_session(db: pog.Connection, req: Request) -> CurrentSession {
   }
 }
 
+// TODO: when reset the cookie, need to unset the previous one
+// TODO: add a task that will cleanup session in DB
 fn add_session_to_response(
   req: Request,
   response: Response,
