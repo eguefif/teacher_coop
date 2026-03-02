@@ -3,9 +3,19 @@
 A full-stack web application written entirely in [Gleam](https://gleam.run/), structured as a monorepo with three separate packages.
 
 ## TODO:
-- [ ] Improve justfile and create a just db-buil
-- [ ] Handle session in frontend Client
+- [ ] Improve justfile and create a just db-build to reset app
+- [X] Handle session in frontend Client
 - [ ] Setup a staging environement to test on my homeserver
+- [ ] End-to-End upload and search file
+    - [ ] Add UI to upload file on user workspace
+    - [ ] Add backend to download file and register it to PG for user
+    - [ ] Rudimentary search with PG and download
+- [ ] Improve search with Meilisearch
+    - [ ] Install and Configure Meilisearch
+    - [ ] Add logic to create job for ingestion when downloading file
+    - [ ] Add a python service that will pull the DB for indexing job
+    - [ ] Add logic for search frontend
+    - [ ] Add logic for search backend
 
 ## Architecture
 
