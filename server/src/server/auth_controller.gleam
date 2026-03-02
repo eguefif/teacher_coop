@@ -1,5 +1,6 @@
 import gleam/dynamic/decode
-import gleam/http.{Delete, Post}
+import gleam/http.{Delete, Get, Post}
+import gleam/json
 import gleam/option
 import pog
 import server/session
@@ -8,10 +9,15 @@ import shared/user
 import wisp.{type Request, type Response}
 import youid/uuid
 
-pub fn handle_request_login(db: pog.Connection, req: Request) -> Response {
+pub fn handle_request_login(
+  db: pog.Connection,
+  req: Request,
+  session: session.CurrentSession,
+) -> Response {
   case req.method, wisp.path_segments(req) {
-    Post, ["login"] -> login_user(db, req)
-    Delete, ["logout"] -> session.destroy_session(db, req)
+    Post, [_, "login"] -> login_user(db, req)
+    Get, [_, "whoami"] -> whoami(session)
+    Delete, [_, "logout"] -> session.destroy_session(db, req)
     _, _ -> wisp.not_found()
   }
 }
@@ -22,10 +28,12 @@ fn login_user(db: pog.Connection, req: Request) -> Response {
     Ok(user) -> {
       let assert user.UserLoginForm(email, password) = user
       case user_controller.check_password(db, email, password) {
-        option.Some(id) -> {
-          case session.init_session(db, id) {
+        option.Some(user) -> {
+          let assert user.User(..) = user
+          case session.init_session(db, user.id) {
             Ok(id) ->
               wisp.ok()
+              |> wisp.json_body(json.to_string(user.user_to_json(user)))
               |> wisp.set_cookie(
                 req,
                 "sessionId",
@@ -40,5 +48,13 @@ fn login_user(db: pog.Connection, req: Request) -> Response {
       }
     }
     Error(_) -> wisp.unprocessable_content()
+  }
+}
+
+fn whoami(current_session: session.CurrentSession) -> Response {
+  case current_session {
+    session.CurrentSession(user: user, ..) ->
+      wisp.ok() |> wisp.json_body(json.to_string(user.user_to_json(user)))
+    session.NoSession -> wisp.response(401)
   }
 }

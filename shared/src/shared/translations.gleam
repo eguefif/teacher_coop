@@ -8,13 +8,16 @@ pub fn fr_translations() -> g18n.Translations {
     "login.error",
     "Votre mot de passe ou email est incorrect.",
   )
+  |> g18n.add_translation("login.logout", "Déconnexion réussie")
   |> g18n.add_translation("login.password", "Mot de passe")
   |> g18n.add_translation("login.submit", "Se connecter")
   |> g18n.add_translation("login.title", "Connexion")
   |> g18n.add_translation("nav.brand", "Teacher Coop")
   |> g18n.add_translation("nav.login", "Se connecter")
+  |> g18n.add_translation("nav.logout", "Se déconnecter")
   |> g18n.add_translation("nav.search", "Rechercher")
   |> g18n.add_translation("nav.signup", "S'inscrire")
+  |> g18n.add_translation("nav.workspace", "Espace de travail")
   |> g18n.add_translation("search.placeholder", "Rechercher...")
   |> g18n.add_translation(
     "signup.account_created",
@@ -70,13 +73,16 @@ pub fn en_translations() -> g18n.Translations {
   g18n.new_translations()
   |> g18n.add_translation("login.email", "Login")
   |> g18n.add_translation("login.error", "Your password or email is incorrect.")
+  |> g18n.add_translation("login.logout", "Disconnection successful")
   |> g18n.add_translation("login.password", "Password")
   |> g18n.add_translation("login.submit", "Login")
   |> g18n.add_translation("login.title", "Login")
   |> g18n.add_translation("nav.brand", "Teacher Coop")
   |> g18n.add_translation("nav.login", "Login")
+  |> g18n.add_translation("nav.logout", "Logout")
   |> g18n.add_translation("nav.search", "Search")
   |> g18n.add_translation("nav.signup", "Signup")
+  |> g18n.add_translation("nav.workspace", "Workspace")
   |> g18n.add_translation("search.placeholder", "Search...")
   |> g18n.add_translation(
     "signup.account_created",

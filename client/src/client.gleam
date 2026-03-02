@@ -1,7 +1,9 @@
 import forms/login
 import forms/signup_form
 import g18n
-import gleam/result
+import gleam/io
+import gleam/option
+import gleam/string
 import gleam/uri.{type Uri}
 import grille_pain
 import grille_pain/lustre/toast
@@ -12,11 +14,12 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import modem
+import router
 import search
 import shared/translations.{fr_translator}
+import shared/user
+import user_api
 
-// TODO: finish create account logic
-// - [ ] Authentication with backend and cookie session
 pub fn main() -> Nil {
   let assert Ok(_) = grille_pain.simple()
   let app = lustre.application(init, update, view)
@@ -33,80 +36,151 @@ type Model {
     signup_form: signup_form.SignupForm,
     login_form: login.LoginForm,
     search: String,
-    route: Route,
+    route: router.Route,
     translator: g18n.Translator,
   )
-}
-
-type Route {
-  Signup
-  Login
-  Search
+  Pending(
+    translator: g18n.Translator,
+    on_success: router.Route,
+    on_error: router.Route,
+  )
+  User(translator: g18n.Translator, user: user.User, route: router.Route)
 }
 
 fn init(_) -> #(Model, Effect(Msg)) {
-  let route =
-    modem.initial_uri()
-    |> result.map(fn(u) { uri.path_segments(u.path) })
-    |> fn(path) {
-      case path {
-        Ok(["search"]) -> Search
-        Ok(["login"]) -> Login
-        Ok(["signup"]) -> Signup
-        _ -> Search
-      }
-    }
+  let assert Ok(uri) = modem.initial_uri()
+  let route = router.from_uri(uri)
+  let protected = router.is_protected_route(route)
+  let configure_router = modem.init(on_url_change)
+
+  // We check if the user has a session id by fetching the user
+  let passively_fetch_user =
+    user_api.get(user_api.GetWhoami) |> effect.map(UserApiMsg)
+
+  let effects = effect.batch([configure_router, passively_fetch_user])
   #(
-    Visitor(
-      signup_form: signup_form.init(),
-      search: "",
-      login_form: login.init(),
-      route:,
-      translator: fr_translator(),
-    ),
-    modem.init(on_url_change),
+    case route {
+      router.Login ->
+        Pending(
+          translator: fr_translator(),
+          on_success: router.Search,
+          on_error: router.Login,
+        )
+      _ if protected ->
+        Pending(
+          translator: fr_translator(),
+          on_success: route,
+          on_error: router.Login,
+        )
+      _ ->
+        Pending(
+          translator: fr_translator(),
+          on_success: route,
+          on_error: router.Search,
+        )
+    },
+    effects,
+  )
+}
+
+fn visitor_init(route: router.Route) -> Model {
+  Visitor(
+    signup_form: signup_form.init(),
+    search: "",
+    login_form: login.init(),
+    route:,
+    translator: fr_translator(),
   )
 }
 
 fn on_url_change(uri: Uri) -> Msg {
-  case uri.path_segments(uri.path) {
-    ["search"] -> OnRouteChange(Search)
-    ["login"] -> OnRouteChange(Login)
-    ["signup"] -> OnRouteChange(Signup)
-    _ -> OnRouteChange(Search)
-  }
+  router.from_uri(uri) |> UserRequestedRoute
 }
 
 // Update ---------------------------------------------------------------------------------------
 
 type Msg {
-  OnRouteChange(Route)
+  UserRequestedRoute(router.Route)
+
   VisitorEditSignupForm(signup_form.Msg)
   VisitorSubmitedSignupForm
+
   VisitorEditLoginForm(login.Msg)
   VisitorSubmitedLoginForm
+
+  UserApiMsg(user_api.Msg)
+  HeaderMsg(header.Msg)
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+  io.println(string.inspect(msg))
+  io.println(string.inspect(model))
+  case model, msg {
+    _, UserRequestedRoute(route) -> #(update_route(model, route), effect.none())
+    Visitor(..), _ -> update_visitor(model, msg)
+    Pending(..), _ -> update_pending(model, msg)
+    User(..), _ -> update_user(model, msg)
+  }
+}
+
+fn update_user(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+  let assert User(..) = model
   case msg {
-    OnRouteChange(route) -> #(update_route(model, route), effect.none())
+    HeaderMsg(header.Logout) -> #(
+      visitor_init(router.Search),
+      user_api.logout() |> effect.map(UserApiMsg),
+    )
+    UserApiMsg(user_api.ApiLogout(_)) -> #(
+      update_route(model, router.Search),
+      toast.success(g18n.translate(model.translator, "login.logout")),
+    )
+    _ -> #(model, effect.none())
+  }
+}
+
+fn update_pending(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+  let assert Pending(..) = model
+  let assert UserApiMsg(msg) = msg
+  case msg {
+    user_api.ApiReturnedUser(Ok(user)) -> {
+      #(
+        User(translator: model.translator, route: model.on_success, user: user),
+        effect.none(),
+      )
+    }
+    user_api.ApiReturnedUser(Error(_)) -> {
+      #(visitor_init(model.on_error), effect.none())
+    }
+    _ -> panic
+  }
+}
+
+fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+  let assert Visitor(..) = model
+  case msg {
     VisitorEditSignupForm(signup_form.ServerCreatedAccount(Ok(_))) -> {
       #(
-        update_route(model, Search),
+        update_route(model, router.Search),
         toast.success(g18n.translate(model.translator, "signup.account_created")),
       )
     }
     VisitorEditSignupForm(signup_form.ServerCreatedAccount(Error(_))) -> {
       #(
-        update_route(model, Search),
+        update_route(model, router.Search),
         toast.error(g18n.translate(
           model.translator,
           "signup.error_account_created",
         )),
       )
     }
-    VisitorEditLoginForm(login.ServerCreatedSession(Ok(_))) -> {
-      #(update_route(model, Search), effect.none())
+    VisitorEditLoginForm(login.ServerCreatedSession(Ok(user))) -> {
+      #(
+        update_route(
+          User(translator: model.translator, user:, route: router.Search),
+          router.Search,
+        ),
+        effect.none(),
+      )
     }
     VisitorEditLoginForm(error_msg) -> {
       update_login(model, error_msg)
@@ -116,6 +190,8 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
     VisitorSubmitedLoginForm ->
       update_login(model, login.VisitorSubmitedLoginForm)
+    UserApiMsg(_msg) -> #(model, effect.none())
+    _ -> panic
   }
 }
 
@@ -123,24 +199,41 @@ fn update_signup(
   model: Model,
   signup_msg: signup_form.Msg,
 ) -> #(Model, Effect(Msg)) {
+  let assert Visitor(..) = model
   let #(signup_form, effect) =
     signup_form.signup_update(model.translator, model.signup_form, signup_msg)
   #(Visitor(..model, signup_form:), effect.map(effect, VisitorEditSignupForm))
 }
 
 fn update_login(model: Model, login_msg: login.Msg) -> #(Model, Effect(Msg)) {
+  let assert Visitor(..) = model
   let #(login_form, effect) =
     login.update(model.translator, model.login_form, login_msg)
   #(Visitor(..model, login_form:), effect.map(effect, VisitorEditLoginForm))
 }
 
-fn update_route(model: Model, route: Route) -> Model {
-  Visitor(..model, route:)
+fn update_route(model: Model, route: router.Route) -> Model {
+  let protected = router.is_protected_route(route)
+  case model {
+    User(..) -> User(..model, route:)
+    Pending(..) -> panic
+    Visitor(..) if protected -> Visitor(..model, route: router.Login)
+    Visitor(..) -> Visitor(..model, route:)
+  }
 }
 
 // View ---------------------------------------------------------------------------------------
 
 fn view(model: Model) -> Element(Msg) {
+  case model {
+    Pending(..) -> html.div([], [])
+    Visitor(..) -> visitor_view(model)
+    User(..) -> user_view(model)
+  }
+}
+
+fn visitor_view(model: Model) -> Element(Msg) {
+  let assert Visitor(..) = model
   let styles = [
     #("max-width", "100%"),
     #("margin", "auto 16px"),
@@ -151,16 +244,40 @@ fn view(model: Model) -> Element(Msg) {
   ]
 
   html.div([attribute.styles(styles)], [
-    header.view(model.translator),
+    header.view(model.translator, option.None, fn(msg) { HeaderMsg(msg) }),
     case model.route {
-      Search -> search.view(model.translator)
-      Signup -> signup_view(model)
-      Login -> login_view(model)
+      router.Search -> search.view(model.translator)
+      router.Signup -> signup_view(model)
+      router.Login -> login_view(model)
+    },
+  ])
+}
+
+fn user_view(model: Model) -> Element(Msg) {
+  let assert User(..) = model
+  let styles = [
+    #("max-width", "100%"),
+    #("margin", "auto 16px"),
+    #("display", "flex"),
+    #("flex-direction", "column"),
+    #("align-items", "center"),
+    #("gap", "32px"),
+  ]
+
+  html.div([attribute.styles(styles)], [
+    header.view(model.translator, option.Some(model.user), fn(msg) {
+      HeaderMsg(msg)
+    }),
+    case model.route {
+      router.Search -> search.view(model.translator)
+      router.Signup -> signup_view(model)
+      router.Login -> login_view(model)
     },
   ])
 }
 
 fn signup_view(model: Model) -> Element(Msg) {
+  let assert Visitor(..) = model
   signup_form.view(
     model.signup_form,
     model.translator,
@@ -170,6 +287,7 @@ fn signup_view(model: Model) -> Element(Msg) {
 }
 
 fn login_view(model: Model) -> Element(Msg) {
+  let assert Visitor(..) = model
   login.view(
     model.login_form,
     model.translator,

@@ -100,6 +100,26 @@ RETURNING
   |> pog.execute(db)
 }
 
+/// Runs the `delete_passed_date_session` query
+/// defined in `./src/server/sql/delete_passed_date_session.sql`.
+///
+/// > 🐿️ This function was generated automatically using v4.6.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn delete_passed_date_session(
+  db: pog.Connection,
+) -> Result(pog.Returned(Nil), pog.QueryError) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  "DELETE FROM sessions
+WHERE expiration_at < NOW();
+
+"
+  |> pog.query
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
 /// Runs the `delete_session_where_id` query
 /// defined in `./src/server/sql/delete_session_where_id.sql`.
 ///

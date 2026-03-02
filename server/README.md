@@ -10,7 +10,6 @@ gleam add server@1
 import server
 
 pub fn main() -> Nil {
-  // TODO: An example of the project in use
 }
 ```
 

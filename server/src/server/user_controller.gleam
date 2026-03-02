@@ -49,13 +49,20 @@ pub fn check_password(
   db: pog.Connection,
   email: String,
   password_check: String,
-) -> Option(Int) {
-  let hashed_password = hash_password(password_check)
-
+) -> Option(user.User) {
+  wisp.log_info("Checking password")
   case sql.get_user_by_email(db, email) {
-    Ok(pog.Returned(_, [sql.GetUserByEmailRow(id, _, _, password)]))
-      if password == hashed_password
-    -> Some(id)
+    Ok(pog.Returned(
+      _,
+      [sql.GetUserByEmailRow(id, fullname, email, hashed_password)],
+    )) ->
+      case argus.verify(hashed_password, password_check) {
+        Ok(True) -> {
+          let user = user.User(id:, fullname:, email:)
+          Some(user)
+        }
+        Ok(False) | Error(_) -> None
+      }
     _ -> None
   }
 }
