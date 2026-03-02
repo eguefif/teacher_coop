@@ -27,9 +27,11 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
     - [ ] Add logic for search frontend
     - [ ] Add logic for search backend
 - [ ] Setup a staging environement to test on my homeserver
-    -[ ] Create shipment gleam
-    -[ ] Create Docker image
+    -[X] Create Docker image
     -[ ] Use Coolify on my homeserver to monitor docker file
+    -[ ] Setup Postgres
+    -[ ] Handle migration
+    -[ ] Make app deploy works
 
 ## Architecture
 
