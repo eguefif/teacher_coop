@@ -30,8 +30,6 @@ fn get_session(db: pog.Connection, req: Request) -> CurrentSession {
   }
 }
 
-// TODO: when reset the cookie, need to unset the previous one
-// TODO: add a task that will cleanup session in DB
 fn add_session_to_response(
   req: Request,
   response: Response,

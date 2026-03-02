@@ -3,6 +3,7 @@
 //// Session are retrieved in the session middleware
 
 import gleam/float
+import gleam/io
 import gleam/order
 import gleam/result
 import gleam/time/duration
@@ -111,6 +112,7 @@ pub fn try_get_session(db: pog.Connection, session_id: String) -> CurrentSession
 }
 
 pub fn destroy_session(db: pog.Connection, req: Request) -> Response {
+  io.println("Destroying session")
   let _ = {
     use session_id <- result.try(wisp.get_cookie(req, "sessionId", wisp.Signed))
     use id <- result.try(uuid.from_string(session_id))

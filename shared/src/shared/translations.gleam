@@ -8,6 +8,7 @@ pub fn fr_translations() -> g18n.Translations {
     "login.error",
     "Votre mot de passe ou email est incorrect.",
   )
+  |> g18n.add_translation("login.logout", "Déconnexion réussie")
   |> g18n.add_translation("login.password", "Mot de passe")
   |> g18n.add_translation("login.submit", "Se connecter")
   |> g18n.add_translation("login.title", "Connexion")
@@ -72,6 +73,7 @@ pub fn en_translations() -> g18n.Translations {
   g18n.new_translations()
   |> g18n.add_translation("login.email", "Login")
   |> g18n.add_translation("login.error", "Your password or email is incorrect.")
+  |> g18n.add_translation("login.logout", "Disconnection successful")
   |> g18n.add_translation("login.password", "Password")
   |> g18n.add_translation("login.submit", "Login")
   |> g18n.add_translation("login.title", "Login")

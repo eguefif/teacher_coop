@@ -60,6 +60,12 @@ fn init(_) -> #(Model, Effect(Msg)) {
   let effects = effect.batch([configure_router, passively_fetch_user])
   #(
     case route {
+      router.Login ->
+        Pending(
+          translator: fr_translator(),
+          on_success: router.Search,
+          on_error: router.Login,
+        )
       _ if protected ->
         Pending(
           translator: fr_translator(),
@@ -103,7 +109,7 @@ type Msg {
   VisitorSubmitedLoginForm
 
   UserApiMsg(user_api.Msg)
-  UserLogout
+  HeaderMsg(header.Msg)
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -120,7 +126,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 fn update_user(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   let assert User(..) = model
   case msg {
-    UserLogout -> #(
+    HeaderMsg(header.Logout) -> #(
       visitor_init(router.Search),
       user_api.logout() |> effect.map(UserApiMsg),
     )
@@ -238,7 +244,7 @@ fn visitor_view(model: Model) -> Element(Msg) {
   ]
 
   html.div([attribute.styles(styles)], [
-    header.view(model.translator, option.None),
+    header.view(model.translator, option.None, fn(msg) { HeaderMsg(msg) }),
     case model.route {
       router.Search -> search.view(model.translator)
       router.Signup -> signup_view(model)
@@ -259,7 +265,9 @@ fn user_view(model: Model) -> Element(Msg) {
   ]
 
   html.div([attribute.styles(styles)], [
-    header.view(model.translator, option.Some(model.user)),
+    header.view(model.translator, option.Some(model.user), fn(msg) {
+      HeaderMsg(msg)
+    }),
     case model.route {
       router.Search -> search.view(model.translator)
       router.Signup -> signup_view(model)

@@ -3,11 +3,17 @@ import gleam/option
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
+import lustre/event
 import shared/user
+
+pub type Msg {
+  Logout
+}
 
 pub fn view(
   translator: g18n.Translator,
   user: option.Option(user.User),
+  msg_wrapper: fn(Msg) -> msg,
 ) -> Element(msg) {
   let styles = [
     #("background", "var(--color-surface)"),
@@ -28,7 +34,7 @@ pub fn view(
       ]),
     ]),
     case user {
-      option.Some(_) -> user_header_button(translator)
+      option.Some(_) -> user_header_button(translator, msg_wrapper)
       option.None -> header_button(translator)
     },
   ])
@@ -54,7 +60,10 @@ fn header_button(translator: g18n.Translator) -> Element(msg) {
   ])
 }
 
-fn user_header_button(translator: g18n.Translator) -> Element(msg) {
+fn user_header_button(
+  translator: g18n.Translator,
+  msg_wrapper: fn(Msg) -> msg,
+) -> Element(msg) {
   let styles = [
     #("background", "var(--color-surface)"),
     #("display", "flex"),
@@ -68,7 +77,7 @@ fn user_header_button(translator: g18n.Translator) -> Element(msg) {
     html.a([attribute.href("/workspace")], [
       html.text(g18n.translate(translator, "nav.workspace")),
     ]),
-    html.a([attribute.href("/logout")], [
+    html.a([attribute.href("/logout"), event.on_click(msg_wrapper(Logout))], [
       html.text(g18n.translate(translator, "nav.logout")),
     ]),
   ])

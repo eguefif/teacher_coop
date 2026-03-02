@@ -1,4 +1,5 @@
 import gleam/http/response
+import gleam/json
 import lustre/effect.{type Effect}
 import rsvp
 import shared/user.{user_decoder}
@@ -25,5 +26,5 @@ fn get_user() -> Effect(Msg) {
 
 pub fn logout() -> Effect(Msg) {
   let url = "/api/auth/logout"
-  rsvp.get(url, rsvp.expect_ok_response(ApiLogout))
+  rsvp.delete(url, json.string(""), rsvp.expect_ok_response(ApiLogout))
 }
