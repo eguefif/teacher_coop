@@ -19,6 +19,8 @@ import youid/uuid
 
 pub const session_ttl = 259_200
 
+pub const session_cookie_name = "session_id"
+
 pub type CurrentSession {
   CurrentSession(
     session_id: uuid.Uuid,
@@ -114,10 +116,14 @@ pub fn try_get_session(db: pog.Connection, session_id: String) -> CurrentSession
 pub fn destroy_session(db: pog.Connection, req: Request) -> Response {
   io.println("Destroying session")
   let _ = {
-    use session_id <- result.try(wisp.get_cookie(req, "sessionId", wisp.Signed))
+    use session_id <- result.try(wisp.get_cookie(
+      req,
+      session_cookie_name,
+      wisp.Signed,
+    ))
     use id <- result.try(uuid.from_string(session_id))
     sql.delete_session_where_id(db, id) |> result.map_error(fn(_) { Nil })
   }
   wisp.ok()
-  |> wisp.set_cookie(req, "sessionId", "", wisp.PlainText, 0)
+  |> wisp.set_cookie(req, session_cookie_name, "", wisp.PlainText, 0)
 }

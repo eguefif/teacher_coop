@@ -3,9 +3,19 @@
 A full-stack web application written entirely in [Gleam](https://gleam.run/), structured as a monorepo with three separate packages.
 
 ## TODO:
-- [ ] Improve justfile and create a just db-build to reset app
+- [X] Improve justfile and create a just db-build to reset app
 - [X] Handle session in frontend Client
-- [ ] Setup a staging environement to test on my homeserver
+
+### Frontend logic
+- [ ] Remove error input handling login form
+- [ ] Display message login error when failing to login
+- [ ] Use form on submit to allow for typing enter to submit: login and signup
+- [ ] Improve signup form, validation input should reset when focus (hide red and error input)
+- [ ] Should display that an email to confirm account was sent after signup
+- [ ] Add email confirmation message (wait for stable version, for now confirm should be false and enable it manually via DB)
+- [ ] Display message login to say that account is not activated
+
+### File logic
 - [ ] End-to-End upload and search file
     - [ ] Add UI to upload file on user workspace
     - [ ] Add backend to download file and register it to PG for user
@@ -16,6 +26,10 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
     - [ ] Add a python service that will pull the DB for indexing job
     - [ ] Add logic for search frontend
     - [ ] Add logic for search backend
+- [ ] Setup a staging environement to test on my homeserver
+    -[ ] Create shipment gleam
+    -[ ] Create Docker image
+    -[ ] Use Coolify on my homeserver to monitor docker file
 
 ## Architecture
 

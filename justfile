@@ -21,6 +21,9 @@ init-env:
 psql:
   psql -h 0.0.0.0 -p 5432 -Uadmin -d teacher_coop
 
+db-build:
+  cd server && gleam run -m db_build
+
 g18n:
   cd shared && gleam run -m g18n/dev generate --nested
 

@@ -24,7 +24,7 @@ pub fn app_middleware(
 }
 
 fn get_session(db: pog.Connection, req: Request) -> CurrentSession {
-  case wisp.get_cookie(req, "sessionId", wisp.Signed) {
+  case wisp.get_cookie(req, session.session_cookie_name, wisp.Signed) {
     Ok(session_id) -> session.try_get_session(db, session_id)
     Error(Nil) -> session.NoSession
   }
@@ -40,7 +40,7 @@ fn add_session_to_response(
       response
       |> wisp.set_cookie(
         req,
-        "sessionId",
+        session.session_cookie_name,
         uuid.to_string(id),
         wisp.Signed,
         expiration_time(expiration),

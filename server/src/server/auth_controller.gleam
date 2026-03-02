@@ -36,7 +36,7 @@ fn login_user(db: pog.Connection, req: Request) -> Response {
               |> wisp.json_body(json.to_string(user.user_to_json(user)))
               |> wisp.set_cookie(
                 req,
-                "sessionId",
+                session.session_cookie_name,
                 uuid.to_string(id),
                 wisp.Signed,
                 session.session_ttl,
