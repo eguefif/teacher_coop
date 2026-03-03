@@ -4,6 +4,7 @@ pub type Route {
   Signup
   Login
   Search
+  Workspace
 }
 
 pub fn from_uri(uri: uri.Uri) -> Route {
@@ -13,6 +14,7 @@ pub fn from_uri(uri: uri.Uri) -> Route {
       ["search"] -> Search
       ["login"] -> Login
       ["signup"] -> Signup
+      ["workspace"] -> Workspace
       _ -> Search
     }
   }
@@ -21,5 +23,6 @@ pub fn from_uri(uri: uri.Uri) -> Route {
 pub fn is_protected_route(route: Route) -> Bool {
   case route {
     Signup | Login | Search -> False
+    _ -> True
   }
 }

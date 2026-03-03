@@ -58,6 +58,16 @@ pub fn fr_translations() -> g18n.Translations {
     "validation.password.too_short",
     "Le mot de passe doit contenir au moins 3 caractères",
   )
+  |> g18n.add_translation("workspace.fileform.filepath_label", "Votre fichier")
+  |> g18n.add_translation(
+    "workspace.fileform.format_error",
+    "Le format du fichier devrait être:",
+  )
+  |> g18n.add_translation(
+    "workspace.fileform.no_extension_erorr",
+    "Votre fichier n'a pas d'extension.",
+  )
+  |> g18n.add_translation("workspace.title", "Espace de travail")
 }
 
 pub fn fr_locale() -> locale.Locale {
@@ -117,6 +127,7 @@ pub fn en_translations() -> g18n.Translations {
     "validation.password.too_short",
     "Password must be at least 3 characters long",
   )
+  |> g18n.add_translation("workspace.title", "Workspace")
 }
 
 pub fn en_locale() -> locale.Locale {

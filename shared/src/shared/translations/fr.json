@@ -40,5 +40,13 @@
       "too_short": "Le mot de passe doit contenir au moins 3 caractères",
       "no_special_char": "Le mot de passe doit contenir au moins un caractère non alphabétique"
     }
+  },
+  "workspace": {
+    "title": "Espace de travail",
+    "fileform": {
+      "filepath_label": "Votre fichier",
+      "format_error": "Le format du fichier devrait être:",
+      "no_extension_erorr": "Votre fichier n'a pas d'extension."
+    }
   }
 }

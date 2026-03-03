@@ -19,6 +19,7 @@ import search
 import shared/translations.{fr_translator}
 import shared/user
 import user_api
+import workspace
 
 pub fn main() -> Nil {
   let assert Ok(_) = grille_pain.simple()
@@ -44,7 +45,13 @@ type Model {
     on_success: router.Route,
     on_error: router.Route,
   )
-  User(translator: g18n.Translator, user: user.User, route: router.Route)
+  User(
+    translator: g18n.Translator,
+    search: String,
+    user: user.User,
+    route: router.Route,
+    workspace: workspace.Model,
+  )
 }
 
 fn init(_) -> #(Model, Effect(Msg)) {
@@ -93,6 +100,16 @@ fn visitor_init(route: router.Route) -> Model {
   )
 }
 
+fn user_init(route: router.Route, user: user.User) -> Model {
+  User(
+    translator: fr_translator(),
+    search: "",
+    route:,
+    user: user,
+    workspace: workspace.fileform_init(),
+  )
+}
+
 fn on_url_change(uri: Uri) -> Msg {
   router.from_uri(uri) |> UserRequestedRoute
 }
@@ -110,16 +127,17 @@ type Msg {
 
   UserApiMsg(user_api.Msg)
   HeaderMsg(header.Msg)
+  WorkspaceMsg(workspace.Msg)
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   io.println(string.inspect(msg))
-  io.println(string.inspect(model))
+  //io.println(string.inspect(model))
   case model, msg {
     _, UserRequestedRoute(route) -> #(update_route(model, route), effect.none())
-    Visitor(..), _ -> update_visitor(model, msg)
-    Pending(..), _ -> update_pending(model, msg)
     User(..), _ -> update_user(model, msg)
+    Pending(..), _ -> update_pending(model, msg)
+    Visitor(..), _ -> update_visitor(model, msg)
   }
 }
 
@@ -134,19 +152,37 @@ fn update_user(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       update_route(model, router.Search),
       toast.success(g18n.translate(model.translator, "login.logout")),
     )
+    WorkspaceMsg(msg) -> update_workspace(model, msg)
     _ -> #(model, effect.none())
   }
 }
 
+// -------- Update Route
+fn update_route(model: Model, route: router.Route) -> Model {
+  let protected = router.is_protected_route(route)
+  case model {
+    User(..) -> User(..model, route:)
+    Pending(..) -> panic
+    Visitor(..) if protected -> Visitor(..model, route: router.Login)
+    Visitor(..) -> Visitor(..model, route:)
+  }
+}
+
+// -------- Update Workspace
+fn update_workspace(model: Model, msg: workspace.Msg) -> #(Model, Effect(Msg)) {
+  let assert User(..) = model
+  let #(workspace, effect) =
+    workspace.update(model.translator, model.workspace, msg)
+  #(User(..model, workspace:), effect.map(effect, WorkspaceMsg))
+}
+
+// -------- Update Pending
 fn update_pending(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   let assert Pending(..) = model
   let assert UserApiMsg(msg) = msg
   case msg {
     user_api.ApiReturnedUser(Ok(user)) -> {
-      #(
-        User(translator: model.translator, route: model.on_success, user: user),
-        effect.none(),
-      )
+      #(user_init(model.on_success, user), effect.none())
     }
     user_api.ApiReturnedUser(Error(_)) -> {
       #(visitor_init(model.on_error), effect.none())
@@ -155,6 +191,7 @@ fn update_pending(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   }
 }
 
+// -------- Update Visitor
 fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   let assert Visitor(..) = model
   case msg {
@@ -175,10 +212,7 @@ fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     }
     VisitorEditLoginForm(login.ServerCreatedSession(Ok(user))) -> {
       #(
-        update_route(
-          User(translator: model.translator, user:, route: router.Search),
-          router.Search,
-        ),
+        update_route(user_init(router.Search, user), router.Search),
         effect.none(),
       )
     }
@@ -212,16 +246,6 @@ fn update_login(model: Model, login_msg: login.Msg) -> #(Model, Effect(Msg)) {
   #(Visitor(..model, login_form:), effect.map(effect, VisitorEditLoginForm))
 }
 
-fn update_route(model: Model, route: router.Route) -> Model {
-  let protected = router.is_protected_route(route)
-  case model {
-    User(..) -> User(..model, route:)
-    Pending(..) -> panic
-    Visitor(..) if protected -> Visitor(..model, route: router.Login)
-    Visitor(..) -> Visitor(..model, route:)
-  }
-}
-
 // View ---------------------------------------------------------------------------------------
 
 fn view(model: Model) -> Element(Msg) {
@@ -249,6 +273,7 @@ fn visitor_view(model: Model) -> Element(Msg) {
       router.Search -> search.view(model.translator)
       router.Signup -> signup_view(model)
       router.Login -> login_view(model)
+      _ -> panic
     },
   ])
 }
@@ -269,9 +294,12 @@ fn user_view(model: Model) -> Element(Msg) {
       HeaderMsg(msg)
     }),
     case model.route {
-      router.Search -> search.view(model.translator)
-      router.Signup -> signup_view(model)
-      router.Login -> login_view(model)
+      router.Search | router.Login | router.Signup ->
+        search.view(model.translator)
+      router.Workspace ->
+        workspace.view(model.translator, model.workspace, fn(msg) {
+          WorkspaceMsg(msg)
+        })
     },
   ])
 }

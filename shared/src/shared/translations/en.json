@@ -40,5 +40,8 @@
       "too_short": "Password must be at least 3 characters long",
       "no_special_char": "Password must contain at least one non-alphabetic character"
     }
+  },
+  "workspace": {
+    "title": "Workspace"
   }
 }
