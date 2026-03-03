@@ -7,15 +7,22 @@ import lustre/event
 //<!-- From Uiverse.io by TaniaDou --> 
 //<div class="button">Button<span class="button-border"></span></div>
 
-pub fn button(event: Option(msg), label: String) -> Element(msg) {
+pub fn button(event: Option(msg), label: String, type_: String) -> Element(msg) {
   case event {
     option.Some(event) ->
-      html.div([attribute.class("button"), event.on_click(event)], [
-        html.text(label),
-        html.span([attribute.class("button-border")], []),
-      ])
+      html.button(
+        [
+          attribute.type_(type_),
+          attribute.class("button"),
+          event.on_click(event),
+        ],
+        [
+          html.text(label),
+          html.span([attribute.class("button-border")], []),
+        ],
+      )
     option.None ->
-      html.div([attribute.class("button")], [
+      html.button([attribute.type_(type_), attribute.class("button")], [
         html.text(label),
         html.span([attribute.class("button-border")], []),
       ])

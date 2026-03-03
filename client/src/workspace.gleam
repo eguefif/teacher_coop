@@ -1,5 +1,6 @@
 import g18n
 import gleam/list
+import gleam/option
 import gleam/string
 import lustre/attribute
 import lustre/effect.{type Effect}
@@ -10,7 +11,7 @@ import reusables/input
 // Model ---------------------------------------------------------------------------------------
 
 pub type Model {
-  FileForm(filepath: String, error_filepath: String, valid_filepath: Bool)
+  FileForm(filepath: String, error: String, valid: Bool)
 }
 
 pub fn fileform_init() {
@@ -99,10 +100,10 @@ fn fileform_view(
   html.form([], [
     input.input(
       fileform.filepath,
-      fileform.error_filepath,
-      fileform.valid_filepath,
+      "",
+      False,
       fn(v) { msg_wrapper(UserUpdatedFilepathInput(v)) },
-      msg_wrapper(UserFinishedUpdatedFilepathInput),
+      option.None,
       "file",
       "filepath",
       g18n.translate(translator, "workspace.fileform.filepath_label"),

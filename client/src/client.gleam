@@ -122,8 +122,7 @@ type Msg {
   VisitorEditSignupForm(signup_form.Msg)
   VisitorSubmitedSignupForm
 
-  VisitorEditLoginForm(login.Msg)
-  VisitorSubmitedLoginForm
+  LoginMsg(login.Msg)
 
   UserApiMsg(user_api.Msg)
   HeaderMsg(header.Msg)
@@ -193,8 +192,10 @@ fn update_pending(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
 // -------- Update Visitor
 fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+  // Simplify Visitor Message: only have one wrapper and use signup.Msg in pattern matching
   let assert Visitor(..) = model
   case msg {
+    // Signup FormMessage
     VisitorEditSignupForm(signup_form.ServerCreatedAccount(Ok(_))) -> {
       #(
         update_route(model, router.Search),
@@ -202,6 +203,7 @@ fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       )
     }
     VisitorEditSignupForm(signup_form.ServerCreatedAccount(Error(_))) -> {
+      // TODO: we should not display an error here but the form
       #(
         update_route(model, router.Search),
         toast.error(g18n.translate(
@@ -210,20 +212,22 @@ fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         )),
       )
     }
-    VisitorEditLoginForm(login.ServerCreatedSession(Ok(user))) -> {
+    VisitorSubmitedSignupForm ->
+      update_signup(model, signup_form.VisitorSubmitedSignupForm)
+
+    VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
+
+    // Login Form Message
+    LoginMsg(login.ServerCreatedSession(Ok(user))) -> {
       #(
         update_route(user_init(router.Search, user), router.Search),
         effect.none(),
       )
     }
-    VisitorEditLoginForm(error_msg) -> {
-      update_login(model, error_msg)
+    LoginMsg(msg) -> {
+      update_login(model, msg)
     }
-    VisitorSubmitedSignupForm ->
-      update_signup(model, signup_form.VisitorSubmitedSignupForm)
-    VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
-    VisitorSubmitedLoginForm ->
-      update_login(model, login.VisitorSubmitedLoginForm)
+    // Other Message
     UserApiMsg(_msg) -> #(model, effect.none())
     _ -> panic
   }
@@ -241,9 +245,8 @@ fn update_signup(
 
 fn update_login(model: Model, login_msg: login.Msg) -> #(Model, Effect(Msg)) {
   let assert Visitor(..) = model
-  let #(login_form, effect) =
-    login.update(model.translator, model.login_form, login_msg)
-  #(Visitor(..model, login_form:), effect.map(effect, VisitorEditLoginForm))
+  let #(login_form, effect) = login.update(model.login_form, login_msg)
+  #(Visitor(..model, login_form:), effect.map(effect, LoginMsg))
 }
 
 // View ---------------------------------------------------------------------------------------
@@ -316,10 +319,7 @@ fn signup_view(model: Model) -> Element(Msg) {
 
 fn login_view(model: Model) -> Element(Msg) {
   let assert Visitor(..) = model
-  login.view(
-    model.login_form,
-    model.translator,
-    fn(login_msg) { VisitorEditLoginForm(login_msg) },
-    VisitorSubmitedLoginForm,
-  )
+  login.view(model.login_form, model.translator, fn(login_msg) {
+    LoginMsg(login_msg)
+  })
 }

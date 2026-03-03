@@ -1,3 +1,4 @@
+import gleam/option.{type Option, None, Some}
 import gleam/string
 import lustre/attribute
 import lustre/element.{type Element}
@@ -9,7 +10,7 @@ pub fn input(
   error: String,
   is_valid is_valid: Bool,
   on_focus on_focus: fn(String) -> msg,
-  on_blur on_blur: msg,
+  on_blur on_blur: Option(msg),
   is type_: String,
   name name: String,
   label label: String,
@@ -44,7 +45,10 @@ pub fn input(
     html.div([attribute.styles(row_styles)], [
       html.input([
         event.on_input(on_focus),
-        event.on_blur(on_blur),
+        case on_blur {
+          Some(on_blur) -> event.on_blur(on_blur)
+          None -> attribute.none()
+        },
         attribute.type_(type_),
         attribute.id(name),
         attribute.value(text),

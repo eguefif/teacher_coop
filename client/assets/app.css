@@ -149,6 +149,8 @@ textarea:disabled {
   text-align: center;
   position: relative;
   cursor: pointer;
+  background: transparent;
+  font-family: inherit;
 }
 
 .button::before {
