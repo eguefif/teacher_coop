@@ -4,11 +4,11 @@ import gleam/http.{Post}
 import gleam/int
 import mist
 import pog
-import server/auth_controller
+import server/auth/auth_controller
 import server/cron_job
 import server/db
 import server/middleware
-import server/user_controller
+import server/user/user_controller
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
 

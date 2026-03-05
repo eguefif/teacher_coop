@@ -3,7 +3,7 @@ import gleam/io
 import gleam/string
 import gleam/time/timestamp
 import pog
-import server/session.{type CurrentSession, CurrentSession}
+import server/auth/session.{type CurrentSession, CurrentSession}
 import wisp.{type Request, type Response}
 import youid/uuid
 

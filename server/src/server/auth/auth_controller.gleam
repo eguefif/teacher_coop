@@ -3,8 +3,8 @@ import gleam/http.{Delete, Get, Post}
 import gleam/json
 import gleam/option
 import pog
-import server/session
-import server/user_controller
+import server/auth/session
+import server/user/user_controller
 import shared/user
 import wisp.{type Request, type Response}
 import youid/uuid

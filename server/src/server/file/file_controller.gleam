@@ -1,9 +1,16 @@
 import gleam/list
-import gleam/option
-import gleam/result
 import pog
-import server/session
+import server/auth/session
+import server/sql
 import wisp
+
+type File {
+  Pdf(data: BitArray)
+  Docx(data: BitArray)
+  Pptx(data: BitArray)
+  Odt(data: BitArray)
+  Odp(data: BitArray)
+}
 
 pub fn handle_file(
   db: pog.Connection,
@@ -16,19 +23,11 @@ pub fn handle_file(
   }
 }
 
-type File {
-  Pdf(data: BitArray)
-  Docx(data: BitArray)
-  Pptx(data: BitArray)
-  Odt(data: BitArray)
-  Odp(data: BitArray)
-}
-
 // TODO: we receive in the  content-type the file typ
 // In the body the byte. I added simplifile
 // We need to get the to
 // - [X] Retrieve the type and file
-// - [ ] Add a new table files
+// - [X] Add a new table files
 //       * id
 //       * user_id
 //       * format
@@ -38,7 +37,7 @@ type File {
 // - [ ] Retrieve the byte and write it on disck
 // - [ ] Save using the type with a semi random name
 // Step 2
-// - [ ] Add a queue table for ingestion in the DB
+// - [X] Add a queue table for ingestion in the DB
 //       * id
 //       * file path
 //       * file id

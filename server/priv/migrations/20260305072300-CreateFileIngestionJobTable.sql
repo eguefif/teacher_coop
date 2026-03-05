@@ -5,16 +5,15 @@ CREATE TYPE job_status AS ENUM (
     'done'
 );
 
-CREATE TABLE file_ingestions_jobs (
+CREATE TABLE file_ingestion_jobs (
     id bigserial PRIMARY KEY,
     filepath text NOT NULL,
-    state job_status NOT NULL
+    state job_status NOT NULL DEFAULT 'pending'
 );
 
 --- migration:down
-DROP TABLE file_ingestions_jobs;
+DROP TABLE file_ingestion_jobs;
 
 DROP TYPE job_status;
 
 --- migration:end
-

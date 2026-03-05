@@ -4,11 +4,10 @@ CREATE TABLE files (
     filename text NOT NULL,
     filepath text NOT NULL,
     user_id bigint NOT NULL,
-    file_ingestions_job_id bigint REFERENCES file_ingestions_jobs ON DELETE CASCADE
+    file_ingestion_job_id bigint REFERENCES file_ingestion_jobs ON DELETE CASCADE
 );
 
 --- migration:down
 DROP TABLE files;
 
 --- migration:end
-
