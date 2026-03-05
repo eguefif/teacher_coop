@@ -1,75 +1,62 @@
+import forms/filepath
 import g18n
-import gleam/list
+import gleam/io
 import gleam/option
 import gleam/string
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
-import reusables/input
+import reusables/button
+
+const extensions = [".pdf", ".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp"]
 
 // Model ---------------------------------------------------------------------------------------
 
 pub type Model {
-  FileForm(filepath: String, error: String, valid: Bool)
+  FileForm(file: filepath.Model, error: String, valid: Bool)
 }
 
 pub fn fileform_init() {
-  FileForm("", "", False)
+  FileForm(filepath.init(), "", False)
 }
 
 // Update ---------------------------------------------------------------------------------------
 pub type Msg {
-  UserUpdatedFilepathInput(String)
-  UserFinishedUpdatedFilepathInput
   UserSubmittedFileForm
+  BrowserSentFile(String)
+  FilePathMsg(filepath.Msg)
 }
 
 pub fn update(
-  translator: g18n.Translator,
+  _translator: g18n.Translator,
   model: Model,
   msg: Msg,
   //wrapper_msg: fn(Msg) -> msg,
 ) -> #(Model, Effect(Msg)) {
   case msg {
-    UserUpdatedFilepathInput(filepath) -> #(
-      FileForm(..model, filepath:),
-      effect.none(),
-    )
-    UserFinishedUpdatedFilepathInput -> #(
-      validate_filepath(translator, model),
-      effect.none(),
-    )
-    UserSubmittedFileForm -> #(model, effect.none())
+    UserSubmittedFileForm -> update_fileform(model)
+    BrowserSentFile(_response) -> #(model, effect.none())
+    FilePathMsg(msg) -> filepath_update(model.file, msg)
   }
 }
 
-fn validate_filepath(translator: g18n.Translator, model: Model) -> Model {
-  let extensions = [".pdf", ".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp"]
-  let FileForm(filepath, _, _) = model
-  case string.split(filepath, ".") {
-    [_, extension] -> {
-      case list.contains(extensions, extension) {
-        True -> FileForm(filepath, "", True)
-        False ->
-          FileForm(
-            filepath,
-            g18n.translate(
-              translator,
-              "workspace.fileform.format_error: "
-                <> string.join(extensions, ", "),
-            ),
-            False,
-          )
-      }
-    }
-    _ ->
-      FileForm(
-        filepath,
-        g18n.translate(translator, "workspace.fileform.no_extension_error"),
-        False,
-      )
-  }
+fn filepath_update(
+  file: filepath.Model,
+  msg: filepath.Msg,
+) -> #(Model, Effect(Msg)) {
+  let #(model, effect) = filepath.update(file, msg)
+  #(FileForm(model, "", False), effect |> effect.map(FilePathMsg))
+}
+
+fn update_fileform(model: Model) -> #(Model, Effect(Msg)) {
+  io.println(
+    "File: "
+    <> string.inspect(model.file.file)
+    <> "\n"
+    <> string.inspect(model.file.data),
+  )
+  #(model, effect.none())
 }
 
 // View ---------------------------------------------------------------------------------------
@@ -94,19 +81,24 @@ pub fn view(
 
 fn fileform_view(
   translator: g18n.Translator,
-  fileform: Model,
-  msg_wrapper,
+  _fileform: Model,
+  msg_wrapper: fn(Msg) -> msg,
 ) -> Element(msg) {
-  html.form([], [
-    input.input(
-      fileform.filepath,
-      "",
-      False,
-      fn(v) { msg_wrapper(UserUpdatedFilepathInput(v)) },
+  let styles = [
+    #("display", "flex"),
+    #("flex-direction", "column"),
+    #("gap", "12px"),
+  ]
+  html.form([attribute.styles(styles)], [
+    filepath.view(
+      translator,
+      fn(msg) { msg_wrapper(FilePathMsg(msg)) },
+      extensions,
+    ),
+    button.button(
       option.None,
-      "file",
-      "filepath",
-      g18n.translate(translator, "workspace.fileform.filepath_label"),
+      g18n.translate(translator, "workspace.fileform.submit"),
+      "submit",
     ),
   ])
 }

@@ -9,12 +9,14 @@ packages = [
   { name = "clockwork", version = "4.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "gleam_time"], otp_app = "clockwork", source = "hex", outer_checksum = "A84AC8734E350EFCCF1336C73F33C7FB2BF6761065D714778905ACF384B0CCB9" },
   { name = "clockwork_schedule", version = "2.0.0", build_tools = ["gleam"], requirements = ["clockwork", "gleam_erlang", "gleam_otp", "gleam_stdlib", "gleam_time", "logging"], otp_app = "clockwork_schedule", source = "hex", outer_checksum = "9556D6A8DA22F7FD255986A337D8291786BDBE4B92F5F35A4B967CBB1033E43E" },
   { name = "directories", version = "1.2.0", build_tools = ["gleam"], requirements = ["envoy", "gleam_stdlib", "platform", "simplifile"], otp_app = "directories", source = "hex", outer_checksum = "D13090CFCDF6759B87217E8DDD73A75903A700148A82C1D33799F333E249BF9E" },
+  { name = "distance", version = "1.1.3", build_tools = ["mix"], requirements = ["seg_seg"], otp_app = "distance", source = "hex", outer_checksum = "FA3FE3D827A089F07EED5FA3A46E8B54AA0E6056E464090986D0EA3B0B1051B1" },
   { name = "envoy", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "envoy", source = "hex", outer_checksum = "850DA9D29D2E5987735872A2B5C81035146D7FE19EFC486129E44440D03FD832" },
   { name = "eval", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "eval", source = "hex", outer_checksum = "264DAF4B49DF807F303CA4A4E4EBC012070429E40BE384C58FE094C4958F9BDA" },
   { name = "exception", version = "2.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "exception", source = "hex", outer_checksum = "329D269D5C2A314F7364BD2711372B6F2C58FA6F39981572E5CA68624D291F8C" },
   { name = "filepath", version = "1.1.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "filepath", source = "hex", outer_checksum = "B06A9AF0BF10E51401D64B98E4B627F1D2E48C154967DA7AF4D0914780A6D40A" },
   { name = "g18n", version = "3.1.1", build_tools = ["gleam"], requirements = ["gleam_community_maths", "gleam_json", "gleam_regexp", "gleam_stdlib", "gleam_time", "splitter", "trie_again"], otp_app = "g18n", source = "hex", outer_checksum = "B02594CD480BFD6C540252638BBA66B0E07AF165483DC56F1D5FFAED3FECC635" },
   { name = "g18n_dev", version = "1.3.0", build_tools = ["gleam"], requirements = ["argv", "filepath", "g18n", "glance", "gleam_json", "gleam_stdlib", "shellout", "simplifile", "snag", "tom", "trie_again"], otp_app = "g18n_dev", source = "hex", outer_checksum = "545C7493B45BA0703153C717CB6826F25796E06134C64C6CC463935C51EDC810" },
+  { name = "geo", version = "4.1.0", build_tools = ["mix"], requirements = ["jason"], otp_app = "geo", source = "hex", outer_checksum = "19EDB2B3398CA9F701B573B1FB11BC90951EBD64F18B06BD1BF35ABE509A2934" },
   { name = "glam", version = "2.0.3", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "glam", source = "hex", outer_checksum = "237C2CE218A2A0A5D46D625F8EF5B78F964BC91018B78D692B17E1AB84295229" },
   { name = "glance", version = "5.0.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "glexer"], otp_app = "glance", source = "hex", outer_checksum = "7F216D97935465FF4AC46699CD1C3E0FB19CB678B002E4ACAFCE256E96312F14" },
   { name = "gleam_community_ansi", version = "1.4.4", build_tools = ["gleam"], requirements = ["gleam_community_colour", "gleam_regexp", "gleam_stdlib"], otp_app = "gleam_community_ansi", source = "hex", outer_checksum = "1B3AEA6074AB34D5F0674744F36DDC7290303A03295507E2DEC61EDD6F5777FE" },
@@ -47,9 +49,11 @@ packages = [
   { name = "pgo", version = "0.20.0", build_tools = ["rebar3"], requirements = ["backoff", "opentelemetry_api", "pg_types"], otp_app = "pgo", source = "hex", outer_checksum = "2F11E6649CEB38E569EF56B16BE1D04874AE5B11A02867080A2817CE423C683B" },
   { name = "platform", version = "1.0.0", build_tools = ["gleam"], requirements = [], otp_app = "platform", source = "hex", outer_checksum = "8339420A95AD89AAC0F82F4C3DB8DD401041742D6C3F46132A8739F6AEB75391" },
   { name = "pog", version = "4.1.0", build_tools = ["gleam"], requirements = ["exception", "gleam_erlang", "gleam_otp", "gleam_stdlib", "gleam_time", "pgo"], otp_app = "pog", source = "hex", outer_checksum = "E4AFBA39A5FAA2E77291836C9683ADE882E65A06AB28CA7D61AE7A3AD61EBBD5" },
+  { name = "seg_seg", version = "1.0.0", build_tools = ["mix"], requirements = ["vector"], otp_app = "seg_seg", source = "hex", outer_checksum = "19FC9008D727A3CFB1F16FC6B3D6BED110D5C4246B1879494BF0A104F422262C" },
   { name = "shared", version = "1.0.0", build_tools = ["gleam"], requirements = ["g18n", "g18n_dev", "gleam_json", "gleam_stdlib"], source = "local", path = "../shared" },
   { name = "shellout", version = "1.8.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "shellout", source = "hex", outer_checksum = "C416356D45151F298108C9DB9CD1EDE0313F620B5EDBB5766CD7237659D87841" },
   { name = "simplifile", version = "2.3.2", build_tools = ["gleam"], requirements = ["filepath", "gleam_stdlib"], otp_app = "simplifile", source = "hex", outer_checksum = "E049B4DACD4D206D87843BCF4C775A50AE0F50A52031A2FFB40C9ED07D6EC70A" },
+  { name = "simplify", version = "2.0.1", build_tools = ["mix"], requirements = ["distance", "geo"], otp_app = "simplify", source = "hex", outer_checksum = "19FDA0017F52C6980B47CA83AE92EF15564422B69ADD921947ABDDFE996EEF48" },
   { name = "snag", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "snag", source = "hex", outer_checksum = "274F41D6C3ECF99F7686FDCE54183333E41D2C1CA5A3A673F9A8B2C7A4401077" },
   { name = "splitter", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "splitter", source = "hex", outer_checksum = "3DFD6B6C49E61EDAF6F7B27A42054A17CFF6CA2135FF553D0CB61C234D281DD0" },
   { name = "squirrel", version = "4.6.0", build_tools = ["gleam"], requirements = ["argv", "envoy", "eval", "filepath", "glam", "gleam_community_ansi", "gleam_crypto", "gleam_json", "gleam_regexp", "gleam_stdlib", "gleam_time", "glexer", "justin", "mug", "non_empty_list", "pog", "simplifile", "term_size", "tom", "tote", "youid"], otp_app = "squirrel", source = "hex", outer_checksum = "0ED10A868BDD1A5D4B68D99CD1C72DC3F23C6E36E16D33454C5F0C31BAC9CB1E" },
@@ -58,6 +62,7 @@ packages = [
   { name = "tom", version = "2.0.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "gleam_time"], otp_app = "tom", source = "hex", outer_checksum = "90791DA4AACE637E30081FE77049B8DB850FBC8CACC31515376BCC4E59BE1DD2" },
   { name = "tote", version = "1.0.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "tote", source = "hex", outer_checksum = "A249892E26A53C668897F8D47845B0007EEE07707A1A03437487F0CD5A452CA5" },
   { name = "trie_again", version = "1.1.4", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "trie_again", source = "hex", outer_checksum = "E3BD66B4E126EF567EA8C4944EAB216413392ADF6C16C36047AF79EE5EF13466" },
+  { name = "vector", version = "1.1.0", build_tools = ["mix"], requirements = [], otp_app = "vector", source = "hex", outer_checksum = "48B0A800EC88E55B12C689B09100E4C9BA41EA1BEFB459221C085A4E70040696" },
   { name = "wisp", version = "2.2.0", build_tools = ["gleam"], requirements = ["directories", "exception", "filepath", "gleam_crypto", "gleam_erlang", "gleam_http", "gleam_json", "gleam_stdlib", "houdini", "logging", "marceau", "mist", "simplifile"], otp_app = "wisp", source = "hex", outer_checksum = "655163D4DE19E3DD4AC75813A991BFD5523CB4FF2FC5F9F58FD6FB39D5D1806D" },
   { name = "youid", version = "1.5.1", build_tools = ["gleam"], requirements = ["gleam_crypto", "gleam_stdlib", "gleam_time"], otp_app = "youid", source = "hex", outer_checksum = "580E909FD704DB16416D5CB080618EDC2DA0F1BE4D21B490C0683335E3FFC5AF" },
 ]
@@ -79,6 +84,7 @@ gleeunit = { version = ">= 1.0.0 and < 2.0.0" }
 mist = { version = ">= 5.0.4 and < 6.0.0" }
 pog = { version = ">= 4.1.0 and < 5.0.0" }
 shared = { path = "../shared" }
+simplify = { version = ">= 2.0.1 and < 3.0.0" }
 squirrel = { version = ">= 4.6.0 and < 5.0.0" }
 wisp = { version = ">= 2.2.0 and < 3.0.0" }
 youid = { version = ">= 1.5.1 and < 2.0.0" }

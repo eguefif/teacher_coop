@@ -12,7 +12,6 @@ import shared/user.{UserLoginForm}
 
 // Model ---------------------------------------------------------------------------------------
 
-// TODO: Work on serverside auth
 pub type LoginForm {
   LoginForm(email: String, password: String, error: Bool)
 }

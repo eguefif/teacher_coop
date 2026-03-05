@@ -38,6 +38,7 @@ fn handle_request(db: pog.Connection, req: Request) -> Response {
   case req.method, wisp.path_segments(req) {
     Post, ["signup"] -> user_controller.handle_request_user(db, req)
     _, ["auth", _] -> auth_controller.handle_request_login(db, req, session)
+    _, ["file", _] -> auth_controller.handle_request_login(db, req, session)
     _, _ -> wisp.not_found()
   }
 }

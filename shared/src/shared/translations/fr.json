@@ -45,6 +45,7 @@
     "title": "Espace de travail",
     "fileform": {
       "filepath_label": "Votre fichier",
+      "submit": "Envoyer",
       "format_error": "Le format du fichier devrait être:",
       "no_extension_erorr": "Votre fichier n'a pas d'extension."
     }
