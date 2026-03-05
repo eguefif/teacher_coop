@@ -1,5 +1,5 @@
 //// This module contains the code to run the sql queries defined in
-//// `./src/server/users/sql`.
+//// `./src/server/user/sql`.
 //// > 🐿️ This module was generated automatically using v4.6.0 of
 //// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ////
@@ -10,7 +10,7 @@ import pog
 import youid/uuid.{type Uuid}
 
 /// A row you get from running the `create_user` query
-/// defined in `./src/server/users/sql/create_user.sql`.
+/// defined in `./src/server/user/sql/create_user.sql`.
 ///
 /// > 🐿️ This type definition was generated automatically using v4.6.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -76,7 +76,7 @@ WHERE email = $1;
 }
 
 /// A row you get from running the `get_user_by_email` query
-/// defined in `./src/server/users/sql/get_user_by_email.sql`.
+/// defined in `./src/server/user/sql/get_user_by_email.sql`.
 ///
 /// > 🐿️ This type definition was generated automatically using v4.6.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -118,7 +118,7 @@ WHERE
 }
 
 /// A row you get from running the `get_user_by_id` query
-/// defined in `./src/server/users/sql/get_user_by_id.sql`.
+/// defined in `./src/server/user/sql/get_user_by_id.sql`.
 ///
 /// > 🐿️ This type definition was generated automatically using v4.6.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -160,7 +160,7 @@ WHERE
 }
 
 /// A row you get from running the `get_user_by_session_id` query
-/// defined in `./src/server/users/sql/get_user_by_session_id.sql`.
+/// defined in `./src/server/user/sql/get_user_by_session_id.sql`.
 ///
 /// > 🐿️ This type definition was generated automatically using v4.6.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -175,7 +175,7 @@ pub type GetUserBySessionIdRow {
 }
 
 /// Runs the `get_user_by_session_id` query
-/// defined in `./src/server/users/sql/get_user_by_session_id.sql`.
+/// defined in `./src/server/user/sql/get_user_by_session_id.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).

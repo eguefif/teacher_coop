@@ -1,8 +1,11 @@
 import gleam/list
 import pog
 import server/auth/session
-import server/sql
+import server/file/sql
+import shared/user.{User}
+import simplifile
 import wisp
+import youid/uuid
 
 type File {
   Pdf(data: BitArray)
@@ -17,9 +20,9 @@ pub fn handle_file(
   req: wisp.Request,
   session: session.CurrentSession,
 ) -> wisp.Response {
-  case session {
-    session.CurrentSession(..) -> dispatch(db, req)
-    session.NoSession -> wisp.response(401)
+  case wisp.path_segments(req) {
+    ["file", "upload"] -> upload_file(db, req, session)
+    _ -> wisp.not_found()
   }
 }
 
@@ -44,10 +47,58 @@ pub fn handle_file(
 //       * Job status: pending, processing, processed
 // - [ ] Schedule an ingestion job link to the file
 // - [ ] Have a job that check
-fn dispatch(db, req) -> wisp.Response {
+fn upload_file(
+  db: pog.Connection,
+  req: wisp.Request,
+  session: session.CurrentSession,
+) -> wisp.Response {
   use body <- wisp.require_bit_array_body(req)
   use file <- get_content_file(req, body)
-  wisp.ok()
+  use file_metadata <- write_file_in_disk(file)
+  use file_id <- add_file_in_db(file_metadata, db, session)
+  schedule_ingestion_job(file_id)
+}
+
+fn schedule_ingestion_job(file_id: Int) -> response.Response(wisp.Body) {
+  todo
+}
+
+fn write_file_in_disk(
+  file: File,
+  next: fn(#(String, String)) -> wisp.Response,
+) -> wisp.Response {
+  let filename = create_filename(file)
+  let filepath = "./assets/" <> filename
+  case simplifile.write_bits(filepath, file.data) {
+    Ok(_) -> next(#(filename, filepath))
+    Error(_) -> wisp.internal_server_error()
+  }
+}
+
+fn create_filename(file: File) -> String {
+  let file_start = uuid.v7() |> uuid.to_string()
+  let file_extension = case file {
+    Pdf(_) -> ".pdf"
+    Docx(_) -> ".docx"
+    Pptx(_) -> "pptx"
+    Odt(_) -> "odt"
+    Odp(_) -> "odp"
+  }
+  file_start <> file_extension
+}
+
+fn add_file_in_db(
+  file_metadata: #(String, String),
+  db: pog.Connection,
+  session: session.CurrentSession,
+  next: fn(Int) -> wisp.Response,
+) -> wisp.Response {
+  let #(filename, filepath) = file_metadata
+  let assert session.CurrentSession(_, _, User(id, ..)) = session
+  case sql.create_file(db, filename, filepath, id) {
+    Ok(pog.Returned(_, [sql.CreateFileRow(id, ..)])) -> next(id)
+    _ -> wisp.internal_server_error()
+  }
 }
 
 fn get_content_file(

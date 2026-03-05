@@ -1,5 +1,5 @@
 //// This module contains the code to run the sql queries defined in
-//// `./src/server/file_ingestions/sql`.
+//// `./src/server/file_ingestion/sql`.
 //// > 🐿️ This module was generated automatically using v4.6.0 of
 //// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ////
@@ -8,7 +8,7 @@ import gleam/dynamic/decode
 import pog
 
 /// Runs the `create_new_job` query
-/// defined in `./src/server/file_ingestions/sql/create_new_job.sql`.
+/// defined in `./src/server/file_ingestion/sql/create_new_job.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -30,7 +30,7 @@ pub fn create_new_job(
 }
 
 /// Runs the `update_job_to_done_by_id` query
-/// defined in `./src/server/file_ingestions/sql/update_job_to_done_by_id.sql`.
+/// defined in `./src/server/file_ingestion/sql/update_job_to_done_by_id.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -56,7 +56,7 @@ WHERE
 }
 
 /// Runs the `update_job_to_processing_by_id` query
-/// defined in `./src/server/file_ingestions/sql/update_job_to_processing_by_id.sql`.
+/// defined in `./src/server/file_ingestion/sql/update_job_to_processing_by_id.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).

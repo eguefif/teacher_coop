@@ -34,6 +34,7 @@ pub fn main() -> Nil {
 
 fn handle_request(db: pog.Connection, req: Request) -> Response {
   use #(req, session) <- middleware.app_middleware(db, req)
+  use req <- middleware.verify_auth(req, session)
 
   case req.method, wisp.path_segments(req) {
     Post, ["signup"] -> user_controller.handle_request_user(db, req)

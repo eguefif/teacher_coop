@@ -1,5 +1,5 @@
 //// This module contains the code to run the sql queries defined in
-//// `./src/server/auths/sql`.
+//// `./src/server/auth/sql`.
 //// > 🐿️ This module was generated automatically using v4.6.0 of
 //// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ////
@@ -10,7 +10,7 @@ import pog
 import youid/uuid.{type Uuid}
 
 /// A row you get from running the `create_session` query
-/// defined in `./src/server/auths/sql/create_session.sql`.
+/// defined in `./src/server/auth/sql/create_session.sql`.
 ///
 /// > 🐿️ This type definition was generated automatically using v4.6.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -25,7 +25,7 @@ pub type CreateSessionRow {
 }
 
 /// Runs the `create_session` query
-/// defined in `./src/server/auths/sql/create_session.sql`.
+/// defined in `./src/server/auth/sql/create_session.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -57,7 +57,7 @@ RETURNING
 }
 
 /// Runs the `delete_passed_date_session` query
-/// defined in `./src/server/auths/sql/delete_passed_date_session.sql`.
+/// defined in `./src/server/auth/sql/delete_passed_date_session.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -77,7 +77,7 @@ WHERE expiration_at < NOW();
 }
 
 /// Runs the `delete_session_where_id` query
-/// defined in `./src/server/auths/sql/delete_session_where_id.sql`.
+/// defined in `./src/server/auth/sql/delete_session_where_id.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -99,7 +99,7 @@ WHERE id = $1;
 }
 
 /// A row you get from running the `get_session_by_user_id` query
-/// defined in `./src/server/auths/sql/get_session_by_user_id.sql`.
+/// defined in `./src/server/auth/sql/get_session_by_user_id.sql`.
 ///
 /// > 🐿️ This type definition was generated automatically using v4.6.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -114,7 +114,7 @@ pub type GetSessionByUserIdRow {
 }
 
 /// Runs the `get_session_by_user_id` query
-/// defined in `./src/server/auths/sql/get_session_by_user_id.sql`.
+/// defined in `./src/server/auth/sql/get_session_by_user_id.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -151,7 +151,7 @@ WHERE
 }
 
 /// Runs the `update_session_expiration_at_by_id` query
-/// defined in `./src/server/auths/sql/update_session_expiration_at_by_id.sql`.
+/// defined in `./src/server/auth/sql/update_session_expiration_at_by_id.sql`.
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).

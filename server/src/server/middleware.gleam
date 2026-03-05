@@ -1,9 +1,7 @@
 import gleam/float
-import gleam/io
-import gleam/string
 import gleam/time/timestamp
 import pog
-import server/auth/session.{type CurrentSession, CurrentSession}
+import server/auth/session.{type CurrentSession, CurrentSession, NoSession}
 import wisp.{type Request, type Response}
 import youid/uuid
 
@@ -17,7 +15,6 @@ pub fn app_middleware(
   use <- wisp.rescue_crashes
   use req <- wisp.handle_head(req)
   let session = get_session(db, req)
-  io.println(string.inspect(session))
 
   let response = next(#(req, session))
   add_session_to_response(req, response, session)
@@ -53,4 +50,28 @@ fn add_session_to_response(
 fn expiration_time(expiration: timestamp.Timestamp) -> Int {
   float.round(timestamp.to_unix_seconds(expiration))
   - float.round(timestamp.to_unix_seconds(timestamp.system_time()))
+}
+
+// TODO: Find a better place for the following verify_auth functions
+
+/// This function verify if the user is on a route that they can access
+/// as authenticated
+pub fn verify_auth(
+  req: Request,
+  session: session.CurrentSession,
+  next: fn(Request) -> Response,
+) -> Response {
+  let protected = is_protected_route(req)
+  case protected, session {
+    True, NoSession -> wisp.response(403)
+    _, _ -> next(req)
+  }
+  next(req)
+}
+
+fn is_protected_route(req: Request) -> Bool {
+  case wisp.path_segments(req) {
+    ["signup"] | ["auth", "login"] -> False
+    _ -> True
+  }
 }
