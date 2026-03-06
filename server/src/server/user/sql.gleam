@@ -20,6 +20,9 @@ pub type CreateUserRow {
 }
 
 /// create user
+/// $1: full_name
+/// $2: email
+/// $3: password
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -39,6 +42,9 @@ pub fn create_user(
   }
 
   "-- create user
+-- $1: full_name
+-- $2: email
+-- $3: password
 INSERT INTO users (full_name, email, password)
     VALUES ($1, $2, $3)
 RETURNING

@@ -7,6 +7,7 @@ import pog
 import server/auth/auth_controller
 import server/cron_job
 import server/db
+import server/file/file_controller
 import server/middleware
 import server/user/user_controller
 import wisp.{type Request, type Response}
@@ -36,10 +37,11 @@ fn handle_request(db: pog.Connection, req: Request) -> Response {
   use #(req, session) <- middleware.app_middleware(db, req)
   use req <- middleware.verify_auth(req, session)
 
+  wisp.log_info("In handle request path: " <> req.path)
   case req.method, wisp.path_segments(req) {
     Post, ["signup"] -> user_controller.handle_request_user(db, req)
     _, ["auth", _] -> auth_controller.handle_request_login(db, req, session)
-    _, ["file", _] -> auth_controller.handle_request_login(db, req, session)
+    _, ["file", ..] -> file_controller.handle_request_file(db, req, session)
     _, _ -> wisp.not_found()
   }
 }

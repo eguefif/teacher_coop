@@ -1,7 +1,11 @@
+import gleam/bit_array
+import gleam/io
 import gleam/list
+import gleam/string
 import pog
 import server/auth/session
 import server/file/sql
+import server/file_ingestion/sql as ingestion_sql
 import shared/user.{User}
 import simplifile
 import wisp
@@ -15,7 +19,7 @@ type File {
   Odp(data: BitArray)
 }
 
-pub fn handle_file(
+pub fn handle_request_file(
   db: pog.Connection,
   req: wisp.Request,
   session: session.CurrentSession,
@@ -27,26 +31,9 @@ pub fn handle_file(
 }
 
 // TODO: we receive in the  content-type the file typ
-// In the body the byte. I added simplifile
-// We need to get the to
-// - [X] Retrieve the type and file
-// - [X] Add a new table files
-//       * id
-//       * user_id
-//       * format
-//       * ingestion job id
-//       * path
-// - [ ] Create an entry in the DB and link to the user
-// - [ ] Retrieve the byte and write it on disck
-// - [ ] Save using the type with a semi random name
-// Step 2
-// - [X] Add a queue table for ingestion in the DB
-//       * id
-//       * file path
-//       * file id
-//       * Job status: pending, processing, processed
-// - [ ] Schedule an ingestion job link to the file
-// - [ ] Have a job that check
+// - [x] Schedule an ingestion job link to the file
+// - [ ] test logic end to end:
+// - [ ] Have a job that check if file is ingested
 fn upload_file(
   db: pog.Connection,
   req: wisp.Request,
@@ -55,12 +42,29 @@ fn upload_file(
   use body <- wisp.require_bit_array_body(req)
   use file <- get_content_file(req, body)
   use file_metadata <- write_file_in_disk(file)
-  use file_id <- add_file_in_db(file_metadata, db, session)
-  schedule_ingestion_job(file_id)
+  use #(file_id, file_path) <- add_file_in_db(file_metadata, db, session)
+  use job_id <- schedule_ingestion_job(db, file_path)
+  update_file_db_with_job_id(db, file_id, job_id)
 }
 
-fn schedule_ingestion_job(file_id: Int) -> response.Response(wisp.Body) {
-  todo
+fn schedule_ingestion_job(
+  db: pog.Connection,
+  file_path: String,
+  next: fn(Int) -> wisp.Response,
+) -> wisp.Response {
+  case ingestion_sql.create_new_job(db, file_path) {
+    Ok(pog.Returned(_, [ingestion_sql.CreateNewJobRow(id, _, _)])) -> next(id)
+    _ -> wisp.internal_server_error()
+  }
+}
+
+fn update_file_db_with_job_id(
+  db: pog.Connection,
+  file_id: Int,
+  job_id: Int,
+) -> wisp.Response {
+  let assert Ok(_) = sql.update_ingestion_job_id_file_by_id(db, job_id, file_id)
+  wisp.ok()
 }
 
 fn write_file_in_disk(
@@ -69,9 +73,16 @@ fn write_file_in_disk(
 ) -> wisp.Response {
   let filename = create_filename(file)
   let filepath = "./assets/" <> filename
+  // TODO: we don't get the data: check why
   case simplifile.write_bits(filepath, file.data) {
-    Ok(_) -> next(#(filename, filepath))
-    Error(_) -> wisp.internal_server_error()
+    Ok(_) -> next(#(filename, "./asserts/"))
+    Error(e) -> {
+      wisp.log_error(
+        "file_controller: error: impossible to write file: "
+        <> string.inspect(e),
+      )
+      wisp.internal_server_error()
+    }
   }
 }
 
@@ -91,12 +102,12 @@ fn add_file_in_db(
   file_metadata: #(String, String),
   db: pog.Connection,
   session: session.CurrentSession,
-  next: fn(Int) -> wisp.Response,
+  next: fn(#(Int, String)) -> wisp.Response,
 ) -> wisp.Response {
   let #(filename, filepath) = file_metadata
   let assert session.CurrentSession(_, _, User(id, ..)) = session
   case sql.create_file(db, filename, filepath, id) {
-    Ok(pog.Returned(_, [sql.CreateFileRow(id, ..)])) -> next(id)
+    Ok(pog.Returned(_, [sql.CreateFileRow(id, ..)])) -> next(#(id, filepath))
     _ -> wisp.internal_server_error()
   }
 }
@@ -107,12 +118,12 @@ fn get_content_file(
   next: fn(File) -> wisp.Response,
 ) -> wisp.Response {
   use content_type <- get_content_type(req)
-  case content_type {
-    "pdf" -> next(Pdf(body))
-    "docx" -> next(Docx(body))
-    "pptx" -> next(Pptx(body))
-    "odt" -> next(Odt(body))
-    "odp" -> next(Odp(body))
+  case string.split(content_type, "/") {
+    [_, "pdf"] -> next(Pdf(body))
+    [_, "docx"] -> next(Docx(body))
+    [_, "pptx"] -> next(Pptx(body))
+    [_, "odt"] -> next(Odt(body))
+    [_, "odp"] -> next(Odp(body))
     _ -> wisp.unprocessable_content()
   }
 }

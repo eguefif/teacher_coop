@@ -6,18 +6,22 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 - [X] Improve justfile and create a just db-build to reset app
 - [X] Handle session in frontend Client
 
+### Session
+- [ ] Fix problem where session is lost in the browser when server restart
+
 ### Frontend logic
-- [ ] Remove error input handling login form
-- [ ] Display message login error when failing to login
-- [ ] Use form on submit to allow for typing enter to submit: login and signup
+- [x] Remove error input handling login form
+- [x] Display message login error when failing to login
+- [x] Use form on submit to allow for typing enter to submit: login and signup
 - [ ] Improve signup form, validation input should reset when focus (hide red and error input)
-- [ ] Should display that an email to confirm account was sent after signup
+- [ ] Should display that an email was sent in a toaster or message. It tells the user that their account was created
 - [ ] Add email confirmation message (wait for stable version, for now confirm should be false and enable it manually via DB)
 - [ ] Display message login to say that account is not activated
 
 ### File logic
 - [ ] End-to-End upload and search file
     - [ ] Add UI to upload file on user workspace
+    - [ ] Picking the file should not trigger sending the file: it should be triggered by the button
     - [ ] Add backend to download file and register it to PG for user
     - [ ] Rudimentary search with PG and download
 - [ ] Improve search with Meilisearch
@@ -32,6 +36,7 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
     -[ ] Setup Postgres
     -[ ] Handle migration
     -[ ] Make app deploy works
+- [ ] What about a hash system that optimize storage. We only store one file but it can be pointed by multiple file row in the db
 
 ## Architecture
 

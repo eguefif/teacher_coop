@@ -30,6 +30,10 @@ g18n:
 export DATABASE_URL := "postgres://admin:12345@127.0.0.1:5432/teacher_coop"
 squirrel:
   cd server && gleam run -m squirrel
+  just gen-doc
 
 migrate:
   cd server && gleam run -m cigogne up
+
+gen-doc:
+  cd server && gleam docs build

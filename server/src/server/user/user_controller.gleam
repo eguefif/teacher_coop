@@ -50,7 +50,6 @@ pub fn check_password(
   email: String,
   password_check: String,
 ) -> Option(user.User) {
-  wisp.log_info("Checking password")
   case sql.get_user_by_email(db, email) {
     Ok(pog.Returned(
       _,
