@@ -1,32 +1,25 @@
 import g18n
-import gleam/bit_array
 import gleam/dynamic
 import gleam/dynamic/decode
-import gleam/http
-import gleam/http/request
-import gleam/io
-import js/window as js
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
-import rsvp
 
 // Model -----------------------------------------------------------------------------------------
 pub type Model {
-  File(file: decode.Dynamic, data: BitArray)
+  File(file: decode.Dynamic, data: BitArray, filetype: String)
 }
 
 pub fn init() -> Model {
-  File(dynamic.nil(), <<>>)
+  File(dynamic.nil(), <<>>, "")
 }
 
 // Update -----------------------------------------------------------------------------------------
 pub type Msg {
   UserSelectedFile(file: decode.Dynamic, mime: String)
   BrowserLoadedFile(data: BitArray, mime: String)
-  ServerReceivedFile(Result(String, rsvp.Error))
 }
 
 pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -35,18 +28,10 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       File(..model, file:),
       read_file(file, mime),
     )
-    BrowserLoadedFile(data, mime) -> #(
-      File(..model, data:),
-      upload_file(data, mime),
+    BrowserLoadedFile(data, filetype) -> #(
+      File(..model, data:, filetype:),
+      effect.none(),
     )
-    ServerReceivedFile(Ok(_)) -> {
-      io.println("File sent")
-      #(model, effect.none())
-    }
-    ServerReceivedFile(Error(_)) -> {
-      io.println("Error sending file")
-      #(model, effect.none())
-    }
   }
 }
 
@@ -57,17 +42,6 @@ fn read_file(file: dynamic.Dynamic, mime: String) -> effect.Effect(Msg) {
 
 @external(javascript, "./read_file.mjs", "read_file")
 fn do_read_file(file: dynamic.Dynamic, dispatch: fn(BitArray) -> Nil) -> Nil
-
-fn upload_file(data: BitArray, mime: String) -> Effect(Msg) {
-  let base_url = js.base_url()
-  let assert Ok(req) = request.to(base_url <> "/api/file/upload")
-  let req =
-    req
-    |> request.set_method(http.Post)
-    |> request.set_header("content-type", mime)
-    |> request.set_body(data)
-  rsvp.send_bits(req, rsvp.expect_text(ServerReceivedFile))
-}
 
 // View -----------------------------------------------------------------------------------------
 

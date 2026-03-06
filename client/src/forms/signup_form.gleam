@@ -8,6 +8,7 @@ import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
+import lustre/event
 import reusables/button.{button}
 import reusables/input.{input}
 import rsvp
@@ -296,7 +297,7 @@ pub fn view(
         ),
       ]),
       button(
-        option.Some(visitor_submited_signup_form),
+        option.Some(event.on_click(visitor_submited_signup_form)),
         g18n.translate(translator, "signup.submit"),
         "submit",
       ),

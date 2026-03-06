@@ -20,16 +20,21 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 
 ### File logic
 - [ ] End-to-End upload and search file
-    - [ ] Add UI to upload file on user workspace
-    - [ ] Picking the file should not trigger sending the file: it should be triggered by the button
-    - [ ] Add backend to download file and register it to PG for user
-    - [ ] Rudimentary search with PG and download
-- [ ] Improve search with Meilisearch
+    - [x] Add UI to upload file on user workspace
+    - [x] Picking the file should not trigger sending the file: it should be triggered by the button
+    - [x] Add backend to download file and register it to PG for user
+- [ ] Implement search with Meilisearch
     - [ ] Install and Configure Meilisearch
     - [ ] Add logic to create job for ingestion when downloading file
     - [ ] Add a python service that will pull the DB for indexing job
     - [ ] Add logic for search frontend
     - [ ] Add logic for search backend
+- [ ] Next iteration
+    - [ ] Keep the file name from the file and fil a hidden input
+    - [ ] Add metadata on the file: type of resource: sequence, exercices, support
+    - [ ] Send as multipart
+
+### Deployement
 - [ ] Setup a staging environement to test on my homeserver
     -[X] Create Docker image
     -[ ] Use Coolify on my homeserver to monitor docker file

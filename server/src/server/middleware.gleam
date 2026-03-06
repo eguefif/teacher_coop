@@ -66,7 +66,6 @@ pub fn verify_auth(
     True, NoSession -> wisp.response(403)
     _, _ -> next(req)
   }
-  next(req)
 }
 
 fn is_protected_route(req: Request) -> Bool {

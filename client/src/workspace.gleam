@@ -1,13 +1,16 @@
 import forms/filepath
 import g18n
-import gleam/io
+import gleam/http
+import gleam/http/request
 import gleam/option
-import gleam/string
+import js/window as js
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
+import lustre/event
 import reusables/button
+import rsvp
 
 const extensions = [".pdf", ".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp"]
 
@@ -23,8 +26,8 @@ pub fn fileform_init() {
 
 // Update ---------------------------------------------------------------------------------------
 pub type Msg {
-  UserSubmittedFileForm
-  BrowserSentFile(String)
+  UserSubmitedFileForm(List(#(String, String)))
+  BrowserSentFile(Result(String, rsvp.Error))
   FilePathMsg(filepath.Msg)
 }
 
@@ -35,8 +38,12 @@ pub fn update(
   //wrapper_msg: fn(Msg) -> msg,
 ) -> #(Model, Effect(Msg)) {
   case msg {
-    UserSubmittedFileForm -> update_fileform(model)
-    BrowserSentFile(_response) -> #(model, effect.none())
+    UserSubmitedFileForm(_) -> #(
+      model,
+      upload_file(model.file.data, model.file.filetype),
+    )
+    BrowserSentFile(Ok(_)) -> #(model, effect.none())
+    BrowserSentFile(Error(_)) -> #(model, effect.none())
     FilePathMsg(msg) -> filepath_update(model.file, msg)
   }
 }
@@ -49,14 +56,15 @@ fn filepath_update(
   #(FileForm(model, "", False), effect |> effect.map(FilePathMsg))
 }
 
-fn update_fileform(model: Model) -> #(Model, Effect(Msg)) {
-  io.println(
-    "File: "
-    <> string.inspect(model.file.file)
-    <> "\n"
-    <> string.inspect(model.file.data),
-  )
-  #(model, effect.none())
+fn upload_file(data: BitArray, mime: String) -> Effect(Msg) {
+  let base_url = js.base_url()
+  let assert Ok(req) = request.to(base_url <> "/api/file/upload")
+  let req =
+    req
+    |> request.set_method(http.Post)
+    |> request.set_header("content-type", mime)
+    |> request.set_body(data)
+  rsvp.send_bits(req, rsvp.expect_text(BrowserSentFile))
 }
 
 // View ---------------------------------------------------------------------------------------
@@ -89,16 +97,22 @@ fn fileform_view(
     #("flex-direction", "column"),
     #("gap", "12px"),
   ]
-  html.form([attribute.styles(styles)], [
-    filepath.view(
-      translator,
-      fn(msg) { msg_wrapper(FilePathMsg(msg)) },
-      extensions,
-    ),
-    button.button(
-      option.None,
-      g18n.translate(translator, "workspace.fileform.submit"),
-      "submit",
-    ),
-  ])
+  html.form(
+    [
+      event.on_submit(fn(msg) { msg_wrapper(UserSubmitedFileForm(msg)) }),
+      attribute.styles(styles),
+    ],
+    [
+      filepath.view(
+        translator,
+        fn(msg) { msg_wrapper(FilePathMsg(msg)) },
+        extensions,
+      ),
+      button.button(
+        option.None,
+        g18n.translate(translator, "workspace.fileform.submit"),
+        "submit",
+      ),
+    ],
+  )
 }
