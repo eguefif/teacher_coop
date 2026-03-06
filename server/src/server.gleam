@@ -18,7 +18,10 @@ pub fn main() -> Nil {
 
   let db = db.init_db()
   let _ = cron_job.init_cron()
-  let secret_key_base = wisp.random_string(64)
+  let secret_key_base = case envoy.get("SECRET_KEY") {
+    Ok(key) -> key
+    Error(_) -> "123451234"
+  }
   let port = get_port()
   let host = get_host()
 

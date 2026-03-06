@@ -7,7 +7,7 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 - [X] Handle session in frontend Client
 
 ### Session
-- [ ] Fix problem where session is lost in the browser when server restart
+- [x] Fix problem where session is lost in the browser when server restart
 
 ### Frontend logic
 - [x] Remove error input handling login form
@@ -19,7 +19,7 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 - [ ] Display message login to say that account is not activated
 
 ### File logic
-- [ ] End-to-End upload and search file
+- [x] End-to-End upload and search file
     - [x] Add UI to upload file on user workspace
     - [x] Picking the file should not trigger sending the file: it should be triggered by the button
     - [x] Add backend to download file and register it to PG for user
@@ -47,9 +47,9 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 
 ```
 teacher_coop/
-├── server/     # Backend HTTP server (Erlang/OTP, port 3000)
-├── client/     # Frontend SPA (compiles to JavaScript)
-└── shared/     # Shared types and serialization (used by both)
+├── server/     # Gleam Backend HTTP server (Erlang/OTP, port 3000)
+├── client/     # Gleam Frontend SPA (compiles to JavaScript)
+└── shared/     # Gleam Shared types and serialization (used by both)
 ```
 
 The `shared` package is referenced as a local path dependency in both `server/gleam.toml` and `client/gleam.toml`, ensuring types and JSON serialization stay in sync across the stack.
@@ -94,4 +94,30 @@ source init_env.sh
 ```
 
 This exports `DATABASE_URL=postgres://admin:12345@127.0.0.1:5432/teacher_coop`.
+
+---
+
+## Development with `just`
+
+A [`justfile`](./justfile) is provided at the root to simplify common tasks. Run `just` (no arguments) to list all available commands.
+
+### Start the full dev environment
+
+In three separate terminals:
+
+```sh
+just db        # Start PostgreSQL via Docker Compose
+just server    # Start the backend server on port 3000
+just client    # Start the frontend dev server with hot-reload
+```
+
+### Other useful commands
+
+```sh
+just migrate   # Run database migrations (cigogne)
+just squirrel  # Regenerate type-safe SQL query modules from .sql files
+just db-build  # Reset/rebuild the database
+just psql      # Open a psql shell to the local DB
+just g18n      # Regenerate i18n translation files
+```
 

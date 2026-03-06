@@ -30,10 +30,6 @@ pub fn handle_request_file(
   }
 }
 
-// TODO: we receive in the  content-type the file typ
-// - [x] Schedule an ingestion job link to the file
-// - [ ] test logic end to end:
-// - [ ] Have a job that check if file is ingested
 fn upload_file(
   db: pog.Connection,
   req: wisp.Request,
@@ -72,10 +68,10 @@ fn write_file_in_disk(
   next: fn(#(String, String)) -> wisp.Response,
 ) -> wisp.Response {
   let filename = create_filename(file)
-  let filepath = "./assets/" <> filename
-  // TODO: we don't get the data: check why
+  let assert Ok(path) = wisp.priv_directory("server")
+  let filepath = path <> filename
   case simplifile.write_bits(filepath, file.data) {
-    Ok(_) -> next(#(filename, "./asserts/"))
+    Ok(_) -> next(#(filename, filepath))
     Error(e) -> {
       wisp.log_error(
         "file_controller: error: impossible to write file: "
