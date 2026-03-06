@@ -11,5 +11,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+
 volumes:
   postgres_data:
+  meilisearch_data:

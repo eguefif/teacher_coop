@@ -25,8 +25,10 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
     - [x] Add backend to download file and register it to PG for user
 - [ ] Implement search with Meilisearch
     - [ ] Install and Configure Meilisearch
-    - [ ] Add logic to create job for ingestion when downloading file
+    - [x] Add logic to create job for ingestion when downloading file
     - [ ] Add a python service that will pull the DB for indexing job
+        -[x] Get one job
+        -[ ] process and save to meilisearch the document
     - [ ] Add logic for search frontend
     - [ ] Add logic for search backend
 - [ ] Next iteration
