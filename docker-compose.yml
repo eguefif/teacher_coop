@@ -13,6 +13,8 @@ services:
 
   meilisearch:
     image: getmeili/meilisearch:latest
+    environment:
+      MASTER_KEY: 123456789123456789
     ports:
       - "7700:7700"
     volumes:

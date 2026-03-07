@@ -21,6 +21,10 @@ _ = signal.signal(signal.SIGTERM, handle_shutdown)
 _ = signal.signal(signal.SIGINT, handle_shutdown)
 
 
+# TODO: get the file and index the first page. One document per paragraph in meilisearch
+# Use the french document and delete the math one
+
+
 async def worker():
     async with get_conn() as conn:
         while running:

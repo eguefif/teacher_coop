@@ -1,3 +1,4 @@
+set dotenv-load
 # List all available commands
 default:
     @just --list
@@ -27,7 +28,6 @@ db-build:
 g18n:
   cd shared && gleam run -m g18n/dev generate --nested
 
-export DATABASE_URL := "postgres://admin:12345@127.0.0.1:5432/teacher_coop"
 squirrel:
   cd server && gleam run -m squirrel
   just gen-doc
