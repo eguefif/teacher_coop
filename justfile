@@ -5,7 +5,7 @@ default:
 
 # Start PostgreSQL via Docker Compose
 db:
-    docker compose up -d
+    docker compose up
 
 # Run the Gleam backend server (port 3000)
 server:
@@ -37,3 +37,7 @@ migrate:
 
 gen-doc:
   cd server && gleam docs build
+
+gleam-update:
+  cd server && gleam update
+  cd client && gleam update

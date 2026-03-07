@@ -2,9 +2,9 @@ services:
   postgres:
     image: postgres:18
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: teacher_coop
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_DB: ${PG_DB}
       PGTZ: UTC
     ports:
       - "5432:5432"
@@ -14,7 +14,7 @@ services:
   meilisearch:
     image: getmeili/meilisearch:latest
     environment:
-      MASTER_KEY: 123456789123456789
+      MASTER_KEY: ${MASTER_KEY}
     ports:
       - "7700:7700"
     volumes:

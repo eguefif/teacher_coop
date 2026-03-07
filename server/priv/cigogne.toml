@@ -11,11 +11,6 @@
 # password = "postgres"
 # port = 5432
 # name = "postgres"
-host = "127.0.0.1"
-user = "admin"
-port = 5432
-password = "12345"
-name = "teacher_coop"
 
 # This section will be overridden by eventual users of the library
 [migration-table]
