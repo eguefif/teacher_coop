@@ -1,8 +1,9 @@
 import cigogne
 import cigogne/config
+import gleam/io
+import gleam/string
 import pog
 import server/db
-import server/user/sql as user_sql
 import server/user/user_controller
 
 // TODO: add logic to create a dummy user
@@ -23,6 +24,21 @@ fn reset_db(db) {
     pog.query("DROP TABLE IF EXISTS sessions")
     |> pog.execute(db)
   let assert Ok(_) =
+    pog.query("DROP TABLE IF EXISTS users")
+    |> pog.execute(db)
+  let assert Ok(_) =
+    pog.query("DROP TABLE IF EXISTS files")
+    |> pog.execute(db)
+  let assert Ok(_) =
+    pog.query("DROP TABLE IF EXISTS file_ingestion_jobs")
+    |> pog.execute(db)
+  let assert Ok(_) =
+    pog.query("DROP TYPE IF EXISTS job_status")
+    |> pog.execute(db)
+  let assert Ok(_) =
+    pog.query("DROP TYPE IF EXISTS user_type")
+    |> pog.execute(db)
+  let assert Ok(_) =
     pog.query("TRUNCATE _migrations RESTART IDENTITY")
     |> pog.execute(db)
   let assert Ok(_) =
@@ -32,5 +48,13 @@ fn reset_db(db) {
 
 fn create_user(db) {
   let password = user_controller.hash_password("1234!")
-  user_sql.create_user(db, "Emmanuel Guefif", "eguefif@fastmail.com", password)
+  let sql = "INSERT INTO users (full_name, email, password, type)
+  VALUES('Emmanuel Guefif', 'eguefif@fastmail.com', '" <> password <> "', 'admin')"
+  case
+    pog.query(sql)
+    |> pog.execute(db)
+  {
+    Ok(_) -> io.println("Creating user admin")
+    Error(err) -> io.println("Error: " <> string.inspect(err))
+  }
 }
