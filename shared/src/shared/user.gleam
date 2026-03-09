@@ -11,7 +11,12 @@ pub type User {
     password: String,
     confirmed: Bool,
   )
-  User(id: Int, fullname: String, email: String)
+  User(id: Int, fullname: String, email: String, type_: UserT)
+}
+
+pub type UserT {
+  Admin
+  Member
 }
 
 pub fn user_form_decoder() -> decode.Decoder(User) {
@@ -48,14 +53,34 @@ pub fn user_decoder() -> decode.Decoder(User) {
   use id <- decode.field("id", decode.int)
   use fullname <- decode.field("fullname", decode.string)
   use email <- decode.field("email", decode.string)
-  decode.success(User(id:, fullname:, email:))
+  use type_ <- decode.field(
+    "user_type",
+    decode.string |> decode.map(fn(user_type) { map_user_type(user_type) }),
+  )
+  decode.success(User(id:, fullname:, email:, type_:))
 }
 
 pub fn user_to_json(user: User) -> json.Json {
-  let assert User(id, fullname, email) = user
+  let assert User(id, fullname, email, user_type) = user
   json.object([
     #("id", json.int(id)),
     #("fullname", json.string(fullname)),
     #("email", json.string(email)),
+    #("user_type", user_type_to_json(user_type)),
   ])
+}
+
+pub fn user_type_to_json(type_: UserT) -> json.Json {
+  case type_ {
+    Admin -> json.string("admin")
+    Member -> json.string("member")
+  }
+}
+
+fn map_user_type(type_: String) -> UserT {
+  case type_ {
+    "admin" -> Admin
+    "member" -> Member
+    _ -> panic
+  }
 }

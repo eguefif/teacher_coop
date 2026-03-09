@@ -9,10 +9,8 @@ import gleam/result
 import gleam/time/duration
 import gleam/time/timestamp
 import pog
-import server/sql.{
-  CreateSessionRow, GetUserBySessionIdRow, create_session,
-  get_user_by_session_id,
-}
+import server/auth/sql as auth_sql
+import server/user/sql as user_sql
 import shared/user.{type User, User}
 import wisp.{type Request, type Response}
 import youid/uuid
@@ -34,10 +32,10 @@ pub fn init_session(
   db: pog.Connection,
   user_id: Int,
 ) -> Result(uuid.Uuid, pog.QueryError) {
-  case create_session(db, user_id, expires_at()) {
+  case auth_sql.create_session(db, user_id, expires_at()) {
     Ok(pog.Returned(_, rows)) -> {
       case rows {
-        [CreateSessionRow(id, _, _, _)] -> Ok(id)
+        [auth_sql.CreateSessionRow(id, _, _, _)] -> Ok(id)
         _ -> panic
       }
     }
@@ -50,10 +48,19 @@ fn expires_at() -> timestamp.Timestamp {
 }
 
 pub fn retrieve_session(db: pog.Connection, id: uuid.Uuid) -> CurrentSession {
-  case get_user_by_session_id(db, id) {
+  wisp.log_info("Session id: " <> uuid.to_string(id))
+  case user_sql.get_user_by_session_id(db, id) {
     Ok(pog.Returned(
       _,
-      [GetUserBySessionIdRow(session_expires_at, user_id, fullname, email)],
+      [
+        user_sql.GetUserBySessionIdRow(
+          session_expires_at,
+          user_id,
+          fullname,
+          email,
+          db_type,
+        ),
+      ],
     )) ->
       case
         timestamp.compare(session_expires_at, timestamp.system_time())
@@ -64,13 +71,22 @@ pub fn retrieve_session(db: pog.Connection, id: uuid.Uuid) -> CurrentSession {
             CurrentSession(
               id,
               session_expires_at,
-              User(id: user_id, fullname:, email:),
+              User(id: user_id, fullname:, email:, type_: case db_type {
+                user_sql.Member -> user.Member
+                user_sql.Admin -> user.Admin
+              }),
             )
           try_refresh_session(db, session)
         }
-        False -> NoSession
+        False -> {
+          wisp.log_info("Error: timestamp")
+          NoSession
+        }
       }
-    _ -> NoSession
+    _ -> {
+      wisp.log_info("Error: No Session")
+      NoSession
+    }
   }
 }
 
@@ -97,7 +113,7 @@ pub fn should_refresh_session(expiration) -> Bool {
 fn refresh_session(db, session) -> CurrentSession {
   let assert CurrentSession(id, ..) = session
   let expiration = expires_at()
-  let _ = sql.update_session_expiration_at_by_id(db, expiration, id)
+  let _ = auth_sql.update_session_expiration_at_by_id(db, expiration, id)
   CurrentSession(..session, expiration: expiration)
 }
 
@@ -122,7 +138,7 @@ pub fn destroy_session(db: pog.Connection, req: Request) -> Response {
       wisp.Signed,
     ))
     use id <- result.try(uuid.from_string(session_id))
-    sql.delete_session_where_id(db, id) |> result.map_error(fn(_) { Nil })
+    auth_sql.delete_session_where_id(db, id) |> result.map_error(fn(_) { Nil })
   }
   wisp.ok()
   |> wisp.set_cookie(req, session_cookie_name, "", wisp.PlainText, 0)

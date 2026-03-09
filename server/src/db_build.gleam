@@ -13,7 +13,7 @@ pub fn main() {
   let assert Ok(cfg) = config.get("server")
   let assert Ok(engine) = cigogne.create_engine(cfg)
   let assert Ok(_) = cigogne.apply_all(engine)
-  create_user(db)
+  create_users(db)
 }
 
 fn reset_db(db) {
@@ -36,7 +36,7 @@ fn reset_db(db) {
     pog.query("DROP TYPE IF EXISTS job_status")
     |> pog.execute(db)
   let assert Ok(_) =
-    pog.query("DROP TYPE IF EXISTS user_type")
+    pog.query("DROP TYPE IF EXISTS pg_user_type")
     |> pog.execute(db)
   let assert Ok(_) =
     pog.query("TRUNCATE _migrations RESTART IDENTITY")
@@ -46,10 +46,14 @@ fn reset_db(db) {
     |> pog.execute(db)
 }
 
-fn create_user(db) {
+fn create_users(db) {
   let password = user_controller.hash_password("1234!")
-  let sql = "INSERT INTO users (full_name, email, password, type)
-  VALUES('Emmanuel Guefif', 'eguefif@fastmail.com', '" <> password <> "', 'admin')"
+  let sql = "
+  INSERT INTO users (full_name, email, password, user_type)
+  VALUES
+  ('Emmanuel Guefif', 'eguefif@fastmail.com', '" <> password <> "', 'admin'),
+  ('Robert Du Limousin', 'rdl@fastmail.com', '" <> password <> "', 'member');
+  "
   case
     pog.query(sql)
     |> pog.execute(db)

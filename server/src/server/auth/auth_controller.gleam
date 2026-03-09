@@ -9,7 +9,7 @@ import shared/user
 import wisp.{type Request, type Response}
 import youid/uuid
 
-pub fn handle_request_login(
+pub fn handle_auth(
   db: pog.Connection,
   req: Request,
   session: session.CurrentSession,

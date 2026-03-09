@@ -3,7 +3,7 @@ import gleam/dynamic/decode
 import gleam/http.{Post}
 import gleam/option.{type Option, None, Some}
 import pog
-import server/sql
+import server/user/sql
 import shared/user.{type User, UserForm, user_form_decoder}
 import wisp.{type Request, type Response}
 
@@ -48,16 +48,20 @@ fn create_user_db(
 pub fn check_password(
   db: pog.Connection,
   email: String,
-  password_check: String,
+  password_input: String,
 ) -> Option(user.User) {
   case sql.get_user_by_email(db, email) {
     Ok(pog.Returned(
       _,
-      [sql.GetUserByEmailRow(id, fullname, email, hashed_password)],
+      [sql.GetUserByEmailRow(id, fullname, email, hashed_password, db_type)],
     )) ->
-      case argus.verify(hashed_password, password_check) {
+      case argus.verify(hashed_password, password_input) {
         Ok(True) -> {
-          let user = user.User(id:, fullname:, email:)
+          let user =
+            user.User(id:, fullname:, email:, type_: case db_type {
+              sql.Member -> user.Member
+              sql.Admin -> user.Admin
+            })
           Some(user)
         }
         Ok(False) | Error(_) -> None

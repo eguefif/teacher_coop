@@ -54,8 +54,8 @@ fn expiration_time(expiration: timestamp.Timestamp) -> Int {
 
 // TODO: Find a better place for the following verify_auth functions
 
-/// This function verify if the user is on a route that they can access
-/// as authenticated
+/// This function verify if the user is on a protected route. If so, we 
+/// check if they are authenticated
 pub fn verify_auth(
   req: Request,
   session: session.CurrentSession,

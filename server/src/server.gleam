@@ -4,6 +4,7 @@ import gleam/http.{Post}
 import gleam/int
 import mist
 import pog
+import server/admin/admin_controller
 import server/auth/auth_controller
 import server/cron_job
 import server/db
@@ -43,8 +44,9 @@ fn handle_request(db: pog.Connection, req: Request) -> Response {
   wisp.log_info("In handle request path: " <> req.path)
   case req.method, wisp.path_segments(req) {
     Post, ["signup"] -> user_controller.handle_request_user(db, req)
-    _, ["auth", _] -> auth_controller.handle_request_login(db, req, session)
+    _, ["auth", _] -> auth_controller.handle_auth(db, req, session)
     _, ["file", ..] -> file_controller.handle_request_file(db, req, session)
+    _, ["admin", ..] -> admin_controller.handle_admin(db, req, session)
     _, _ -> wisp.not_found()
   }
 }

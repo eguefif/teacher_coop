@@ -1,3 +1,4 @@
+import admin
 import forms/login
 import forms/signup_form
 import g18n
@@ -127,6 +128,7 @@ type Msg {
   UserApiMsg(user_api.Msg)
   HeaderMsg(header.Msg)
   WorkspaceMsg(workspace.Msg)
+  AdminMsg(admin.Msg)
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
@@ -159,7 +161,9 @@ fn update_user(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 // -------- Update Route
 fn update_route(model: Model, route: router.Route) -> Model {
   let protected = router.is_protected_route(route)
+  let admin = router.is_admin_route(route)
   case model {
+    User(..) if admin -> User(..model, route: router.Search)
     User(..) -> User(..model, route:)
     Pending(..) -> panic
     Visitor(..) if protected -> Visitor(..model, route: router.Login)
@@ -303,6 +307,7 @@ fn user_view(model: Model) -> Element(Msg) {
         workspace.view(model.translator, model.workspace, fn(msg) {
           WorkspaceMsg(msg)
         })
+      router.Admin -> admin.view()
     },
   ])
 }

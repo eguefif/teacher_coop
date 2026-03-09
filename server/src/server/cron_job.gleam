@@ -2,8 +2,8 @@ import clockwork
 import clockwork_schedule
 import gleam/erlang/process
 import gleam/otp/static_supervisor as supervisor
+import server/auth/sql
 import server/db
-import server/sql
 
 pub fn init_cron() {
   let cleanup_sessions = init_cleanup_session()

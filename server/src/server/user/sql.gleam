@@ -16,7 +16,13 @@ import youid/uuid.{type Uuid}
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type CreateUserRow {
-  CreateUserRow(id: Int, full_name: String, email: String, password: String)
+  CreateUserRow(
+    id: Int,
+    full_name: String,
+    email: String,
+    password: String,
+    user_type: PgUserType,
+  )
 }
 
 /// create user
@@ -38,7 +44,8 @@ pub fn create_user(
     use full_name <- decode.field(1, decode.string)
     use email <- decode.field(2, decode.string)
     use password <- decode.field(3, decode.string)
-    decode.success(CreateUserRow(id:, full_name:, email:, password:))
+    use user_type <- decode.field(4, pg_user_type_decoder())
+    decode.success(CreateUserRow(id:, full_name:, email:, password:, user_type:))
   }
 
   "-- create user
@@ -88,7 +95,13 @@ WHERE email = $1;
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type GetUserByEmailRow {
-  GetUserByEmailRow(id: Int, full_name: String, email: String, password: String)
+  GetUserByEmailRow(
+    id: Int,
+    full_name: String,
+    email: String,
+    password: String,
+    user_type: PgUserType,
+  )
 }
 
 /// get user by email
@@ -105,7 +118,14 @@ pub fn get_user_by_email(
     use full_name <- decode.field(1, decode.string)
     use email <- decode.field(2, decode.string)
     use password <- decode.field(3, decode.string)
-    decode.success(GetUserByEmailRow(id:, full_name:, email:, password:))
+    use user_type <- decode.field(4, pg_user_type_decoder())
+    decode.success(GetUserByEmailRow(
+      id:,
+      full_name:,
+      email:,
+      password:,
+      user_type:,
+    ))
   }
 
   "-- get user by email
@@ -130,7 +150,13 @@ WHERE
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type GetUserByIdRow {
-  GetUserByIdRow(id: Int, full_name: String, email: String, password: String)
+  GetUserByIdRow(
+    id: Int,
+    full_name: String,
+    email: String,
+    password: String,
+    user_type: PgUserType,
+  )
 }
 
 /// Get user by id
@@ -147,7 +173,14 @@ pub fn get_user_by_id(
     use full_name <- decode.field(1, decode.string)
     use email <- decode.field(2, decode.string)
     use password <- decode.field(3, decode.string)
-    decode.success(GetUserByIdRow(id:, full_name:, email:, password:))
+    use user_type <- decode.field(4, pg_user_type_decoder())
+    decode.success(GetUserByIdRow(
+      id:,
+      full_name:,
+      email:,
+      password:,
+      user_type:,
+    ))
   }
 
   "-- Get user by id
@@ -177,6 +210,7 @@ pub type GetUserBySessionIdRow {
     id: Int,
     full_name: String,
     email: String,
+    user_type: PgUserType,
   )
 }
 
@@ -195,11 +229,13 @@ pub fn get_user_by_session_id(
     use id <- decode.field(1, decode.int)
     use full_name <- decode.field(2, decode.string)
     use email <- decode.field(3, decode.string)
+    use user_type <- decode.field(4, pg_user_type_decoder())
     decode.success(GetUserBySessionIdRow(
       expiration_at:,
       id:,
       full_name:,
       email:,
+      user_type:,
     ))
   }
 
@@ -207,7 +243,8 @@ pub fn get_user_by_session_id(
     sessions.expiration_at,
     users.id,
     users.full_name,
-    users.email
+    users.email,
+    users.user_type
 FROM
     sessions
     INNER JOIN users ON users.id = sessions.user_id
@@ -219,4 +256,25 @@ WHERE
   |> pog.parameter(pog.text(uuid.to_string(arg_1)))
   |> pog.returning(decoder)
   |> pog.execute(db)
+}
+
+// --- Enums -------------------------------------------------------------------
+
+/// Corresponds to the Postgres `pg_user_type` enum.
+///
+/// > 🐿️ This type definition was generated automatically using v4.6.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type PgUserType {
+  Member
+  Admin
+}
+
+fn pg_user_type_decoder() -> decode.Decoder(PgUserType) {
+  use pg_user_type <- decode.then(decode.string)
+  case pg_user_type {
+    "member" -> decode.success(Member)
+    "admin" -> decode.success(Admin)
+    _ -> decode.failure(Member, "PgUserType")
+  }
 }
