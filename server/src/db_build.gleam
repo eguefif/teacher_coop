@@ -8,7 +8,7 @@ import server/user/user_controller
 
 // TODO: add logic to create a dummy user
 pub fn main() {
-  let db = db.init_db()
+  let #(db, _) = db.init_db()
   let _ = reset_db(db)
   let assert Ok(cfg) = config.get("server")
   let assert Ok(engine) = cigogne.create_engine(cfg)
