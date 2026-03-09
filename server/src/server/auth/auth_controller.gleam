@@ -1,3 +1,4 @@
+import app_type.{type App}
 import gleam/dynamic/decode
 import gleam/http.{Delete, Get, Post}
 import gleam/json
@@ -10,14 +11,14 @@ import wisp.{type Request, type Response}
 import youid/uuid
 
 pub fn handle_auth(
-  db: pog.Connection,
+  app: App,
   req: Request,
   session: session.CurrentSession,
 ) -> Response {
   case req.method, wisp.path_segments(req) {
-    Post, [_, "login"] -> login_user(db, req)
+    Post, [_, "login"] -> login_user(app.db, req)
     Get, [_, "whoami"] -> whoami(session)
-    Delete, [_, "logout"] -> session.destroy_session(db, req)
+    Delete, [_, "logout"] -> session.destroy_session(app.db, req)
     _, _ -> wisp.not_found()
   }
 }

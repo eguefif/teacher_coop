@@ -1,3 +1,4 @@
+import app_type.{type App}
 import gleam/list
 import gleam/string
 import pog
@@ -18,12 +19,12 @@ type File {
 }
 
 pub fn handle_request_file(
-  db: pog.Connection,
+  app: App,
   req: wisp.Request,
   session: session.CurrentSession,
 ) -> wisp.Response {
   case wisp.path_segments(req) {
-    ["file", "upload"] -> upload_file(db, req, session)
+    ["file", "upload"] -> upload_file(app.db, req, session)
     _ -> wisp.not_found()
   }
 }

@@ -1,3 +1,4 @@
+import app_type.{type App}
 import argus
 import gleam/dynamic/decode
 import gleam/http.{Post}
@@ -7,9 +8,9 @@ import server/user/sql
 import shared/user.{type User, UserForm, user_form_decoder}
 import wisp.{type Request, type Response}
 
-pub fn handle_request_user(db: pog.Connection, req: Request) -> Response {
+pub fn handle_request_user(app: App, req: Request) -> Response {
   case req.method, wisp.path_segments(req) {
-    Post, ["signup"] -> create_user(db, req)
+    Post, ["signup"] -> create_user(app.db, req)
     _, _ -> wisp.not_found()
   }
 }
