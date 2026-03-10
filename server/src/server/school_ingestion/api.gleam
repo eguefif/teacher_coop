@@ -41,7 +41,7 @@ pub fn api_school_response_to_json(response: ApiSchoolResponse) -> json.Json {
   ])
 }
 
-fn api_school_to_json(school: ApiSchool) -> json.Json {
+pub fn api_school_to_json(school: ApiSchool) -> json.Json {
   json.object([
     #(
       "identifiant_de_l_etablissement",

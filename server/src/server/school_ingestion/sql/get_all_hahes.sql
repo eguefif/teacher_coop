@@ -1,7 +1,6 @@
+-- get_all_hahes
 SELECT
     *
 FROM
-    school_ingestion_page_hashes
-WHERE
-    hash = ANY ($1);
+    school_ingestion_page_hashes;
 

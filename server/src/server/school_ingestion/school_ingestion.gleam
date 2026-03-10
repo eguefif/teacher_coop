@@ -5,11 +5,13 @@ import gleam/http/response.{Response}
 import gleam/httpc
 import gleam/int
 import gleam/io
+import gleam/json
 import gleam/list
 import gleam/string
 import mumu
 import pog
 import server/school_ingestion/api
+import server/school_ingestion/sql
 
 const scheme = http.Http
 
@@ -18,57 +20,40 @@ const host = "127.0.0.1:8080"
 
 const default_limit = 100
 
-const max_recursion = 20_000
+const max_recursion = 69_000
 
 //const path = "api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records/"
 const path = "/records/"
 
 const select = "identifiant_de_l_etablissement,nom_etablissement,type_etablissement,statut_public_prive,code_postal,nom_commune,code_departement,code_region,ecole_maternelle,ecole_elementaire,voie_generale,voie_professionnelle,appartenance_education_prioritaire"
 
-pub fn ingest_french_school(_db: pog.Connection, _ignore_cache: Bool) {
-  let #(indexes, hashes, pages) = request_dataset([], [], [], 100_000)
-  io.println("indexes: " <> int.to_string(list.length(indexes)))
-  io.println("hashes: " <> int.to_string(list.length(hashes)))
-  io.println("pages: " <> int.to_string(list.length(pages)))
+pub fn ingest_french_school(db: pog.Connection, _ignore_cache: Bool) {
+  request_dataset(0, 100_000)
+  |> persist_hashes_and_filter_out_pages(db, _)
+  //|> create_or_update_schools(db, _)
 }
 
+/// Side effect to the API: retrieve all data per batch of 100 rows
+///
+/// Returns a list of tupples, each page is associated to its hashe
 fn request_dataset(
-  indexes: List(Int),
-  hashes: List(Int),
-  pages: List(List(api.ApiSchool)),
-  remaining: Int,
-) -> #(List(Int), List(Int), List(List(api.ApiSchool))) {
-  let last_index = case list.last(indexes) {
-    Ok(last_index) -> last_index
-    _ -> 0
-  }
-  case last_index > max_recursion {
-    True -> #(indexes, hashes, pages)
+  offset: Int,
+  max_rows: Int,
+) -> List(#(Int, List(api.ApiSchool))) {
+  case offset >= max_rows || offset > max_recursion {
+    True -> []
     False -> {
-      let offset = last_index * default_limit
-      let limit = case remaining < default_limit {
-        True -> remaining
-        False -> default_limit
-      }
-      let request = create_request(offset, limit)
-      case httpc.send(request) {
+      let limit = int.min(default_limit, max_rows - offset)
+      case httpc.send(create_request(offset, limit)) {
         Ok(Response(status, _, body)) if status < 300 -> {
-          case remaining > 0 {
-            True -> {
-              let hash = mumu.hash(body)
-              let assert Ok(api.ApiSchoolResponse(total_records, new_page)) =
-                api.api_school_from_json(body)
-              request_dataset(
-                list.append(indexes, [last_index + 1]),
-                list.append(hashes, [hash]),
-                list.append(pages, [new_page]),
-                total_records - offset - limit,
-              )
-            }
-            _ -> #(indexes, hashes, pages)
-          }
+          let assert Ok(api.ApiSchoolResponse(total_records, page)) =
+            api.api_school_from_json(body)
+          [
+            #(mumu.hash(body), page),
+            ..request_dataset(offset + limit, total_records)
+          ]
         }
-        Ok(Response(status, _, _body)) -> {
+        Ok(Response(status, _, _)) -> {
           io.println("Http error: " <> string.inspect(status))
           panic
         }
@@ -89,22 +74,108 @@ fn create_request(offset: Int, limit: Int) -> Request(String) {
   |> request.set_path(path)
   |> request.set_method(http.Get)
   |> request.set_cookie("Authorization", "Bearer " <> token)
-  |> request.set_query([#("select", select)])
-  |> request.set_query([#("limit", int.to_string(limit))])
-  |> request.set_query([#("offset", int.to_string(offset))])
+  |> request.set_query([
+    #("select", select),
+    #("limit", int.to_string(limit)),
+    #("offset", int.to_string(offset)),
+  ])
 }
 
-pub fn ingest_school_result_page(db, page: String) {
-  case api.api_school_from_json(page) {
-    Ok(api.ApiSchoolResponse(_, results)) -> create_db_records_from(db, results)
+/// Compares fetched page hashes against the DB to find pages that changed.
+///
+/// Fetches all known hashes from the DB, filters out pages whose hash already
+/// exists (unchanged), then persists the full new hash list via truncate+insert.
+/// Returns only the pages that need to be ingested.
+fn persist_hashes_and_filter_out_pages(
+  db: pog.Connection,
+  data: List(#(Int, List(api.ApiSchool))),
+) -> List(List(api.ApiSchool)) {
+  let pages = case sql.get_all_hahes(db) {
+    Ok(pog.Returned(_len, results)) -> {
+      let results = results |> list.map(fn(entry) { entry.hash })
+      data
+      |> list.filter_map(fn(pair) {
+        case list.contains(results, pair.0) {
+          True -> Error(Nil)
+          False -> Ok(pair.1)
+        }
+      })
+    }
     Error(_) -> panic
+  }
+
+  io.println("Updating " <> int.to_string(list.length(pages)) <> " rows")
+  persist_hahes(db, data)
+  pages
+}
+
+fn persist_hahes(db: pog.Connection, data: List(#(Int, a))) {
+  let hashes = list.map(data, fn(entry) { entry.0 })
+  let query = "TRUNCATE school_ingestion_page_hashes;"
+  let _ = pog.query(query) |> pog.execute(db)
+  let query =
+    "
+  INSERT INTO school_ingestion_page_hashes (hash)
+  select *
+  FROM
+    unnest($1::bigint[])
+  "
+  let result =
+    pog.query(query)
+    |> pog.parameter(pog.array(pog.int, hashes))
+    |> pog.execute(db)
+
+  case result {
+    Ok(_) -> Nil
+    Error(err) -> io.println("Error in perist hash db: " <> string.inspect(err))
   }
 }
 
-fn create_db_records_from(_db: pog.Connection, _results: List(api.ApiSchool)) {
-  let _sql =
+fn create_or_update_schools(
+  db: pog.Connection,
+  pages: List(List(api.ApiSchool)),
+) {
+  case pages {
+    [page] -> create_or_update_one_page(db, page)
+    [page, ..rest] -> {
+      create_or_update_one_page(db, page)
+      create_or_update_schools(db, rest)
+    }
+    [] -> Nil
+  }
+}
+
+fn create_or_update_one_page(
+  db: pog.Connection,
+  page: List(api.ApiSchool),
+) -> Nil {
+  // TODO: needs to add a primary key on school identifiant from the dataset
+  // It will be used by our db as a primary KEy
+  // Need to add logic to make sure we handle correctly school typ
+  let query =
     "
-  INSERT INTO french_schools ()
-  VALUES
+  INSERT INTO french_schools (...)
+  SELECT 
+    list of columns, + add case when to process school type
+  FROM jsonb_array_elements($1::jsonb) as elem
+  ON CONFLICT school_id
+    DO UPDATE SET ....
   "
+
+  let page_json = list_api_school_to_json(page)
+  let result =
+    pog.query(query)
+    |> pog.parameter(pog.text(page_json))
+    |> pog.execute(db)
+
+  case result {
+    Ok(_) -> io.println("Page ingested")
+    Error(err) -> io.println("Error while ingested: " <> string.inspect(err))
+  }
+  Nil
+}
+
+fn list_api_school_to_json(schools: List(api.ApiSchool)) -> String {
+  json.array(schools, api.api_school_to_json)
+  |> json.to_string
 }
