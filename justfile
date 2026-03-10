@@ -35,6 +35,9 @@ squirrel:
 migrate:
   cd server && gleam run -m cigogne up
 
+migrate-all:
+  cd server && gleam run -m cigogne all
+
 gen-doc:
   cd server && gleam docs build
 

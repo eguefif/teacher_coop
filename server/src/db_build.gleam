@@ -25,7 +25,7 @@ fn reset_db(db) {
     DROP TABLE IF EXISTS file_ingestion_jobs;
     DROP TYPE IF EXISTS job_status;
     DROP TYPE IF EXISTS pg_user_type;
-    DROP TABLE IF EXISTS french_scholes;
+    DROP TABLE IF EXISTS french_schools;
     DROP TYPE IF EXISTS school_type;
     DROP TYPE IF EXISTS primary_school_type;
     DROP TYPE IF EXISTS french_highschool_type;

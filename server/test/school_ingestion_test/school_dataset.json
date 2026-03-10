@@ -1,0 +1,50 @@
+{
+  "total_count": 68929,
+  "results": [
+    {
+      "identifiant_de_l_etablissement": "0250560Y",
+      "nom_etablissement": "Ecole \u00e9l\u00e9mentaire Centre",
+      "type_etablissement": "Ecole",
+      "statut_public_prive": "Public",
+      "code_postal": "25310",
+      "nom_commune": "H\u00e9rimoncourt",
+      "code_departement": "025",
+      "code_region": "27",
+      "ecole_maternelle": 0,
+      "ecole_elementaire": 1,
+      "voie_generale": null,
+      "voie_professionnelle": null,
+      "appartenance_education_prioritaire": null
+    },
+    {
+      "identifiant_de_l_etablissement": "0790855A",
+      "nom_etablissement": "Ecole primaire priv\u00e9e",
+      "type_etablissement": "Ecole",
+      "statut_public_prive": "Priv\u00e9",
+      "code_postal": "79130",
+      "nom_commune": "Neuvy-Bouin",
+      "code_departement": "079",
+      "code_region": "75",
+      "ecole_maternelle": 1,
+      "ecole_elementaire": 1,
+      "voie_generale": null,
+      "voie_professionnelle": null,
+      "appartenance_education_prioritaire": null
+    },
+    {
+      "identifiant_de_l_etablissement": "0900196Z",
+      "nom_etablissement": "Ecole primaire",
+      "type_etablissement": "Ecole",
+      "statut_public_prive": "Public",
+      "code_postal": "90340",
+      "nom_commune": "Ch\u00e8vremont",
+      "code_departement": "090",
+      "code_region": "27",
+      "ecole_maternelle": 1,
+      "ecole_elementaire": 1,
+      "voie_generale": null,
+      "voie_professionnelle": null,
+      "appartenance_education_prioritaire": null
+    }
+  ]
+}
