@@ -26,8 +26,8 @@ pub fn parse_first_school_required_fields_test() {
   let assert Ok(school) = list.first(response.results)
   assert school.identifiant_de_l_etablissement == "0250560Y"
   assert school.nom_etablissement == "Ecole élémentaire Centre"
-  assert school.type_etablissement == "Ecole"
-  assert school.statut_public_prive == "Public"
+  assert school.type_etablissement == Some("Ecole")
+  assert school.statut_public_prive == Some("Public")
 }
 
 pub fn parse_first_school_optional_fields_test() {
@@ -62,7 +62,7 @@ pub fn parse_second_school_test() {
     response.results |> list.drop(1) |> list.first
   let school: api.ApiSchool = school
   assert school.identifiant_de_l_etablissement == "0790855A"
-  assert school.statut_public_prive == "Privé"
+  assert school.statut_public_prive == Some("Privé")
   assert school.ecole_maternelle == Some(1)
   assert school.ecole_elementaire == Some(1)
 }

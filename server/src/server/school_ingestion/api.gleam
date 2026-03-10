@@ -20,17 +20,17 @@ pub type ApiSchool {
   ApiSchool(
     identifiant_de_l_etablissement: String,
     nom_etablissement: String,
-    type_etablissement: String,
-    statut_public_prive: String,
+    type_etablissement: Option(String),
+    statut_public_prive: Option(String),
     code_postal: Option(String),
     nom_commune: Option(String),
     code_departement: Option(String),
     code_region: Option(String),
     ecole_maternelle: Option(Int),
     ecole_elementaire: Option(Int),
-    voie_generale: Option(Int),
-    voie_professionnelle: Option(Int),
-    appartenance_education_prioritaire: Option(Int),
+    voie_generale: Option(String),
+    voie_professionnelle: Option(String),
+    appartenance_education_prioritaire: Option(String),
   )
 }
 
@@ -48,19 +48,25 @@ fn api_school_to_json(school: ApiSchool) -> json.Json {
       json.string(school.identifiant_de_l_etablissement),
     ),
     #("nom_etablissement", json.string(school.nom_etablissement)),
-    #("type_etablissement", json.string(school.type_etablissement)),
-    #("statut_public_prive", json.string(school.statut_public_prive)),
+    #("type_etablissement", optional_string_to_json(school.type_etablissement)),
+    #(
+      "statut_public_prive",
+      optional_string_to_json(school.statut_public_prive),
+    ),
     #("code_postal", optional_string_to_json(school.code_postal)),
     #("nom_commune", optional_string_to_json(school.nom_commune)),
     #("code_departement", optional_string_to_json(school.code_departement)),
     #("code_region", optional_string_to_json(school.code_region)),
     #("ecole_maternelle", optional_int_to_json(school.ecole_maternelle)),
     #("ecole_elementaire", optional_int_to_json(school.ecole_elementaire)),
-    #("voie_generale", optional_int_to_json(school.voie_generale)),
-    #("voie_professionnelle", optional_int_to_json(school.voie_professionnelle)),
+    #("voie_generale", optional_string_to_json(school.voie_generale)),
+    #(
+      "voie_professionnelle",
+      optional_string_to_json(school.voie_professionnelle),
+    ),
     #(
       "appartenance_education_prioritaire",
-      optional_int_to_json(school.appartenance_education_prioritaire),
+      optional_string_to_json(school.appartenance_education_prioritaire),
     ),
   ])
 }
@@ -91,8 +97,14 @@ fn api_school_decoder() -> decode.Decoder(ApiSchool) {
     decode.string,
   )
   use nom_etablissement <- decode.field("nom_etablissement", decode.string)
-  use type_etablissement <- decode.field("type_etablissement", decode.string)
-  use statut_public_prive <- decode.field("statut_public_prive", decode.string)
+  use type_etablissement <- decode.field(
+    "type_etablissement",
+    decode.optional(decode.string),
+  )
+  use statut_public_prive <- decode.field(
+    "statut_public_prive",
+    decode.optional(decode.string),
+  )
   use code_postal <- decode.field("code_postal", decode.optional(decode.string))
   use nom_commune <- decode.field("nom_commune", decode.optional(decode.string))
   use code_departement <- decode.field(
@@ -110,15 +122,15 @@ fn api_school_decoder() -> decode.Decoder(ApiSchool) {
   )
   use voie_generale <- decode.field(
     "voie_generale",
-    decode.optional(decode.int),
+    decode.optional(decode.string),
   )
   use voie_professionnelle <- decode.field(
     "voie_professionnelle",
-    decode.optional(decode.int),
+    decode.optional(decode.string),
   )
   use appartenance_education_prioritaire <- decode.field(
     "appartenance_education_prioritaire",
-    decode.optional(decode.int),
+    decode.optional(decode.string),
   )
   decode.success(ApiSchool(
     identifiant_de_l_etablissement:,

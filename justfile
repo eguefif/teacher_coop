@@ -35,6 +35,9 @@ squirrel:
 migrate:
   cd server && gleam run -m cigogne up
 
+migrate-down:
+  cd server && gleam run -m cigogne down
+
 migrate-all:
   cd server && gleam run -m cigogne all
 
@@ -44,3 +47,6 @@ gen-doc:
 gleam-update:
   cd server && gleam update
   cd client && gleam update
+
+schools:
+  cd server && gleam run -m test_ingestion
