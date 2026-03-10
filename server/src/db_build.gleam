@@ -17,32 +17,24 @@ pub fn main() {
 }
 
 fn reset_db(db) {
+  let sql =
+    "
+    DROP TABLE IF EXISTS users;
+    DROP TABLE IF EXISTS sessions;
+    DROP TABLE IF EXISTS files;
+    DROP TABLE IF EXISTS file_ingestion_jobs;
+    DROP TYPE IF EXISTS job_status;
+    DROP TYPE IF EXISTS pg_user_type;
+    DROP TABLE IF EXISTS french_scholes;
+    DROP TYPE IF EXISTS school_type;
+    DROP TYPE IF EXISTS primary_school_type;
+    DROP TYPE IF EXISTS french_highschool_type;
+    DROP TYPE IF EXISTS rep_type;
+    TRUNCATE _migrations RESTART IDENTITY;
+    DROP SEQUENCE IF EXISTS users_id_seq;
+    "
   let assert Ok(_) =
-    pog.query("DROP TABLE IF EXISTS users")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("DROP TABLE IF EXISTS sessions")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("DROP TABLE IF EXISTS users")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("DROP TABLE IF EXISTS files")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("DROP TABLE IF EXISTS file_ingestion_jobs")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("DROP TYPE IF EXISTS job_status")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("DROP TYPE IF EXISTS pg_user_type")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("TRUNCATE _migrations RESTART IDENTITY")
-    |> pog.execute(db)
-  let assert Ok(_) =
-    pog.query("DROP SEQUENCE IF EXISTS users_id_seq")
+    pog.query(sql)
     |> pog.execute(db)
 }
 
