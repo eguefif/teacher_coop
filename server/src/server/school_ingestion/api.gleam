@@ -1,6 +1,7 @@
 import gleam/dynamic/decode
 import gleam/json
 import gleam/option.{type Option, None, Some}
+import gleam/string
 
 /// Returns the result from the tailored query to the APIScool
 ///

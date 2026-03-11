@@ -30,7 +30,7 @@ const select = "identifiant_de_l_etablissement,nom_etablissement,type_etablissem
 pub fn ingest_french_school(db: pog.Connection, _ignore_cache: Bool) {
   request_dataset(0, 100_000)
   |> persist_hashes_and_filter_out_pages(db, _)
-  //|> create_or_update_schools(db, _)
+  |> create_or_update_schools(db, _)
 }
 
 /// Side effect to the API: retrieve all data per batch of 100 rows
@@ -136,7 +136,6 @@ fn create_or_update_schools(
   pages: List(List(api.ApiSchool)),
 ) {
   case pages {
-    [page] -> create_or_update_one_page(db, page)
     [page, ..rest] -> {
       create_or_update_one_page(db, page)
       create_or_update_schools(db, rest)
@@ -149,9 +148,10 @@ fn create_or_update_one_page(
   db: pog.Connection,
   page: List(api.ApiSchool),
 ) -> Nil {
-  // TODO: needs to add a primary key on school identifiant from the dataset
-  // It will be used by our db as a primary KEy
-  // Need to add logic to make sure we handle correctly school typ
+  // TODO: 
+  // 1. Update table with primary key on school identifiant from the dataset
+  // 2. Edit query and define columns to INSERT
+  // 3. Edit query with columns to UPDATE
   let query =
     "
   INSERT INTO french_schools (...)

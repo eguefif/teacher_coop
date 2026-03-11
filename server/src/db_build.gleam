@@ -1,6 +1,7 @@
 import cigogne
 import cigogne/config
 import gleam/io
+import gleam/list
 import gleam/string
 import pog
 import server/db
@@ -8,7 +9,7 @@ import server/user/user_controller
 
 // TODO: add logic to create a dummy user
 pub fn main() {
-  let #(db, _) = db.init_db()
+  let db = db.init_db_start()
   let _ = reset_db(db)
   let assert Ok(cfg) = config.get("server")
   let assert Ok(engine) = cigogne.create_engine(cfg)
@@ -17,25 +18,30 @@ pub fn main() {
 }
 
 fn reset_db(db) {
-  let sql =
-    "
-    DROP TABLE IF EXISTS users;
+  // The following string no empty line after and before the "
+  "DROP TABLE IF EXISTS users;
     DROP TABLE IF EXISTS sessions;
+    DROP TABLE IF EXISTS school_ingestion_page_hashes;
     DROP TABLE IF EXISTS files;
     DROP TABLE IF EXISTS file_ingestion_jobs;
     DROP TYPE IF EXISTS job_status;
     DROP TYPE IF EXISTS pg_user_type;
     DROP TABLE IF EXISTS french_schools;
     DROP TYPE IF EXISTS school_type;
-    DROP TYPE IF EXISTS primary_school_type;
-    DROP TYPE IF EXISTS french_highschool_type;
     DROP TYPE IF EXISTS rep_type;
     TRUNCATE _migrations RESTART IDENTITY;
-    DROP SEQUENCE IF EXISTS users_id_seq;
-    "
-  let assert Ok(_) =
-    pog.query(sql)
-    |> pog.execute(db)
+    DROP SEQUENCE IF EXISTS users_id_seq;"
+  |> string.split("\n")
+  |> list.map(fn(query) { pog.query(query) })
+  |> list.map(fn(query) { pog.execute(query, db) })
+  |> list.each(fn(result) {
+    case result {
+      Ok(_) -> Nil
+      Error(error) -> io.println("Error: DB Reset: " <> string.inspect(error))
+    }
+  })
+
+  io.println("DB Reset Done")
 }
 
 fn create_users(db) {
