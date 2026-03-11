@@ -18,6 +18,11 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 - [ ] Add email confirmation message (wait for stable version, for now confirm should be false and enable it manually via DB)
 - [ ] Display message login to say that account is not activated
 
+### Improve signup teacher form
+- [ ] Ingestion of french_schools using open data
+- [ ] Add end point to retrieve list of school based on a word search
+- [ ] Add basic input (independant component) that will allow a teacher to select a school from a list
+
 ### File logic
 - [x] End-to-End upload and search file
     - [x] Add UI to upload file on user workspace

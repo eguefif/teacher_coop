@@ -22,6 +22,7 @@ pub type ApiSchool {
     identifiant_de_l_etablissement: String,
     nom_etablissement: String,
     type_etablissement: Option(String),
+    adresse_1: Option(String),
     statut_public_prive: Option(String),
     code_postal: Option(String),
     nom_commune: Option(String),
@@ -50,6 +51,7 @@ pub fn api_school_to_json(school: ApiSchool) -> json.Json {
     ),
     #("nom_etablissement", json.string(school.nom_etablissement)),
     #("type_etablissement", optional_string_to_json(school.type_etablissement)),
+    #("adresse_1", optional_string_to_json(school.adresse_1)),
     #(
       "statut_public_prive",
       optional_string_to_json(school.statut_public_prive),
@@ -102,6 +104,7 @@ fn api_school_decoder() -> decode.Decoder(ApiSchool) {
     "type_etablissement",
     decode.optional(decode.string),
   )
+  use adresse_1 <- decode.field("adresse_1", decode.optional(decode.string))
   use statut_public_prive <- decode.field(
     "statut_public_prive",
     decode.optional(decode.string),
@@ -137,6 +140,7 @@ fn api_school_decoder() -> decode.Decoder(ApiSchool) {
     identifiant_de_l_etablissement:,
     nom_etablissement:,
     type_etablissement:,
+    adresse_1:,
     statut_public_prive:,
     code_postal:,
     nom_commune:,

@@ -1,4 +1,5 @@
 import envoy
+import gleam/dynamic/decode
 import gleam/http
 import gleam/http/request.{type Request}
 import gleam/http/response.{Response}
@@ -13,24 +14,28 @@ import pog
 import server/school_ingestion/api
 import server/school_ingestion/sql
 
+// TODO: find how to execute the ingestion regularly
+
 const scheme = http.Http
 
 //const host = "data.education.gouv.fr"
 const host = "127.0.0.1:8080"
 
-const default_limit = 100
+const default_limit = 5000
 
-const max_recursion = 69_000
+const max_recursion = 70_000
 
 //const path = "api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records/"
 const path = "/records/"
 
-const select = "identifiant_de_l_etablissement,nom_etablissement,type_etablissement,statut_public_prive,code_postal,nom_commune,code_departement,code_region,ecole_maternelle,ecole_elementaire,voie_generale,voie_professionnelle,appartenance_education_prioritaire"
+const select = "identifiant_de_l_etablissement,nom_etablissement,type_etablissement,adresse_1,statut_public_prive,code_postal,nom_commune,code_departement,code_region,ecole_maternelle,ecole_elementaire,voie_generale,voie_professionnelle,voie_technologique,appartenance_education_prioritaire"
 
 pub fn ingest_french_school(db: pog.Connection, _ignore_cache: Bool) {
+  io.println("school_ingestion: Starting ingesting french schools...")
   request_dataset(0, 100_000)
   |> persist_hashes_and_filter_out_pages(db, _)
   |> create_or_update_schools(db, _)
+  io.println("school_ingestion: Finished ingesting schools")
 }
 
 /// Side effect to the API: retrieve all data per batch of 100 rows
@@ -90,6 +95,11 @@ fn persist_hashes_and_filter_out_pages(
   db: pog.Connection,
   data: List(#(Int, List(api.ApiSchool))),
 ) -> List(List(api.ApiSchool)) {
+  io.println(
+    "Starting page filter with "
+    <> int.to_string(list.length(data))
+    <> " pages.",
+  )
   let pages = case sql.get_all_hahes(db) {
     Ok(pog.Returned(_len, results)) -> {
       let results = results |> list.map(fn(entry) { entry.hash })
@@ -134,7 +144,20 @@ fn persist_hahes(db: pog.Connection, data: List(#(Int, a))) {
 fn create_or_update_schools(
   db: pog.Connection,
   pages: List(List(api.ApiSchool)),
-) {
+) -> Nil {
+  io.println(
+    "school_ingestion: start persiting in DB "
+    <> int.to_string(list.length(pages))
+    <> " pages",
+  )
+  create_or_update_schools_loop(db, pages)
+  io.println("school_ingestion: finish persiting in DB ")
+}
+
+fn create_or_update_schools_loop(
+  db: pog.Connection,
+  pages: List(List(api.ApiSchool)),
+) -> Nil {
   case pages {
     [page, ..rest] -> {
       create_or_update_one_page(db, page)
@@ -148,31 +171,85 @@ fn create_or_update_one_page(
   db: pog.Connection,
   page: List(api.ApiSchool),
 ) -> Nil {
-  // TODO: 
-  // 1. Update table with primary key on school identifiant from the dataset
-  // 2. Edit query and define columns to INSERT
-  // 3. Edit query with columns to UPDATE
   let query =
     "
-  INSERT INTO french_schools (...)
+  INSERT INTO french_schools (id, name, adresse_1, postal_code, city_name,
+                              code_departement, code_region, public, rep, school_type)
   SELECT 
-    list of columns, + add case when to process school type
+    elem->>'identifiant_de_l_etablissement' as id,
+    elem->>'nom_etablissement' as name,
+    COALESCE(elem->>'adresse_1', 'no_address') as adresse_1,
+    elem->>'code_postal' as postal_code,
+    elem->>'nom_commune' as city_name,
+    elem->>'code_departement' as code_departement,
+    elem->>'code_region' as code_region,
+
+    CASE
+      WHEN lower(elem->>'statut_public_prive') = 'public' THEN true
+      ELSE false
+    END as public,
+
+    -- Define the rep type
+    CASE
+      WHEN lower(elem->>'appartenance_education_prioritaire') = 'rep' THEN 'rep'
+      WHEN lower(elem->>'appartenance_education_prioritaire') = 'rep+' THEN 'rep+'
+      ELSE 'none'
+    END::rep_type as rep,
+
+    -- Define the school type
+    CASE
+      WHEN lower(elem->>'type_etablissement') = 'collège' THEN 'middleschool'
+      WHEN elem->>'ecole_maternelle' = '1' AND
+           elem->>'ecole_elementaire' = '1'
+                THEN 'elem_kinder'
+      WHEN elem->>'ecole_elementaire' = '1' THEN 'elementary'
+      WHEN elem->>'ecole_maternelle' = '1' THEN 'kindergarten'
+      WHEN elem->>'voie_generale' = '1' AND
+           elem->>'voie_technologique' = '1' AND
+           elem->>'voie_professionnelle' = '1'
+                THEN 'gen_tech_pro'
+      WHEN elem->>'voie_generale' = '1'
+           AND elem->>'voie_technologique' = '1'
+                THEN 'gen_tech'
+      WHEN elem->>'voie_professionnelle' = '1' AND
+           elem->>'voie_technologique' = '1'
+                THEN 'tech_pro'
+      WHEN elem->>'voie_generale' = '1' THEN 'general'
+      WHEN elem->>'voie_technologique' = '1' THEN 'technology'
+      WHEN elem->>'voie_professionnelle' = '1' THEN 'professionnal'
+      ELSE 'no_type'
+    END::school_type as school_type
+
   FROM jsonb_array_elements($1::jsonb) as elem
-  ON CONFLICT school_id
-    DO UPDATE SET ....
+  ON CONFLICT (id, name, adresse_1)
+    DO UPDATE SET 
+          name = EXCLUDED.name,
+          school_type = EXCLUDED.school_type,
+          public = EXCLUDED.public,
+          postal_code = EXCLUDED.postal_code,
+          city_name = EXCLUDED.city_name,
+          code_departement = EXCLUDED.code_departement,
+          code_region = EXCLUDED.code_region,
+          rep = EXCLUDED.rep
+  RETURNING id
   "
+
+  let decoder = {
+    use id <- decode.field(0, decode.string)
+    decode.success(id)
+  }
 
   let page_json = list_api_school_to_json(page)
   let result =
     pog.query(query)
     |> pog.parameter(pog.text(page_json))
+    |> pog.returning(decoder)
     |> pog.execute(db)
 
   case result {
-    Ok(_) -> io.println("Page ingested")
+    Ok(pog.Returned(_, _)) -> Nil
     Error(err) -> io.println("Error while ingested: " <> string.inspect(err))
   }
-  Nil
 }
 
 fn list_api_school_to_json(schools: List(api.ApiSchool)) -> String {
