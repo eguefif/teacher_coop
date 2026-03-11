@@ -1,7 +1,7 @@
 import envoy
 import gleam/erlang/process
 import pog
-import server/school_ingestion/school_ingestion as si
+import server/school/school_ingestion as si
 
 pub fn main() {
   let db_name = process.new_name("db_pool")

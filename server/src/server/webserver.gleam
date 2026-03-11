@@ -9,6 +9,7 @@ import server/admin/admin_controller
 import server/auth/auth_controller
 import server/file/file_controller
 import server/middleware
+import server/school/school_controller
 import server/user/user_controller
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
@@ -45,6 +46,7 @@ fn handle_request(app: App, req: Request) -> Response {
     Post, ["signup"] -> user_controller.handle_request_user(app, req)
     _, ["auth", _] -> auth_controller.handle_auth(app, req, session)
     _, ["file", ..] -> file_controller.handle_request_file(app, req, session)
+    _, ["school", ..] -> school_controller.handle_school(app, req, session)
     _, ["admin", ..] -> admin_controller.handle_admin(app, req, session)
     _, _ -> wisp.not_found()
   }

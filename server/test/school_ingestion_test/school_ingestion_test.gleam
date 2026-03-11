@@ -1,7 +1,7 @@
 import gleam/json
 import gleam/list
 import gleam/option.{None, Some}
-import server/school_ingestion/api
+import server/school/api
 import simplifile
 
 fn load_dataset() -> api.ApiSchoolResponse {
@@ -13,7 +13,7 @@ fn load_dataset() -> api.ApiSchoolResponse {
 
 pub fn parse_total_count_test() {
   let response = load_dataset()
-  assert response.total_count == 68929
+  assert response.total_count == 68_929
 }
 
 pub fn parse_results_count_test() {
@@ -58,8 +58,7 @@ pub fn json_roundtrip_test() {
 
 pub fn parse_second_school_test() {
   let response = load_dataset()
-  let assert Ok(school) =
-    response.results |> list.drop(1) |> list.first
+  let assert Ok(school) = response.results |> list.drop(1) |> list.first
   let school: api.ApiSchool = school
   assert school.identifiant_de_l_etablissement == "0790855A"
   assert school.statut_public_prive == Some("Privé")
