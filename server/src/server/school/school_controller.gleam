@@ -2,8 +2,11 @@ import app_type.{type App}
 import gleam/http/request
 import gleam/http/response
 import gleam/json
+import gleam/list
+import gleam/string
 import pog
-import shared/school.{school_list_to_json}
+import server/school/sql
+import shared/school.{School, school_list_to_json}
 import wisp
 
 pub fn handle_school(app: App, req: wisp.Request) -> wisp.Response {
@@ -39,7 +42,20 @@ fn get_search_query(
 fn get_results(
   db: pog.Connection,
   search: String,
-  value: fn(a) -> b,
+  next: fn(List(school.School)) -> wisp.Response,
 ) -> response.Response(wisp.Body) {
-  todo
+  case sql.search_schools(db, search) {
+    Ok(pog.Returned(_len, results)) -> {
+      results
+      |> list.map(fn(school) {
+        let sql.SearchSchoolsRow(name, code_departement, city_name, _) = school
+        School(name:, code_departement:, city_name:)
+      })
+      |> next()
+    }
+    Error(error) -> {
+      wisp.log_error("schools_controller: search: " <> string.inspect(error))
+      wisp.internal_server_error()
+    }
+  }
 }
