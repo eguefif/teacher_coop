@@ -9,6 +9,8 @@ import server/school/sql
 import shared/school.{School, school_list_to_json}
 import wisp
 
+// TODO: improve search it does not work well.
+
 pub fn handle_school(app: App, req: wisp.Request) -> wisp.Response {
   case wisp.path_segments(req) {
     ["school", "search"] -> search_school(app.db, req)
@@ -48,8 +50,9 @@ fn get_results(
     Ok(pog.Returned(_len, results)) -> {
       results
       |> list.map(fn(school) {
-        let sql.SearchSchoolsRow(name, code_departement, city_name, _) = school
-        School(name:, code_departement:, city_name:)
+        let sql.SearchSchoolsRow(id, name, code_departement, city_name, _) =
+          school
+        School(id:, name:, code_departement:, city_name:)
       })
       |> next()
     }

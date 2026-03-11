@@ -173,12 +173,13 @@ fn create_or_update_one_page(
 ) -> Nil {
   let query =
     "
-  INSERT INTO french_schools (id, name, adresse_1, postal_code, city_name,
+  INSERT INTO french_schools (id, name, postal_code, city_name,
                               code_departement, code_region, public, rep, school_type)
   SELECT 
-    elem->>'identifiant_de_l_etablissement' as id,
+    md5((elem->>'identifiant_de_l_etablissement' ||
+    (elem->>'nom_etablissement') ||
+    COALESCE(elem->>'adresse_1', 'no_address'))) as id,
     elem->>'nom_etablissement' as name,
-    COALESCE(elem->>'adresse_1', 'no_address') as adresse_1,
     elem->>'code_postal' as postal_code,
     elem->>'nom_commune' as city_name,
     elem->>'code_departement' as code_departement,
@@ -221,7 +222,7 @@ fn create_or_update_one_page(
     END::school_type as school_type
 
   FROM jsonb_array_elements($1::jsonb) as elem
-  ON CONFLICT (id, name, adresse_1)
+  ON CONFLICT (id)
     DO UPDATE SET 
           name = EXCLUDED.name,
           school_type = EXCLUDED.school_type,

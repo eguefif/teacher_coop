@@ -21,9 +21,8 @@ CREATE TYPE rep_type AS ENUM (
 );
 
 CREATE TABLE french_schools (
-    id text NOT NULL, -- Identifiant de l'etablissement in dataset
+    id text PRIMARY KEY NOT NULL, -- Identifiant de l'etablissement in dataset
     name text NOT NULL,
-    adresse_1 text NOT NULL DEFAULT 'no_address',
     school_type school_type NOT NULL DEFAULT 'no_type',
     public boolean NOT NULL DEFAULT TRUE,
     postal_code text NOT NULL,
@@ -32,8 +31,6 @@ CREATE TABLE french_schools (
     code_region text NOT NULL,
     rep rep_type NOT NULL DEFAULT 'none'
 );
-
-CREATE UNIQUE INDEX french_schools_id_name_adresse_1 ON french_schools (id, name, adresse_1);
 
 --- migration:down
 DROP TABLE french_schools;

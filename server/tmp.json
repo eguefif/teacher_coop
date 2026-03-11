@@ -1,0 +1,62 @@
+[
+  {
+    "name": "41ed7cb37ca6657a9a0a7db4a3e46d95",
+    "name": "Ecole Robert Desnos",
+    "city_name": "Ancône",
+    "code_departement": "026"
+  },
+  {
+    "name": "9255c0f56fc897463e83a617dc1c40ad",
+    "name": "Ecole primaire Robert Doisneau",
+    "city_name": "Serris",
+    "code_departement": "077"
+  },
+  {
+    "name": "a83775b8dfa6468b824301f23d5b018f",
+    "name": "Ecole primaire ROBERT DOISNEAU",
+    "city_name": "Chaulnes",
+    "code_departement": "080"
+  },
+  {
+    "name": "1c1fe5d7e0d79f9736a18df4a82af529",
+    "name": "Ecole primaire Robert Doisneau",
+    "city_name": "Les Attaques",
+    "code_departement": "062"
+  },
+  {
+    "name": "3a3a6799b951df6e553c254ead5112cc",
+    "name": "Ecole primaire Robert Doisneau",
+    "city_name": "Arcisses",
+    "code_departement": "028"
+  },
+  {
+    "name": "084c7406c215f2f7779c685e9901a643",
+    "name": "Ecole primaire Robert Doisneau",
+    "city_name": "Wailly",
+    "code_departement": "062"
+  },
+  {
+    "name": "b928d7b61e2d1ce8ef0083c83f234486",
+    "name": "Ecole primaire Robert Doisneau",
+    "city_name": "Lucenay",
+    "code_departement": "069"
+  },
+  {
+    "name": "d435b8a82d7e09c3fc1fb39e319ae01e",
+    "name": "Ecole primaire Robert Doisneau",
+    "city_name": "Tramoyes",
+    "code_departement": "001"
+  },
+  {
+    "name": "65dd7b1c8a4af4299b1b519f7e9c523d",
+    "name": "Ecole maternelle Robert Doisneau",
+    "city_name": "Taverny",
+    "code_departement": "095"
+  },
+  {
+    "name": "0ea4bf013f6655cd8beefe0891dde274",
+    "name": "Ecole maternelle Robert Doisneau",
+    "city_name": "Saint-Denis",
+    "code_departement": "093"
+  }
+]

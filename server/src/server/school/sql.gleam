@@ -50,6 +50,7 @@ FROM
 ///
 pub type SearchSchoolsRow {
   SearchSchoolsRow(
+    id: String,
     name: String,
     code_departement: String,
     city_name: String,
@@ -68,11 +69,13 @@ pub fn search_schools(
   arg_1: String,
 ) -> Result(pog.Returned(SearchSchoolsRow), pog.QueryError) {
   let decoder = {
-    use name <- decode.field(0, decode.string)
-    use code_departement <- decode.field(1, decode.string)
-    use city_name <- decode.field(2, decode.string)
-    use score <- decode.field(3, decode.float)
+    use id <- decode.field(0, decode.string)
+    use name <- decode.field(1, decode.string)
+    use code_departement <- decode.field(2, decode.string)
+    use city_name <- decode.field(3, decode.string)
+    use score <- decode.field(4, decode.float)
     decode.success(SearchSchoolsRow(
+      id:,
       name:,
       code_departement:,
       city_name:,
@@ -83,14 +86,15 @@ pub fn search_schools(
   "-- search_schools
 -- arg1: String search parameters
 SELECT
+    id,
     name,
     code_departement,
     city_name,
-    similarity (name_search, lower(unaccent ($1))) AS score
+    similarity (search, lower(unaccent ($1))) AS score
 FROM
     french_schools
 WHERE
-    name_search % lower(unaccent ($1))
+    search % lower(unaccent ($1))
 ORDER BY
     SCORE DESC
 LIMIT 10;

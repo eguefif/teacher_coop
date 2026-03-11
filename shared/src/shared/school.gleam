@@ -2,11 +2,12 @@ import gleam/dynamic/decode
 import gleam/json
 
 pub type School {
-  School(name: String, city_name: String, code_departement: String)
+  School(id: String, name: String, city_name: String, code_departement: String)
 }
 
 pub fn school_to_json(school: School) -> json.Json {
   json.object([
+    #("id", json.string(school.id)),
     #("name", json.string(school.name)),
     #("city_name", json.string(school.city_name)),
     #("code_departement", json.string(school.code_departement)),
@@ -15,11 +16,12 @@ pub fn school_to_json(school: School) -> json.Json {
 
 pub fn school_from_json(school: String) -> Result(School, json.DecodeError) {
   let decoder = {
+    use id <- decode.field("id", decode.string)
     use name <- decode.field("name", decode.string)
     use city_name <- decode.field("city_name", decode.string)
     use code_departement <- decode.field("code_departement", decode.string)
 
-    decode.success(School(name:, city_name:, code_departement:))
+    decode.success(School(id:, name:, city_name:, code_departement:))
   }
 
   json.parse(school, decoder)

@@ -12,13 +12,12 @@ LANGUAGE sql
 IMMUTABLE PARALLEL SAFE STRICT;
 
 ALTER TABLE french_schools
-    ADD COLUMN name_search text GENERATED ALWAYS AS (lower(f_unaccent (name))) STORED;
+    ADD COLUMN search text GENERATED ALWAYS AS (lower(f_unaccent (name))) STORED;
 
-CREATE INDEX idx_on_french_schools_name_search ON french_schools USING gin (name_search gin_trgm_ops);
+CREATE INDEX idx_on_french_schools_name_search ON french_schools USING gin (search gin_trgm_ops);
 
 --- migration:down
 ALTER TABLE french_schools
     DROP COLUMN IF EXISTS name_search;
 
 --- migration:end
-
