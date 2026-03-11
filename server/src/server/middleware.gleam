@@ -70,7 +70,7 @@ pub fn verify_auth(
 
 fn is_protected_route(req: Request) -> Bool {
   case wisp.path_segments(req) {
-    ["signup"] | ["auth", "login"] -> False
+    ["signup"] | ["auth", "login"] | ["school", ..] -> False
     _ -> True
   }
 }

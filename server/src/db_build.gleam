@@ -30,7 +30,10 @@ fn reset_db(db) {
     DROP TYPE IF EXISTS school_type;
     DROP TYPE IF EXISTS rep_type;
     TRUNCATE _migrations RESTART IDENTITY;
-    DROP SEQUENCE IF EXISTS users_id_seq;"
+    DROP SEQUENCE IF EXISTS users_id_seq;
+    DROP EXTENSION IF EXISTS pg_trgm;
+    DROP EXTENSION IF EXISTS unaccent;
+    DROP INDEX idx_on_french_schools_name_search;"
   |> string.split("\n")
   |> list.map(fn(query) { pog.query(query) })
   |> list.map(fn(query) { pog.execute(query, db) })

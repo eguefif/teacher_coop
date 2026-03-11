@@ -11,8 +11,8 @@ import gleam/list
 import gleam/string
 import mumu
 import pog
-import server/school_ingestion/api
-import server/school_ingestion/sql
+import server/school/api
+import server/school/sql
 
 // TODO: find how to execute the ingestion regularly
 

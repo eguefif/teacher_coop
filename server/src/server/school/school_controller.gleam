@@ -13,6 +13,9 @@ pub fn handle_school(app: App, req: wisp.Request) -> wisp.Response {
   }
 }
 
+/// Returns a list of 15 schools based on a search
+///
+/// Expect query paramters: search
 fn search_school(
   db: pog.Connection,
   req: request.Request(wisp.Connection),

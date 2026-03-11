@@ -46,7 +46,7 @@ fn handle_request(app: App, req: Request) -> Response {
     Post, ["signup"] -> user_controller.handle_request_user(app, req)
     _, ["auth", _] -> auth_controller.handle_auth(app, req, session)
     _, ["file", ..] -> file_controller.handle_request_file(app, req, session)
-    _, ["school", ..] -> school_controller.handle_school(app, req, session)
+    _, ["school", ..] -> school_controller.handle_school(app, req)
     _, ["admin", ..] -> admin_controller.handle_admin(app, req, session)
     _, _ -> wisp.not_found()
   }
