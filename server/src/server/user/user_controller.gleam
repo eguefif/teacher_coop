@@ -1,9 +1,11 @@
 import app_type.{type App}
 import argus
+import envoy
 import gleam/dynamic/decode
 import gleam/http.{Post}
 import gleam/option.{type Option, None, Some}
 import pog
+import server/env_utils
 import server/user/sql
 import shared/user.{type User, UserForm, user_form_decoder}
 import wisp.{type Request, type Response}
@@ -51,6 +53,7 @@ pub fn check_password(
   email: String,
   password_input: String,
 ) -> Option(user.User) {
+  let skip_password = env_utils.skip_password()
   case sql.get_user_by_email(db, email) {
     Ok(pog.Returned(
       _,
@@ -58,6 +61,15 @@ pub fn check_password(
     )) ->
       case argus.verify(hashed_password, password_input) {
         Ok(True) -> {
+          let user =
+            user.User(id:, fullname:, email:, type_: case db_type {
+              sql.Member -> user.Member
+              sql.Admin -> user.Admin
+            })
+          Some(user)
+        }
+        // The following is a dev config that allows fast login
+        Ok(False) if skip_password -> {
           let user =
             user.User(id:, fullname:, email:, type_: case db_type {
               sql.Member -> user.Member
