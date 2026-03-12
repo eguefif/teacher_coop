@@ -9,50 +9,78 @@
 ////      * j
 
 import gleam/dynamic/decode
-import gleam/http/request
 import gleam/io
+import gleam/json
 import gleam/list
 import gleam/option
 import gleam/string
-import js/window as js
 import lustre
 import lustre/attribute.{type Attribute}
 import lustre/component
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
+import lustre/event
 import reusables/input
-import rsvp
 
-import shared/school.{type School, school_decoder}
-
-pub fn register() -> Result(Nil, lustre.Error) {
+// TODO:
+// [ ] Improve UI
+// [ ] Increase the list of selection and do a scroll
+// [ ] Improve search
+pub fn register(
+  name: String,
+  get_list: fn(String, fn(Result(List(#(String, String)), SearchError)) -> Msg) ->
+    Effect(Msg),
+) -> Result(Nil, lustre.Error) {
   let component =
-    lustre.component(init, update, view, [
-      component.on_attribute_change("input_label", fn(label) {
-        Ok(ParentChangedInputLabel(label))
-      }),
-    ])
+    lustre.component(
+      init,
+      fn(model, msg) { update(model, get_list, msg) },
+      view,
+      [
+        component.on_attribute_change("input_label", fn(label) {
+          Ok(ParentChangedInputLabel(label))
+        }),
+      ],
+    )
 
-  lustre.register(component, "search-autocomplete")
+  lustre.register(component, "search-autocomplete-" <> name)
 }
 
-pub fn element(attributes: List(Attribute(msg))) -> Element(msg) {
-  element.element("search-autocomplete", attributes, [])
+pub fn element(name: String, attributes: List(Attribute(msg))) -> Element(msg) {
+  element.element("search-autocomplete-" <> name, attributes, [])
 }
 
 pub fn attribute_input_label(value: String) -> Attribute(msg) {
   attribute.attribute("input_label", value)
 }
 
+pub fn on_click(handler: fn(String) -> msg) -> Attribute(msg) {
+  event.on("change", {
+    decode.at(["detail"], decode.string) |> decode.map(handler)
+  })
+}
+
+// Types ------------------------------------------------------------------------------------
+
+pub type SearchError {
+  NetworkError
+  DecodeError
+}
+
 // Model ------------------------------------------------------------------------------------
 
 pub type Model {
-  Model(search: String, results: List(School), input_label: String)
+  Model(
+    search: String,
+    results: List(#(String, String)),
+    input_label: String,
+    error: option.Option(SearchError),
+  )
 }
 
 pub fn init(_) -> #(Model, Effect(Msg)) {
-  #(Model("", [], ""), effect.none())
+  #(Model("", [], "", option.None), effect.none())
 }
 
 // Update ------------------------------------------------------------------------------------
@@ -60,42 +88,51 @@ pub fn init(_) -> #(Model, Effect(Msg)) {
 pub type Msg {
   UserChangedSearch(String)
   ParentChangedInputLabel(String)
-  ApiReturnedSearchResults(Result(List(School), rsvp.Error))
+  ApiReturnedSearchResults(Result(List(#(String, String)), SearchError))
+  UserClickedOnRow(#(String, String))
 }
 
-fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+fn update(
+  model: Model,
+  get_list: fn(String, fn(Result(List(#(String, String)), SearchError)) -> Msg) ->
+    Effect(Msg),
+  msg: Msg,
+) -> #(Model, Effect(Msg)) {
   io.println(string.inspect(msg))
   case msg {
-    UserChangedSearch(search) -> update_search(model, search)
+    UserChangedSearch(search) -> update_search(model, search, get_list)
     ParentChangedInputLabel(input_label) -> #(
       Model(..model, input_label:),
       effect.none(),
     )
     ApiReturnedSearchResults(Ok(results)) -> #(
-      Model(..model, results:),
+      Model(..model, results:, error: option.None),
       effect.none(),
     )
-    // TODO: Handle error
-    ApiReturnedSearchResults(Error(_err)) -> #(model, effect.none())
+    ApiReturnedSearchResults(Error(err)) -> #(
+      Model(..model, results: [], error: option.Some(err)),
+      effect.none(),
+    )
+    UserClickedOnRow(#(row_id, row_value)) -> #(
+      Model(..model, results: [], search: row_value),
+      event.emit("change", json.string(row_id)),
+    )
   }
 }
 
-fn update_search(model: Model, search: String) -> #(Model, Effect(Msg)) {
+fn update_search(
+  model: Model,
+  search: String,
+  get_list: fn(String, fn(Result(List(#(String, String)), SearchError)) -> Msg) ->
+    Effect(Msg),
+) -> #(Model, Effect(Msg)) {
   case string.length(search) > 4 {
-    True -> #(Model(..model, search:), search_api(search))
+    True -> #(
+      Model(..model, search:),
+      get_list(search, ApiReturnedSearchResults),
+    )
     False -> #(Model(..model, search:), effect.none())
   }
-}
-
-fn search_api(search: String) -> Effect(Msg) {
-  let base_url = js.base_url()
-  let assert Ok(req) = request.to(base_url <> "/api/school/search")
-  req
-  |> request.set_query([#("search", search)])
-  |> rsvp.send(rsvp.expect_json(
-    decode.list(school_decoder()),
-    ApiReturnedSearchResults,
-  ))
 }
 
 // View -------------------------------------------------------------------------------------
@@ -111,21 +148,32 @@ pub fn view(model: Model) -> Element(Msg) {
       name: model.input_label <> "-input",
       label: model.input_label,
     ),
-    case list.length(model.results) {
-      0 -> element.none()
-      _ -> view_results(model.results)
+    case model.error {
+      option.Some(_) ->
+        html.p([], [html.text("Search failed, please try again.")])
+      option.None ->
+        case list.length(model.results) {
+          0 -> element.none()
+          _ -> view_results(model.results)
+        }
     },
   ])
 }
 
-fn view_results(results: List(School)) -> Element(Msg) {
+fn view_results(results: List(#(String, String))) -> Element(Msg) {
   html.div([results_styles()], list.map(results, fn(row) { view_row(row) }))
 }
 
-fn view_row(row: School) -> Element(Msg) {
-  html.div([], [
-    html.text(row.name <> " " <> row.city_name <> " " <> row.code_departement),
-  ])
+fn view_row(row: #(String, String)) -> Element(Msg) {
+  html.div(
+    [
+      event.on("click", { decode.success(UserClickedOnRow(row)) }),
+      attribute.value(row.0),
+    ],
+    [
+      html.text(row.1),
+    ],
+  )
 }
 
 fn results_styles() -> Attribute(msg) {

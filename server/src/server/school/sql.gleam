@@ -85,19 +85,16 @@ pub fn search_schools(
 
   "-- search_schools
 -- arg1: String search parameters
-WITH set_threshold AS (
-    SELECT
-        set_limit (0.15))
 SELECT
     id,
     name,
     code_departement,
     city_name,
-    word_similarity (search, lower(unaccent ($1))) AS score
+    word_similarity (lower(unaccent ($1)), search) AS score
 FROM
     french_schools
 WHERE
-    search %> lower(unaccent ($1))
+    lower(unaccent ($1)) <% search
 ORDER BY
     SCORE DESC
 LIMIT 10;

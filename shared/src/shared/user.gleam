@@ -2,7 +2,12 @@ import gleam/dynamic/decode
 import gleam/json
 
 pub type User {
-  UserForm(full_name: String, email: String, password: String)
+  UserForm(
+    full_name: String,
+    email: String,
+    password: String,
+    school_id: String,
+  )
   UserLoginForm(email: String, password: String)
   UserDB(
     id: Int,
@@ -23,15 +28,17 @@ pub fn user_form_decoder() -> decode.Decoder(User) {
   use full_name <- decode.field("full_name", decode.string)
   use email <- decode.field("email", decode.string)
   use password <- decode.field("password", decode.string)
-  decode.success(UserForm(full_name:, email:, password:))
+  use school_id <- decode.field("school_id", decode.string)
+  decode.success(UserForm(full_name:, email:, password:, school_id:))
 }
 
 pub fn user_form_to_json(user: User) -> json.Json {
-  let assert UserForm(full_name, email, password) = user
+  let assert UserForm(full_name, email, password, school_id) = user
   json.object([
     #("full_name", json.string(full_name)),
     #("email", json.string(email)),
     #("password", json.string(password)),
+    #("school_id", json.string(school_id)),
   ])
 }
 

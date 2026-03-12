@@ -18,6 +18,21 @@ pub fn school_from_json(school: String) -> Result(School, json.DecodeError) {
   json.parse(school, school_decoder())
 }
 
+pub fn school_tupple_decoder() -> decode.Decoder(#(String, String)) {
+  let decoder = {
+    use id <- decode.field("id", decode.string)
+    use name <- decode.field("name", decode.string)
+    use city_name <- decode.field("city_name", decode.string)
+    use code_departement <- decode.field("code_departement", decode.string)
+
+    decode.success(#(
+      id,
+      name <> " " <> city_name <> "(" <> code_departement <> ")",
+    ))
+  }
+  decoder
+}
+
 pub fn school_decoder() -> decode.Decoder(School) {
   let decoder = {
     use id <- decode.field("id", decode.string)

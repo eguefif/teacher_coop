@@ -5,6 +5,7 @@
 ////
 
 import gleam/dynamic/decode
+import gleam/option.{type Option}
 import gleam/time/timestamp.{type Timestamp}
 import pog
 import youid/uuid.{type Uuid}
@@ -22,6 +23,7 @@ pub type CreateUserRow {
     email: String,
     password: String,
     user_type: PgUserType,
+    school_id: Option(String),
   )
 }
 
@@ -29,6 +31,7 @@ pub type CreateUserRow {
 /// $1: full_name
 /// $2: email
 /// $3: password
+/// $4: school_id
 ///
 /// > 🐿️ This function was generated automatically using v4.6.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -38,6 +41,7 @@ pub fn create_user(
   arg_1: String,
   arg_2: String,
   arg_3: String,
+  arg_4: String,
 ) -> Result(pog.Returned(CreateUserRow), pog.QueryError) {
   let decoder = {
     use id <- decode.field(0, decode.int)
@@ -45,15 +49,24 @@ pub fn create_user(
     use email <- decode.field(2, decode.string)
     use password <- decode.field(3, decode.string)
     use user_type <- decode.field(4, pg_user_type_decoder())
-    decode.success(CreateUserRow(id:, full_name:, email:, password:, user_type:))
+    use school_id <- decode.field(5, decode.optional(decode.string))
+    decode.success(CreateUserRow(
+      id:,
+      full_name:,
+      email:,
+      password:,
+      user_type:,
+      school_id:,
+    ))
   }
 
   "-- create user
 -- $1: full_name
 -- $2: email
 -- $3: password
-INSERT INTO users (full_name, email, password)
-    VALUES ($1, $2, $3)
+-- $4: school_id
+INSERT INTO users (full_name, email, password, school_id)
+    VALUES ($1, $2, $3, $4)
 RETURNING
     *;
 
@@ -62,6 +75,7 @@ RETURNING
   |> pog.parameter(pog.text(arg_1))
   |> pog.parameter(pog.text(arg_2))
   |> pog.parameter(pog.text(arg_3))
+  |> pog.parameter(pog.text(arg_4))
   |> pog.returning(decoder)
   |> pog.execute(db)
 }
@@ -101,6 +115,7 @@ pub type GetUserByEmailRow {
     email: String,
     password: String,
     user_type: PgUserType,
+    school_id: Option(String),
   )
 }
 
@@ -119,12 +134,14 @@ pub fn get_user_by_email(
     use email <- decode.field(2, decode.string)
     use password <- decode.field(3, decode.string)
     use user_type <- decode.field(4, pg_user_type_decoder())
+    use school_id <- decode.field(5, decode.optional(decode.string))
     decode.success(GetUserByEmailRow(
       id:,
       full_name:,
       email:,
       password:,
       user_type:,
+      school_id:,
     ))
   }
 
@@ -156,6 +173,7 @@ pub type GetUserByIdRow {
     email: String,
     password: String,
     user_type: PgUserType,
+    school_id: Option(String),
   )
 }
 
@@ -174,12 +192,14 @@ pub fn get_user_by_id(
     use email <- decode.field(2, decode.string)
     use password <- decode.field(3, decode.string)
     use user_type <- decode.field(4, pg_user_type_decoder())
+    use school_id <- decode.field(5, decode.optional(decode.string))
     decode.success(GetUserByIdRow(
       id:,
       full_name:,
       email:,
       password:,
       user_type:,
+      school_id:,
     ))
   }
 

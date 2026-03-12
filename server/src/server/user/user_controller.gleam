@@ -21,7 +21,7 @@ fn create_user(db: pog.Connection, req: Request) -> Response {
 
   case decode.run(json, user_form_decoder()) {
     Ok(user) -> {
-      let assert UserForm(_, _, password) = user
+      let assert UserForm(_, _, password, _) = user
       let user = UserForm(..user, password: hash_password(password))
       case create_user_db(db, user) {
         Ok(_) -> wisp.ok()
@@ -43,8 +43,8 @@ fn create_user_db(
   db: pog.Connection,
   user: User,
 ) -> Result(pog.Returned(sql.CreateUserRow), pog.QueryError) {
-  let assert UserForm(full_name, email, password) = user
-  sql.create_user(db, full_name, email, password)
+  let assert UserForm(full_name, email, password, school_id) = user
+  sql.create_user(db, full_name, email, password, school_id)
 }
 
 pub fn check_password(
@@ -56,7 +56,16 @@ pub fn check_password(
   case sql.get_user_by_email(db, email) {
     Ok(pog.Returned(
       _,
-      [sql.GetUserByEmailRow(id, fullname, email, hashed_password, db_type)],
+      [
+        sql.GetUserByEmailRow(
+          id,
+          fullname,
+          email,
+          hashed_password,
+          db_type,
+          _school_id,
+        ),
+      ],
     )) ->
       case argus.verify(hashed_password, password_input) {
         Ok(True) -> {

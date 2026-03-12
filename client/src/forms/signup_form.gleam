@@ -26,6 +26,7 @@ pub type SignupForm {
     email: String,
     password: String,
     confirmation: String,
+    school_id: String,
     error_fullname: String,
     error_email: String,
     error_password: String,
@@ -38,7 +39,7 @@ pub type SignupForm {
 }
 
 pub fn init() -> SignupForm {
-  SignupForm("", "", "", "", "", "", "", "", False, False, False, False)
+  SignupForm("", "", "", "", "", "", "", "", "", False, False, False, False)
 }
 
 // Update ---------------------------------------------------------------------------------------
@@ -55,6 +56,7 @@ pub type Msg {
   VisitorFinishUpdatedEmail
   VisitorFinishUpdatedPassword
   VisitorFinishUpdatedConfirmation
+  VisitorClickedOnSchool(String)
 }
 
 pub fn signup_update(
@@ -76,6 +78,11 @@ pub fn signup_update(
     VisitorFinishUpdatedPassword -> validate_password(translator, signup_form)
     VisitorFinishUpdatedConfirmation ->
       validate_confirmation(translator, signup_form)
+
+    VisitorClickedOnSchool(school_id) -> #(
+      SignupForm(..signup_form, school_id:),
+      effect.none(),
+    )
 
     ServerCreatedAccount(_) -> #(signup_form, effect.none())
   }
@@ -215,6 +222,7 @@ fn handle_create_user(form: SignupForm) -> #(SignupForm, Effect(Msg)) {
         full_name: form.fullname,
         email: form.email,
         password: form.password,
+        school_id: form.school_id,
       )),
     )
     False -> #(form, effect.none())
@@ -297,7 +305,10 @@ pub fn view(
           g18n.translate(translator, "signup.email"),
         ),
       ]),
-      search_autocomplete.element([
+      search_autocomplete.element("school", [
+        search_autocomplete.on_click(fn(s) {
+          visitor_edit_signup_form(VisitorClickedOnSchool(s))
+        }),
         search_autocomplete.attribute_input_label(g18n.translate(
           translator,
           "signup.school",
