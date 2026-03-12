@@ -5,11 +5,11 @@ SELECT
     name,
     code_departement,
     city_name,
-    similarity (search, lower(unaccent ($1))) AS score
+    word_similarity (lower(unaccent ($1)), search) AS score
 FROM
     french_schools
 WHERE
-    search % lower(unaccent ($1))
+    lower(unaccent ($1)) <% search
 ORDER BY
     SCORE DESC
 LIMIT 10;

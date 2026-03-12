@@ -1,4 +1,5 @@
 import gleam/float
+import gleam/io
 import gleam/time/timestamp
 import pog
 import server/auth/session.{type CurrentSession, CurrentSession, NoSession}
@@ -70,7 +71,11 @@ pub fn verify_auth(
 
 fn is_protected_route(req: Request) -> Bool {
   case wisp.path_segments(req) {
-    ["signup"] | ["auth", "login"] | ["school", ..] -> False
-    _ -> True
+    ["signup"] | ["auth", "login"] -> False
+    ["school", ..] -> False
+    _ -> {
+      io.println("Protected")
+      True
+    }
   }
 }

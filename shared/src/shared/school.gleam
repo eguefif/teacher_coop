@@ -15,6 +15,10 @@ pub fn school_to_json(school: School) -> json.Json {
 }
 
 pub fn school_from_json(school: String) -> Result(School, json.DecodeError) {
+  json.parse(school, school_decoder())
+}
+
+pub fn school_decoder() -> decode.Decoder(School) {
   let decoder = {
     use id <- decode.field("id", decode.string)
     use name <- decode.field("name", decode.string)
@@ -23,10 +27,15 @@ pub fn school_from_json(school: String) -> Result(School, json.DecodeError) {
 
     decode.success(School(id:, name:, city_name:, code_departement:))
   }
-
-  json.parse(school, decoder)
+  decoder
 }
 
 pub fn school_list_to_json(schools: List(School)) -> json.Json {
   json.array(schools, school_to_json)
+}
+
+pub fn school_list_from_json(
+  schools: String,
+) -> Result(List(School), json.DecodeError) {
+  json.parse(schools, decode.list(school_decoder()))
 }

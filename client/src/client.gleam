@@ -15,6 +15,7 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import modem
+import reusables/search_autocomplete
 import router
 import search
 import shared/translations.{fr_translator}
@@ -23,6 +24,7 @@ import user_api
 import workspace
 
 pub fn main() -> Nil {
+  let assert Ok(_) = search_autocomplete.register()
   let assert Ok(_) = grille_pain.simple()
   let app = lustre.application(init, update, view)
 
@@ -132,7 +134,7 @@ type Msg {
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
-  io.println(string.inspect(msg))
+  //io.println(string.inspect(msg))
   //io.println(string.inspect(model))
   case model, msg {
     _, UserRequestedRoute(route) -> #(update_route(model, route), effect.none())

@@ -11,6 +11,7 @@ import lustre/element/html
 import lustre/event
 import reusables/button.{button}
 import reusables/input.{input}
+import reusables/search_autocomplete
 import rsvp
 import shared/user.{type User, UserForm}
 
@@ -295,6 +296,12 @@ pub fn view(
           "email",
           g18n.translate(translator, "signup.email"),
         ),
+      ]),
+      search_autocomplete.element([
+        search_autocomplete.attribute_input_label(g18n.translate(
+          translator,
+          "signup.school",
+        )),
       ]),
       button(
         option.Some(event.on_click(visitor_submited_signup_form)),

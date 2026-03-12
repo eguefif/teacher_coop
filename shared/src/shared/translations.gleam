@@ -30,6 +30,7 @@ pub fn fr_translations() -> g18n.Translations {
   )
   |> g18n.add_translation("workspace.fileform.submit", "Envoyer")
   |> g18n.add_translation("search.placeholder", "Rechercher...")
+  |> g18n.add_translation("signup.school", "Ecole")
   |> g18n.add_translation("signup.confirm", "Confirmation")
   |> g18n.add_translation(
     "signup.error_email",
@@ -106,6 +107,7 @@ pub fn en_translations() -> g18n.Translations {
   )
   |> g18n.add_translation("workspace.fileform.submit", "Upload")
   |> g18n.add_translation("search.placeholder", "Search...")
+  |> g18n.add_translation("signup.school", "School")
   |> g18n.add_translation("signup.confirm", "Confirmation")
   |> g18n.add_translation("signup.error_email", "Your email address is invalid")
   |> g18n.add_translation("nav.workspace", "Workspace")

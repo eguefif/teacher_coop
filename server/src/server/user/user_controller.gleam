@@ -1,6 +1,5 @@
 import app_type.{type App}
 import argus
-import envoy
 import gleam/dynamic/decode
 import gleam/http.{Post}
 import gleam/option.{type Option, None, Some}

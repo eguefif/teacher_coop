@@ -16,6 +16,7 @@
     "password": "Password",
     "confirm": "Confirmation",
     "email": "Email",
+    "school": "School",
     "submit": "Create",
     "error_fullname": "Your full name must contain at least 3 characters.",
     "error_password": "Your password must contain at least 3 characters and one digit/symbol",

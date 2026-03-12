@@ -16,6 +16,7 @@
     "password": "Mot de passe",
     "confirm": "Confirmation",
     "email": "Email",
+    "school": "École",
     "submit": "Créer",
     "error_fullname": "Votre nom complet doit contenir au moins 3 charactères.",
     "error_password": "Votre mot de passe doit contenir au moins 3 charactères et un chifre/symbole.",

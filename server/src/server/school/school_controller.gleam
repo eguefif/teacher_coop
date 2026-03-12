@@ -1,6 +1,7 @@
 import app_type.{type App}
 import gleam/http/request
 import gleam/http/response
+import gleam/io
 import gleam/json
 import gleam/list
 import gleam/string

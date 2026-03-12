@@ -15,14 +15,6 @@ pub fn input(
   name name: String,
   label label: String,
 ) -> Element(msg) {
-  let wrapper_styles = [
-    #("position", "relative"),
-    #("display", "flex"),
-    #("max-width", "300px"),
-    #("flex-direction", "column"),
-    #("gap", "4px"),
-    #("padding-bottom", "2.5rem"),
-  ]
   let has_error = string.length(error) > 0
   let input_class = case is_valid, has_error {
     _, True -> "input-error"
@@ -38,7 +30,7 @@ pub fn input(
     #("align-items", "center"),
   ]
 
-  html.div([attribute.styles(wrapper_styles)], [
+  html.div([input_styles()], [
     html.label([attribute.for(name)], [
       html.text(label),
     ]),
@@ -73,5 +65,16 @@ pub fn input(
       ],
       [html.text(error)],
     ),
+  ])
+}
+
+pub fn input_styles() -> attribute.Attribute(msg) {
+  attribute.styles([
+    #("position", "relative"),
+    #("display", "flex"),
+    #("max-width", "300px"),
+    #("flex-direction", "column"),
+    #("gap", "4px"),
+    #("padding-bottom", "2.5rem"),
   ])
 }
