@@ -16,10 +16,11 @@ pub fn input(
   label label: String,
 ) -> Element(msg) {
   let has_error = string.length(error) > 0
-  let input_class = case is_valid, has_error {
-    _, True -> "input-error"
-    True, False -> "input-valid"
-    False, False -> ""
+  let has_input = string.length(text) > 0
+  let input_class = case is_valid, has_error, has_input {
+    _, True, True -> "input-error"
+    True, False, True -> "input-valid"
+    _, _, _ -> ""
   }
 
   let row_styles = [
@@ -37,6 +38,7 @@ pub fn input(
     html.div([attribute.styles(row_styles)], [
       html.input([
         event.on_input(on_focus),
+        event.on_input(on_focus),
         case on_blur {
           Some(on_blur) -> event.on_blur(on_blur)
           None -> attribute.none()
@@ -48,7 +50,7 @@ pub fn input(
       ]),
       html.p(
         [
-          attribute.class(case is_valid {
+          attribute.class(case is_valid && has_input {
             True -> "input-valid-message visible"
             False -> "input-valid-message"
           }),
@@ -58,7 +60,7 @@ pub fn input(
     ]),
     html.div(
       [
-        attribute.class(case has_error {
+        attribute.class(case has_error && has_input {
           True -> "input-error-message visible"
           False -> "input-error-message"
         }),

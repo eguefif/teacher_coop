@@ -15,8 +15,7 @@ import reusables/input.{input}
 import rsvp
 import shared/user.{type User, UserForm}
 
-// TODO:: need to have responsivness, text is not well display when reduced window
-// TODO: When correcting an input after the first time, we should validate anytime a user change
+// TODO:: need to have responsivness, error text is not well display when reduced window
 
 // Model ---------------------------------------------------------------------------------------
 
@@ -92,28 +91,34 @@ fn update_email(
   signup_form: SignupForm,
   email: String,
 ) -> #(SignupForm, Effect(Msg)) {
-  #(SignupForm(..signup_form, email:, error_email: ""), effect.none())
+  #(
+    SignupForm(..signup_form, email:, valid_email: False, error_email: ""),
+    effect.none(),
+  )
 }
 
 fn update_confirmation(
   signup_form: SignupForm,
   confirmation: String,
 ) -> #(SignupForm, Effect(Msg)) {
-  #(SignupForm(..signup_form, confirmation:, error_email: ""), effect.none())
+  #(
+    SignupForm(..signup_form, confirmation:, error_confirmation: ""),
+    effect.none(),
+  )
 }
 
 fn update_password(
   signup_form: SignupForm,
   password: String,
 ) -> #(SignupForm, Effect(Msg)) {
-  #(SignupForm(..signup_form, password:, error_email: ""), effect.none())
+  #(SignupForm(..signup_form, password:, error_password: ""), effect.none())
 }
 
 fn update_fullname(
   signup_form: SignupForm,
   fullname: String,
 ) -> #(SignupForm, Effect(Msg)) {
-  #(SignupForm(..signup_form, fullname:, error_email: ""), effect.none())
+  #(SignupForm(..signup_form, fullname:, error_fullname: ""), effect.none())
 }
 
 fn validate_fullname(
@@ -313,11 +318,13 @@ pub fn view(
             "signup.school",
           )),
         ]),
-        button(
-          option.Some(event.on_click(visitor_submited_signup_form)),
-          g18n.translate(translator, "signup.submit"),
-          "submit",
-        ),
+        html.div([attribute.style("margin", "0 auto 0 auto")], [
+          button(
+            option.Some(event.on_click(visitor_submited_signup_form)),
+            g18n.translate(translator, "signup.submit"),
+            "submit",
+          ),
+        ]),
       ]),
     ]),
   ])

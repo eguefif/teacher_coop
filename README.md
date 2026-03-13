@@ -13,15 +13,20 @@ A full-stack web application written entirely in [Gleam](https://gleam.run/), st
 - [x] Remove error input handling login form
 - [x] Display message login error when failing to login
 - [x] Use form on submit to allow for typing enter to submit: login and signup
-- [ ] Improve signup form, validation input should reset when focus (hide red and error input)
+- [x] Improve signup form, validation input should reset when focus (hide red and error input)
 - [ ] Should display that an email was sent in a toaster or message. It tells the user that their account was created
 - [ ] Add email confirmation message (wait for stable version, for now confirm should be false and enable it manually via DB)
 - [ ] Display message login to say that account is not activated
+- [ ] Implement Toggle dark/light style
+- [ ] Use a better font
+- [ ] Refactor input, it does not seem right
 
 ### Improve signup teacher form
-- [ ] Ingestion of french_schools using open data
-- [ ] Add end point to retrieve list of school based on a word search
-- [ ] Add basic input (independant component) that will allow a teacher to select a school from a list
+- [x] Ingestion of french_schools using open data
+- [x] Add end point to retrieve list of school based on a word search
+- [x] Add basic input (independant component) that will allow a teacher to select a school from a list
+- [x] Add auto complete search component full fledge
+- [ ] Improve search logic in the backend
 
 ### File logic
 - [x] End-to-End upload and search file

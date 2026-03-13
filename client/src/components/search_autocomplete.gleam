@@ -181,8 +181,6 @@ fn view_input(model: Model) -> Element(Msg) {
   )
 }
 
-// TODO: add an overlay with on click event to close dropdown
-// This might be externalize
 fn view_results(results: List(#(String, String))) -> Element(Msg) {
   html.div([attribute.style("position", "relative")], [
     overlay(UserClickedOutside, UserDidNothing),

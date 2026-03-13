@@ -76,7 +76,6 @@ pub fn view(
   translator: g18n.Translator,
   wrapper_msg: fn(Msg) -> msg,
 ) -> Element(msg) {
-  // TODO: style, center button submit
   html.div([], [
     html.form(
       [event.on_submit(fn(v) { wrapper_msg(VisitorSubmitedLoginForm(v)) })],
