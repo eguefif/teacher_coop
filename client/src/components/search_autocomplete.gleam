@@ -1,12 +1,9 @@
 //// Display a search input with autocomplete
 ////
-//// WHen a user type, after a three letters, search kick-off
+//// When a user type, after a three letters, search kick-off
 //// Results are displayed in a dropdown poper and are selectable.
 //// The the user need to choose a result to complete the input
 ////
-//// Attributes
-////      * fn(search) -> List(String)
-////      * j
 
 import gleam/dynamic/decode
 import gleam/io
@@ -21,12 +18,11 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
-import reusables/input
+import reusables/overlay.{overlay}
 
 // TODO:
-// [ ] Improve UI
-// [ ] Increase the list of selection and do a scroll
-// [ ] Improve search
+// [ ] We want to add more result
+// [ ] Implement a scroll
 pub fn register(
   name: String,
   get_list: fn(String, fn(Result(List(#(String, String)), SearchError)) -> Msg) ->
@@ -75,12 +71,13 @@ pub type Model {
     search: String,
     results: List(#(String, String)),
     input_label: String,
+    dropdown_visible: Bool,
     error: option.Option(SearchError),
   )
 }
 
 pub fn init(_) -> #(Model, Effect(Msg)) {
-  #(Model("", [], "", option.None), effect.none())
+  #(Model("", [], "", False, option.None), effect.none())
 }
 
 // Update ------------------------------------------------------------------------------------
@@ -90,6 +87,8 @@ pub type Msg {
   ParentChangedInputLabel(String)
   ApiReturnedSearchResults(Result(List(#(String, String)), SearchError))
   UserClickedOnRow(#(String, String))
+  UserClickedOutside
+  UserDidNothing
 }
 
 fn update(
@@ -106,7 +105,7 @@ fn update(
       effect.none(),
     )
     ApiReturnedSearchResults(Ok(results)) -> #(
-      Model(..model, results:, error: option.None),
+      Model(..model, results:, dropdown_visible: True, error: option.None),
       effect.none(),
     )
     ApiReturnedSearchResults(Error(err)) -> #(
@@ -117,6 +116,11 @@ fn update(
       Model(..model, results: [], search: row_value),
       event.emit("change", json.string(row_id)),
     )
+    UserClickedOutside -> #(
+      Model(..model, dropdown_visible: False),
+      effect.none(),
+    )
+    UserDidNothing -> #(model, effect.none())
   }
 }
 
@@ -138,35 +142,62 @@ fn update_search(
 // View -------------------------------------------------------------------------------------
 pub fn view(model: Model) -> Element(Msg) {
   html.div([], [
-    input.input(
-      model.search,
-      "",
-      is_valid: False,
-      on_focus: fn(msg) { UserChangedSearch(msg) },
-      on_blur: option.None,
-      is: "search",
-      name: model.input_label <> "-input",
-      label: model.input_label,
-    ),
+    view_input(model),
     case model.error {
       option.Some(_) ->
         html.p([], [html.text("Search failed, please try again.")])
       option.None ->
         case list.length(model.results) {
           0 -> element.none()
-          _ -> view_results(model.results)
+          _ if model.dropdown_visible == True -> view_results(model.results)
+          _ -> element.none()
         }
     },
   ])
 }
 
+fn view_input(model: Model) -> Element(Msg) {
+  let name = model.input_label <> "-input"
+  html.div(
+    [
+      attribute.styles([
+        #("display", "flex"),
+        #("width", "400px"),
+        #("flex-direction", "column"),
+        #("gap", "4px"),
+        #("padding-bottom", "2.5rem"),
+      ]),
+    ],
+    [
+      html.label([attribute.for(name)], [html.text(model.input_label)]),
+      html.input([
+        //attribute.style("border-radius", "16px 16px 0 0"),
+        attribute.type_("search"),
+        attribute.id(name),
+        attribute.value(model.search),
+        event.on_input(UserChangedSearch),
+      ]),
+    ],
+  )
+}
+
+// TODO: add an overlay with on click event to close dropdown
+// This might be externalize
 fn view_results(results: List(#(String, String))) -> Element(Msg) {
-  html.div([results_styles()], list.map(results, fn(row) { view_row(row) }))
+  html.div([attribute.style("position", "relative")], [
+    overlay(UserClickedOutside, UserDidNothing),
+    html.div([results_styles()], [
+      component_style(),
+      ..list.map(results, fn(row) { view_row(row) })
+    ]),
+  ])
 }
 
 fn view_row(row: #(String, String)) -> Element(Msg) {
   html.div(
     [
+      attribute.class("search-row"),
+      row_style(),
       event.on("click", { decode.success(UserClickedOnRow(row)) }),
       attribute.value(row.0),
     ],
@@ -176,6 +207,64 @@ fn view_row(row: #(String, String)) -> Element(Msg) {
   )
 }
 
+fn row_style() -> Attribute(Msg) {
+  attribute.attribute(
+    "style",
+    "
+    z-index: 15;
+    font-size: 14px;
+    padding: 12px;
+  ",
+  )
+}
+
 fn results_styles() -> Attribute(msg) {
-  attribute.styles([#("", "")])
+  attribute.attribute(
+    "style",
+    "
+    position: absolute;
+    left: -3px;
+    top: -43px;
+
+    display: flex;
+    z-index: 15;
+    flex-direction: column;
+    background-color: var(--color-primary-light);
+    margin: 0px 0px 12px 0px;
+    width: 406px;
+    border-radius: 0px 0px 16px 16px;
+    animation: dropdown-in 550ms ease-in-out;
+    overflow: hidden;
+    ",
+  )
+}
+
+fn component_style() -> Element(Msg) {
+  html.style(
+    [],
+    ".search-row:hover {
+        cursor: pointer;
+        background-color: var(--color-primary-dark);
+      }
+      .search-row:last-of-type{
+        padding-top: 14px
+        border-radius: 0px 0px 16px 16px;
+      }
+      .search-row:first-of-type{
+        padding-bottom: 14px
+      }
+
+      /* ------- DropDown Animation -------- */
+      @keyframes dropdown-in {
+        from {
+          opacitity: 0;
+          max-height: 50px;
+        }
+        to {
+          opacitity: 1;
+          max-height: 900px;
+        }
+      }
+      ",
+  )
 }

@@ -1,4 +1,3 @@
-import forms/filepath
 import g18n
 import gleam/http
 import gleam/http/request
@@ -10,6 +9,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
 import reusables/button
+import reusables/filepath
 import rsvp
 
 const extensions = [".pdf", ".docx", ".xlsx", ".pptx", ".odt", ".ods", ".odp"]

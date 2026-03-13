@@ -25,7 +25,7 @@ pub fn input(
   let row_styles = [
     #("position", "relative"),
     #("display", "flex"),
-    #("width", "100%"),
+    #("width", "400px"),
     #("flex-direction", "row"),
     #("align-items", "center"),
   ]

@@ -1,6 +1,6 @@
-import admin
-import forms/login
-import forms/signup_form
+import api/school_api
+import api/user_api
+import components/search_autocomplete
 import g18n
 import gleam/io
 import gleam/option
@@ -8,21 +8,21 @@ import gleam/string
 import gleam/uri.{type Uri}
 import grille_pain
 import grille_pain/lustre/toast
-import header
 import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import modem
-import reusables/search_autocomplete
+import pages/admin
+import pages/login
+import pages/search
+import pages/signup_form
+import pages/workspace
 import router
-import school_api
-import search
+import sections/header
 import shared/translations.{fr_translator}
 import shared/user
-import user_api
-import workspace
 
 pub fn main() -> Nil {
   let assert Ok(_) =
@@ -85,11 +85,7 @@ fn init(_) -> #(Model, Effect(Msg)) {
           on_error: router.Login,
         )
       _ ->
-        Pending(
-          translator: fr_translator(),
-          on_success: route,
-          on_error: router.Search,
-        )
+        Pending(translator: fr_translator(), on_success: route, on_error: route)
     },
     effects,
   )
@@ -132,7 +128,7 @@ type Msg {
   UserApiMsg(user_api.Msg)
   HeaderMsg(header.Msg)
   WorkspaceMsg(workspace.Msg)
-  AdminMsg(admin.Msg)
+  //AdminMsg(admin.Msg)
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {

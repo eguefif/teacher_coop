@@ -52,6 +52,7 @@ textarea {
   font-size: 1rem;
   line-height: 1.5;
   outline: none;
+  height: 45px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   box-sizing: border-box;
 }

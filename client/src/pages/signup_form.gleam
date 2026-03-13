@@ -1,3 +1,4 @@
+import components/search_autocomplete
 import g18n
 import gleam/http/response
 import gleam/io
@@ -11,7 +12,6 @@ import lustre/element/html
 import lustre/event
 import reusables/button.{button}
 import reusables/input.{input}
-import reusables/search_autocomplete
 import rsvp
 import shared/user.{type User, UserForm}
 
@@ -304,21 +304,21 @@ pub fn view(
           "email",
           g18n.translate(translator, "signup.email"),
         ),
+        search_autocomplete.element("school", [
+          search_autocomplete.on_click(fn(s) {
+            visitor_edit_signup_form(VisitorClickedOnSchool(s))
+          }),
+          search_autocomplete.attribute_input_label(g18n.translate(
+            translator,
+            "signup.school",
+          )),
+        ]),
+        button(
+          option.Some(event.on_click(visitor_submited_signup_form)),
+          g18n.translate(translator, "signup.submit"),
+          "submit",
+        ),
       ]),
-      search_autocomplete.element("school", [
-        search_autocomplete.on_click(fn(s) {
-          visitor_edit_signup_form(VisitorClickedOnSchool(s))
-        }),
-        search_autocomplete.attribute_input_label(g18n.translate(
-          translator,
-          "signup.school",
-        )),
-      ]),
-      button(
-        option.Some(event.on_click(visitor_submited_signup_form)),
-        g18n.translate(translator, "signup.submit"),
-        "submit",
-      ),
     ]),
   ])
 }
