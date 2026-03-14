@@ -30,7 +30,7 @@ pub fn fr_translations() -> g18n.Translations {
   )
   |> g18n.add_translation("workspace.fileform.submit", "Envoyer")
   |> g18n.add_translation("search.placeholder", "Rechercher...")
-  |> g18n.add_translation("signup.school", "Ecole")
+  |> g18n.add_translation("signup.school", "École")
   |> g18n.add_translation("signup.confirm", "Confirmation")
   |> g18n.add_translation(
     "signup.error_email",
@@ -40,6 +40,10 @@ pub fn fr_translations() -> g18n.Translations {
   |> g18n.add_translation("signup.submit", "Créer")
   |> g18n.add_translation("nav.search", "Rechercher")
   |> g18n.add_translation("signup.email", "Email")
+  |> g18n.add_translation(
+    "signup.error_email_duplicate",
+    "Le couriel existe déjà",
+  )
   |> g18n.add_translation(
     "signup.error_fullname",
     "Votre nom complet doit contenir au moins 3 charactères.",

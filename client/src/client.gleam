@@ -205,16 +205,6 @@ fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         toast.success(g18n.translate(model.translator, "signup.account_created")),
       )
     }
-    VisitorEditSignupForm(signup_form.ServerCreatedAccount(Error(_))) -> {
-      // TODO: we should not display an error here but the form
-      #(
-        update_route(model, router.Search),
-        toast.error(g18n.translate(
-          model.translator,
-          "signup.error_account_created",
-        )),
-      )
-    }
     VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
 
     // Login Form Message

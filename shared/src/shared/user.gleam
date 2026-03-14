@@ -17,7 +17,11 @@ pub type User {
     confirmed: Bool,
   )
   User(id: Int, fullname: String, email: String, type_: UserT)
-  UserFormError(email: String)
+  UserFormError(errors: List(FormErrorType))
+}
+
+pub type FormErrorType {
+  DuplicateEmail
 }
 
 pub type UserT {
@@ -25,9 +29,34 @@ pub type UserT {
   Member
 }
 
-pub fn user_form_error_to_json(user_error: User) -> json.Json {
-  let assert UserFormError(email) = user_error
-  json.object([#("email", json.string(email))])
+pub fn user_form_error_to_json(user_errors: User) -> json.Json {
+  let assert UserFormError(errors) = user_errors
+  json.array(errors, form_error_type_to_json)
+}
+
+fn form_error_type_to_json(error: FormErrorType) -> json.Json {
+  case error {
+    DuplicateEmail -> json.string("duplicate_email")
+  }
+}
+
+pub fn user_form_error_from_json(
+  error: String,
+) -> Result(User, json.DecodeError) {
+  let decoder = {
+    use errors <- decode.then(decode.list(form_error_type_decoder()))
+    decode.success(UserFormError(errors:))
+  }
+  json.parse(error, decoder)
+}
+
+fn form_error_type_decoder() -> decode.Decoder(FormErrorType) {
+  use error_type <- decode.then(decode.string)
+  let error = case error_type {
+    "duplicate_email" -> DuplicateEmail
+    _ -> panic
+  }
+  decode.success(error)
 }
 
 pub fn user_form_decoder() -> decode.Decoder(User) {

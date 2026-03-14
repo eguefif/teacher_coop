@@ -40,10 +40,11 @@ fn create_user(db: pog.Connection, req: Request) -> Response {
 
 fn build_constraint_error_response(message: String) -> wisp.Response {
   let constraint_name = db.extract_constraint_name(message)
+  // TODO: We need type to handle constraint error
   let body = case constraint_name {
     "unique_email" -> {
       json.to_string(
-        user_form_error_to_json(UserFormError(email: "duplicate_email")),
+        user_form_error_to_json(UserFormError([user.DuplicateEmail])),
       )
     }
     _ -> {
@@ -55,6 +56,7 @@ fn build_constraint_error_response(message: String) -> wisp.Response {
     }
   }
 
+  wisp.log_info(body)
   wisp.json_response(body, 400)
 }
 

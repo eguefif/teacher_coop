@@ -1,6 +1,8 @@
 import components/search_autocomplete
 import g18n
 import gleam/http/response
+import gleam/io
+import gleam/list
 import gleam/option
 import gleam/regexp
 import gleam/string
@@ -12,7 +14,9 @@ import lustre/event
 import reusables/button.{button}
 import reusables/input.{input}
 import rsvp
-import shared/user.{type User, UserForm}
+import shared/user.{
+  type User, DuplicateEmail, UserForm, UserFormError, user_form_error_from_json,
+}
 
 // TODO:: need to have responsivness, error text is not well display when reduced window
 
@@ -82,8 +86,39 @@ pub fn signup_update(
       effect.none(),
     )
 
+    ServerCreatedAccount(Error(rsvp.HttpError(response.Response(400, _, body)))) ->
+      handle_api_error(translator, signup_form, body)
     ServerCreatedAccount(_) -> #(signup_form, effect.none())
   }
+}
+
+fn handle_api_error(
+  translator: g18n.Translator,
+  model: SignupForm,
+  body: String,
+) -> #(SignupForm, Effect(Msg)) {
+  let model = case user_form_error_from_json(body) {
+    Ok(UserFormError(errors)) ->
+      list.fold(errors, model, fn(model, error) {
+        case error {
+          DuplicateEmail ->
+            SignupForm(
+              ..model,
+              error_email: g18n.translate(
+                translator,
+                "signup.error_email_duplicate",
+              ),
+              valid_email: False,
+            )
+        }
+      })
+    _ -> {
+      io.println("Error: Decode error")
+      model
+    }
+  }
+
+  #(model, effect.none())
 }
 
 fn update_email(
