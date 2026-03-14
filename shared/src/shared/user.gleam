@@ -1,5 +1,7 @@
 import gleam/dynamic/decode
 import gleam/json
+import gleam/regexp
+import gleam/string
 
 pub type User {
   UserForm(
@@ -27,6 +29,11 @@ pub type FormErrorType {
 pub type UserT {
   Admin
   Member
+}
+
+pub fn is_valid_password(password: String) -> Bool {
+  let assert Ok(re) = regexp.from_string("[^a-zA-Z0-9]")
+  string.length(password) > 3 && regexp.check(re, password)
 }
 
 pub fn user_form_error_to_json(user_errors: User) -> json.Json {

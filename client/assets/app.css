@@ -1,4 +1,9 @@
 :root {
+  --input-width: 400px;
+  @media (max-width: 550px) {
+    --input-width: 300px;
+  }
+
   --breakpoint-sm: 480px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
@@ -78,65 +83,6 @@ textarea::placeholder {
   color: var(--color-text-muted);
 }
 
-input.input-valid,
-textarea.input-valid {
-  border-color: var(--color-success);
-}
-
-input.input-valid:focus,
-textarea.input-valid:focus {
-  border-color: var(--color-success);
-  box-shadow: 0 0 0 3px rgba(76, 175, 130, 0.3);
-}
-
-input.input-error,
-textarea.input-error {
-  border-color: var(--color-danger);
-}
-
-input.input-error:focus,
-textarea.input-error:focus {
-  border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px rgba(232, 95, 79, 0.3);
-}
-
-.input-error-message {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  font-size: 0.8rem;
-  margin: 0;
-  visibility: hidden;
-  color: var(--color-danger);
-}
-
-.input-error-message.visible {
-  visibility: visible;
-}
-
-.input-error-message.visible::before {
-  content: "x ";
-}
-
-.input-valid-message {
-  position: absolute;
-  right: -1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-  margin: 0;
-  visibility: hidden;
-  color: var(--color-success);
-}
-
-.input-valid-message.visible {
-  visibility: visible;
-}
-
-.input-valid-message.visible::before {
-  content: "✓";
-}
 
 input:disabled,
 textarea:disabled {

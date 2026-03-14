@@ -140,8 +140,10 @@ fn update_search(
 }
 
 // View -------------------------------------------------------------------------------------
+
 pub fn view(model: Model) -> Element(Msg) {
   html.div([], [
+    component_style(),
     view_input(model),
     case model.error {
       option.Some(_) ->
@@ -158,36 +160,24 @@ pub fn view(model: Model) -> Element(Msg) {
 
 fn view_input(model: Model) -> Element(Msg) {
   let name = model.input_label <> "-input"
-  html.div(
-    [
-      attribute.styles([
-        #("display", "flex"),
-        #("width", "400px"),
-        #("flex-direction", "column"),
-        #("gap", "4px"),
-        #("padding-bottom", "2.5rem"),
-      ]),
-    ],
-    [
-      html.label([attribute.for(name)], [html.text(model.input_label)]),
-      html.input([
-        //attribute.style("border-radius", "16px 16px 0 0"),
-        attribute.type_("search"),
-        attribute.id(name),
-        attribute.value(model.search),
-        event.on_input(UserChangedSearch),
-      ]),
-    ],
-  )
+  html.div([attribute.class("search-input-container")], [
+    html.label([attribute.for(name)], [html.text(model.input_label)]),
+    html.input([
+      attribute.type_("search"),
+      attribute.id(name),
+      attribute.value(model.search),
+      event.on_input(UserChangedSearch),
+    ]),
+  ])
 }
 
 fn view_results(results: List(#(String, String))) -> Element(Msg) {
   html.div([attribute.style("position", "relative")], [
     overlay(UserClickedOutside, UserDidNothing),
-    html.div([results_styles()], [
-      component_style(),
-      ..list.map(results, fn(row) { view_row(row) })
-    ]),
+    html.div(
+      [attribute.class("search-results")],
+      list.map(results, fn(row) { view_row(row) }),
+    ),
   ])
 }
 
@@ -195,74 +185,67 @@ fn view_row(row: #(String, String)) -> Element(Msg) {
   html.div(
     [
       attribute.class("search-row"),
-      row_style(),
       event.on("click", { decode.success(UserClickedOnRow(row)) }),
       attribute.value(row.0),
     ],
-    [
-      html.text(row.1),
-    ],
-  )
-}
-
-fn row_style() -> Attribute(Msg) {
-  attribute.attribute(
-    "style",
-    "
-    z-index: 15;
-    font-size: 14px;
-    padding: 12px;
-  ",
-  )
-}
-
-fn results_styles() -> Attribute(msg) {
-  attribute.attribute(
-    "style",
-    "
-    position: absolute;
-    left: -3px;
-    top: -43px;
-
-    display: flex;
-    z-index: 15;
-    flex-direction: column;
-    background-color: var(--color-primary-light);
-    margin: 0px 0px 12px 0px;
-    width: 406px;
-    border-radius: 0px 0px 16px 16px;
-    animation: dropdown-in 550ms ease-in-out;
-    overflow: hidden;
-    ",
+    [html.text(row.1)],
   )
 }
 
 fn component_style() -> Element(Msg) {
   html.style(
     [],
-    ".search-row:hover {
-        cursor: pointer;
-        background-color: var(--color-primary-dark);
+    "
+    .search-input-container {
+      display: flex;
+      width: var(--input-width);
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 32px;
+    }
+    .search-results {
+      position: absolute;
+      left: 0;
+      top: -34px;
+      display: flex;
+      z-index: 15;
+      flex-direction: column;
+      background-color: var(--color-primary-light);
+      margin: 0px 0px 12px 0px;
+      width: var(--input-width);
+      border: 0px solid var(--color-primary);
+      border-color: var(--color-primary);
+      border-radius: 0px 0px 16px 16px;
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+      animation: dropdown-in 550ms ease-in-out;
+      overflow: hidden;
+    }
+    .search-row {
+      z-index: 15;
+      font-size: 14px;
+      padding: 12px;
+    }
+    .search-row:hover {
+      cursor: pointer;
+      background-color: var(--color-primary-dark);
+    }
+    .search-row:last-of-type {
+      padding-top: 14px;
+      border-radius: 0px 0px 16px 16px;
+    }
+    .search-row:first-of-type {
+      padding-bottom: 14px;
+    }
+    @keyframes dropdown-in {
+      from {
+        opacity: 0;
+        max-height: 50px;
       }
-      .search-row:last-of-type{
-        padding-top: 14px
-        border-radius: 0px 0px 16px 16px;
+      to {
+        opacity: 1;
+        max-height: 900px;
       }
-      .search-row:first-of-type{
-        padding-bottom: 14px
-      }
-
-      /* ------- DropDown Animation -------- */
-      @keyframes dropdown-in {
-        from {
-          opacitity: 0;
-          max-height: 50px;
-        }
-        to {
-          opacitity: 1;
-          max-height: 900px;
-        }
-      }
-      ",
+    }
+    ",
   )
 }

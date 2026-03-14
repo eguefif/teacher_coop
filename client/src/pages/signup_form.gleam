@@ -15,7 +15,8 @@ import reusables/button.{button}
 import reusables/input.{input}
 import rsvp
 import shared/user.{
-  type User, DuplicateEmail, UserForm, UserFormError, user_form_error_from_json,
+  type User, DuplicateEmail, UserForm, UserFormError, is_valid_password,
+  user_form_error_from_json,
 }
 
 // TODO:: need to have responsivness, error text is not well display when reduced window
@@ -200,23 +201,25 @@ fn validate_password(
   translator: g18n.Translator,
   signup_form: SignupForm,
 ) -> #(SignupForm, Effect(Msg)) {
-  let assert Ok(re) = regexp.from_string("[^a-zA-Z0-9]")
-  case
-    string.length(signup_form.password) > 3
-    && regexp.check(re, signup_form.password)
-  {
-    True -> #(
-      SignupForm(..signup_form, error_password: "", valid_password: True),
-      effect.none(),
-    )
-    False -> #(
+  let model = case is_valid_password(signup_form.password) {
+    True ->
+      SignupForm(
+        ..signup_form,
+        error_password: "",
+        valid_password: True,
+        error_confirmation: "",
+        valid_confirmation: True,
+      )
+    False ->
       SignupForm(
         ..signup_form,
         error_password: g18n.translate(translator, "signup.error_password"),
         valid_password: False,
-      ),
-      effect.none(),
-    )
+      )
+  }
+  case string.length(model.confirmation) > 0 {
+    True -> validate_confirmation(translator, model)
+    False -> #(model, effect.none())
   }
 }
 
@@ -282,21 +285,8 @@ pub fn view(
   translator: g18n.Translator,
   wrapper_msg: fn(Msg) -> msg,
 ) -> Element(msg) {
-  let styles = [
-    #("margin", "auto"),
-    #("display", "flex"),
-    #("flex-direction", "column"),
-    #("align-items", "center"),
-    #("gap", "16px"),
-  ]
-
-  let inputs_div_styles = [
-    #("display", "flex"),
-    #("flex-direction", "column"),
-    #("gap", "8px"),
-  ]
-
-  html.div([attribute.styles(styles)], [
+  html.div([attribute.class("signup-container")], [
+    signup_style(),
     html.h1([], [
       html.text(g18n.translate(translator, "signup.title")),
     ]),
@@ -307,7 +297,7 @@ pub fn view(
         }),
       ],
       [
-        html.div([attribute.styles(inputs_div_styles)], [
+        html.div([attribute.class("signup-inputs")], [
           input(
             signup_form.fullname,
             signup_form.error_fullname,
@@ -368,4 +358,24 @@ pub fn view(
       ],
     ),
   ])
+}
+
+fn signup_style() -> Element(msg) {
+  html.style(
+    [],
+    "
+    .signup-container {
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .signup-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    ",
+  )
 }
