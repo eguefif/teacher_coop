@@ -76,11 +76,15 @@ pub fn view(
   translator: g18n.Translator,
   wrapper_msg: fn(Msg) -> msg,
 ) -> Element(msg) {
-  html.div([], [
+  html.div([attribute.class("login-container")], [
+    login_style(),
+    html.h1([], [html.text(g18n.translate(translator, "login.title"))]),
     html.form(
-      [event.on_submit(fn(v) { wrapper_msg(VisitorSubmitedLoginForm(v)) })],
       [
-        html.h1([], [html.text(g18n.translate(translator, "login.title"))]),
+        attribute.class("login-form"),
+        event.on_submit(fn(v) { wrapper_msg(VisitorSubmitedLoginForm(v)) }),
+      ],
+      [
         input(
           login_form.email,
           "",
@@ -91,7 +95,6 @@ pub fn view(
           "email",
           g18n.translate(translator, "login.email"),
         ),
-
         input(
           login_form.password,
           "",
@@ -102,17 +105,18 @@ pub fn view(
           "password",
           g18n.translate(translator, "login.password"),
         ),
-        button(
-          option.None,
-          g18n.translate(translator, "login.submit"),
-          "submit",
-        ),
+        html.div([attribute.class("login-submit")], [
+          button(
+            option.None,
+            g18n.translate(translator, "login.submit"),
+            "submit",
+          ),
+        ]),
         html.p(
           [
-            attribute.style("color", "var(--color-danger)"),
-            attribute.style("visibility", case login_form.error {
-              True -> "visible"
-              False -> "hidden"
+            attribute.class(case login_form.error {
+              True -> "login-error visible"
+              False -> "login-error"
             }),
           ],
           [html.text(g18n.translate(translator, "login.error"))],
@@ -120,4 +124,33 @@ pub fn view(
       ],
     ),
   ])
+}
+
+fn login_style() -> Element(msg) {
+  html.style(
+    [],
+    "
+    .login-container {
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .login-submit {
+      margin: 0 auto;
+    }
+    .login-error {
+      color: var(--color-danger);
+      visibility: hidden;
+    }
+    .login-error.visible {
+      visibility: visible;
+    }
+    ",
+  )
 }

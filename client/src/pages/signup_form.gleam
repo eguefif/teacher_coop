@@ -347,7 +347,7 @@ pub fn view(
               "signup.school",
             )),
           ]),
-          html.div([attribute.style("margin", "0 auto 0 auto")], [
+          html.div([attribute.style("margin", "0 auto")], [
             button(
               option.None,
               g18n.translate(translator, "signup.submit"),
