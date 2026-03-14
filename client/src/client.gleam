@@ -121,7 +121,6 @@ type Msg {
   UserRequestedRoute(router.Route)
 
   VisitorEditSignupForm(signup_form.Msg)
-  VisitorSubmitedSignupForm
 
   LoginMsg(login.Msg)
 
@@ -216,9 +215,6 @@ fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         )),
       )
     }
-    VisitorSubmitedSignupForm ->
-      update_signup(model, signup_form.VisitorSubmitedSignupForm)
-
     VisitorEditSignupForm(signup_msg) -> update_signup(model, signup_msg)
 
     // Login Form Message
@@ -314,12 +310,9 @@ fn user_view(model: Model) -> Element(Msg) {
 
 fn signup_view(model: Model) -> Element(Msg) {
   let assert Visitor(..) = model
-  signup_form.view(
-    model.signup_form,
-    model.translator,
-    fn(signup_msg) { VisitorEditSignupForm(signup_msg) },
-    VisitorSubmitedSignupForm,
-  )
+  signup_form.view(model.signup_form, model.translator, fn(signup_msg) {
+    VisitorEditSignupForm(signup_msg)
+  })
 }
 
 fn login_view(model: Model) -> Element(Msg) {

@@ -1,7 +1,6 @@
 import components/search_autocomplete
 import g18n
 import gleam/http/response
-import gleam/io
 import gleam/option
 import gleam/regexp
 import gleam/string
@@ -45,7 +44,7 @@ pub fn init() -> SignupForm {
 
 pub type Msg {
   ServerCreatedAccount(Result(response.Response(String), rsvp.Error))
-  VisitorSubmitedSignupForm
+  VisitorSubmitedSignupForm(List(#(String, String)))
 
   VisitorUpdateFullname(String)
   VisitorUpdateEmail(String)
@@ -64,7 +63,7 @@ pub fn signup_update(
   msg: Msg,
 ) -> #(SignupForm, Effect(Msg)) {
   case msg {
-    VisitorSubmitedSignupForm -> handle_create_user(signup_form)
+    VisitorSubmitedSignupForm(_) -> handle_create_user(signup_form)
 
     // Input Validation on_input
     VisitorUpdateFullname(fullname) -> update_fullname(signup_form, fullname)
@@ -234,10 +233,10 @@ fn handle_create_user(form: SignupForm) -> #(SignupForm, Effect(Msg)) {
   }
 }
 
+// TODO: Refactor project API handling: think of where to put everything api related
 fn create_user(user: User) -> Effect(Msg) {
   let body = user.user_form_to_json(user)
   let url = "/api/signup"
-  io.println(url <> ": Creating user")
   rsvp.post(url, body, rsvp.expect_ok_response(ServerCreatedAccount))
 }
 
@@ -246,8 +245,7 @@ fn create_user(user: User) -> Effect(Msg) {
 pub fn view(
   signup_form: SignupForm,
   translator: g18n.Translator,
-  visitor_edit_signup_form: fn(Msg) -> msg,
-  visitor_submited_signup_form: msg,
+  wrapper_msg: fn(Msg) -> msg,
 ) -> Element(msg) {
   let styles = [
     #("margin", "0 auto"),
@@ -267,65 +265,72 @@ pub fn view(
     html.h1([], [
       html.text(g18n.translate(translator, "signup.title")),
     ]),
-    html.form([], [
-      html.div([attribute.styles(inputs_div_styles)], [
-        input(
-          signup_form.fullname,
-          signup_form.error_fullname,
-          signup_form.valid_fullname,
-          fn(s) { visitor_edit_signup_form(VisitorUpdateFullname(s)) },
-          option.Some(visitor_edit_signup_form(VisitorFinishUpdatedFullname)),
-          "text",
-          "fullname",
-          g18n.translate(translator, "signup.fullname"),
-        ),
-        input(
-          signup_form.password,
-          signup_form.error_password,
-          signup_form.valid_password,
-          fn(s) { visitor_edit_signup_form(VisitorUpdatePassword(s)) },
-          option.Some(visitor_edit_signup_form(VisitorFinishUpdatedPassword)),
-          "password",
-          "password",
-          g18n.translate(translator, "signup.password"),
-        ),
-        input(
-          signup_form.confirmation,
-          signup_form.error_confirmation,
-          signup_form.valid_confirmation,
-          fn(s) { visitor_edit_signup_form(VisitorUpdateConfirmation(s)) },
-          option.Some(visitor_edit_signup_form(VisitorFinishUpdatedConfirmation)),
-          "password",
-          "confirm",
-          g18n.translate(translator, "signup.confirm"),
-        ),
-        input(
-          signup_form.email,
-          signup_form.error_email,
-          signup_form.valid_email,
-          fn(s) { visitor_edit_signup_form(VisitorUpdateEmail(s)) },
-          option.Some(visitor_edit_signup_form(VisitorFinishUpdatedEmail)),
-          "email",
-          "email",
-          g18n.translate(translator, "signup.email"),
-        ),
-        search_autocomplete.element("school", [
-          search_autocomplete.on_click(fn(s) {
-            visitor_edit_signup_form(VisitorClickedOnSchool(s))
-          }),
-          search_autocomplete.attribute_input_label(g18n.translate(
-            translator,
-            "signup.school",
-          )),
-        ]),
-        html.div([attribute.style("margin", "0 auto 0 auto")], [
-          button(
-            option.Some(event.on_click(visitor_submited_signup_form)),
-            g18n.translate(translator, "signup.submit"),
-            "submit",
+    html.form(
+      [
+        event.on_submit(fn(form) {
+          wrapper_msg(VisitorSubmitedSignupForm(form))
+        }),
+      ],
+      [
+        html.div([attribute.styles(inputs_div_styles)], [
+          input(
+            signup_form.fullname,
+            signup_form.error_fullname,
+            signup_form.valid_fullname,
+            fn(s) { wrapper_msg(VisitorUpdateFullname(s)) },
+            option.Some(wrapper_msg(VisitorFinishUpdatedFullname)),
+            "text",
+            "fullname",
+            g18n.translate(translator, "signup.fullname"),
           ),
+          input(
+            signup_form.password,
+            signup_form.error_password,
+            signup_form.valid_password,
+            fn(s) { wrapper_msg(VisitorUpdatePassword(s)) },
+            option.Some(wrapper_msg(VisitorFinishUpdatedPassword)),
+            "password",
+            "password",
+            g18n.translate(translator, "signup.password"),
+          ),
+          input(
+            signup_form.confirmation,
+            signup_form.error_confirmation,
+            signup_form.valid_confirmation,
+            fn(s) { wrapper_msg(VisitorUpdateConfirmation(s)) },
+            option.Some(wrapper_msg(VisitorFinishUpdatedConfirmation)),
+            "password",
+            "confirm",
+            g18n.translate(translator, "signup.confirm"),
+          ),
+          input(
+            signup_form.email,
+            signup_form.error_email,
+            signup_form.valid_email,
+            fn(s) { wrapper_msg(VisitorUpdateEmail(s)) },
+            option.Some(wrapper_msg(VisitorFinishUpdatedEmail)),
+            "email",
+            "email",
+            g18n.translate(translator, "signup.email"),
+          ),
+          search_autocomplete.element("school", [
+            search_autocomplete.on_click(fn(s) {
+              wrapper_msg(VisitorClickedOnSchool(s))
+            }),
+            search_autocomplete.attribute_input_label(g18n.translate(
+              translator,
+              "signup.school",
+            )),
+          ]),
+          html.div([attribute.style("margin", "0 auto 0 auto")], [
+            button(
+              option.None,
+              g18n.translate(translator, "signup.submit"),
+              "submit",
+            ),
+          ]),
         ]),
-      ]),
-    ]),
+      ],
+    ),
   ])
 }
