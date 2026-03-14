@@ -11,10 +11,7 @@ import gleam/list
 import gleam/string
 import pog
 import server/school/api
-import server/school/sql
 import simplifile
-
-// TODO: find how to execute the ingestion regularly
 
 const scheme = http.Http
 

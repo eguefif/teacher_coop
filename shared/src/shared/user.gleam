@@ -17,11 +17,17 @@ pub type User {
     confirmed: Bool,
   )
   User(id: Int, fullname: String, email: String, type_: UserT)
+  UserFormError(email: String)
 }
 
 pub type UserT {
   Admin
   Member
+}
+
+pub fn user_form_error_to_json(user_error: User) -> json.Json {
+  let assert UserFormError(email) = user_error
+  json.object([#("email", json.string(email))])
 }
 
 pub fn user_form_decoder() -> decode.Decoder(User) {

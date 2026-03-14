@@ -2,12 +2,15 @@ import app_type.{type App}
 import argus
 import gleam/dynamic/decode
 import gleam/http.{Post}
-import gleam/io
+import gleam/json
 import gleam/option.{type Option, None, Some}
 import pog
+import server/db
 import server/env_utils
 import server/user/sql
-import shared/user.{type User, UserForm, user_form_decoder}
+import shared/user.{
+  type User, UserForm, UserFormError, user_form_decoder, user_form_error_to_json,
+}
 import wisp.{type Request, type Response}
 
 pub fn handle_request_user(app: App, req: Request) -> Response {
@@ -26,17 +29,33 @@ fn create_user(db: pog.Connection, req: Request) -> Response {
       let user = UserForm(..user, password: hash_password(password))
       case create_user_db(db, user) {
         Ok(_) -> wisp.ok()
-        Error(pog.ConstraintViolated(message, constraint, detail)) -> {
-          io.println("message: " <> message)
-          io.println("constraint: " <> constraint)
-          io.println("detail: " <> detail)
-          wisp.internal_server_error()
-        }
+        Error(pog.ConstraintViolated(message, _, _)) ->
+          build_constraint_error_response(message)
         Error(_) -> wisp.internal_server_error()
       }
     }
     Error(_) -> wisp.unprocessable_content()
   }
+}
+
+fn build_constraint_error_response(message: String) -> wisp.Response {
+  let constraint_name = db.extract_constraint_name(message)
+  let body = case constraint_name {
+    "unique_email" -> {
+      json.to_string(
+        user_form_error_to_json(UserFormError(email: "duplicate_email")),
+      )
+    }
+    _ -> {
+      wisp.log_error(
+        "user_controller: constraint name does not exists error: "
+        <> constraint_name,
+      )
+      panic
+    }
+  }
+
+  wisp.json_response(body, 400)
 }
 
 pub fn hash_password(password: String) -> String {
