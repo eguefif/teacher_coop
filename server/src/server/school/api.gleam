@@ -30,6 +30,7 @@ pub type ApiSchool {
     ecole_maternelle: Option(Int),
     ecole_elementaire: Option(Int),
     voie_generale: Option(String),
+    voie_technologique: Option(String),
     voie_professionnelle: Option(String),
     appartenance_education_prioritaire: Option(String),
   )
@@ -87,6 +88,12 @@ fn optional_int_to_json(value: Option(Int)) -> json.Json {
   }
 }
 
+pub fn api_schools_list_from_json(
+  json_string: String,
+) -> Result(List(ApiSchool), json.DecodeError) {
+  json.parse(json_string, decode.list(api_school_decoder()))
+}
+
 fn api_school_response_decoder() -> decode.Decoder(ApiSchoolResponse) {
   use total_count <- decode.field("total_count", decode.int)
   use results <- decode.field("results", decode.list(api_school_decoder()))
@@ -127,6 +134,11 @@ fn api_school_decoder() -> decode.Decoder(ApiSchool) {
     "voie_generale",
     decode.optional(decode.string),
   )
+
+  use voie_technologique <- decode.field(
+    "voie_professionnelle",
+    decode.optional(decode.string),
+  )
   use voie_professionnelle <- decode.field(
     "voie_professionnelle",
     decode.optional(decode.string),
@@ -148,6 +160,7 @@ fn api_school_decoder() -> decode.Decoder(ApiSchool) {
     ecole_maternelle:,
     ecole_elementaire:,
     voie_generale:,
+    voie_technologique:,
     voie_professionnelle:,
     appartenance_education_prioritaire:,
   ))

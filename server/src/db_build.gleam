@@ -5,6 +5,7 @@ import gleam/list
 import gleam/string
 import pog
 import server/db
+import server/school/school_ingestion
 import server/user/user_controller
 
 // TODO: add logic to create a dummy user
@@ -15,13 +16,17 @@ pub fn main() {
   let assert Ok(engine) = cigogne.create_engine(cfg)
   let assert Ok(_) = cigogne.apply_all(engine)
   create_users(db)
+  school_ingestion.ingest_french_school_from_file(
+    db,
+    "../fr-en-annuaire-education.json",
+    500,
+  )
 }
 
 fn reset_db(db) {
   // The following string no empty line after and before the "
   "DROP TABLE IF EXISTS users;
     DROP TABLE IF EXISTS sessions;
-    DROP TABLE IF EXISTS school_ingestion_page_hashes;
     DROP TABLE IF EXISTS files;
     DROP TABLE IF EXISTS file_ingestion_jobs;
     DROP TYPE IF EXISTS job_status;

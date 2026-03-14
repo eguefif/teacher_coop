@@ -2,7 +2,7 @@
 CREATE TABLE users (
     id bigserial PRIMARY KEY,
     full_name text NOT NULL,
-    email text NOT NULL,
+    email text NOT NULL UNIQUE,
     password TEXT NOT NULL
 );
 

@@ -2,6 +2,7 @@ import app_type.{type App}
 import argus
 import gleam/dynamic/decode
 import gleam/http.{Post}
+import gleam/io
 import gleam/option.{type Option, None, Some}
 import pog
 import server/env_utils
@@ -25,6 +26,12 @@ fn create_user(db: pog.Connection, req: Request) -> Response {
       let user = UserForm(..user, password: hash_password(password))
       case create_user_db(db, user) {
         Ok(_) -> wisp.ok()
+        Error(pog.ConstraintViolated(message, constraint, detail)) -> {
+          io.println("message: " <> message)
+          io.println("constraint: " <> constraint)
+          io.println("detail: " <> detail)
+          wisp.internal_server_error()
+        }
         Error(_) -> wisp.internal_server_error()
       }
     }

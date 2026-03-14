@@ -9,10 +9,10 @@ import gleam/io
 import gleam/json
 import gleam/list
 import gleam/string
-import mumu
 import pog
 import server/school/api
 import server/school/sql
+import simplifile
 
 // TODO: find how to execute the ingestion regularly
 
@@ -30,10 +30,43 @@ const path = "/records/"
 
 const select = "identifiant_de_l_etablissement,nom_etablissement,type_etablissement,adresse_1,statut_public_prive,code_postal,nom_commune,code_departement,code_region,ecole_maternelle,ecole_elementaire,voie_generale,voie_professionnelle,voie_technologique,appartenance_education_prioritaire"
 
+/// Ingest French schools from a local JSON file.
+///
+/// The file must be a flat JSON array of school records
+/// (e.g. `fr-en-annuaire-education.json`). Only the first `limit` records are
+/// processed, which is useful for faster dev/test runs. Pass a large number to
+/// ingest everything.
+///
+/// Unlike the API-based ingestion, no hash deduplication is performed — every
+/// run upserts all records. Idempotency is guaranteed by the `ON CONFLICT DO
+/// UPDATE` in the underlying SQL.
+pub fn ingest_french_school_from_file(
+  db: pog.Connection,
+  file_path: String,
+  limit: Int,
+) {
+  io.println("school_ingestion: Starting ingesting french schools from file...")
+  let assert Ok(content) = simplifile.read(file_path)
+  let assert Ok(schools) = api.api_schools_list_from_json(content)
+  schools
+  |> list.take(limit)
+  |> list.sized_chunk(default_limit)
+  |> create_or_update_schools(db, _)
+  io.println("school_ingestion: Finished ingesting schools from file")
+}
+
+/// Ingest French schools by fetching data from the education nationale API.
+///
+/// Retrieves all records in paginated batches of `default_limit` rows. Each
+/// page's body is hashed and compared against the hashes stored in
+/// `school_ingestion_page_hashes`. Only pages whose hash has changed since the
+/// last run are upserted, making repeated runs cheap. After filtering, the full
+/// set of new hashes replaces the old ones in the DB (truncate + insert).
+///
+/// Requires the `EDUCATION_NATIONAL_TOKEN` environment variable to be set.
 pub fn ingest_french_school(db: pog.Connection, _ignore_cache: Bool) {
   io.println("school_ingestion: Starting ingesting french schools...")
   request_dataset(0, 100_000)
-  |> persist_hashes_and_filter_out_pages(db, _)
   |> create_or_update_schools(db, _)
   io.println("school_ingestion: Finished ingesting schools")
 }
@@ -41,10 +74,7 @@ pub fn ingest_french_school(db: pog.Connection, _ignore_cache: Bool) {
 /// Side effect to the API: retrieve all data per batch of 100 rows
 ///
 /// Returns a list of tupples, each page is associated to its hashe
-fn request_dataset(
-  offset: Int,
-  max_rows: Int,
-) -> List(#(Int, List(api.ApiSchool))) {
+fn request_dataset(offset: Int, max_rows: Int) -> List(List(api.ApiSchool)) {
   case offset >= max_rows || offset > max_recursion {
     True -> []
     False -> {
@@ -53,10 +83,7 @@ fn request_dataset(
         Ok(Response(status, _, body)) if status < 300 -> {
           let assert Ok(api.ApiSchoolResponse(total_records, page)) =
             api.api_school_from_json(body)
-          [
-            #(mumu.hash(body), page),
-            ..request_dataset(offset + limit, total_records)
-          ]
+          [page, ..request_dataset(offset + limit, total_records)]
         }
         Ok(Response(status, _, _)) -> {
           io.println("Http error: " <> string.inspect(status))
@@ -84,61 +111,6 @@ fn create_request(offset: Int, limit: Int) -> Request(String) {
     #("limit", int.to_string(limit)),
     #("offset", int.to_string(offset)),
   ])
-}
-
-/// Compares fetched page hashes against the DB to find pages that changed.
-///
-/// Fetches all known hashes from the DB, filters out pages whose hash already
-/// exists (unchanged), then persists the full new hash list via truncate+insert.
-/// Returns only the pages that need to be ingested.
-fn persist_hashes_and_filter_out_pages(
-  db: pog.Connection,
-  data: List(#(Int, List(api.ApiSchool))),
-) -> List(List(api.ApiSchool)) {
-  io.println(
-    "Starting page filter with "
-    <> int.to_string(list.length(data))
-    <> " pages.",
-  )
-  let pages = case sql.get_all_hahes(db) {
-    Ok(pog.Returned(_len, results)) -> {
-      let results = results |> list.map(fn(entry) { entry.hash })
-      data
-      |> list.filter_map(fn(pair) {
-        case list.contains(results, pair.0) {
-          True -> Error(Nil)
-          False -> Ok(pair.1)
-        }
-      })
-    }
-    Error(_) -> panic
-  }
-
-  io.println("Updating " <> int.to_string(list.length(pages)) <> " rows")
-  persist_hahes(db, data)
-  pages
-}
-
-fn persist_hahes(db: pog.Connection, data: List(#(Int, a))) {
-  let hashes = list.map(data, fn(entry) { entry.0 })
-  let query = "TRUNCATE school_ingestion_page_hashes;"
-  let _ = pog.query(query) |> pog.execute(db)
-  let query =
-    "
-  INSERT INTO school_ingestion_page_hashes (hash)
-  select *
-  FROM
-    unnest($1::bigint[])
-  "
-  let result =
-    pog.query(query)
-    |> pog.parameter(pog.array(pog.int, hashes))
-    |> pog.execute(db)
-
-  case result {
-    Ok(_) -> Nil
-    Error(err) -> io.println("Error in perist hash db: " <> string.inspect(err))
-  }
 }
 
 fn create_or_update_schools(
