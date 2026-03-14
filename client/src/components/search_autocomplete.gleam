@@ -18,6 +18,7 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+import reusables/input
 import reusables/overlay.{overlay}
 
 // TODO:
@@ -62,6 +63,7 @@ pub fn on_click(handler: fn(String) -> msg) -> Attribute(msg) {
 pub type SearchError {
   NetworkError
   DecodeError
+  NoSelectionError
 }
 
 // Model ------------------------------------------------------------------------------------
@@ -72,12 +74,18 @@ pub type Model {
     results: List(#(String, String)),
     input_label: String,
     dropdown_visible: Bool,
+    // This index is used for keyboard navigation
+    nav_row_idx: option.Option(Int),
     error: option.Option(SearchError),
+    school_selected: option.Option(#(String, String)),
   )
 }
 
 pub fn init(_) -> #(Model, Effect(Msg)) {
-  #(Model("", [], "", False, option.None), effect.none())
+  #(
+    Model("", [], "", False, option.None, option.None, option.None),
+    effect.none(),
+  )
 }
 
 // Update ------------------------------------------------------------------------------------
@@ -88,7 +96,9 @@ pub type Msg {
   ApiReturnedSearchResults(Result(List(#(String, String)), SearchError))
   UserClickedOnRow(#(String, String))
   UserClickedOutside
+  UserPressedKey(String)
   UserDidNothing
+  UserSelectedRowWithKeyboard(Int)
 }
 
 fn update(
@@ -112,15 +122,70 @@ fn update(
       Model(..model, results: [], error: option.Some(err)),
       effect.none(),
     )
-    UserClickedOnRow(#(row_id, row_value)) -> #(
-      Model(..model, results: [], search: row_value),
-      event.emit("change", json.string(row_id)),
+    UserClickedOnRow(selection) -> #(
+      Model(
+        ..model,
+        results: [],
+        school_selected: option.Some(selection),
+        search: selection.1,
+      ),
+      event.emit("change", json.string(selection.0)),
     )
     UserClickedOutside -> #(
       Model(..model, dropdown_visible: False),
       effect.none(),
     )
     UserDidNothing -> #(model, effect.none())
+    UserPressedKey(key) -> update_key_pressed(key, model)
+    UserSelectedRowWithKeyboard(index) -> {
+      let selection = get_result_from_index(model.results, 0, index)
+      #(
+        Model(
+          ..model,
+          school_selected: option.Some(selection),
+          results: [],
+          search: selection.1,
+        ),
+        event.emit("change", json.string(selection.0)),
+      )
+    }
+  }
+}
+
+fn get_result_from_index(
+  results: List(#(String, String)),
+  idx: Int,
+  lookup: Int,
+) -> #(String, String) {
+  case idx == lookup, results {
+    True, [first, ..] -> first
+    False, [_, ..rest] -> get_result_from_index(rest, idx + 1, lookup)
+    _, [] -> panic
+  }
+}
+
+fn update_key_pressed(key: String, model: Model) -> #(Model, Effect(Msg)) {
+  let results_length = list.length(model.results)
+  let nav_row_idx = case model.nav_row_idx {
+    option.Some(row_index) -> {
+      case key {
+        "ArrowUp" if row_index - 1 < 0 -> option.Some(results_length - 1)
+        "ArrowUp" -> option.Some(row_index - 1)
+        "ArrowDown" if row_index + 1 >= results_length -> option.Some(0)
+        "ArrowDown" -> option.Some(row_index + 1)
+        _ -> option.None
+      }
+    }
+    option.None if key == "ArrowUp" || key == "ArrowDown" -> option.Some(0)
+    _ -> option.None
+  }
+  // Check if enter is pressed
+  case key, model.nav_row_idx {
+    "Enter", option.Some(idx) -> #(
+      Model(..model, dropdown_visible: False),
+      effect.from(fn(dispatch) { dispatch(UserSelectedRowWithKeyboard(idx)) }),
+    )
+    _, _ -> #(Model(..model, nav_row_idx:), effect.none())
   }
 }
 
@@ -132,7 +197,7 @@ fn update_search(
 ) -> #(Model, Effect(Msg)) {
   case string.length(search) > 4 {
     True -> #(
-      Model(..model, search:),
+      Model(..model, search:, school_selected: option.None),
       get_list(search, ApiReturnedSearchResults),
     )
     False -> #(Model(..model, search:), effect.none())
@@ -142,7 +207,7 @@ fn update_search(
 // View -------------------------------------------------------------------------------------
 
 pub fn view(model: Model) -> Element(Msg) {
-  html.div([], [
+  html.div([event.on_keydown(UserPressedKey)], [
     component_style(),
     view_input(model),
     case model.error {
@@ -151,7 +216,8 @@ pub fn view(model: Model) -> Element(Msg) {
       option.None ->
         case list.length(model.results) {
           0 -> element.none()
-          _ if model.dropdown_visible == True -> view_results(model.results)
+          _ if model.dropdown_visible == True ->
+            view_results(model.results, model.nav_row_idx)
           _ -> element.none()
         }
     },
@@ -159,31 +225,43 @@ pub fn view(model: Model) -> Element(Msg) {
 }
 
 fn view_input(model: Model) -> Element(Msg) {
-  let name = model.input_label <> "-input"
-  html.div([attribute.class("search-input-container")], [
-    html.label([attribute.for(name)], [html.text(model.input_label)]),
-    html.input([
-      attribute.type_("search"),
-      attribute.id(name),
-      attribute.value(model.search),
-      event.on_input(UserChangedSearch),
-    ]),
-  ])
+  input.input(
+    model.search,
+    "",
+    is_valid: option.is_some(model.school_selected),
+    on_focus: UserChangedSearch,
+    on_blur: option.None,
+    is: "search",
+    name: model.input_label <> "-input",
+    label: model.input_label,
+  )
 }
 
-fn view_results(results: List(#(String, String))) -> Element(Msg) {
+fn view_results(
+  results: List(#(String, String)),
+  nav_idx: option.Option(Int),
+) -> Element(Msg) {
   html.div([attribute.style("position", "relative")], [
     overlay(UserClickedOutside, UserDidNothing),
     html.div(
       [attribute.class("search-results")],
-      list.map(results, fn(row) { view_row(row) }),
+      list.index_map(results, fn(row, index) { view_row(row, index, nav_idx) }),
     ),
   ])
 }
 
-fn view_row(row: #(String, String)) -> Element(Msg) {
+fn view_row(
+  row: #(String, String),
+  index: Int,
+  nav_idx: option.Option(Int),
+) -> Element(Msg) {
   html.div(
     [
+      case nav_idx {
+        option.Some(nav_idx) if index == nav_idx ->
+          attribute.style("background-color", "var(--color-primary-dark)")
+        _ -> attribute.none()
+      },
       attribute.class("search-row"),
       event.on("click", { decode.success(UserClickedOnRow(row)) }),
       attribute.value(row.0),
@@ -196,13 +274,6 @@ fn component_style() -> Element(Msg) {
   html.style(
     [],
     "
-    .search-input-container {
-      display: flex;
-      width: var(--input-width);
-      flex-direction: column;
-      gap: 4px;
-      padding-bottom: 32px;
-    }
     .search-results {
       position: absolute;
       left: 0;

@@ -201,7 +201,10 @@ fn update_visitor(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     // Signup FormMessage
     VisitorEditSignupForm(signup_form.ServerCreatedAccount(Ok(_))) -> {
       #(
-        update_route(model, router.Search),
+        update_route(
+          Visitor(..model, signup_form: signup_form.init()),
+          router.Search,
+        ),
         toast.success(g18n.translate(model.translator, "signup.account_created")),
       )
     }
