@@ -19,8 +19,6 @@ import shared/user.{
   user_form_error_from_json,
 }
 
-// TODO:: need to have responsivness, error text is not well display when reduced window
-
 // Model ---------------------------------------------------------------------------------------
 
 pub type SignupForm {

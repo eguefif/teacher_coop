@@ -1,4 +1,16 @@
 --- migration:up
+-- The following function is a wrapper around unaccent.
+-- This is required to create a new column as PG except an IMMUTABLE marker to guarantee
+-- deterministic generation
+CREATE OR REPLACE FUNCTION f_unaccent (text)
+    RETURNS text
+    AS $$
+    SELECT
+        public.unaccent ('public.unaccent', $1);
+$$
+LANGUAGE sql
+IMMUTABLE PARALLEL SAFE STRICT;
+
 CREATE TYPE school_type AS ENUM (
     'elementary',
     'kindergarten',
@@ -29,16 +41,19 @@ CREATE TABLE french_schools (
     city_name text NOT NULL,
     code_departement text NOT NULL,
     code_region text NOT NULL,
-    rep rep_type NOT NULL DEFAULT 'none'
+    rep rep_type NOT NULL DEFAULT 'none',
+    search text GENERATED ALWAYS AS (lower(f_unaccent (name))) STORED
 );
+
+CREATE INDEX idx_on_french_schools_search ON french_schools USING gin (search gin_trgm_ops);
 
 --- migration:down
 DROP TABLE french_schools;
 
-DROP INDEX french_schools_id_name_adresse_1;
-
 DROP TYPE school_type;
 
 DROP TYPE rep_type;
+
+DROP INDEX ids_on_french_schools_search;
 
 --- migration:end

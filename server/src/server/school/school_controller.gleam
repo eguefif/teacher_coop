@@ -10,6 +10,9 @@ import shared/school.{School, school_list_to_json}
 import wisp
 
 // TODO: improve search it does not work well.
+// Some school does not have name. It's the city name that matter
+// It's possible that we need to add the address
+// Gonna have to study vector search coupled to trigram
 
 pub fn handle_school(app: App, req: wisp.Request) -> wisp.Response {
   case wisp.path_segments(req) {

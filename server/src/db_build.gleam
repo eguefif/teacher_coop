@@ -19,7 +19,7 @@ pub fn main() {
   school_ingestion.ingest_french_school_from_file(
     db,
     "../fr-en-annuaire-education.json",
-    500,
+    70_000,
   )
 }
 

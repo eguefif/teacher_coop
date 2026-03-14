@@ -12,5 +12,5 @@ WHERE
     lower(unaccent ($1)) <% search
 ORDER BY
     SCORE DESC
-LIMIT 10;
+LIMIT 20;
 
