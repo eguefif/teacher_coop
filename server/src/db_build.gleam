@@ -25,19 +25,12 @@ pub fn main() {
 
 fn reset_db(db) {
   // The following string no empty line after and before the "
-  "DROP TABLE IF EXISTS users;
-    DROP TABLE IF EXISTS sessions;
-    DROP TABLE IF EXISTS files;
-    DROP TABLE IF EXISTS file_ingestion_jobs;
-    DROP TYPE IF EXISTS job_status;
-    DROP TYPE IF EXISTS pg_user_type;
-    DROP TABLE IF EXISTS french_schools;
-    DROP TYPE IF EXISTS school_type;
-    DROP TYPE IF EXISTS rep_type;
-    TRUNCATE _migrations RESTART IDENTITY;
-    DROP SEQUENCE IF EXISTS users_id_seq;
+  "DROP TABLE users;
+    DROP SCHEMA public CASCADE;
+    CREATE SCHEMA public;
+    GRANT ALL ON SCHEMA public TO public;
     DROP EXTENSION IF EXISTS pg_trgm;
-    DROP EXTENSION IF EXISTS unaccent;"
+    DROP EXXTENSION IF EXISTS unaccent;"
   |> string.split("\n")
   |> list.map(fn(query) { pog.query(query) })
   |> list.map(fn(query) { pog.execute(query, db) })
