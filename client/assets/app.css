@@ -1,4 +1,10 @@
 :root {
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
   --color-primary: #4f7be8;
   --color-primary-dark: #3a5fcc;
   --color-primary-light: #7aa0f0;

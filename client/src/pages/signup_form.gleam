@@ -283,7 +283,7 @@ pub fn view(
   wrapper_msg: fn(Msg) -> msg,
 ) -> Element(msg) {
   let styles = [
-    #("margin", "0 auto"),
+    #("margin", "auto"),
     #("display", "flex"),
     #("flex-direction", "column"),
     #("align-items", "center"),

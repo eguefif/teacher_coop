@@ -15,19 +15,8 @@ pub fn view(
   user: option.Option(user.User),
   msg_wrapper: fn(Msg) -> msg,
 ) -> Element(msg) {
-  let styles = [
-    #("background", "var(--color-surface)"),
-    #("display", "flex"),
-    #("flex-direction", "row"),
-    #("justify-content", "space-between"),
-    #("align-items", "center"),
-    #("width", "840px"),
-    #("border-radius", "40px"),
-    #("margin", "16px auto"),
-    #("padding", "12px 24px"),
-  ]
-
-  html.div([attribute.styles(styles)], [
+  html.div([attribute.class("header")], [
+    header_style(),
     html.h2([], [
       html.a([attribute.href("/")], [
         html.text(g18n.translate(translator, "nav.brand")),
@@ -41,13 +30,7 @@ pub fn view(
 }
 
 fn header_button(translator: g18n.Translator) -> Element(msg) {
-  let styles = [
-    #("background", "var(--color-surface)"),
-    #("display", "flex"),
-    #("flex-direction", "row"),
-    #("gap", "20px"),
-  ]
-  html.div([attribute.styles(styles)], [
+  html.nav([attribute.class("header-nav")], [
     html.a([attribute.href("/")], [
       html.text(g18n.translate(translator, "nav.search")),
     ]),
@@ -64,13 +47,7 @@ fn user_header_button(
   translator: g18n.Translator,
   msg_wrapper: fn(Msg) -> msg,
 ) -> Element(msg) {
-  let styles = [
-    #("background", "var(--color-surface)"),
-    #("display", "flex"),
-    #("flex-direction", "row"),
-    #("gap", "20px"),
-  ]
-  html.div([attribute.styles(styles)], [
+  html.nav([attribute.class("header-nav")], [
     html.a([attribute.href("/")], [
       html.text(g18n.translate(translator, "nav.search")),
     ]),
@@ -81,4 +58,43 @@ fn user_header_button(
       html.text(g18n.translate(translator, "nav.logout")),
     ]),
   ])
+}
+
+fn header_style() -> Element(msg) {
+  html.style(
+    [],
+    "
+    .header {
+      background: var(--color-surface);
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      width: 90%;
+      max-width: 800px;
+      border-radius: 40px;
+      margin: auto;
+      padding: 12px;
+    }
+    .header-nav {
+      background: var(--color-surface);
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      margin: 4px;
+    }
+    @media (max-width: 550px) {
+      .header {
+        padding: 12px 4px;
+      }
+      .header-nav {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .header h2 {
+        font-size: 1.1rem;
+      }
+    }
+    ",
+  )
 }

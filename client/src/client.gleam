@@ -253,7 +253,7 @@ fn visitor_view(model: Model) -> Element(Msg) {
   let assert Visitor(..) = model
   let styles = [
     #("max-width", "100%"),
-    #("margin", "auto 16px"),
+    #("margin", "16px auto"),
     #("display", "flex"),
     #("flex-direction", "column"),
     #("align-items", "center"),
@@ -275,7 +275,7 @@ fn user_view(model: Model) -> Element(Msg) {
   let assert User(..) = model
   let styles = [
     #("max-width", "100%"),
-    #("margin", "auto 16px"),
+    #("margin", "16px auto"),
     #("display", "flex"),
     #("flex-direction", "column"),
     #("align-items", "center"),
