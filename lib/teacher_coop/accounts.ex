@@ -77,7 +77,15 @@ defmodule TeacherCoop.Accounts do
   def register_user(attrs) do
     %User{}
     |> User.email_changeset(attrs)
+    |> User.fullname_changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Returns an `%Eco.ChangeSet{}` for changing the user registration data: email, fullname.
+  """
+  def change_user_registration(user, attrs \\ %{}, opts \\ []) do
+    User.registration_changeset(user, attrs, opts)
   end
 
   ## Settings

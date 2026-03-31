@@ -33,6 +33,14 @@ defmodule TeacherCoopWeb.UserLive.Registration do
             phx-mounted={JS.focus()}
           />
 
+          <.input
+            field={@form[:fullname]}
+            type="text"
+            label={gettext("Fullname")}
+            spellcheck="false"
+            required
+          />
+
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
             Create an account
           </.button>
@@ -78,7 +86,7 @@ defmodule TeacherCoopWeb.UserLive.Registration do
   end
 
   def handle_event("validate", %{"user" => user_params}, socket) do
-    changeset = Accounts.change_user_email(%User{}, user_params, validate_unique: false)
+    changeset = Accounts.change_user_registration(%User{}, user_params, validate_unique: false)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
 

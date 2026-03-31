@@ -4,12 +4,36 @@ defmodule TeacherCoop.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :fullname, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
 
     timestamps(type: :utc_datetime)
+  end
+
+  @doc """
+  A user changeset for registering email and fullname.
+  """
+  def registration_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :fullname])
+    |> validate_email(opts)
+    |> validate_fullname
+  end
+
+  def fullname_changeset(user, attrs, _opts \\ []) do
+    user
+    |> cast(attrs, [:fullname])
+    |> validate_fullname
+  end
+
+  def validate_fullname(changeset) do
+    changeset
+    |> validate_required([:fullname])
+    |> validate_length(:fullname, max: 160)
+    |> validate_length(:fullname, min: 3)
   end
 
   @doc """
