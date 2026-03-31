@@ -9,7 +9,7 @@ defmodule TeacherCoopWeb.SearchLive do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="flex flex-col items-center gap-4">
-        <.header>Search</.header>
+        <.header>{gettext("Search")}</.header>
         <.form
           for={@form}
           id="search_form"

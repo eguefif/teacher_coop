@@ -1,5 +1,5 @@
-db:
-    docker compose up -d
+services:
+    docker compose up
 
 server:
     mix phx.server
