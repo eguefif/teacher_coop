@@ -74,12 +74,21 @@ defmodule TeacherCoop.Workspace do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_document(%Scope{} = scope, attrs) do
+  def create_document(%Scope{} = scope, attrs, entries) do
+    files =
+      Enum.map(entries, fn entry ->
+        %TeacherCoop.Workspace.File{
+          filename: entry.filename,
+          path: entry.path,
+          format: entry.format
+        }
+      end)
+
     with {:ok, document = %Document{}} <-
-           %Document{}
+           %Document{files: files}
            |> Document.changeset(attrs, scope)
            |> Repo.insert() do
-      broadcast_document(scope, {:created, document})
+      broadcast_document(scope, {:inserted, document})
       {:ok, document}
     end
   end

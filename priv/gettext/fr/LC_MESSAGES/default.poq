@@ -27,3 +27,18 @@ msgstr "Se connecter"
 
 msgid "My Documents"
 msgstr "Mes documents"
+
+msgid "Saving..."
+msgstr "Sauvegarde en cours..."
+
+msgid "Edit Document"
+msgstr "Modifier le document"
+
+msgid "New Document"
+msgstr "Nouveau document"
+
+msgid "Document updated successfully"
+msgstr "Document mis à jour avec succès"
+
+msgid "Document created successfully"
+msgstr "Document créé avec succès"

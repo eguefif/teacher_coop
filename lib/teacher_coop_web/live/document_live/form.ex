@@ -4,6 +4,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   alias TeacherCoop.Workspace
   alias TeacherCoop.Workspace.Document
 
+  # TODO:
+  # - [x] Display one file error correctly
+  # - [ ] Persist document (description)
+  # - [ ] Persist files
+  # - [ ] Add a document type
+  # - [ ] Add a the curriculum
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -12,14 +19,110 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         {@page_title}
       </.header>
 
-      <.form for={@form} id="document-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:title]} type="text" label="Title" />
-        <footer>
-          <.button phx-disable-with={gettext("Saving...")} variant="primary">Save Document</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @document)}>Cancel</.button>
+      <.form
+        for={@form}
+        id="document-form"
+        phx-change="validate"
+        phx-submit="save"
+        class="flex flex-col gap-4"
+      >
+        <.input field={@form[:title]} type="text" label={gettext("Title")} />
+        <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
+        <.input_file uploads={@uploads} />
+        <footer class="mx-auto">
+          <.button phx-disable-with={gettext("Saving...")} variant="primary">
+            {gettext("Save Document")}
+          </.button>
+          <.button navigate={return_path(@current_scope, @return_to, @document)}>
+            {gettext("Cancel")}
+          </.button>
         </footer>
       </.form>
+      <p :for={error <- upload_errors(@uploads.files)} class="alert alert-danger">
+        {error_to_string(error)}
+      </p>
     </Layouts.app>
+    """
+  end
+
+  attr :uploads, :map, required: true
+
+  def input_file(assigns) do
+    ~H"""
+    <div class="flex flex-row justify-start gap-8 w-full">
+      <label
+        for={@uploads.files.ref}
+        phx-drop-target={@uploads.files.ref}
+        class="flex flex-col items-center justify-center w-64 h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 phx-drop-target-active:bg-gray-300"
+      >
+        <div class="flex flex-col items-center justify-center">
+          <svg
+            class="w-8 h-8 mb-2 text-gray-400"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 20 20"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13
+    13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0
+    8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+            />
+          </svg>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-sm text-gray-500">
+            <span class="font-semibold">{gettext("Click to upload or drag and drop")}</span>
+          </p>
+          <p class="text-xs text-gray-400 mt-1 text-center">PDF, DOCX {gettext("up to 8MB")}</p>
+        </div>
+        <.live_file_input upload={@uploads.files} class="hidden" />
+      </label>
+      <div :if={@uploads.files.entries == []}>
+        <p>{gettext("No files")}</p>
+      </div>
+      <div class="flex flex-col gap-1">
+        <article :for={entry <- @uploads.files.entries}>
+          <.remove_button entry={entry} />
+          <span class="text-xs">{entry.client_name}</span>
+          <.file_error errors={upload_errors(@uploads.files, entry)} />
+        </article>
+      </div>
+    </div>
+    """
+  end
+
+  attr :entry, :map, required: true
+
+  def remove_button(assigns) do
+    ~H"""
+    <.button
+      type="button"
+      class="btn btn-primary w-4 h-4"
+      variant="primary"
+      phx-click="cancel-upload"
+      phx-value-ref={@entry.ref}
+      aria-label="cancel"
+    >
+      X
+    </.button>
+    """
+  end
+
+  attr :errors, :list
+
+  def file_error(assigns) do
+    ~H"""
+    <span :if={@errors != []} class="relative group">
+      <span><.icon name="hero-exclamation-triangle" class="text-red-500 w-4 h-4" /></span>
+      <div class="absolute top-0 left-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-red-100 text-red-700 text-xs p-2 rounded shadow z-10 w-max">
+        <article :for={error <- @errors}>{error_to_string(error)}</article>
+      </div>
+    </span>
     """
   end
 
@@ -28,7 +131,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> apply_action(socket.assigns.live_action, params)}
+     |> apply_action(socket.assigns.live_action, params)
+     |> allow_upload(:files, accept: ~w(.docx .pdf .txt .jpg .jpeg .png), max_entries: 10)}
   end
 
   defp return_to("show"), do: "show"
@@ -52,6 +156,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
 
+  @impl Phoenix.LiveView
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :files, ref)}
+  end
+
   @impl true
   def handle_event("validate", %{"document" => document_params}, socket) do
     changeset =
@@ -65,10 +174,25 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   def handle_event("save", %{"document" => document_params}, socket) do
-    save_document(socket, socket.assigns.live_action, document_params)
+    entries =
+      consume_uploaded_entries(socket, :files, fn %{path: path}, entry ->
+        dest =
+          Path.join(
+            Application.app_dir(:teacher_coop, "priv/static/uploads"),
+            Path.basename(path)
+          )
+
+        File.cp!(path, dest)
+        {:ok, %{path: dest, filename: entry.client_name, format: entry.client_type}}
+      end)
+
+    # TODO: change the logic in save_document to persit files too
+    # - [ ] edit
+    # - [ ] new
+    save_document(socket, socket.assigns.live_action, document_params, entries)
   end
 
-  defp save_document(socket, :edit, document_params) do
+  defp save_document(socket, :edit, document_params, _entries) do
     case Workspace.update_document(
            socket.assigns.current_scope,
            socket.assigns.document,
@@ -87,8 +211,10 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     end
   end
 
-  defp save_document(socket, :new, document_params) do
-    case Workspace.create_document(socket.assigns.current_scope, document_params) do
+  defp save_document(socket, :new, document_params, entries) do
+    dbg(document_params)
+
+    case Workspace.create_document(socket.assigns.current_scope, document_params, entries) do
       {:ok, document} ->
         {:noreply,
          socket
@@ -104,4 +230,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   defp return_path(_scope, "index", _document), do: ~p"/workspace/documents"
   defp return_path(_scope, "show", document), do: ~p"/workspace/documents/#{document}"
+
+  # File uploads Error Handling
+  defp error_to_string(:too_many_files), do: gettext("You added too many files.")
+  defp error_to_string(:too_large), do: gettext("File too large.")
+  defp error_to_string(:not_accepted), do: gettext("This file format is not accepted.")
 end

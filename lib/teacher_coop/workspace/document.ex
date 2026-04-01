@@ -4,7 +4,9 @@ defmodule TeacherCoop.Workspace.Document do
 
   schema "documents" do
     field :title, :string
-    field :user_id, :id
+    field :description, :string
+    belongs_to :user, TeacherCoop.Accounts.User
+    has_many :files, TeacherCoop.Workspace.File
 
     timestamps(type: :utc_datetime)
   end
@@ -12,8 +14,9 @@ defmodule TeacherCoop.Workspace.Document do
   @doc false
   def changeset(document, attrs, user_scope) do
     document
-    |> cast(attrs, [:title])
-    |> validate_required([:title])
+    |> cast(attrs, [:title, :description])
+    |> validate_required([:title, :description])
     |> put_change(:user_id, user_scope.user.id)
+    |> cast_assoc(:files, with: &TeacherCoop.Workspace.File.changeset/3)
   end
 end

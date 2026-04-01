@@ -4,6 +4,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateDocuments do
   def change do
     create table(:documents) do
       add :title, :string
+      add :description, :string
       add :user_id, references(:users, type: :id, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
