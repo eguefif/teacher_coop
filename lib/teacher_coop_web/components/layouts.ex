@@ -46,20 +46,20 @@ defmodule TeacherCoopWeb.Layouts do
         <ul class="menu menu-horizontal relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
           <%= if @current_scope do %>
             <li>
-              {@current_scope.user.email}
+              <.link href={~p"/users/workspace"}>{gettext("Workspace")}</.link>
             </li>
             <li>
-              <.link href={~p"/users/settings"}>Settings</.link>
+              <.link href={~p"/users/settings"}>{gettext("Settings")}</.link>
             </li>
             <li>
-              <.link href={~p"/users/log-out"} method="delete">Log out</.link>
+              <.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link>
             </li>
           <% else %>
             <li>
-              <.link href={~p"/users/register"}>Register</.link>
+              <.link href={~p"/users/register"}>{gettext("Register")}</.link>
             </li>
             <li>
-              <.link href={~p"/users/log-in"}>Log in</.link>
+              <.link href={~p"/users/log-in"}>{gettext("Log in")}</.link>
             </li>
           <% end %>
         </ul>

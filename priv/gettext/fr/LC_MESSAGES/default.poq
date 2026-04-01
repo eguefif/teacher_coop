@@ -9,3 +9,21 @@ msgstr "Rechercher"
 
 msgid "Fullname"
 msgstr "Nom complet"
+
+msgid "Workspace"
+msgstr "Espace de travail"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Log out"
+msgstr "Se déconnecter"
+
+msgid "Register"
+msgstr "S'inscrire"
+
+msgid "Log in"
+msgstr "Se connecter"
+
+msgid "Add document"
+msgstr "Ajouter un document"
