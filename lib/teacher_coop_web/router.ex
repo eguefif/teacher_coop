@@ -57,6 +57,20 @@ defmodule TeacherCoopWeb.Router do
     post "/users/update-password", UserSessionController, :update_password
   end
 
+  scope "/workspace", TeacherCoopWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :workspace,
+      on_mount: [{TeacherCoopWeb.UserAuth, :require_authenticated}] do
+      live "/", WorkspaceLive.Workspace, :index
+
+      live "/documents", WorkspaceLive.DocumentLive.Index, :index
+      live "/documents/new", WorkspaceLive.DocumentLive.Form, :new
+      live "/documents/:id/edit", WorkspaceLive.DocumentLive.Form, :edit
+      live "/documents/:id", WorkspaceLive.DocumentLive.Show, :show
+    end
+  end
+
   scope "/", TeacherCoopWeb do
     pipe_through [:browser]
 

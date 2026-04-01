@@ -46,7 +46,7 @@ defmodule TeacherCoopWeb.Layouts do
         <ul class="menu menu-horizontal relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
           <%= if @current_scope do %>
             <li>
-              <.link href={~p"/users/workspace"}>{gettext("Workspace")}</.link>
+              <.link href={~p"/workspace"}>{gettext("Workspace")}</.link>
             </li>
             <li>
               <.link href={~p"/users/settings"}>{gettext("Settings")}</.link>
