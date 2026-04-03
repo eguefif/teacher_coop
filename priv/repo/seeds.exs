@@ -9,3 +9,11 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias TeacherCoop.Repo
+alias TeacherCoop.Accounts.User
+
+Repo.insert!(%User{
+  email: "admin@localhost.fr",
+  fullname: "Robert De Fouca"
+})

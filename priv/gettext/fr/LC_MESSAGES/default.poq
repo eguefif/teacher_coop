@@ -42,3 +42,33 @@ msgstr "Document mis à jour avec succès"
 
 msgid "Document created successfully"
 msgstr "Document créé avec succès"
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Save Document"
+msgstr "Enregistrer le document"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Click to upload or drag and drop"
+msgstr "Cliquer pour téléverser ou glisser-déposer"
+
+msgid "up to 8MB"
+msgstr "jusqu'à 8 Mo"
+
+msgid "No files"
+msgstr "Aucun fichier"
+
+msgid "You added too many files."
+msgstr "Vous avez ajouté trop de fichiers."
+
+msgid "File too large."
+msgstr "Fichier trop volumineux."
+
+msgid "This file format is not accepted."
+msgstr "Ce format de fichier n'est pas accepté."

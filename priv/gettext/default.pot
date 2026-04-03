@@ -1,3 +1,34 @@
 ## From Search page
 msgid "Search"
 msgstr ""
+
+## From Document form
+msgid "Title"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Save Document"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Click to upload or drag and drop"
+msgstr ""
+
+msgid "up to 8MB"
+msgstr ""
+
+msgid "No files"
+msgstr ""
+
+msgid "You added too many files."
+msgstr ""
+
+msgid "File too large."
+msgstr ""
+
+msgid "This file format is not accepted."
+msgstr ""

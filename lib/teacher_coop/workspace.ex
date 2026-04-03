@@ -7,6 +7,7 @@ defmodule TeacherCoop.Workspace do
   alias TeacherCoop.Repo
 
   alias TeacherCoop.Workspace.Document
+  alias TeacherCoop.Workspace.File
   alias TeacherCoop.Accounts.Scope
 
   @doc """
@@ -74,22 +75,28 @@ defmodule TeacherCoop.Workspace do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_document(%Scope{} = scope, attrs, entries) do
-    files =
-      Enum.map(entries, fn entry ->
-        %TeacherCoop.Workspace.File{
-          filename: entry.filename,
-          path: entry.path,
-          format: entry.format
-        }
+  def create_document(%Scope{} = scope, files, attrs) do
+    Repo.transaction(fn ->
+      document =
+        %Document{}
+        |> Document.changeset(attrs, scope)
+        |> Repo.insert!()
+
+      Enum.each(files, fn file ->
+        %File{}
+        |> File.changeset(Map.put(file, :document_id, document.id), scope)
+        |> Repo.insert!()
       end)
 
-    with {:ok, document = %Document{}} <-
-           %Document{files: files}
-           |> Document.changeset(attrs, scope)
-           |> Repo.insert() do
-      broadcast_document(scope, {:inserted, document})
-      {:ok, document}
+      document
+    end)
+    |> case do
+      {:ok, document} ->
+        broadcast_document(scope, {:created, document})
+        {:ok, document}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -105,15 +112,33 @@ defmodule TeacherCoop.Workspace do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_document(%Scope{} = scope, %Document{} = document, attrs) do
+  def update_document(%Scope{} = scope, %Document{} = document, files, attrs) do
     true = document.user_id == scope.user.id
 
-    with {:ok, document = %Document{}} <-
-           document
-           |> Document.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast_document(scope, {:updated, document})
-      {:ok, document}
+    result =
+      Repo.transaction(fn ->
+        document =
+          document
+          |> Document.changeset(attrs, scope)
+          |> Repo.update!()
+
+        Enum.each(files, fn file ->
+          %File{}
+          |> File.changeset(file, scope)
+          |> Ecto.Changeset.put_change(:document_id, document.id)
+          |> Repo.insert!()
+        end)
+
+        {:ok, document}
+      end)
+
+    case result do
+      {:ok, document} ->
+        broadcast_document(scope, {:updated, document})
+        {:ok, document}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -152,5 +177,20 @@ defmodule TeacherCoop.Workspace do
     true = document.user_id == scope.user.id
 
     Document.changeset(document, attrs, scope)
+  end
+
+  def get_files!(id) do
+    query =
+      Ecto.Query.from(files in File,
+        where: files.document_id == ^id,
+        select: files
+      )
+
+    Repo.all(query)
+  end
+
+  def delete_file!(id) do
+    file = Repo.get!(File, id)
+    Repo.delete!(file)
   end
 end
