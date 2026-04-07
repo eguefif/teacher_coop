@@ -2,6 +2,14 @@
 msgid "Search"
 msgstr ""
 
+## From Modal
+msgid "Confirm"
+msgstr ""
+
+## From Document index
+msgid "Do you really want to delete this document?"
+msgstr ""
+
 ## From Document form
 msgid "Title"
 msgstr ""

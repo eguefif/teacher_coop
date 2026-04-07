@@ -32,6 +32,33 @@ defmodule TeacherCoopWeb.CoreComponents do
   alias Phoenix.LiveView.JS
 
   @doc """
+  Renders a confirmation modal.
+  """
+  attr :id, :string, required: true
+  attr :event, :string
+  slot :inner_block, required: true
+
+  def modal(assigns) do
+    ~H"""
+    <dialog id={@id} class="modal">
+      <div class="modal-box">
+        <p class="py-4">{render_slot(@inner_block)}</p>
+        <div class="modal-action">
+          <form method="dialog" class="flex flex-row gap-2">
+            <.link class="btn" phx-click={JS.dispatch("data-confirm:confirm")}>
+              {gettext("Confirm")}
+            </.link>
+            <.link class="btn" phx-click={JS.dispatch("data-confirm:cancel")}>
+              {gettext("Cancel")}
+            </.link>
+          </form>
+        </div>
+      </div>
+    </dialog>
+    """
+  end
+
+  @doc """
   Renders flash notices.
 
   ## Examples

@@ -84,7 +84,8 @@ defmodule TeacherCoop.Workspace do
 
       Enum.each(files, fn file ->
         %File{}
-        |> File.changeset(Map.put(file, :document_id, document.id), scope)
+        |> File.changeset(file, scope)
+        |> Ecto.Changeset.put_change(:document_id, document.id)
         |> Repo.insert!()
       end)
 

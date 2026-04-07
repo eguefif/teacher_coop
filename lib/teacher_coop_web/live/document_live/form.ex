@@ -29,7 +29,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       >
         <.input field={@form[:title]} type="text" label={gettext("Title")} />
         <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
-        <.files_list :if={@files != []} files={@files} />
+        <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
         <footer class="mx-auto">
           <.button phx-disable-with={gettext("Saving...")} variant="primary">
@@ -54,7 +54,14 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     <h2>{gettext("Files")}</h2>
     <div class="flex flex-col gap-1">
       <article :for={entry <- @files}>
-        <.button type="button" phx-click="remove-file" phx-value-id={entry.id}>X</.button>
+        <.button
+          type="button"
+          phx-click="remove-file"
+          phx-value-id={entry.id}
+          data-confirm={gettext("Are you sure you want to delete this file?")}
+        >
+          X
+        </.button>
         <span class="text-xs">{entry.filename}</span>
       </article>
     </div>
@@ -72,23 +79,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         class="flex flex-col items-center justify-center w-64 h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 phx-drop-target-active:bg-gray-300"
       >
         <div class="flex flex-col items-center justify-center">
-          <svg
-            class="w-8 h-8 mb-2 text-gray-400"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 20 20"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13
-    13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0
-    8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-            />
-          </svg>
+          <.icon name="hero-cloud-arrow-up" class="size-10 shrink-0 text-gray-400" />
         </div>
         <div class="flex flex-col gap-2">
           <p class="text-sm text-gray-500">

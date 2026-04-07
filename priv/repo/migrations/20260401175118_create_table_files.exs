@@ -6,7 +6,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateTableFiles do
       add :filename, :string, require: true
       add :path, :string, require: true, size: 400
       add :format, :string, require: true, size: 30
-      add :document_id, references("documents")
+      add :document_id, references("documents", on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end

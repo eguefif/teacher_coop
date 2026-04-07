@@ -36,10 +36,10 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
             </div>
             <.link navigate={~p"/workspace/documents/#{document}/edit"}>Edit</.link>
           </:action>
-          <:action :let={{id, document}}>
+          <:action :let={{_id, document}}>
             <.link
-              phx-click={JS.push("delete", value: %{id: document.id}) |> hide("##{id}")}
-              data-confirm="Are you sure?"
+              phx-click={JS.push("delete", value: %{id: document.id})}
+              data-confirm={gettext("Do you really want to delete this document?")}
             >
               Delete
             </.link>

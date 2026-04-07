@@ -28,6 +28,12 @@ msgstr "Document updated successfully"
 msgid "Document created successfully"
 msgstr "Document created successfully"
 
+msgid "Confirm"
+msgstr "Confirm"
+
+msgid "Do you really want to delete this document?"
+msgstr "Do you really want to delete this document?"
+
 msgid "Title"
 msgstr "Title"
 
