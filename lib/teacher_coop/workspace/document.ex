@@ -5,6 +5,7 @@ defmodule TeacherCoop.Workspace.Document do
   schema "documents" do
     field :title, :string
     field :description, :string
+    field :tags, :string
     belongs_to :user, TeacherCoop.Accounts.User
     has_many :files, TeacherCoop.Workspace.File
 

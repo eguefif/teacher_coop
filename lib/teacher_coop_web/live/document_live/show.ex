@@ -22,8 +22,28 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
         </:actions>
       </.header>
 
-      <div>
-        {@document.description}
+      <div class="flex flex-col gap-8">
+        <div>
+          {@document.description}
+        </div>
+
+        <section>
+          <h2>{gettext("Files")}</h2>
+          <.table
+            id="files"
+            rows={@files}
+          >
+            <:col :let={file} label={gettext("Filename")}>{file.filename}</:col>
+            <:action :let={file}>
+              <.link
+                phx-click={JS.push("delete", value: %{id: file.id})}
+                data-confirm={gettext("Do you really want to delete this file?")}
+              >
+                {gettext("Delete")}
+              </.link>
+            </:action>
+          </.table>
+        </section>
       </div>
     </Layouts.app>
     """

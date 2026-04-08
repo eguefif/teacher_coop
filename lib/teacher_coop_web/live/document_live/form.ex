@@ -9,8 +9,14 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   # - [x] Persist document (description)
   # - [x] Persist files
   # - [x] Update edit form.
-  # - [ ] Add a document type
-  # - [ ] Add a the curriculum
+  # - [ ] Add a tag document input (special auto complete input, each added tag turns into a tag)
+  # - [ ] Add a curriculum input
+
+  # The tag system could first read the description for some key word: cm1, elementary, math
+  # It would add tags directly and ask the user if they want to add more or fix the list.
+  # It would then turn the list into a long space separated string.
+  # If a user wants to add a tag, it will offer autocomplete. We need to show quickly that a tag
+  # does not exists. We can allow duplicate, it will remove the duplicated when saving.
 
   @impl true
   def render(assigns) do
@@ -29,6 +35,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       >
         <.input field={@form[:title]} type="text" label={gettext("Title")} />
         <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
+        <.tag_input autocomplete_tags={@autocomplete_tags} />
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
         <footer class="mx-auto">
@@ -47,11 +54,29 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     """
   end
 
+  attr :tags, :list, default: []
+  attr :autocomplete_tags, :list, default: []
+
+  def tag_input(assigns) do
+    ~H"""
+    <div>
+      <label for="tag">
+        <span class="label mb-1">{gettext("Tags")}</span>
+        <input type="text" id="tag" name="tag" class="w-full input" phx-change="tag-complete" />
+        <div class="flex flex-row gap-4">
+          <article :for={tag <- @tags}>{tag}</article>
+        </div>
+        <div :if={@autocomplete_tags != []}>{@autocomplete_tags}</div>
+      </label>
+    </div>
+    """
+  end
+
   attr :files, :list, required: true
 
   def files_list(assigns) do
     ~H"""
-    <h2>{gettext("Files")}</h2>
+    <span class="label mb-1">{gettext("Files")}</span>
     <div class="flex flex-col gap-1">
       <article :for={entry <- @files}>
         <.button
@@ -149,11 +174,14 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   defp apply_action(socket, :edit, %{"id" => id}) do
     document = Workspace.get_document!(socket.assigns.current_scope, id)
     files = Workspace.get_files(document.id)
+    tags = Workspace.list_tags(document.tags)
 
     socket
     |> assign(:page_title, gettext("Edit Document"))
     |> assign(:document, document)
     |> assign(:files, files)
+    |> assign(:tags, tags)
+    |> assign(:autocomplete_tags, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
 
@@ -188,6 +216,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       )
 
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+  end
+
+  def handle_event("tag-complete", %{"tag" => tag}, socket) do
+    tags = Workspace.autocomplete_tags(tag)
+    {:noreply, assign(socket, :autocomplete_tags, tags)}
   end
 
   def handle_event("save", %{"document" => document_params}, socket) do

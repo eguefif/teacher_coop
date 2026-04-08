@@ -41,7 +41,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
               phx-click={JS.push("delete", value: %{id: document.id})}
               data-confirm={gettext("Do you really want to delete this document?")}
             >
-              Delete
+              {gettext("Delete")}
             </.link>
           </:action>
         </.table>

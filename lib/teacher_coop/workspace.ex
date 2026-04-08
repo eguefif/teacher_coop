@@ -180,6 +180,10 @@ defmodule TeacherCoop.Workspace do
     Document.changeset(document, attrs, scope)
   end
 
+  def get_file!(scope, id) do
+    Repo.get_by!(File, id: id, user_id: scope.user.id)
+  end
+
   def get_files(id) do
     query =
       Ecto.Query.from(files in File,
@@ -193,5 +197,37 @@ defmodule TeacherCoop.Workspace do
   def delete_file!(id) do
     file = Repo.get!(File, id)
     Repo.delete!(file)
+  end
+
+  def get_all_tags() do
+    [
+      "ps",
+      "ms",
+      "gs",
+      "cp",
+      "ce1",
+      "ce2",
+      "cm1",
+      "cm2",
+      "français",
+      "mathématiques",
+      "exercices",
+      "séquence"
+    ]
+  end
+
+  def list_tags(string_tags) do
+    case string_tags do
+      nil ->
+        []
+
+      _ ->
+        get_all_tags()
+        |> Enum.filter(fn entry -> String.contains?(string_tags, entry) end)
+    end
+  end
+
+  def autocomplete_tags(tag) do
+    get_all_tags()
   end
 end

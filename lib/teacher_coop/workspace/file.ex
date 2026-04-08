@@ -6,7 +6,6 @@ defmodule TeacherCoop.Workspace.File do
     field :filename, :string
     field :path, :string
     field :format, :string
-    field :type, Ecto.Enum, values: [:lesson, :exercices, :plan, :supports, :none]
     belongs_to :document, TeacherCoop.Workspace.Document
 
     timestamps(type: :utc_datetime)
