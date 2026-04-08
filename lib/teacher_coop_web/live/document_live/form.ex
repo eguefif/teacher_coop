@@ -60,13 +60,20 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   def tag_input(assigns) do
     ~H"""
     <div>
-      <label for="tag">
+      <label for="tag" class="static">
         <span class="label mb-1">{gettext("Tags")}</span>
         <input type="text" id="tag" name="tag" class="w-full input" phx-change="tag-complete" />
+        <div
+          :if={@autocomplete_tags != []}
+          class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
+        >
+          <ul class="list bg-base-100 rounded-box shadow-md">
+            <li :for={tag <- @autocomplete_tags} class="list-row hover:bg-primary">{tag}</li>
+          </ul>
+        </div>
         <div class="flex flex-row gap-4">
           <article :for={tag <- @tags}>{tag}</article>
         </div>
-        <div :if={@autocomplete_tags != []}>{@autocomplete_tags}</div>
       </label>
     </div>
     """
