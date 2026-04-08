@@ -8,8 +8,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Document {@document.id}
-        <:subtitle>This is a document record from your database.</:subtitle>
+        {@document.title}
         <:actions>
           <.button navigate={~p"/workspace/documents"}>
             <.icon name="hero-arrow-left" />
@@ -23,9 +22,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
         </:actions>
       </.header>
 
-      <.list>
-        <:item title="Title">{@document.title}</:item>
-      </.list>
+      <div>
+        {@document.description}
+      </div>
     </Layouts.app>
     """
   end
@@ -36,10 +35,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
       Workspace.subscribe_documents(socket.assigns.current_scope)
     end
 
+    document = Workspace.get_document!(socket.assigns.current_scope, id)
+
     {:ok,
      socket
      |> assign(:page_title, "Show Document")
-     |> assign(:document, Workspace.get_document!(socket.assigns.current_scope, id))}
+     |> assign(:document, document)
+     |> assign(:files, Workspace.get_files(document.id))}
   end
 
   @impl true

@@ -148,7 +148,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     document = Workspace.get_document!(socket.assigns.current_scope, id)
-    files = Workspace.get_files!(document.id)
+    files = Workspace.get_files(document.id)
 
     socket
     |> assign(:page_title, gettext("Edit Document"))
@@ -174,7 +174,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   @impl Phoenix.LiveView
   def handle_event("remove-file", %{"id" => id}, socket) do
     Workspace.delete_file!(id)
-    files = Workspace.get_files!(socket.assigns.document.id)
+    files = Workspace.get_files(socket.assigns.document.id)
     {:noreply, assign(socket, :files, files)}
   end
 

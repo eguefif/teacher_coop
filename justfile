@@ -1,3 +1,6 @@
+all-recipes:
+  @just --list
+
 services:
     docker compose up
 

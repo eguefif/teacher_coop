@@ -16,6 +16,8 @@ defmodule TeacherCoop.Workspace.Document do
     document
     |> cast(attrs, [:title, :description])
     |> validate_required([:title, :description])
+    |> validate_length(:title, min: 3, max: 200)
+    |> validate_length(:description, min: 5, max: 1200)
     |> put_change(:user_id, user_scope.user.id)
     |> cast_assoc(:files, with: &TeacherCoop.Workspace.File.changeset/3)
   end

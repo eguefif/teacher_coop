@@ -180,7 +180,7 @@ defmodule TeacherCoop.Workspace do
     Document.changeset(document, attrs, scope)
   end
 
-  def get_files!(id) do
+  def get_files(id) do
     query =
       Ecto.Query.from(files in File,
         where: files.document_id == ^id,
