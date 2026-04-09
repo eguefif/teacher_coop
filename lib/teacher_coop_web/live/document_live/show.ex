@@ -27,6 +27,15 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
           {@document.description}
         </div>
 
+        <div class="flex flex-row gap-4">
+          <article
+            :for={tag <- TeacherCoop.Tags.get_tags_from_indexes(String.split(@document.tags || "", " ", trim: true))}
+            class="badge badge-soft badge-lg badge-primary"
+          >
+            {tag}
+          </article>
+        </div>
+
         <section>
           <h2>{gettext("Files")}</h2>
           <.table
