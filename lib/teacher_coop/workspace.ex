@@ -130,7 +130,7 @@ defmodule TeacherCoop.Workspace do
           |> Repo.insert!()
         end)
 
-        {:ok, document}
+        document
       end)
 
     case result do

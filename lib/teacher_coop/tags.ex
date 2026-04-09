@@ -67,7 +67,10 @@ defmodule TeacherCoop.Tags do
   Returns a list of tags from a list of indexes.
   """
   def get_tags_from_indexes(indexes) do
-    indexes = indexes |> Enum.map(fn idx -> String.to_integer(idx) end)
+    indexes =
+      indexes
+      |> Enum.map(fn idx -> String.trim(idx) end)
+      |> Enum.map(fn idx -> String.to_integer(idx) end)
 
     case indexes do
       [] ->

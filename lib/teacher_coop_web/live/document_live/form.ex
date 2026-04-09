@@ -63,7 +63,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   def tag_input(assigns) do
     tags_list =
-      TeacherCoop.Tags.get_tags_from_indexes(String.split(assigns.tags, " ", trim: true))
+      case assigns.tags do
+        nil ->
+          []
+
+        _ ->
+          TeacherCoop.Tags.get_tags_from_indexes(String.split(assigns.tags, " ", trim: true))
+      end
 
     assigns = assign(assigns, :tags_list, tags_list)
 
@@ -71,12 +77,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     <div>
       <label for="tag" class="static">
         <span class="label mb-1">{gettext("Tags")}</span>
-        <input
-          type="hidden"
-          id="tags"
-          name="tags"
-          value={@tags}
-        />
         <input
           type="text"
           id="tag"
@@ -228,8 +228,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:page_title, gettext("Edit Document"))
     |> assign(:document, document)
     |> assign(:files, files)
-    |> assign(:tags, tags)
     |> assign(:tag_input, "")
+    |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
@@ -240,6 +240,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     socket
     |> assign(:page_title, gettext("New Document"))
     |> assign(:document, document)
+    |> assign(:tag_input, "")
+    |> assign(:tags, "")
+    |> assign(:autocomplete_tags, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
 
@@ -268,7 +271,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   def handle_event("tag-complete", %{"tag" => tag}, socket) do
-    current_tags = TeacherCoop.Tags.get_tags_from_indexes(String.split(socket.assigns.tags))
+    current_tags =
+      TeacherCoop.Tags.get_tags_from_indexes(String.split(socket.assigns.tags, " ", trim: true))
 
     autocomplete_tags =
       Workspace.autocomplete_tags(tag)
@@ -299,6 +303,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   def handle_event("save", %{"document" => document_params}, socket) do
     files = get_files_from_uploads(socket)
+    document_params = Map.put(document_params, "tags", String.trim(socket.assigns.tags))
+    IO.inspect(document_params)
     save_document(socket, socket.assigns.live_action, document_params, files)
   end
 

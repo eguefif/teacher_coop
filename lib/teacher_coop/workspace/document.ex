@@ -15,7 +15,7 @@ defmodule TeacherCoop.Workspace.Document do
   @doc false
   def changeset(document, attrs, user_scope) do
     document
-    |> cast(attrs, [:title, :description])
+    |> cast(attrs, [:title, :description, :tags])
     |> validate_required([:title, :description])
     |> validate_length(:title, min: 3, max: 200)
     |> validate_length(:description, min: 5, max: 1200)
