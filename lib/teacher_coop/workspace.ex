@@ -199,35 +199,25 @@ defmodule TeacherCoop.Workspace do
     Repo.delete!(file)
   end
 
-  def get_all_tags() do
-    [
-      "ps",
-      "ms",
-      "gs",
-      "cp",
-      "ce1",
-      "ce2",
-      "cm1",
-      "cm2",
-      "français",
-      "mathématiques",
-      "exercices",
-      "séquence"
-    ]
-  end
+  def get_tags_from_indexes(indexes) do
+    indexes = String.split(indexes)
 
-  def list_tags(string_tags) do
-    case string_tags do
-      nil ->
+    case indexes do
+      [] ->
         []
 
       _ ->
-        get_all_tags()
-        |> Enum.filter(fn entry -> String.contains?(string_tags, entry) end)
+        TeacherCoop.Tags
+        |> Map.filter(fn {index, _} -> Enum.any?(indexes, fn idx -> idx == index end) end)
+        |> Map.values()
     end
   end
 
   def autocomplete_tags(tag) do
-    get_all_tags()
+    TeacherCoop.Tags.get_all_tags()
+    |> Enum.map(fn entry -> {entry, String.jaro_distance(entry, tag)} end)
+    |> Enum.filter(fn {_, jaro} -> jaro > 0.5 end)
+    |> Enum.sort(fn {_, jaro1}, {_, jaro2} -> jaro1 > jaro2 end)
+    |> Enum.map(fn {entry, _} -> entry end)
   end
 end

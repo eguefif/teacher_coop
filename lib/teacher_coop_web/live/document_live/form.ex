@@ -2,6 +2,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   use TeacherCoopWeb, :live_view
 
   alias TeacherCoop.Workspace
+  alias TeacherCoop.Tags
   alias TeacherCoop.Workspace.Document
 
   # TODO:
@@ -10,6 +11,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   # - [x] Persist files
   # - [x] Update edit form.
   # - [ ] Add a tag document input (special auto complete input, each added tag turns into a tag)
+  #   - [ ] Persist tags
+  #   - [ ] Erase input tag content when removing tag and adding tag
   # - [ ] Add a curriculum input
 
   # The tag system could first read the description for some key word: cm1, elementary, math
@@ -35,7 +38,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       >
         <.input field={@form[:title]} type="text" label={gettext("Title")} />
         <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
-        <.tag_input autocomplete_tags={@autocomplete_tags} />
+        <.tag_input tags={@tags} autocomplete_tags={@autocomplete_tags} tag={@tag_input} />
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
         <footer class="mx-auto">
@@ -54,25 +57,63 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     """
   end
 
-  attr :tags, :list, default: []
+  attr :tags, :string, default: ""
   attr :autocomplete_tags, :list, default: []
+  attr :tag, :string, default: ""
 
   def tag_input(assigns) do
+    tags_list =
+      TeacherCoop.Tags.get_tags_from_indexes(String.split(assigns.tags, " ", trim: true))
+
+    assigns = assign(assigns, :tags_list, tags_list)
+
     ~H"""
     <div>
       <label for="tag" class="static">
         <span class="label mb-1">{gettext("Tags")}</span>
-        <input type="text" id="tag" name="tag" class="w-full input" phx-change="tag-complete" />
+        <input
+          type="hidden"
+          id="tags"
+          name="tags"
+          value={@tags}
+        />
+        <input
+          type="text"
+          id="tag"
+          name="tag"
+          value={@tag}
+          class="w-full input"
+          phx-change="tag-complete"
+        />
         <div
           :if={@autocomplete_tags != []}
           class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
         >
           <ul class="list bg-base-100 rounded-box shadow-md">
-            <li :for={tag <- @autocomplete_tags} class="list-row hover:bg-primary">{tag}</li>
+            <li
+              :for={tag <- @autocomplete_tags}
+              class="list-row hover:bg-primary"
+              phx-click="add-tag"
+              phx-value-tag={tag}
+            >
+              {tag}
+            </li>
           </ul>
         </div>
-        <div class="flex flex-row gap-4">
-          <article :for={tag <- @tags}>{tag}</article>
+        <div class="flex flex-row gap-4 m-4">
+          <article
+            :for={tag <- @tags_list}
+            class="badge badge-soft badge-lg badge-primary hover:badge-accent relative group"
+          >
+            {tag}
+            <div
+              class="hidden btn btn-circle btn-xs absolute -right-2 -top-2 group-hover:flex"
+              phx-click="remove-tag"
+              phx-value-tag={tag}
+            >
+              X
+            </div>
+          </article>
         </div>
       </label>
     </div>
@@ -181,13 +222,14 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   defp apply_action(socket, :edit, %{"id" => id}) do
     document = Workspace.get_document!(socket.assigns.current_scope, id)
     files = Workspace.get_files(document.id)
-    tags = Workspace.list_tags(document.tags)
+    tags = if document.tags == nil, do: "", else: document.tags
 
     socket
     |> assign(:page_title, gettext("Edit Document"))
     |> assign(:document, document)
     |> assign(:files, files)
     |> assign(:tags, tags)
+    |> assign(:tag_input, "")
     |> assign(:autocomplete_tags, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
@@ -226,8 +268,33 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   def handle_event("tag-complete", %{"tag" => tag}, socket) do
-    tags = Workspace.autocomplete_tags(tag)
-    {:noreply, assign(socket, :autocomplete_tags, tags)}
+    current_tags = TeacherCoop.Tags.get_tags_from_indexes(String.split(socket.assigns.tags))
+
+    autocomplete_tags =
+      Workspace.autocomplete_tags(tag)
+      |> Enum.filter(fn entry -> !Enum.any?(current_tags, fn tag -> tag == entry end) end)
+
+    {:noreply, assign(socket, :autocomplete_tags, autocomplete_tags)}
+  end
+
+  def handle_event("add-tag", %{"tag" => tag}, socket) do
+    index = TeacherCoop.Tags.get_index_from_value(tag)
+    tags = socket.assigns.tags <> " " <> Integer.to_string(index)
+
+    {:noreply,
+     assign(socket, :tags, tags)
+     |> assign(:autocomplete_tags, [])
+     |> assign(:tag_input, "")}
+  end
+
+  def handle_event("remove-tag", %{"tag" => tag}, socket) do
+    index = TeacherCoop.Tags.get_index_from_value(tag)
+    tags = String.replace(socket.assigns.tags, Integer.to_string(index), "")
+
+    {:noreply,
+     assign(socket, :tags, tags)
+     |> assign(:autocomplete_tags, [])
+     |> assign(:tag_input, "")}
   end
 
   def handle_event("save", %{"document" => document_params}, socket) do
