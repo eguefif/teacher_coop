@@ -1,18 +1,28 @@
 # TeacherCoop
 
-To start your Phoenix server:
+## Getting started
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+A `justfile` is provided for common tasks. Run `just` to list all available recipes.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+1. Start the database (requires Docker):
+   ```bash
+   just services
+   ```
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+2. Install dependencies, set up the database and assets:
+   ```bash
+   mix setup
+   ```
 
-## Learn more
+3. Start the server:
+   ```bash
+   just server
+   ```
 
-* Official website: https://www.phoenixframework.org/
-* Guides: https://hexdocs.pm/phoenix/overview.html
-* Docs: https://hexdocs.pm/phoenix
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+4. Visit [http://localhost:4000](http://localhost:4000)
+
+## Default user
+
+Email: `admin@localhost.fr`
+
+Login is done via a magic link. In development, emails are not sent — access the local mailbox at [http://localhost:4000/dev/mailbox](http://localhost:4000/dev/mailbox) to retrieve the link.
