@@ -2,7 +2,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   use TeacherCoopWeb, :live_view
 
   alias TeacherCoop.Workspace
-  alias TeacherCoop.Tags
   alias TeacherCoop.Workspace.Document
 
   # TODO:
@@ -14,12 +13,16 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   #   - [x] Persist tags
   #   - [x] Erase input tag content when removing tag and adding tag
   # - [ ] Add a curriculum input
+  #   - [ ] Add curriculum cycle 2 maths
+  #   - [ ] Register curriculum in Meilisearch
+  #   - [ ] Relation has many curriculum
+  #   - [ ] Auto complete input.
+  #   - [ ] Auto complete input.
 
-  # The tag system could first read the description for some key word: cm1, elementary, math
-  # It would add tags directly and ask the user if they want to add more or fix the list.
-  # It would then turn the list into a long space separated string.
-  # If a user wants to add a tag, it will offer autocomplete. We need to show quickly that a tag
-  # does not exists. We can allow duplicate, it will remove the duplicated when saving.
+  ## Curriculum
+  # The user can choose an curriculum item and customize it.
+  # They can add several curriculum item
+  # It's important that the user does not have to match the item. They can modify it if they want.
 
   @impl true
   def render(assigns) do

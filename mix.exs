@@ -90,7 +90,8 @@ defmodule TeacherCoop.MixProject do
         "esbuild teacher_coop --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
+      curriculum: ["run priv/repo/curriculum.exs"]
     ]
   end
 end

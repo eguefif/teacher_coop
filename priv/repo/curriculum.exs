@@ -1,0 +1,67 @@
+alias TeacherCoop.Repo
+alias TeacherCoop.Curriculum.CurriculumItem
+
+{:ok, _} = Repo.query("TRUNCATE curriculum_items", [])
+
+{:ok, cwd} = File.cwd()
+base_path = Path.join(cwd, "/priv/repo/curriculum/")
+
+defmodule CurriculumFile do
+  defstruct year: 0, subject: "", content: ""
+
+  def build_curriculum_files(path) do
+    case File.dir?(path) do
+      false ->
+        [path]
+
+      true ->
+        File.ls!(path)
+        |> Enum.flat_map(fn entry -> build_curriculum_files(path <> "/" <> entry) end)
+    end
+  end
+
+  def parse_file(base_path, file) do
+    [year | rest] =
+      String.replace(file, base_path, "")
+      |> Path.split()
+      |> Enum.slice(1..-1//1)
+
+    subject = List.last(rest) |> Path.rootname()
+    content = File.read!(file)
+    year = String.to_integer(year)
+    date_time = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    case content do
+      "" ->
+        []
+
+      _ ->
+        String.split(content, "\n\n", trim: true)
+        |> Enum.flat_map(&parse_block/1)
+        |> Enum.map(fn entry ->
+          %{
+            year: year,
+            subject: String.trim(subject),
+            strand: String.trim(entry.strand),
+            grade: String.trim(entry.grade),
+            item: String.trim(entry.item),
+            inserted_at: date_time,
+            updated_at: date_time
+          }
+        end)
+    end
+  end
+
+  def parse_block(block) do
+    [first_line | rest] = String.split(block, "\n", trim: true)
+    [strand, grade] = String.split(first_line, "-", trim: true)
+
+    Enum.map(rest, fn entry -> %{strand: strand, grade: grade, item: entry} end)
+  end
+end
+
+entries =
+  CurriculumFile.build_curriculum_files(base_path)
+  |> Enum.flat_map(fn file -> CurriculumFile.parse_file(base_path, file) end)
+
+Repo.insert_all(CurriculumItem, entries)
