@@ -10,9 +10,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   # - [x] Persist document (description)
   # - [x] Persist files
   # - [x] Update edit form.
-  # - [ ] Add a tag document input (special auto complete input, each added tag turns into a tag)
-  #   - [ ] Persist tags
-  #   - [ ] Erase input tag content when removing tag and adding tag
+  # - [x] Add a tag document input (special auto complete input, each added tag turns into a tag)
+  #   - [x] Persist tags
+  #   - [x] Erase input tag content when removing tag and adding tag
   # - [ ] Add a curriculum input
 
   # The tag system could first read the description for some key word: cm1, elementary, math

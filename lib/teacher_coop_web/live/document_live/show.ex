@@ -9,6 +9,19 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@document.title}
+        <div class="flex flex-row gap-4">
+          <article
+            :for={
+              tag <-
+                TeacherCoop.Tags.get_tags_from_indexes(
+                  String.split(@document.tags || "", " ", trim: true)
+                )
+            }
+            class="badge badge-soft badge-lg badge-primary"
+          >
+            {tag}
+          </article>
+        </div>
         <:actions>
           <.button navigate={~p"/workspace/documents"}>
             <.icon name="hero-arrow-left" />
@@ -25,15 +38,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
       <div class="flex flex-col gap-8">
         <div>
           {@document.description}
-        </div>
-
-        <div class="flex flex-row gap-4">
-          <article
-            :for={tag <- TeacherCoop.Tags.get_tags_from_indexes(String.split(@document.tags || "", " ", trim: true))}
-            class="badge badge-soft badge-lg badge-primary"
-          >
-            {tag}
-          </article>
         </div>
 
         <section>
