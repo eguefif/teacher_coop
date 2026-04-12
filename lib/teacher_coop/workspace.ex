@@ -220,4 +220,13 @@ defmodule TeacherCoop.Workspace do
     |> Enum.sort(fn {_, jaro1}, {_, jaro2} -> jaro1 > jaro2 end)
     |> Enum.map(fn {entry, _} -> entry end)
   end
+
+  def autocomplete_curriculum(curriculum) do
+    {:ok, results} = Meilisearch.Search.search("curriculum", curriculum, limit: 15)
+
+    case Map.get(results, "hits") do
+      nil -> []
+      hits -> Enum.map(hits, fn hit -> Map.get(hit, "item") end)
+    end
+  end
 end

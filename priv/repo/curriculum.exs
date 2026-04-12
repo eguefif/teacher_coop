@@ -7,6 +7,16 @@ alias TeacherCoop.Curriculum.CurriculumItem
 base_path = Path.join(cwd, "/priv/repo/curriculum/")
 
 defmodule CurriculumFile do
+  @moduledoc """
+  This module contains utilities function to seed the database with curriculum entries.  
+  It uses the content of curriculum/ to find relevant files, parse them and seed the database.
+  The curriculum forlder is organize per year/school_level/subject.
+
+  Each file are organized as follow:
+  * Section are separated by a double line feed.
+  * One section has a one-line header formated as: strand - LEVEL (lecture - CP)
+  * Each following lines are a curriculum entry for that section.
+  """
   defstruct year: 0, subject: "", content: ""
 
   def build_curriculum_files(path) do
@@ -60,8 +70,31 @@ defmodule CurriculumFile do
   end
 end
 
+defmodule CurriculumMeilisearch do
+  @moduledoc """
+  This modules contains utility functions to index curriculum into Meilisearch
+  """
+
+  def index_entries(entries) do
+    if Meilisearch.Indexes.exists?("curriculum") == {:ok, false} do
+      {:ok, _} = Meilisearch.Indexes.create("curriculum")
+    end
+
+    {entries, _} =
+      Enum.map_reduce(entries, 0, fn entry, acc ->
+        {Map.put(entry, :id, acc), acc + 1}
+      end)
+
+    {:ok, task} = Meilisearch.Documents.add_or_replace("curriculum", entries)
+    IO.inspect(task)
+    IO.puts("Indexed curriculum into meilisearch")
+  end
+end
+
 entries =
   CurriculumFile.build_curriculum_files(base_path)
   |> Enum.flat_map(fn file -> CurriculumFile.parse_file(base_path, file) end)
 
 Repo.insert_all(CurriculumItem, entries)
+
+CurriculumMeilisearch.index_entries(entries)

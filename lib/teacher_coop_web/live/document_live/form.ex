@@ -42,7 +42,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       >
         <.input field={@form[:title]} type="text" label={gettext("Title")} />
         <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
-        <.curriculum_input curriculum={@curriculum} autocomplete={@curriculum_autocomplete} />
+        <.curriculum_input curriculum={@curriculum} autocomplete={@autocomplete_curriculum} />
         <.tag_input tags={@tags} autocomplete_tags={@autocomplete_tags} tag={@tag_input} />
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
@@ -273,7 +273,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
-    |> assign(:curriculum_autocomplete, [])
+    |> assign(:autocomplete_curriculum, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
 
@@ -285,9 +285,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:document, document)
     |> assign(:tag_input, "")
     |> assign(:tags, "")
-    |> assign(:curriculum, "")
-    |> assign(:curriculum_autocomplete, [])
     |> assign(:autocomplete_tags, [])
+    |> assign(:curriculum, "")
+    |> assign(:autocomplete_curriculum, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
 
@@ -350,16 +350,16 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   # Event Curriculum Input *************************************************************
   def handle_event("set-curriculum", %{"curriculum" => curriculum}, socket) do
-    assign(socket, :curriculum, curriculum)
+    {:noreply, assign(socket, :curriculum, curriculum)}
   end
 
   def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket)
       when byte_size(curriculum) > 3 do
-    IO.puts(curriculum)
-    {:noreply, assign(socket, :autocomplete_curriculum, [curriculum])}
+    results = Workspace.autocomplete_curriculum(curriculum)
+    {:noreply, assign(socket, :autocomplete_curriculum, results)}
   end
 
-  def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket) do
+  def handle_event("curriculum-complete", %{"curriculum" => _curriculum}, socket) do
     {:noreply, socket}
   end
 
