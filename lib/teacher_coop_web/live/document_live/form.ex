@@ -9,6 +9,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   # - [x] Persist document (description)
   # - [x] Persist files
   # - [x] Update edit form.
+  # - [ ] Work on accessibility
   # - [x] Add a tag document input (special auto complete input, each added tag turns into a tag)
   #   - [x] Persist tags
   #   - [x] Erase input tag content when removing tag and adding tag
@@ -41,6 +42,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       >
         <.input field={@form[:title]} type="text" label={gettext("Title")} />
         <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
+        <.curriculum_input curriculum={@curriculum} autocomplete={@curriculum_autocomplete} />
         <.tag_input tags={@tags} autocomplete_tags={@autocomplete_tags} tag={@tag_input} />
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
@@ -57,6 +59,42 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         {error_to_string(error)}
       </p>
     </Layouts.app>
+    """
+  end
+
+  attr :curriculum, :string, default: ""
+  attr :autocomplete, :list, default: []
+
+  def curriculum_input(assigns) do
+    ~H"""
+    <div class="fieldset">
+      <label for="curriculum" class="static">
+        <span class="label mb-1">{gettext("Curriculum")}</span>
+        <input
+          type="text"
+          id="curriculum"
+          name="curriculum"
+          value={@curriculum}
+          class="w-full input"
+          phx-change="curriculum-complete"
+        />
+        <div
+          :if={@autocomplete != []}
+          class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
+        >
+          <ul class="list bg-base-100 rounded-box shadow-md">
+            <li
+              :for={entry <- @autocomplete}
+              class="list-row hover:bg-primary"
+              phx-click="set-curriculum"
+              phx-value-curriculum={entry}
+            >
+              {entry}
+            </li>
+          </ul>
+        </div>
+      </label>
+    </div>
     """
   end
 
@@ -77,7 +115,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     assigns = assign(assigns, :tags_list, tags_list)
 
     ~H"""
-    <div>
+    <div class="fieldset">
       <label for="tag" class="static">
         <span class="label mb-1">{gettext("Tags")}</span>
         <input
@@ -234,6 +272,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:tag_input, "")
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
+    |> assign(:curriculum, "")
+    |> assign(:curriculum_autocomplete, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
 
@@ -245,10 +285,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:document, document)
     |> assign(:tag_input, "")
     |> assign(:tags, "")
+    |> assign(:curriculum, "")
+    |> assign(:curriculum_autocomplete, [])
     |> assign(:autocomplete_tags, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
 
+  # Event file Input **********************************************************
   @impl Phoenix.LiveView
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do
     {:noreply, cancel_upload(socket, :files, ref)}
@@ -273,6 +316,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
+  # Event Tag Input *************************************************************
   def handle_event("tag-complete", %{"tag" => tag}, socket) do
     current_tags =
       TeacherCoop.Tags.get_tags_from_indexes(String.split(socket.assigns.tags, " ", trim: true))
@@ -304,6 +348,22 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
      |> assign(:tag_input, "")}
   end
 
+  # Event Curriculum Input *************************************************************
+  def handle_event("set-curriculum", %{"curriculum" => curriculum}, socket) do
+    assign(socket, :curriculum, curriculum)
+  end
+
+  def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket)
+      when byte_size(curriculum) > 3 do
+    IO.puts(curriculum)
+    {:noreply, assign(socket, :autocomplete_curriculum, [curriculum])}
+  end
+
+  def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket) do
+    {:noreply, socket}
+  end
+
+  # Event Form save *************************************************************
   def handle_event("save", %{"document" => document_params}, socket) do
     files = get_files_from_uploads(socket)
     document_params = Map.put(document_params, "tags", String.trim(socket.assigns.tags))
@@ -362,7 +422,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   defp return_path(_scope, "index", _document), do: ~p"/workspace/documents"
   defp return_path(_scope, "show", document), do: ~p"/workspace/documents/#{document.id}"
 
-  # File uploads Error Handling
+  # File uploads Error Handling *********************************************************
   defp error_to_string(:too_many_files), do: gettext("You added too many files.")
   defp error_to_string(:too_large), do: gettext("File too large.")
   defp error_to_string(:not_accepted), do: gettext("This file format is not accepted.")
