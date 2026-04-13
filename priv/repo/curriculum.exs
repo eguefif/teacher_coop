@@ -1,3 +1,4 @@
+import Ecto.Query, only: [from: 2]
 alias TeacherCoop.Repo
 alias TeacherCoop.Curriculum.CurriculumItem
 
@@ -77,17 +78,29 @@ defmodule CurriculumMeilisearch do
 
   def index_entries(entries) do
     if Meilisearch.Indexes.exists?("curriculum") == {:ok, false} do
-      {:ok, _} = Meilisearch.Indexes.create("curriculum")
+      {:ok, task} = Meilisearch.Indexes.delete("curriculum")
+      wait_for_task(task, "Delete index")
+      {:ok, task} = Meilisearch.Indexes.create("curriculum")
+      wait_for_task(task, "Create index")
     end
 
-    {entries, _} =
-      Enum.map_reduce(entries, 0, fn entry, acc ->
-        {Map.put(entry, :id, acc), acc + 1}
-      end)
-
     {:ok, task} = Meilisearch.Documents.add_or_replace("curriculum", entries)
+    wait_for_task(task, "Add documents")
     IO.inspect(task)
     IO.puts("Indexed curriculum into meilisearch")
+  end
+
+  defp wait_for_task(task, task_type) do
+    {:ok, response} =
+      Meilisearch.HTTP.get("/tasks/" <> Integer.to_string(Map.get(task, "taskUid")))
+
+    task_status = response.body
+
+    case Map.get(task_status, "status") do
+      "enqueued" -> Process.sleep(500)
+      "processing" -> Process.sleep(500)
+      status -> IO.puts("Task " <> task_type <> " done with status " <> status)
+    end
   end
 end
 
@@ -96,5 +109,10 @@ entries =
   |> Enum.flat_map(fn file -> CurriculumFile.parse_file(base_path, file) end)
 
 Repo.insert_all(CurriculumItem, entries)
+
+query =
+  from c in CurriculumItem,
+    select: %{id: c.id, strand: c.strand, grade: c.grade, item: c.item, subject: c.subject},
+    where: c.year == 2024
 
 CurriculumMeilisearch.index_entries(entries)

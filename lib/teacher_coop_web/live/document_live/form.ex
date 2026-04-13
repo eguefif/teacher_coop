@@ -15,10 +15,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   #   - [x] Erase input tag content when removing tag and adding tag
   # - [ ] Add a curriculum input
   #   - [ ] Add curriculum cycle 2 maths
-  #   - [ ] Register curriculum in Meilisearch
-  #   - [ ] Relation has many curriculum
-  #   - [ ] Auto complete input.
-  #   - [ ] Auto complete input.
+  #   - [ ] We want to update the input with the selected value.
+  #   - [ ] User can add multiple curriculum items
 
   ## Curriculum
   # The user can choose an curriculum item and customize it.
@@ -74,20 +72,22 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           type="text"
           id="curriculum"
           name="curriculum"
-          value={@curriculum}
           class="w-full input"
           phx-change="curriculum-complete"
         />
         <div
           :if={@autocomplete != []}
           class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
+          phx-click-away="close-curriculum-autocomplete"
         >
           <ul class="list bg-base-100 rounded-box shadow-md">
             <li
               :for={entry <- @autocomplete}
               class="list-row hover:bg-primary"
-              phx-click="set-curriculum"
-              phx-value-curriculum={entry}
+              phx-click={
+                JS.dispatch("phx:set-input-value", detail: %{id: "curriculum", value: entry})
+                |> JS.push("set-curriculum", value: %{curriculum: entry})
+              }
             >
               {entry}
             </li>
@@ -129,12 +129,16 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         <div
           :if={@autocomplete_tags != []}
           class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
+          phx-click-away="close-tag-autocomplete"
         >
           <ul class="list bg-base-100 rounded-box shadow-md">
             <li
               :for={tag <- @autocomplete_tags}
               class="list-row hover:bg-primary"
-              phx-click="add-tag"
+              phx-click={
+                JS.dispatch("phx:set-input-value", detail: %{id: "tag", value: ""})
+                |> JS.push("add-tag", value: %{tag: tag})
+              }
               phx-value-tag={tag}
             >
               {tag}
@@ -348,9 +352,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
      |> assign(:tag_input, "")}
   end
 
+  def handle_event("close-tag-autocomplete", %{}, socket) do
+    {:noreply, assign(socket, :autocomplete_tags, [])}
+  end
+
   # Event Curriculum Input *************************************************************
   def handle_event("set-curriculum", %{"curriculum" => curriculum}, socket) do
-    {:noreply, assign(socket, :curriculum, curriculum)}
+    {:noreply, socket |> assign(:curriculum, curriculum) |> assign(:autocomplete_curriculum, [])}
   end
 
   def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket)
@@ -360,14 +368,17 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   def handle_event("curriculum-complete", %{"curriculum" => _curriculum}, socket) do
-    {:noreply, socket}
+    {:noreply, assign(socket, :autocomplete_curriculum, [])}
+  end
+
+  def handle_event("close-curriculum-autocomplete", %{}, socket) do
+    {:noreply, assign(socket, :autocomplete_curriculum, [])}
   end
 
   # Event Form save *************************************************************
   def handle_event("save", %{"document" => document_params}, socket) do
     files = get_files_from_uploads(socket)
     document_params = Map.put(document_params, "tags", String.trim(socket.assigns.tags))
-    IO.inspect(document_params)
     save_document(socket, socket.assigns.live_action, document_params, files)
   end
 
