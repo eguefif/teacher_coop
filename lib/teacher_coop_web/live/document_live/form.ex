@@ -15,8 +15,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   #   - [x] Erase input tag content when removing tag and adding tag
   # - [ ] Add a curriculum input
   #   - [ ] Add curriculum cycle 2 maths
-  #   - [ ] We want to update the input with the selected value.
+  #   - [x] We want to update the input with the selected value.
   #   - [ ] User can add multiple curriculum items
+  #     - [x] Add a button/enter event to add items
+  #     - [x] User can add multiple curriculum items
+  #     - [ ] Persist curriculum items
 
   ## Curriculum
   # The user can choose an curriculum item and customize it.
@@ -40,7 +43,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       >
         <.input field={@form[:title]} type="text" label={gettext("Title")} />
         <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
-        <.curriculum_input curriculum={@curriculum} autocomplete={@autocomplete_curriculum} />
+        <.curriculum_input
+          curriculum={@curriculum}
+          autocomplete={@autocomplete_curriculum}
+          items={@curriculum_items}
+        />
         <.tag_input tags={@tags} autocomplete_tags={@autocomplete_tags} tag={@tag_input} />
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
@@ -62,19 +69,29 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   attr :curriculum, :string, default: ""
   attr :autocomplete, :list, default: []
+  attr :items, :list, default: []
 
   def curriculum_input(assigns) do
     ~H"""
     <div class="fieldset">
       <label for="curriculum" class="static">
         <span class="label mb-1">{gettext("Curriculum")}</span>
-        <input
-          type="text"
-          id="curriculum"
-          name="curriculum"
-          class="w-full input"
-          phx-change="curriculum-complete"
-        />
+        <div class="flex flex-row gap-2">
+          <input
+            type="text"
+            id="curriculum"
+            name="curriculum"
+            class="w-full input"
+            phx-change="curriculum-complete"
+            phx-key="Enter"
+            phx-keydown="add-curriculum-item"
+            phx-value-item={@curriculum}
+            onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+          />
+          <button type="button" phx-click="add-curriculum-item" phx-value-item={@curriculum}>
+            <.icon name="hero-plus-circle" class="size-8 shrink-0 text-gray-400" />
+          </button>
+        </div>
         <div
           :if={@autocomplete != []}
           class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
@@ -94,6 +111,16 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           </ul>
         </div>
       </label>
+      <div :if={@items != []}>
+        <ul class="m-2 p-2">
+          <li :for={item <- @items}>
+            {item}
+            <button type="button" phx-click="remove-curriculum-item" phx-value-item={item}>
+              <.icon name="hero-x-circle" class="size-6 hover:bg-primary" />
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
     """
   end
@@ -277,6 +304,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
+    |> assign(:curriculum_items, [])
     |> assign(:autocomplete_curriculum, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
@@ -291,6 +319,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:tags, "")
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
+    |> assign(:curriculum_items, [])
     |> assign(:autocomplete_curriculum, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
   end
@@ -364,15 +393,26 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket)
       when byte_size(curriculum) > 3 do
     results = Workspace.autocomplete_curriculum(curriculum)
-    {:noreply, assign(socket, :autocomplete_curriculum, results)}
+
+    {:noreply,
+     socket |> assign(:autocomplete_curriculum, results) |> assign(:curriculum, curriculum)}
   end
 
-  def handle_event("curriculum-complete", %{"curriculum" => _curriculum}, socket) do
-    {:noreply, assign(socket, :autocomplete_curriculum, [])}
+  def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket) do
+    {:noreply, socket |> assign(:autocomplete_curriculum, []) |> assign(:curriculum, curriculum)}
   end
 
   def handle_event("close-curriculum-autocomplete", %{}, socket) do
     {:noreply, assign(socket, :autocomplete_curriculum, [])}
+  end
+
+  def handle_event("add-curriculum-item", %{"item" => item}, socket) do
+    {:noreply, assign(socket, :curriculum_items, socket.assigns.curriculum_items ++ [item])}
+  end
+
+  def handle_event("remove-curriculum-item", %{"item" => item}, socket) do
+    filtered_items = Enum.filter(socket.assigns.curriculum_items, fn entry -> entry != item end)
+    {:noreply, assign(socket, :curriculum_items, filtered_items)}
   end
 
   # Event Form save *************************************************************

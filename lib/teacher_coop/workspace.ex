@@ -199,20 +199,6 @@ defmodule TeacherCoop.Workspace do
     Repo.delete!(file)
   end
 
-  def get_tags_from_indexes(indexes) do
-    indexes = String.split(indexes)
-
-    case indexes do
-      [] ->
-        []
-
-      _ ->
-        TeacherCoop.Tags
-        |> Map.filter(fn {index, _} -> Enum.any?(indexes, fn idx -> idx == index end) end)
-        |> Map.values()
-    end
-  end
-
   def autocomplete_tags(tag) do
     TeacherCoop.Tags.get_all_tags()
     |> Enum.map(fn entry -> {entry, String.jaro_distance(entry, tag)} end)
