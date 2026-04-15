@@ -68,6 +68,8 @@ defmodule TeacherCoopWeb.Router do
       live "/documents/new", WorkspaceLive.DocumentLive.Form, :new
       live "/documents/:id/edit", WorkspaceLive.DocumentLive.Form, :edit
       live "/documents/:id", WorkspaceLive.DocumentLive.Show, :show
+
+      live "/groups", WorkspaceLive.GroupLive.Index, :index
     end
   end
 

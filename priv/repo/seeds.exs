@@ -12,8 +12,22 @@
 
 alias TeacherCoop.Repo
 alias TeacherCoop.Accounts.User
+alias TeacherCoop.Groups.WorkingGroup
+alias TeacherCoop.Groups.Membership
 
-Repo.insert!(%User{
-  email: "admin@localhost.fr",
-  fullname: "Robert De Fouca"
+user =
+  Repo.insert!(%User{
+    email: "admin@localhost.fr",
+    fullname: "Robert De Fouca"
+  })
+
+group =
+  Repo.insert!(%WorkingGroup{
+    name: "Hello, World"
+  })
+
+Repo.insert!(%Membership{
+  user_id: user.id,
+  working_group_id: group.id,
+  role: "admin"
 })

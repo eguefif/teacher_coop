@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Membership do
+defmodule TeacherCoop.Groups.Membership do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,10 +11,11 @@ defmodule TeacherCoop.Membership do
   end
 
   @doc false
-  def changeset(membership, attrs, user_scope) do
+  def changeset(membership, attrs, group, user_scope) do
     membership
     |> cast(attrs, [:role])
     |> validate_required([:role])
     |> put_change(:user_id, user_scope.user.id)
+    |> put_change(:working_group_id, group.id)
   end
 end
