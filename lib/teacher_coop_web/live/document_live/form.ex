@@ -5,9 +5,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   alias TeacherCoop.Workspace.Document
 
   # TODO:
-  # - [ ] Work on accessibility: arias
-  # - [ ] Max 20 files (handle error)
-  # - [ ] Max 15 mo(handle error)
+  # - [ ] Improve UI
 
   ## Curriculum
   # The user can choose an curriculum item and customize it.
@@ -85,8 +83,18 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
             phx-change="curriculum-complete"
             phx-keydown="nav-curriculum"
             onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+            role="combobox"
+            aria-expanded={@autocomplete != []}
+            aria-autocomplete="list"
+            aria-controls="curriculum-listbox"
+            aria-activedescendant={@nav && "curriculum-option-#{@nav}"}
           />
-          <button type="button" phx-click="add-curriculum-item" phx-value-item={@curriculum}>
+          <button
+            type="button"
+            phx-click="add-curriculum-item"
+            phx-value-item={@curriculum}
+            aria-label={gettext("Add curriculum item")}
+          >
             <.icon name="hero-plus-circle" class="size-8 shrink-0 text-gray-400" />
           </button>
         </div>
@@ -95,9 +103,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
           phx-click-away="close-curriculum-autocomplete"
         >
-          <ul class="list bg-base-100 rounded-box shadow-md">
+          <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id="curriculum-listbox">
             <li
               :for={{entry, index} <- Enum.with_index(@autocomplete)}
+              id={"curriculum-option-#{index}"}
+              role="option"
+              aria-selected={@nav == index}
+              tabindex="0"
               class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
               phx-click={
                 JS.dispatch("phx:set-input-value", detail: %{id: "curriculum", value: entry})
@@ -113,13 +125,23 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         <ul class="m-2 p-2">
           <li :for={item <- @items}>
             {item}
-            <button type="button" phx-click="remove-curriculum-item" phx-value-item={item}>
+            <button
+              type="button"
+              phx-click="remove-curriculum-item"
+              phx-value-item={item}
+              aria-label={gettext("Remove") <> " #{item}"}
+            >
               <.icon name="hero-x-circle" class="size-6 hover:bg-primary" />
             </button>
           </li>
         </ul>
       </div>
-      <div :if={@error} class="text-error-content first-letter:capitalize">
+      <div
+        :if={@error}
+        role="alert"
+        aria-live="polite"
+        class="text-error-content first-letter:capitalize"
+      >
         {@error}
       </div>
     </div>
@@ -155,15 +177,24 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           phx-change="tag-complete"
           phx-keydown="nav-tag"
           onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+          role="combobox"
+          aria-expanded={@autocomplete_tags != []}
+          aria-autocomplete="list"
+          aria-controls="tag-listbox"
+          aria-activedescendant={@nav && "tag-option-#{@nav}"}
         />
         <div
           :if={@autocomplete_tags != []}
           class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
           phx-click-away="close-tag-autocomplete"
         >
-          <ul class="list bg-base-100 rounded-box shadow-md">
+          <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id="tag-listbox">
             <li
               :for={{tag, index} <- Enum.with_index(@autocomplete_tags)}
+              id={"tag-option-#{index}"}
+              role="option"
+              aria-selected={@nav == index}
+              tabindex="0"
               class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
               phx-click={
                 JS.dispatch("phx:set-input-value", detail: %{id: "tag", value: ""})
@@ -182,16 +213,24 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           >
             {tag}
             <div
+              role="button"
+              tabindex="0"
               class="hidden btn btn-circle btn-xs absolute -right-2 -top-2 group-hover:flex"
               phx-click="remove-tag"
               phx-value-tag={tag}
+              aria-label={gettext("Remove tag") <> " #{tag}"}
             >
               X
             </div>
           </article>
         </div>
       </label>
-      <div :if={@error} class="text-error-content first-letter:capitalize">
+      <div
+        :if={@error}
+        role="alert"
+        aria-live="polite"
+        class="text-error-content first-letter:capitalize"
+      >
         {@error}
       </div>
     </div>
@@ -210,6 +249,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           phx-click="remove-file"
           phx-value-id={entry.id}
           data-confirm={gettext("Are you sure you want to delete this file?")}
+          aria-label={gettext("Remove file") <> " #{entry.filename}"}
         >
           X
         </.button>
@@ -265,7 +305,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       variant="primary"
       phx-click={@action}
       phx-value-ref={@entry.ref}
-      aria-label="cancel"
+      aria-label={gettext("Cancel upload") <> " #{@entry.client_name}"}
     >
       X
     </.button>
@@ -291,7 +331,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
      socket
      |> assign(:return_to, return_to(params["return_to"]))
      |> apply_action(socket.assigns.live_action, params)
-     |> allow_upload(:files, accept: ~w(.docx .pdf .txt .jpg .jpeg .png), max_entries: 10)}
+     |> allow_upload(:files, accept: ~w(.docx .pdf .txt .jpg .jpeg .png), max_entries: 20)}
   end
 
   defp return_to("show"), do: "show"
@@ -353,6 +393,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   @impl true
   def handle_event("validate", %{"document" => document_params}, socket) do
+    IO.inspect(socket.assigns.uploads)
+
     changeset =
       Workspace.change_document(
         socket.assigns.current_scope,
@@ -419,32 +461,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     end
   end
 
-  defp do_add_tag(socket, tag) do
-    tags = socket.assigns.tags ++ [tag]
-
-    changeset =
-      Workspace.validate_change(
-        socket.assigns.current_scope,
-        %TeacherCoop.Workspace.Document{},
-        %{tags: tags}
-      )
-
-    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :tags end)
-
-    case error != nil do
-      true ->
-        assign(socket, :tag_error, elem(error, 1) |> translate_error())
-
-      false ->
-        socket
-        |> assign(:tags, tags)
-        |> assign(:tag_error, "")
-        |> assign(:tag_nav, nil)
-        |> assign(:autocomplete_tags, [])
-        |> assign(:tag_input, "")
-    end
-  end
-
   # Event Curriculum Input *************************************************************
   def handle_event("set-curriculum", %{"curriculum" => curriculum}, socket) do
     {:noreply, socket |> assign(:curriculum, curriculum) |> assign(:autocomplete_curriculum, [])}
@@ -504,31 +520,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
       _ ->
         {:noreply, socket}
-    end
-  end
-
-  defp do_add_curriculum_item(socket, item) do
-    goals = socket.assigns.curriculum_items ++ [item]
-
-    changeset =
-      Workspace.validate_change(
-        socket.assigns.current_scope,
-        %TeacherCoop.Workspace.Document{},
-        %{goals: goals}
-      )
-
-    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :goals end)
-
-    case error != nil do
-      true ->
-        assign(socket, :curriculum_error, elem(error, 1) |> translate_error())
-
-      false ->
-        socket
-        |> assign(:curriculum_items, goals)
-        |> assign(:curriculum_error, nil)
-        |> assign(:curriculum_nav, nil)
-        |> assign(:autocomplete_curriculum, [])
     end
   end
 
@@ -609,4 +600,56 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   defp calculate_new_nav(idx, _, "down"), do: idx + 1
   defp calculate_new_nav(idx, max_idx, "up") when idx - 1 < 0, do: max_idx - 1
   defp calculate_new_nav(idx, _, "up"), do: idx - 1
+
+  # Add functions **********************************************
+  defp do_add_curriculum_item(socket, item) do
+    goals = socket.assigns.curriculum_items ++ [item]
+
+    changeset =
+      Workspace.validate_change(
+        socket.assigns.current_scope,
+        %TeacherCoop.Workspace.Document{},
+        %{goals: goals}
+      )
+
+    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :goals end)
+
+    case error != nil do
+      true ->
+        assign(socket, :curriculum_error, elem(error, 1) |> translate_error())
+
+      false ->
+        socket
+        |> assign(:curriculum_items, goals)
+        |> assign(:curriculum_error, nil)
+        |> assign(:curriculum_nav, nil)
+        |> assign(:autocomplete_curriculum, [])
+    end
+  end
+
+  defp do_add_tag(socket, tag) do
+    tags = socket.assigns.tags ++ [tag]
+
+    changeset =
+      Workspace.validate_change(
+        socket.assigns.current_scope,
+        %TeacherCoop.Workspace.Document{},
+        %{tags: tags}
+      )
+
+    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :tags end)
+
+    case error != nil do
+      true ->
+        assign(socket, :tag_error, elem(error, 1) |> translate_error())
+
+      false ->
+        socket
+        |> assign(:tags, tags)
+        |> assign(:tag_error, "")
+        |> assign(:tag_nav, nil)
+        |> assign(:autocomplete_tags, [])
+        |> assign(:tag_input, "")
+    end
+  end
 end
