@@ -42,6 +42,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           tags={@tags}
           autocomplete_tags={@autocomplete_tags}
           tag={@tag_input}
+          nav={@tag_nav}
           error={@tag_error}
         />
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
@@ -127,6 +128,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   attr :tags, :list, default: []
   attr :autocomplete_tags, :list, default: []
   attr :tag, :string, default: ""
+  attr :nav, :integer, default: nil
   attr :error, :string
 
   def tag_input(assigns) do
@@ -141,6 +143,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           value={@tag}
           class="w-full input"
           phx-change="tag-complete"
+          phx-keydown="nav-tag"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();}"
         />
         <div
           :if={@autocomplete_tags != []}
@@ -149,8 +153,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         >
           <ul class="list bg-base-100 rounded-box shadow-md">
             <li
-              :for={tag <- @autocomplete_tags}
-              class="list-row hover:bg-primary"
+              :for={{tag, index} <- Enum.with_index(@autocomplete_tags)}
+              class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
               phx-click={
                 JS.dispatch("phx:set-input-value", detail: %{id: "tag", value: ""})
                 |> JS.push("add-tag", value: %{tag: tag})
@@ -295,6 +299,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:files, files)
     |> assign(:tag_input, "")
     |> assign(:tag_error, "")
+    |> assign(:tag_nav, nil)
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
@@ -312,6 +317,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:document, document)
     |> assign(:tag_input, "")
     |> assign(:tag_error, "")
+    |> assign(:tag_nav, nil)
     |> assign(:tags, [])
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
@@ -356,29 +362,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   def handle_event("add-tag", %{"tag" => tag}, socket) do
-    tags = socket.assigns.tags ++ [tag]
-
-    changeset =
-      Workspace.validate_change(
-        socket.assigns.current_scope,
-        %TeacherCoop.Workspace.Document{},
-        %{tags: tags}
-      )
-
-    IO.inspect(changeset)
-    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :tags end)
-
-    case error != nil do
-      true ->
-        {:noreply, assign(socket, :tag_error, elem(error, 1) |> translate_error())}
-
-      false ->
-        {:noreply,
-         assign(socket, :tags, tags)
-         |> assign(:tag_error, "")
-         |> assign(:autocomplete_tags, [])
-         |> assign(:tag_input, "")}
-    end
+    {:noreply, do_add_tag(socket, tag)}
   end
 
   def handle_event("remove-tag", %{"tag" => tag}, socket) do
@@ -392,6 +376,62 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   def handle_event("close-tag-autocomplete", %{}, socket) do
     {:noreply, assign(socket, :autocomplete_tags, [])}
+  end
+
+  def handle_event("nav-tag", %{"key" => key}, socket) do
+    max_idx = Enum.count(socket.assigns.autocomplete_tags)
+    IO.puts(socket.assigns.tag_nav)
+    IO.puts(max_idx)
+
+    case {key, socket.assigns.tag_nav} do
+      {"ArrowUp", nil} ->
+        {:noreply, assign(socket, :tag_nav, max_idx - 1)}
+
+      {"ArrowDown", nil} ->
+        {:noreply, assign(socket, :tag_nav, 0)}
+
+      {"ArrowUp", idx} ->
+        {:noreply, assign(socket, :tag_nav, calculate_new_nav(idx, max_idx, "up"))}
+
+      {"ArrowDown", idx} ->
+        {:noreply, assign(socket, :tag_nav, calculate_new_nav(idx, max_idx, "down"))}
+
+      {"Enter", idx} when not is_nil(idx) ->
+        tag = Enum.at(socket.assigns.autocomplete_tags, idx)
+        {:noreply, do_add_tag(socket, tag)}
+
+      {"Escape", _} ->
+        {:noreply, assign(socket, :tag_nav, nil) |> assign(:autocomplete_tags, [])}
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  defp do_add_tag(socket, tag) do
+    tags = socket.assigns.tags ++ [tag]
+
+    changeset =
+      Workspace.validate_change(
+        socket.assigns.current_scope,
+        %TeacherCoop.Workspace.Document{},
+        %{tags: tags}
+      )
+
+    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :tags end)
+
+    case error != nil do
+      true ->
+        assign(socket, :tag_error, elem(error, 1) |> translate_error())
+
+      false ->
+        socket
+        |> assign(:tags, tags)
+        |> assign(:tag_error, "")
+        |> assign(:tag_nav, nil)
+        |> assign(:autocomplete_tags, [])
+        |> assign(:tag_input, "")
+    end
   end
 
   # Event Curriculum Input *************************************************************
@@ -516,4 +556,10 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   defp error_to_string(:too_many_files), do: gettext("You added too many files.")
   defp error_to_string(:too_large), do: gettext("File too large.")
   defp error_to_string(:not_accepted), do: gettext("This file format is not accepted.")
+
+  # Utility functions for accessiblity navigation *****************************************
+  defp calculate_new_nav(idx, max_idx, "down") when idx + 1 == max_idx, do: 0
+  defp calculate_new_nav(idx, _, "down"), do: idx + 1
+  defp calculate_new_nav(idx, max_idx, "up") when idx - 1 < 0, do: max_idx - 1
+  defp calculate_new_nav(idx, _, "up"), do: idx - 1
 end
