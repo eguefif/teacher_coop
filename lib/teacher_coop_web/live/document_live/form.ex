@@ -7,8 +7,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   # TODO:
   # - [ ] Work on accessibility:
   #   - [ ] autocomplete: moving with keyboards
-  # - [ ] Max 6 curirulum items (handle error)
-  # - [ ] Max 20 documents (handle error)
+  # - [ ] Max 20 files (handle error)
+  # - [ ] Max 15 mo(handle error)
 
   ## Curriculum
   # The user can choose an curriculum item and customize it.
@@ -36,8 +36,14 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           curriculum={@curriculum}
           autocomplete={@autocomplete_curriculum}
           items={@curriculum_items}
+          error={@curriculum_error}
         />
-        <.tag_input tags={@tags} autocomplete_tags={@autocomplete_tags} tag={@tag_input} />
+        <.tag_input
+          tags={@tags}
+          autocomplete_tags={@autocomplete_tags}
+          tag={@tag_input}
+          error={@tag_error}
+        />
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
         <footer class="mx-auto">
@@ -59,6 +65,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   attr :curriculum, :string, default: ""
   attr :autocomplete, :list, default: []
   attr :items, :list, default: []
+  attr :error, :string
 
   def curriculum_input(assigns) do
     ~H"""
@@ -110,6 +117,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           </li>
         </ul>
       </div>
+      <div :if={@error} class="text-error-content first-letter:capitalize">
+        {@error}
+      </div>
     </div>
     """
   end
@@ -117,6 +127,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   attr :tags, :list, default: []
   attr :autocomplete_tags, :list, default: []
   attr :tag, :string, default: ""
+  attr :error, :string
 
   def tag_input(assigns) do
     ~H"""
@@ -166,6 +177,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           </article>
         </div>
       </label>
+      <div :if={@error} class="text-error-content first-letter:capitalize">
+        {@error}
+      </div>
     </div>
     """
   end
@@ -280,9 +294,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:document, document)
     |> assign(:files, files)
     |> assign(:tag_input, "")
+    |> assign(:tag_error, "")
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
+    |> assign(:curriculum_error, nil)
     |> assign(:curriculum_items, goals)
     |> assign(:autocomplete_curriculum, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
@@ -295,9 +311,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:page_title, gettext("New Document"))
     |> assign(:document, document)
     |> assign(:tag_input, "")
+    |> assign(:tag_error, "")
     |> assign(:tags, [])
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
+    |> assign(:curriculum_error, nil)
     |> assign(:curriculum_items, [])
     |> assign(:autocomplete_curriculum, [])
     |> assign(:form, to_form(Workspace.change_document(socket.assigns.current_scope, document)))
@@ -340,10 +358,27 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   def handle_event("add-tag", %{"tag" => tag}, socket) do
     tags = socket.assigns.tags ++ [tag]
 
-    {:noreply,
-     assign(socket, :tags, tags)
-     |> assign(:autocomplete_tags, [])
-     |> assign(:tag_input, "")}
+    changeset =
+      Workspace.validate_change(
+        socket.assigns.current_scope,
+        %TeacherCoop.Workspace.Document{},
+        %{tags: tags}
+      )
+
+    IO.inspect(changeset)
+    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :tags end)
+
+    case error != nil do
+      true ->
+        {:noreply, assign(socket, :tag_error, elem(error, 1) |> translate_error())}
+
+      false ->
+        {:noreply,
+         assign(socket, :tags, tags)
+         |> assign(:tag_error, "")
+         |> assign(:autocomplete_tags, [])
+         |> assign(:tag_input, "")}
+    end
   end
 
   def handle_event("remove-tag", %{"tag" => tag}, socket) do
@@ -381,7 +416,33 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   def handle_event("add-curriculum-item", %{"item" => item}, socket) do
-    {:noreply, assign(socket, :curriculum_items, socket.assigns.curriculum_items ++ [item])}
+    goals = socket.assigns.curriculum_items ++ [item]
+
+    changeset =
+      Workspace.validate_change(
+        socket.assigns.current_scope,
+        %TeacherCoop.Workspace.Document{},
+        %{
+          goals: goals
+        }
+      )
+
+    error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :goals end)
+
+    case error == nil do
+      true ->
+        {:noreply, assign(socket, :curriculum_items, goals)}
+
+      false ->
+        {:noreply,
+         assign(socket, :curriculum_items, socket.assigns.curriculum_items)
+         |> assign(
+           :curriculum_error,
+           Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :goals end)
+           |> elem(1)
+           |> translate_error()
+         )}
+    end
   end
 
   def handle_event("remove-curriculum-item", %{"item" => item}, socket) do

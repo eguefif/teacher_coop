@@ -180,6 +180,10 @@ defmodule TeacherCoop.Workspace do
     Document.changeset(document, attrs, scope)
   end
 
+  def validate_change(%Scope{} = scope, %Document{} = document, attrs \\ %{}) do
+    Document.changeset(document, attrs, scope)
+  end
+
   def get_file!(scope, id) do
     Repo.get_by!(File, id: id, user_id: scope.user.id)
   end
