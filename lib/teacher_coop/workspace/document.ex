@@ -5,7 +5,8 @@ defmodule TeacherCoop.Workspace.Document do
   schema "documents" do
     field :title, :string
     field :description, :string
-    field :tags, :string
+    field :tags, {:array, :string}
+    field :goals, {:array, :string}
     belongs_to :user, TeacherCoop.Accounts.User
     has_many :files, TeacherCoop.Workspace.File
 
@@ -15,7 +16,7 @@ defmodule TeacherCoop.Workspace.Document do
   @doc false
   def changeset(document, attrs, user_scope) do
     document
-    |> cast(attrs, [:title, :description, :tags])
+    |> cast(attrs, [:title, :description, :tags, :goals])
     |> validate_required([:title, :description])
     |> validate_length(:title, min: 3, max: 200)
     |> validate_length(:description, min: 5, max: 1200)

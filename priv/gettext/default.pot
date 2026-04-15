@@ -17,10 +17,37 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
+msgid "Curriculum"
+msgstr ""
+
+msgid "Tags"
+msgstr ""
+
+msgid "Files"
+msgstr ""
+
 msgid "Save Document"
 msgstr ""
 
+msgid "Saving..."
+msgstr ""
+
 msgid "Cancel"
+msgstr ""
+
+msgid "Edit Document"
+msgstr ""
+
+msgid "New Document"
+msgstr ""
+
+msgid "Document updated successfully"
+msgstr ""
+
+msgid "Document created successfully"
+msgstr ""
+
+msgid "Are you sure you want to delete this file?"
 msgstr ""
 
 msgid "Click to upload or drag and drop"
@@ -39,4 +66,17 @@ msgid "File too large."
 msgstr ""
 
 msgid "This file format is not accepted."
+msgstr ""
+
+## From Document show
+msgid "Goals"
+msgstr ""
+
+msgid "Filename"
+msgstr ""
+
+msgid "Do you really want to delete this file?"
+msgstr ""
+
+msgid "Delete"
 msgstr ""

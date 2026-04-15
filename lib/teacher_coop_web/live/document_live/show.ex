@@ -9,14 +9,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@document.title}
-        <div class="flex flex-row gap-4">
+        <div :if={@document.tags != []} class="flex flex-row gap-4">
           <article
-            :for={
-              tag <-
-                TeacherCoop.Tags.get_tags_from_indexes(
-                  String.split(@document.tags || "", " ", trim: true)
-                )
-            }
+            :for={tag <- @document.tags}
             class="badge badge-soft badge-lg badge-primary"
           >
             {tag}
@@ -35,12 +30,20 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
         </:actions>
       </.header>
 
+      <div :if={@document.goals != []} class="flex flex-col gap-4">
+        <h2>{gettext("Goals")}</h2>
+        <ul class="list-disc list-inside">
+          <li :for={entry <- @document.goals} class="ml-2">{entry}</li>
+        </ul>
+      </div>
+
       <div class="flex flex-col gap-8">
+        <h2>{gettext("Description")}</h2>
         <div>
           {@document.description}
         </div>
 
-        <section>
+        <section :if={@files != []}>
           <h2>{gettext("Files")}</h2>
           <.table
             id="files"
