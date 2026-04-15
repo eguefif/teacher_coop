@@ -5,8 +5,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   alias TeacherCoop.Workspace.Document
 
   # TODO:
-  # - [ ] Work on accessibility:
-  #   - [ ] autocomplete: moving with keyboards
+  # - [ ] Work on accessibility: arias
   # - [ ] Max 20 files (handle error)
   # - [ ] Max 15 mo(handle error)
 
@@ -36,6 +35,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           curriculum={@curriculum}
           autocomplete={@autocomplete_curriculum}
           items={@curriculum_items}
+          nav={@curriculum_nav}
           error={@curriculum_error}
         />
         <.tag_input
@@ -66,6 +66,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   attr :curriculum, :string, default: ""
   attr :autocomplete, :list, default: []
   attr :items, :list, default: []
+  attr :nav, :integer, default: nil
   attr :error, :string
 
   def curriculum_input(assigns) do
@@ -78,11 +79,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
             type="text"
             id="curriculum"
             name="curriculum"
+            value={@curriculum}
             class="w-full input"
+            phx-hook=".SetValue"
             phx-change="curriculum-complete"
-            phx-key="Enter"
-            phx-keydown="add-curriculum-item"
-            phx-value-item={@curriculum}
+            phx-keydown="nav-curriculum"
             onkeydown="if(event.key==='Enter'){event.preventDefault();}"
           />
           <button type="button" phx-click="add-curriculum-item" phx-value-item={@curriculum}>
@@ -96,8 +97,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         >
           <ul class="list bg-base-100 rounded-box shadow-md">
             <li
-              :for={entry <- @autocomplete}
-              class="list-row hover:bg-primary"
+              :for={{entry, index} <- Enum.with_index(@autocomplete)}
+              class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
               phx-click={
                 JS.dispatch("phx:set-input-value", detail: %{id: "curriculum", value: entry})
                 |> JS.push("set-curriculum", value: %{curriculum: entry})
@@ -122,6 +123,15 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         {@error}
       </div>
     </div>
+    <script :type={Phoenix.LiveView.ColocatedHook} name=".SetValue">
+      export default {
+        mounted() {
+          this.handleEvent("set-value", ({value}) => {
+            this.el.value = value
+          })
+        }
+      }
+    </script>
     """
   end
 
@@ -303,6 +313,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
+    |> assign(:curriculum_nav, nil)
     |> assign(:curriculum_error, nil)
     |> assign(:curriculum_items, goals)
     |> assign(:autocomplete_curriculum, [])
@@ -456,32 +467,68 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   def handle_event("add-curriculum-item", %{"item" => item}, socket) do
+    {:noreply, do_add_curriculum_item(socket, item)}
+  end
+
+  def handle_event("nav-curriculum", %{"key" => key, "value" => value}, socket) do
+    max_idx = Enum.count(socket.assigns.autocomplete_curriculum)
+
+    case {key, socket.assigns.curriculum_nav} do
+      {"ArrowUp", nil} ->
+        {:noreply, assign(socket, :curriculum_nav, max_idx - 1)}
+
+      {"ArrowDown", nil} ->
+        {:noreply, assign(socket, :curriculum_nav, 0)}
+
+      {"ArrowUp", idx} ->
+        {:noreply, assign(socket, :curriculum_nav, calculate_new_nav(idx, max_idx, "up"))}
+
+      {"ArrowDown", idx} ->
+        {:noreply, assign(socket, :curriculum_nav, calculate_new_nav(idx, max_idx, "down"))}
+
+      {"Enter", idx} when not is_nil(idx) ->
+        item = Enum.at(socket.assigns.autocomplete_curriculum, idx)
+
+        {:noreply,
+         socket
+         |> assign(:curriculum, item)
+         |> assign(:curriculum_nav, nil)
+         |> assign(:autocomplete_curriculum, [])
+         |> push_event("set-value", %{value: item})}
+
+      {"Enter", nil} ->
+        {:noreply, do_add_curriculum_item(socket, value)}
+
+      {"Escape", _} ->
+        {:noreply, assign(socket, :curriculum_nav, nil) |> assign(:autocomplete_curriculum, [])}
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  defp do_add_curriculum_item(socket, item) do
     goals = socket.assigns.curriculum_items ++ [item]
 
     changeset =
       Workspace.validate_change(
         socket.assigns.current_scope,
         %TeacherCoop.Workspace.Document{},
-        %{
-          goals: goals
-        }
+        %{goals: goals}
       )
 
     error = Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :goals end)
 
-    case error == nil do
+    case error != nil do
       true ->
-        {:noreply, assign(socket, :curriculum_items, goals)}
+        assign(socket, :curriculum_error, elem(error, 1) |> translate_error())
 
       false ->
-        {:noreply,
-         assign(socket, :curriculum_items, socket.assigns.curriculum_items)
-         |> assign(
-           :curriculum_error,
-           Enum.find(changeset.errors, fn entry -> elem(entry, 0) == :goals end)
-           |> elem(1)
-           |> translate_error()
-         )}
+        socket
+        |> assign(:curriculum_items, goals)
+        |> assign(:curriculum_error, nil)
+        |> assign(:curriculum_nav, nil)
+        |> assign(:autocomplete_curriculum, [])
     end
   end
 
