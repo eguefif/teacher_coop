@@ -25,7 +25,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
             variant="primary"
             navigate={~p"/workspace/documents/#{@document}/edit?return_to=show"}
           >
-            <.icon name="hero-pencil-square" /> Edit document
+            <.icon name="hero-pencil-square" /> {gettext("Edit document")}
           </.button>
         </:actions>
       </.header>

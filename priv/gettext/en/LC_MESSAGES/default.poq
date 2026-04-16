@@ -63,3 +63,21 @@ msgstr "File too large."
 
 msgid "This file format is not accepted."
 msgstr "This file format is not accepted."
+
+msgid "Goals"
+msgstr "Goals"
+
+msgid "Files"
+msgstr "Files"
+
+msgid "Filename"
+msgstr "Filename"
+
+msgid "Do you really want to delete this file?"
+msgstr "Do you really want to delete this file?"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Edit document"
+msgstr "Edit document"

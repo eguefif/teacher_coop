@@ -72,6 +72,9 @@ msgstr ""
 msgid "Goals"
 msgstr ""
 
+msgid "Files"
+msgstr ""
+
 msgid "Filename"
 msgstr ""
 
@@ -79,4 +82,7 @@ msgid "Do you really want to delete this file?"
 msgstr ""
 
 msgid "Delete"
+msgstr ""
+
+msgid "Edit document"
 msgstr ""

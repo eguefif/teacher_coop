@@ -78,3 +78,21 @@ msgstr "Fichier trop volumineux."
 
 msgid "This file format is not accepted."
 msgstr "Ce format de fichier n'est pas accepté."
+
+msgid "Goals"
+msgstr "Objectifs"
+
+msgid "Files"
+msgstr "Fichiers"
+
+msgid "Filename"
+msgstr "Nom du fichier"
+
+msgid "Do you really want to delete this file?"
+msgstr "Voulez-vous vraiment supprimer ce fichier ?"
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Edit document"
+msgstr "Modifier le document"
