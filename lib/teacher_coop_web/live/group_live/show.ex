@@ -3,6 +3,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
 
   alias TeacherCoop.Groups
 
+  # TODO:
+  # - [ ] Add colleague: just add people easily and fast that are in your graph
+
   @impl true
   def render(assigns) do
     ~H"""

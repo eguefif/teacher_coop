@@ -14,12 +14,25 @@ alias TeacherCoop.Repo
 alias TeacherCoop.Accounts.User
 alias TeacherCoop.Groups.WorkingGroup
 alias TeacherCoop.Groups.Membership
+alias TeacherCoop.Colleague
 
 user =
   Repo.insert!(%User{
     email: "admin@localhost.fr",
     fullname: "Robert De Fouca"
   })
+
+user2 =
+  Repo.insert!(%User{
+    email: "gemini@localhost.fr",
+    fullname: "Gemini Jupiter"
+  })
+
+Repo.insert!(%Colleague{
+  user1_id: user2.id,
+  user2_id: user.id,
+  state: "pending"
+})
 
 group =
   Repo.insert!(%WorkingGroup{
