@@ -393,8 +393,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   @impl true
   def handle_event("validate", %{"document" => document_params}, socket) do
-    IO.inspect(socket.assigns.uploads)
-
     changeset =
       Workspace.change_document(
         socket.assigns.current_scope,
