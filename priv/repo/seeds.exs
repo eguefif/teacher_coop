@@ -28,6 +28,31 @@ user2 =
     fullname: "Gemini Jupiter"
   })
 
+for {email, fullname} <- [
+  {"marie@localhost.fr", "Marie Curie"},
+  {"albert@localhost.fr", "Albert Einstein"},
+  {"ada@localhost.fr", "Ada Lovelace"},
+  {"nikola@localhost.fr", "Nikola Tesla"},
+  {"linus@localhost.fr", "Linus Torvalds"},
+  {"grace@localhost.fr", "Grace Hopper"},
+  {"alan@localhost.fr", "Alan Turing"},
+  {"richard@localhost.fr", "Richard Feynman"},
+  {"sophie@localhost.fr", "Sophie Germain"},
+  {"charles@localhost.fr", "Charles Darwin"},
+  {"elena@localhost.fr", "Elena Vasquez"},
+  {"omar@localhost.fr", "Omar Khalid"},
+  {"priya@localhost.fr", "Priya Sharma"},
+  {"lucas@localhost.fr", "Lucas Moreau"},
+  {"amara@localhost.fr", "Amara Diallo"},
+  {"yuki@localhost.fr", "Yuki Tanaka"},
+  {"felix@localhost.fr", "Felix Schneider"},
+  {"ingrid@localhost.fr", "Ingrid Larsen"},
+  {"marco@localhost.fr", "Marco Ricci"},
+  {"chloe@localhost.fr", "Chloe Dubois"}
+] do
+  Repo.insert!(%User{email: email, fullname: fullname})
+end
+
 Repo.insert!(%Colleague{
   user1_id: user2.id,
   user2_id: user.id,

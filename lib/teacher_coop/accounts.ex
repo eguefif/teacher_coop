@@ -302,4 +302,14 @@ defmodule TeacherCoop.Accounts do
       end
     end)
   end
+
+  def search_user(search) do
+    like_search = "%#{search}%"
+
+    query =
+      from user in User,
+        where: ilike(user.fullname, ^like_search)
+
+    Repo.all(query)
+  end
 end

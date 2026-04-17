@@ -431,8 +431,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   def handle_event("nav-tag", %{"key" => key}, socket) do
     max_idx = Enum.count(socket.assigns.autocomplete_tags)
-    IO.puts(socket.assigns.tag_nav)
-    IO.puts(max_idx)
 
     case {key, socket.assigns.tag_nav} do
       {"ArrowUp", nil} ->
