@@ -30,27 +30,28 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       >
         <.input field={@form[:title]} type="text" label={gettext("Title")} />
         <.input field={@form[:description]} type="textarea" label={gettext("Description")} />
-        <.curriculum_input
-          curriculum={@curriculum}
-          autocomplete={@autocomplete_curriculum}
-          items={@curriculum_items}
-          nav={@curriculum_nav}
-          error={@curriculum_error}
-        />
+        <div class="fieldset">
+          <span class="label mb-1">{gettext("Curriculum")}</span>
+          <.curriculum_input
+            autocomplete_list={@autocomplete_curriculum}
+            on_user_typing={fn value -> send(self(), {:curriculum_typing, value}) end}
+            on_autocomplete_submit={fn item -> send(self(), {:curriculum_selected, item}) end}
+            on_close={fn -> send(self(), :close_curriculum_autocomplete) end}
+            on_add={fn item -> send(self(), {:add_curriculum_item, item}) end}
+            items={@curriculum_items}
+            error={@curriculum_error}
+          />
+        </div>
         <div class="fieldset">
           <span class="label mb-1">{gettext("Tags")}</span>
-          <.live_component
-            module={Reusables.AutocompleteInput}
-            id="tag-input"
-            name="tag-input"
-            allow_input_edit={false}
-            input_value=""
-            nav={nil}
+          <.tag_input
             autocomplete_list={Enum.map(@autocomplete_tags, &%{id: &1, value: &1})}
             on_user_typing={fn value -> send(self(), {:tag_typing, value}) end}
             on_autocomplete_submit={fn tag -> send(self(), {:add_tag, tag}) end}
+            on_close={fn -> send(self(), :close_tag_autocomplete) end}
+            tags={@tags}
+            error={@tag_error}
           />
-          <.tag_input tags={@tags} error={@tag_error} />
         </div>
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
@@ -70,107 +71,76 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     """
   end
 
-  attr :curriculum, :string, default: ""
-  attr :autocomplete, :list, default: []
+  attr :autocomplete_list, :list, required: true
+  attr :on_user_typing, :any, required: true
+  attr :on_autocomplete_submit, :any, required: true
+  attr :on_close, :any, required: true
+  attr :on_add, :any, required: true
   attr :items, :list, default: []
-  attr :nav, :integer, default: nil
-  attr :error, :string
+  attr :error, :string, default: nil
 
   def curriculum_input(assigns) do
     ~H"""
-    <div class="fieldset">
-      <label for="curriculum" class="static">
-        <span class="label mb-1">{gettext("Curriculum")}</span>
-        <div class="flex flex-row gap-2">
-          <input
-            type="text"
-            id="curriculum"
-            name="curriculum"
-            value={@curriculum}
-            class="w-full input"
-            phx-hook=".SetValue"
-            phx-change="curriculum-complete"
-            phx-keydown="nav-curriculum"
-            onkeydown="if(event.key==='Enter'){event.preventDefault();}"
-            role="combobox"
-            aria-expanded={@autocomplete != []}
-            aria-autocomplete="list"
-            aria-controls="curriculum-listbox"
-            aria-activedescendant={@nav && "curriculum-option-#{@nav}"}
-          />
+    <.live_component
+      module={Reusables.AutocompleteInput}
+      id="curriculum-input"
+      name="curriculum-input"
+      allow_input_edit={true}
+      input_value=""
+      nav={nil}
+      autocomplete_list={@autocomplete_list}
+      on_user_typing={@on_user_typing}
+      on_autocomplete_submit={@on_autocomplete_submit}
+      on_close={@on_close}
+      on_add={@on_add}
+    />
+    <div :if={@items != []}>
+      <ul class="m-2 p-2">
+        <li :for={item <- @items}>
+          {item}
           <button
             type="button"
-            phx-click="add-curriculum-item"
-            phx-value-item={@curriculum}
-            aria-label={gettext("Add curriculum item")}
+            phx-click="remove-curriculum-item"
+            phx-value-item={item}
+            aria-label={gettext("Remove") <> " #{item}"}
           >
-            <.icon name="hero-plus-circle" class="size-8 shrink-0 text-gray-400" />
+            <.icon name="hero-x-circle" class="size-6 hover:bg-primary" />
           </button>
-        </div>
-        <div
-          :if={@autocomplete != []}
-          class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
-          phx-click-away="close-curriculum-autocomplete"
-        >
-          <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id="curriculum-listbox">
-            <li
-              :for={{entry, index} <- Enum.with_index(@autocomplete)}
-              id={"curriculum-option-#{index}"}
-              role="option"
-              aria-selected={@nav == index}
-              tabindex="0"
-              class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
-              phx-click={
-                JS.dispatch("phx:set-input-value", detail: %{id: "curriculum", value: entry})
-                |> JS.push("set-curriculum", value: %{curriculum: entry})
-              }
-            >
-              {entry}
-            </li>
-          </ul>
-        </div>
-      </label>
-      <div :if={@items != []}>
-        <ul class="m-2 p-2">
-          <li :for={item <- @items}>
-            {item}
-            <button
-              type="button"
-              phx-click="remove-curriculum-item"
-              phx-value-item={item}
-              aria-label={gettext("Remove") <> " #{item}"}
-            >
-              <.icon name="hero-x-circle" class="size-6 hover:bg-primary" />
-            </button>
-          </li>
-        </ul>
-      </div>
-      <div
-        :if={@error}
-        role="alert"
-        aria-live="polite"
-        class="text-error-content first-letter:capitalize"
-      >
-        {@error}
-      </div>
+        </li>
+      </ul>
     </div>
-    <script :type={Phoenix.LiveView.ColocatedHook} name=".SetValue">
-      export default {
-        mounted() {
-          this.handleEvent("set-value", ({value}) => {
-            this.el.value = value
-          })
-        }
-      }
-    </script>
+    <div
+      :if={@error}
+      role="alert"
+      aria-live="polite"
+      class="text-error-content first-letter:capitalize"
+    >
+      {@error}
+    </div>
     """
   end
 
+  attr :autocomplete_list, :list, required: true
+  attr :on_user_typing, :any, required: true
+  attr :on_autocomplete_submit, :any, required: true
+  attr :on_close, :any, required: true
   attr :tags, :list, default: []
   attr :error, :string, default: ""
 
   def tag_input(assigns) do
     ~H"""
+    <.live_component
+      module={Reusables.AutocompleteInput}
+      id="tag-input"
+      name="tag-input"
+      allow_input_edit={false}
+      input_value=""
+      nav={nil}
+      autocomplete_list={@autocomplete_list}
+      on_user_typing={@on_user_typing}
+      on_autocomplete_submit={@on_autocomplete_submit}
+      on_close={@on_close}
+    />
     <div class="flex flex-row gap-4 m-4">
       <article
         :for={tag <- @tags}
@@ -314,7 +284,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
-    |> assign(:curriculum_nav, nil)
     |> assign(:curriculum_error, nil)
     |> assign(:curriculum_items, goals)
     |> assign(:autocomplete_curriculum, [])
@@ -331,7 +300,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:tags, [])
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
-    |> assign(:curriculum_nav, nil)
     |> assign(:curriculum_error, nil)
     |> assign(:curriculum_items, [])
     |> assign(:autocomplete_curriculum, [])
@@ -364,85 +332,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   # Event Tag Input *************************************************************
+
   def handle_event("remove-tag", %{"tag" => tag}, socket) do
     tags = Enum.filter(socket.assigns.tags, fn entry -> entry != tag end)
     {:noreply, assign(socket, :tags, tags) |> assign(:autocomplete_tags, [])}
   end
 
-  @impl true
-  def handle_info({:tag_typing, value}, socket) do
-    autocomplete_tags =
-      Workspace.autocomplete_tags(value)
-      |> Enum.filter(fn entry -> !Enum.any?(socket.assigns.tags, fn tag -> tag == entry end) end)
-
-    {:noreply, assign(socket, :autocomplete_tags, autocomplete_tags)}
-  end
-
-  def handle_info({:add_tag, %{value: tag}}, socket) do
-    {:noreply, do_add_tag(socket, tag)}
-  end
-
   # Event Curriculum Input *************************************************************
-  def handle_event("set-curriculum", %{"curriculum" => curriculum}, socket) do
-    {:noreply, socket |> assign(:curriculum, curriculum) |> assign(:autocomplete_curriculum, [])}
-  end
-
-  def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket)
-      when byte_size(curriculum) > 3 do
-    results = Workspace.autocomplete_curriculum(curriculum)
-
-    {:noreply,
-     socket |> assign(:autocomplete_curriculum, results) |> assign(:curriculum, curriculum)}
-  end
-
-  def handle_event("curriculum-complete", %{"curriculum" => curriculum}, socket) do
-    {:noreply, socket |> assign(:autocomplete_curriculum, []) |> assign(:curriculum, curriculum)}
-  end
-
-  def handle_event("close-curriculum-autocomplete", %{}, socket) do
-    {:noreply, assign(socket, :autocomplete_curriculum, [])}
-  end
-
-  def handle_event("add-curriculum-item", %{"item" => item}, socket) do
-    {:noreply, do_add_curriculum_item(socket, item)}
-  end
-
-  def handle_event("nav-curriculum", %{"key" => key, "value" => value}, socket) do
-    max_idx = Enum.count(socket.assigns.autocomplete_curriculum)
-
-    case {key, socket.assigns.curriculum_nav} do
-      {"ArrowUp", nil} ->
-        {:noreply, assign(socket, :curriculum_nav, max_idx - 1)}
-
-      {"ArrowDown", nil} ->
-        {:noreply, assign(socket, :curriculum_nav, 0)}
-
-      {"ArrowUp", idx} ->
-        {:noreply, assign(socket, :curriculum_nav, calculate_new_nav(idx, max_idx, "up"))}
-
-      {"ArrowDown", idx} ->
-        {:noreply, assign(socket, :curriculum_nav, calculate_new_nav(idx, max_idx, "down"))}
-
-      {"Enter", idx} when not is_nil(idx) ->
-        item = Enum.at(socket.assigns.autocomplete_curriculum, idx)
-
-        {:noreply,
-         socket
-         |> assign(:curriculum, item)
-         |> assign(:curriculum_nav, nil)
-         |> assign(:autocomplete_curriculum, [])
-         |> push_event("set-value", %{value: item})}
-
-      {"Enter", nil} ->
-        {:noreply, do_add_curriculum_item(socket, value)}
-
-      {"Escape", _} ->
-        {:noreply, assign(socket, :curriculum_nav, nil) |> assign(:autocomplete_curriculum, [])}
-
-      _ ->
-        {:noreply, socket}
-    end
-  end
 
   def handle_event("remove-curriculum-item", %{"item" => item}, socket) do
     filtered_items = Enum.filter(socket.assigns.curriculum_items, fn entry -> entry != item end)
@@ -516,12 +412,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   defp error_to_string(:too_large), do: gettext("File too large.")
   defp error_to_string(:not_accepted), do: gettext("This file format is not accepted.")
 
-  # Utility functions for accessiblity navigation *****************************************
-  defp calculate_new_nav(idx, max_idx, "down") when idx + 1 == max_idx, do: 0
-  defp calculate_new_nav(idx, _, "down"), do: idx + 1
-  defp calculate_new_nav(idx, max_idx, "up") when idx - 1 < 0, do: max_idx - 1
-  defp calculate_new_nav(idx, _, "up"), do: idx - 1
-
   # Add functions **********************************************
   defp do_add_curriculum_item(socket, item) do
     goals = socket.assigns.curriculum_items ++ [item]
@@ -543,7 +433,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         socket
         |> assign(:curriculum_items, goals)
         |> assign(:curriculum_error, nil)
-        |> assign(:curriculum_nav, nil)
         |> assign(:autocomplete_curriculum, [])
     end
   end
@@ -570,5 +459,45 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         |> assign(:tag_error, "")
         |> assign(:autocomplete_tags, [])
     end
+  end
+
+  # Handle info functions **************************************************************
+  @impl true
+  def handle_info({:tag_typing, value}, socket) do
+    autocomplete_tags =
+      Workspace.autocomplete_tags(value)
+      |> Enum.filter(fn entry -> !Enum.any?(socket.assigns.tags, fn tag -> tag == entry end) end)
+
+    {:noreply, assign(socket, :autocomplete_tags, autocomplete_tags)}
+  end
+
+  @impl true
+  def handle_info({:add_tag, %{value: tag}}, socket) do
+    {:noreply, do_add_tag(socket, tag)}
+  end
+
+  def handle_info(:close_tag_autocomplete, socket) do
+    {:noreply, assign(socket, :autocomplete_tags, [])}
+  end
+
+  def handle_info(:close_curriculum_autocomplete, socket) do
+    {:noreply, assign(socket, :autocomplete_curriculum, [])}
+  end
+
+  def handle_info({:curriculum_typing, value}, socket) when byte_size(value) > 3 do
+    results = Workspace.autocomplete_curriculum(value)
+    {:noreply, socket |> assign(:autocomplete_curriculum, results) |> assign(:curriculum, value)}
+  end
+
+  def handle_info({:curriculum_typing, value}, socket) do
+    {:noreply, socket |> assign(:autocomplete_curriculum, []) |> assign(:curriculum, value)}
+  end
+
+  def handle_info({:curriculum_selected, %{value: item}}, socket) do
+    {:noreply, socket |> assign(:curriculum, item) |> assign(:autocomplete_curriculum, [])}
+  end
+
+  def handle_info({:add_curriculum_item, item}, socket) do
+    {:noreply, do_add_curriculum_item(socket, item)}
   end
 end

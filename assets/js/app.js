@@ -27,11 +27,22 @@ import topbar from "../vendor/topbar"
 //Import the modal confirmation handler
 import "./confirmation_modal.js"
 
+// Hook for AutocompleteInput (allow_input_edit=true) — sets the input's displayed
+// value when the server pushes a "set-value" event after an item is selected.
+let Hooks = {}
+Hooks.SetValue = {
+  mounted() {
+    this.handleEvent("set-value", ({value}) => {
+      this.el.value = value
+    })
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, ...Hooks},
 })
 
 // Show progress bar on live navigation and form submits

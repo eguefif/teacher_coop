@@ -216,7 +216,7 @@ defmodule TeacherCoop.Workspace do
 
     case Map.get(results, "hits") do
       nil -> []
-      hits -> Enum.map(hits, fn hit -> Map.get(hit, "item") end)
+      hits -> Enum.map(hits, fn hit -> %{id: Map.get(hit, "id"), value: Map.get(hit, "item")} end)
     end
   end
 end

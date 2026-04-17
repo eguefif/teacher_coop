@@ -2,30 +2,51 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
   use TeacherCoopWeb, :live_component
 
   @impl true
+  def update(assigns, socket) do
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign_new(:current_value, fn -> "" end)
+     |> assign_new(:on_add, fn -> nil end)}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div>
-      <input
-        type="text"
-        id={@name <> "-input-autocomplete"}
-        name="input-autocomplete"
-        value={@input_value}
-        class="w-full input"
-        phx-hook={@allow_input_edit && ".SetValue"}
-        phx-change="user-typing"
-        phx-keydown="user-navigate"
-        phx-target={@myself}
-        onkeydown="if(event.key==='Enter'){event.preventDefault();}"
-        role="combobox"
-        aria-expanded={@autocomplete_list != []}
-        aria-autocomplete="list"
-        aria-controls={@name <> "-listbox"}
-        aria-activedescendant={@nav && "#{@name}-option-#{@nav}"}
-      />
+      <div class="flex flex-row gap-2">
+        <input
+          type="text"
+          id={@name <> "-input-autocomplete"}
+          name={@name}
+          value={@input_value}
+          class="w-full input"
+          phx-hook={if @allow_input_edit, do: "SetValue"}
+          phx-change="user-typing"
+          phx-keydown="user-navigate"
+          phx-target={@myself}
+          onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+          role="combobox"
+          aria-expanded={@autocomplete_list != []}
+          aria-autocomplete="list"
+          aria-controls={@name <> "-listbox"}
+          aria-activedescendant={@nav && "#{@name}-option-#{@nav}"}
+        />
+        <button
+          :if={@on_add}
+          type="button"
+          phx-click="add-item"
+          phx-target={@myself}
+          aria-label={gettext("Add item")}
+        >
+          <.icon name="hero-plus-circle" class="size-8 shrink-0 text-gray-400 cursor-pointer" />
+        </button>
+      </div>
       <div
         :if={@autocomplete_list != []}
         class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
-        phx-click-away={"close-#{@name}-autocomplete"}
+        phx-click-away="close-autocomplete"
+        phx-target={@myself}
       >
         <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id={"#{@name}-listbox"}>
           <li
@@ -38,7 +59,10 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
             class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
             phx-click={
               JS.dispatch("phx:set-input-value",
-                detail: %{id: @name <> "-input-autocomplete", value: ""}
+                detail: %{
+                  id: @name <> "-input-autocomplete",
+                  value: if(@allow_input_edit, do: entry.value, else: "")
+                }
               )
               |> JS.push("select-entry", value: %{id: entry.id, value: entry.value})
             }
@@ -47,31 +71,42 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
           </li>
         </ul>
       </div>
-
-      <script :if={@allow_input_edit} :type={Phoenix.LiveView.ColocatedHook} name=".SetValue">
-        export default {
-          mounted() {
-            this.handleEvent("set-value", ({value}) => {
-              this.el.value = value
-            })
-          }
-        }
-      </script>
     </div>
     """
   end
 
   @impl true
+  def handle_event("close-autocomplete", _, socket) do
+    socket.assigns.on_close.()
+    {:noreply, assign(socket, :autocomplete_list, [])}
+  end
+
   def handle_event("select-entry", %{"id" => id, "value" => value}, socket) do
-    user_submit(%{id: id, value: value}, socket)
+    case socket.assigns.allow_input_edit do
+      true ->
+        {:noreply,
+         socket
+         |> assign(:current_value, value)
+         |> assign(:autocomplete_list, [])
+         |> push_event("set-value", %{value: value})}
+
+      false ->
+        user_submit(%{id: id, value: value}, socket)
+    end
   end
 
-  def handle_event("user-typing", %{"input-autocomplete" => value}, socket) do
+  def handle_event("user-typing", params, socket) do
+    value = params[socket.assigns.name] || ""
     socket.assigns.on_user_typing.(value)
-    {:noreply, socket}
+    {:noreply, assign(socket, :current_value, value)}
   end
 
-  def handle_event("user-navigate", %{"key" => key, "value" => user_input}, socket) do
+  def handle_event("add-item", _, socket) do
+    socket.assigns.on_add.(socket.assigns.current_value)
+    {:noreply, assign(socket, :current_value, "")}
+  end
+
+  def handle_event("user-navigate", %{"key" => key}, socket) do
     max_idx = Enum.count(socket.assigns.autocomplete_list)
 
     case {key, socket.assigns.nav} do
@@ -88,8 +123,14 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
         {:noreply, assign(socket, :nav, calculate_new_nav(idx, max_idx, "down"))}
 
       {"Enter", idx} when not is_nil(idx) ->
-        value = Enum.at(socket.assigns.autocomplete_list, idx)
-        user_submit(value, socket)
+        case socket.assigns.allow_input_edit do
+          true ->
+            {:noreply, socket}
+
+          false ->
+            value = Enum.at(socket.assigns.autocomplete_list, idx)
+            user_submit(value, socket)
+        end
 
       {"Escape", _} ->
         {:noreply, assign(socket, :nav, nil) |> assign(:autocomplete_list, [])}
