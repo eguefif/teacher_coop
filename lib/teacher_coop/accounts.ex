@@ -304,11 +304,15 @@ defmodule TeacherCoop.Accounts do
   end
 
   def search_user(search) do
-    like_search = "%#{search}%"
-
     query =
       from user in User,
-        where: ilike(user.fullname, ^like_search)
+        where: fragment("? <% ?", ^search, user.search_text),
+        select: %{
+          id: user.id,
+          fullname: user.fullname,
+          similarity: fragment("word_similarity(?, ?)", ^search, user.search_text)
+        },
+        order_by: [desc: fragment("word_similarity(?, ?)", ^search, user.search_text)]
 
     Repo.all(query)
   end
