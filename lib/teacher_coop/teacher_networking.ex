@@ -26,8 +26,10 @@ defmodule TeacherCoop.TeacherNetworking do
       from c in Colleague,
         join: user in User,
         on: (user.id == c.user1_id or user.id == c.user2_id) and user.id != ^user_id,
-        where: c.state == "accepted" and (c.user2_id == ^user_id or c.user1_id == ^user_id),
-        select: %{id: c.id, fullname: user.fullname}
+        where:
+          c.state in ["accepted", "pending", "rejected"] and
+            (c.user2_id == ^user_id or c.user1_id == ^user_id),
+        select: %{id: c.id, fullname: user.fullname, state: c.state}
 
     Repo.all(query)
   end
@@ -54,5 +56,33 @@ defmodule TeacherCoop.TeacherNetworking do
         |> Colleague.changeset(%{state: "rejected"})
         |> Repo.update()
     end
+  end
+
+  def create_pending_connection(%Scope{} = scope, invited_user_id) do
+    case Repo.get_by(Colleague, user1_id: scope.user.id, user2_id: invited_user_id) do
+      nil ->
+        %Colleague{}
+        |> Colleague.changeset(%{
+          user1_id: scope.user.id,
+          user2_id: invited_user_id,
+          state: "pending"
+        })
+        |> Repo.insert()
+
+      _ ->
+        :already_pending_connection
+    end
+  end
+
+  def remove_pending_connection(%Scope{} = scope, pending_connection_user2_id) do
+    connection =
+      Repo.get_by(Colleague,
+        user1_id: scope.user.id,
+        user2_id: pending_connection_user2_id,
+        state: "rejected"
+      )
+
+    IO.inspect(connection)
+    Repo.delete!(connection)
   end
 end

@@ -66,16 +66,34 @@ defmodule TeacherCoopWeb.WorkspaceLive.Workspace do
   @impl true
   def handle_event("accept-connection-request", %{"ref" => id}, socket) do
     case TeacherNetworking.update_connection(socket.assigns.current_scope, :accept, id) do
-      {:ok, _} -> {:noreply, socket |> put_flash(:info, gettext("Connection request accepted"))}
-      :error -> {:noreply, socket |> put_flash(:error, gettext("An error occured, retry later."))}
+      {:ok, _} ->
+        pending_connections =
+          TeacherNetworking.get_pending_connections(socket.assigns.current_scope)
+
+        {:noreply,
+         socket
+         |> assign(:pending_connections, pending_connections)
+         |> put_flash(:info, gettext("Connection request accepted"))}
+
+      :error ->
+        {:noreply, socket |> put_flash(:error, gettext("An error occured, retry later."))}
     end
   end
 
   @impl true
   def handle_event("reject-connection-request", %{"ref" => id}, socket) do
     case TeacherNetworking.update_connection(socket.assigns.current_scope, :reject, id) do
-      {:ok, _} -> {:noreply, socket |> put_flash(:info, gettext("Connection request rejected"))}
-      :error -> {:noreply, socket |> put_flash(:error, gettext("An error occured, retry later."))}
+      {:ok, _} ->
+        pending_connections =
+          TeacherNetworking.get_pending_connections(socket.assigns.current_scope)
+
+        {:noreply,
+         socket
+         |> assign(:pending_connections, pending_connections)
+         |> put_flash(:info, gettext("Connection request rejected"))}
+
+      :error ->
+        {:noreply, socket |> put_flash(:error, gettext("An error occured, retry later."))}
     end
   end
 end

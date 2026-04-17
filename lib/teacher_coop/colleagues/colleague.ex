@@ -13,7 +13,7 @@ defmodule TeacherCoop.Colleague do
   @doc false
   def changeset(colleague, attrs) do
     colleague
-    |> cast(attrs, [:state])
-    |> validate_required([])
+    |> cast(attrs, [:user1_id, :user2_id, :state])
+    |> validate_required([:user1_id, :user2_id, :state])
   end
 end
