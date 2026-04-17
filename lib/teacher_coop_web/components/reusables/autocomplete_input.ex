@@ -11,6 +11,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
         name="input-autocomplete"
         value={@input_value}
         class="w-full input"
+        phx-hook={@allow_input_edit && ".SetValue"}
         phx-change="user-typing"
         phx-keydown="user-navigate"
         phx-target={@myself}
@@ -46,6 +47,16 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
           </li>
         </ul>
       </div>
+
+      <script :if={@allow_input_edit} :type={Phoenix.LiveView.ColocatedHook} name=".SetValue">
+        export default {
+          mounted() {
+            this.handleEvent("set-value", ({value}) => {
+              this.el.value = value
+            })
+          }
+        }
+      </script>
     </div>
     """
   end

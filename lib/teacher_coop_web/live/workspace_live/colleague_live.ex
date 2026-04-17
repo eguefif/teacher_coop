@@ -5,12 +5,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
   alias TeacherCoop.Accounts
   alias TeacherCoopWeb.Reusables
 
-  # TODO:
-  # -[x] Extract tag like autocomplete logic in a component
-  # - [ ] Wrap into a form with a button that will send invitation for all the user in the list
-  # - [ ] component autocomplete should not display the list of entry
-  # -[ ] Add another callback that will return the list for the autocomplete
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -26,6 +20,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
           module={Reusables.AutocompleteInput}
           id="teacher-search"
           name="teacher-search"
+          allow_input_edit={true}
           input_value=""
           nav={nil}
           autocomplete_list={@autocomplete}
