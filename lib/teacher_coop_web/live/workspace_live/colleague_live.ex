@@ -30,8 +30,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
           nav={nil}
           autocomplete_list={@autocomplete}
           on_user_typing={fn input_value -> send(self(), {:input_value, input_value}) end}
-          on_autocomplete_submit={fn colleague -> send(self(), {:colleague, colleague}) end}
+          on_autocomplete_submit={fn colleague -> send(self(), {:add_colleague, colleague}) end}
         />
+        <ul class="list">
+          <li :for={colleague <- @new_colleagues_list}>{colleague.value}</li>
+        </ul>
         <div class="flex flex-col gap-8">
           <h1>{gettext("My Colleagues")}</h1>
           <ul class="list">
@@ -55,9 +58,10 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
   end
 
   @impl true
-  def handle_info({:colleague, colleague}, socket) do
+  def handle_info({:add_colleague, colleague}, socket) do
     new_list = socket.assigns.new_colleagues_list ++ [colleague]
-    {:noreply, socket |> assign(:new_colleague_list, new_list)}
+    IO.inspect(new_list)
+    {:noreply, socket |> assign(:new_colleagues_list, new_list)}
   end
 
   @impl true

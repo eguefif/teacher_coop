@@ -33,14 +33,14 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
             role="option"
             aria-selected={@nav == index}
             tabindex="0"
+            phx-target={@myself}
             class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
             phx-click={
               JS.dispatch("phx:set-input-value",
                 detail: %{id: @name <> "-input-autocomplete", value: ""}
               )
-              |> JS.push("select-entry", value: %{value: entry.id})
+              |> JS.push("select-entry", value: %{id: entry.id, value: entry.value})
             }
-            phx-value-ref={entry.id}
           >
             {entry.value}
           </li>
@@ -51,9 +51,8 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
   end
 
   @impl true
-  def handle_event("select-entry", %{"value" => value}, socket) do
-    socket.assigns.on_autocomplete_submit(value)
-    {:noreply, socket}
+  def handle_event("select-entry", %{"id" => id, "value" => value}, socket) do
+    user_submit(%{id: id, value: value}, socket)
   end
 
   def handle_event("user-navigate", %{"key" => key, "value" => user_input}, socket) do
@@ -74,8 +73,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
 
       {"Enter", idx} when not is_nil(idx) ->
         value = Enum.at(socket.assigns.autocomplete_list, idx)
-        socket.assigns.on_autocomplete_submit(value)
-        {:noreply, socket}
+        user_submit(value, socket)
 
       {"Escape", _} ->
         {:noreply, assign(socket, :nav, nil) |> assign(:autocomplete_list, [])}
@@ -87,6 +85,11 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
       _ ->
         {:noreply, socket}
     end
+  end
+
+  def user_submit(%{id: id, value: value}, socket) do
+    socket.assigns.on_autocomplete_submit.(%{id: id, value: value})
+    {:noreply, socket |> assign(:autocomplete_list, [])}
   end
 
   defp calculate_new_nav(idx, max_idx, "down") when idx + 1 == max_idx, do: 0
