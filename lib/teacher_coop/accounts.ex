@@ -304,6 +304,7 @@ defmodule TeacherCoop.Accounts do
   end
 
   def search_user(search) do
+    # TODO: add option to exclude user connection
     query =
       from user in User,
         where: fragment("? <% ?", ^search, user.search_text),

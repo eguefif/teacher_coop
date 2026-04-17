@@ -54,10 +54,10 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
             <li :for={colleague <- @colleagues} class="list-row">
               {colleague.fullname}({colleague.state})
               <.button
-                :if={colleague.state == "rejected"}
                 type="button"
-                phx-click="user-remove-pending-connection"
-                phx-value-id={colleague.id}
+                phx-click="user-remove-connection"
+                phx-value-id={colleague.colleague_id}
+                data-confirm={gettext("Are you sure?")}
               >
                 <.icon name="hero-x-mark" class="size-6" />
               </.button>
@@ -125,8 +125,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
      socket |> assign(:new_colleagues_list, new_list) |> assign(:colleagues, colleagues)}
   end
 
-  def handle_event("user-remove-pending-connection", %{"id" => id}, socket) do
-    TeacherNetworking.remove_pending_connection(socket.assigns.current_scope, id)
+  def handle_event("user-remove-connection", %{"id" => id}, socket) do
+    TeacherNetworking.remove_connection_by_id(socket.assigns.current_scope, id)
     colleagues = TeacherNetworking.get_connections(socket.assigns.current_scope)
     {:noreply, socket |> assign(:colleagues, colleagues)}
   end

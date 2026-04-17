@@ -26,10 +26,8 @@ defmodule TeacherCoop.TeacherNetworking do
       from c in Colleague,
         join: user in User,
         on: (user.id == c.user1_id or user.id == c.user2_id) and user.id != ^user_id,
-        where:
-          c.state in ["accepted", "pending", "rejected"] and
-            (c.user2_id == ^user_id or c.user1_id == ^user_id),
-        select: %{id: c.id, fullname: user.fullname, state: c.state}
+        where: c.user2_id == ^user_id or c.user1_id == ^user_id,
+        select: %{colleague_id: c.id, fullname: user.fullname, state: c.state}
 
     Repo.all(query)
   end
@@ -74,12 +72,11 @@ defmodule TeacherCoop.TeacherNetworking do
     end
   end
 
-  def remove_pending_connection(%Scope{} = scope, pending_connection_user2_id) do
+  def remove_connection_by_id(%Scope{} = scope, id) do
     connection =
       Repo.get_by(Colleague,
-        user1_id: scope.user.id,
-        user2_id: pending_connection_user2_id,
-        state: "rejected"
+        id: id,
+        user1_id: scope.user.id
       )
 
     IO.inspect(connection)
