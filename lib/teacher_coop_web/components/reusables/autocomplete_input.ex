@@ -66,6 +66,11 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
     user_submit(%{id: id, value: value}, socket)
   end
 
+  def handle_event("user-typing", %{"input-autocomplete" => value}, socket) do
+    socket.assigns.on_user_typing.(value)
+    {:noreply, socket}
+  end
+
   def handle_event("user-navigate", %{"key" => key, "value" => user_input}, socket) do
     max_idx = Enum.count(socket.assigns.autocomplete_list)
 
@@ -88,10 +93,6 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
 
       {"Escape", _} ->
         {:noreply, assign(socket, :nav, nil) |> assign(:autocomplete_list, [])}
-
-      _ when byte_size(user_input) > 2 ->
-        socket.assigns.on_user_typing.(user_input)
-        {:noreply, socket}
 
       _ ->
         {:noreply, socket}

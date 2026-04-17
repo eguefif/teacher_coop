@@ -3,6 +3,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   alias TeacherCoop.Workspace
   alias TeacherCoop.Workspace.Document
+  alias TeacherCoopWeb.Reusables
 
   # TODO:
   # - [ ] Improve UI
@@ -36,13 +37,21 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           nav={@curriculum_nav}
           error={@curriculum_error}
         />
-        <.tag_input
-          tags={@tags}
-          autocomplete_tags={@autocomplete_tags}
-          tag={@tag_input}
-          nav={@tag_nav}
-          error={@tag_error}
-        />
+        <div class="fieldset">
+          <span class="label mb-1">{gettext("Tags")}</span>
+          <.live_component
+            module={Reusables.AutocompleteInput}
+            id="tag-input"
+            name="tag-input"
+            allow_input_edit={false}
+            input_value=""
+            nav={nil}
+            autocomplete_list={Enum.map(@autocomplete_tags, &%{id: &1, value: &1})}
+            on_user_typing={fn value -> send(self(), {:tag_typing, value}) end}
+            on_autocomplete_submit={fn tag -> send(self(), {:add_tag, tag}) end}
+          />
+          <.tag_input tags={@tags} error={@tag_error} />
+        </div>
         <.files_list :if={Map.has_key?(assigns, :files) && @files != []} files={@files} />
         <.input_file uploads={@uploads} />
         <footer class="mx-auto">
@@ -158,81 +167,35 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   attr :tags, :list, default: []
-  attr :autocomplete_tags, :list, default: []
-  attr :tag, :string, default: ""
-  attr :nav, :integer, default: nil
-  attr :error, :string
+  attr :error, :string, default: ""
 
   def tag_input(assigns) do
     ~H"""
-    <div class="fieldset">
-      <label for="tag" class="static">
-        <span class="label mb-1">{gettext("Tags")}</span>
-        <input
-          type="text"
-          id="tag"
-          name="tag"
-          value={@tag}
-          class="w-full input"
-          phx-change="tag-complete"
-          phx-keydown="nav-tag"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();}"
-          role="combobox"
-          aria-expanded={@autocomplete_tags != []}
-          aria-autocomplete="list"
-          aria-controls="tag-listbox"
-          aria-activedescendant={@nav && "tag-option-#{@nav}"}
-        />
-        <div
-          :if={@autocomplete_tags != []}
-          class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
-          phx-click-away="close-tag-autocomplete"
-        >
-          <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id="tag-listbox">
-            <li
-              :for={{tag, index} <- Enum.with_index(@autocomplete_tags)}
-              id={"tag-option-#{index}"}
-              role="option"
-              aria-selected={@nav == index}
-              tabindex="0"
-              class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
-              phx-click={
-                JS.dispatch("phx:set-input-value", detail: %{id: "tag", value: ""})
-                |> JS.push("add-tag", value: %{tag: tag})
-              }
-              phx-value-tag={tag}
-            >
-              {tag}
-            </li>
-          </ul>
-        </div>
-        <div class="flex flex-row gap-4 m-4">
-          <article
-            :for={tag <- @tags}
-            class="badge badge-soft badge-lg badge-primary hover:badge-accent relative group"
-          >
-            {tag}
-            <div
-              role="button"
-              tabindex="0"
-              class="hidden btn btn-circle btn-xs absolute -right-2 -top-2 group-hover:flex"
-              phx-click="remove-tag"
-              phx-value-tag={tag}
-              aria-label={gettext("Remove tag") <> " #{tag}"}
-            >
-              X
-            </div>
-          </article>
-        </div>
-      </label>
-      <div
-        :if={@error}
-        role="alert"
-        aria-live="polite"
-        class="text-error-content first-letter:capitalize"
+    <div class="flex flex-row gap-4 m-4">
+      <article
+        :for={tag <- @tags}
+        class="badge badge-soft badge-lg badge-primary hover:badge-accent relative group"
       >
-        {@error}
-      </div>
+        {tag}
+        <div
+          role="button"
+          tabindex="0"
+          class="hidden btn btn-circle btn-xs absolute -right-2 -top-2 group-hover:flex"
+          phx-click="remove-tag"
+          phx-value-tag={tag}
+          aria-label={gettext("Remove tag") <> " #{tag}"}
+        >
+          X
+        </div>
+      </article>
+    </div>
+    <div
+      :if={@error != ""}
+      role="alert"
+      aria-live="polite"
+      class="text-error-content first-letter:capitalize"
+    >
+      {@error}
     </div>
     """
   end
@@ -347,9 +310,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     |> assign(:page_title, gettext("Edit Document"))
     |> assign(:document, document)
     |> assign(:files, files)
-    |> assign(:tag_input, "")
     |> assign(:tag_error, "")
-    |> assign(:tag_nav, nil)
     |> assign(:tags, tags)
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
@@ -366,12 +327,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     socket
     |> assign(:page_title, gettext("New Document"))
     |> assign(:document, document)
-    |> assign(:tag_input, "")
     |> assign(:tag_error, "")
-    |> assign(:tag_nav, nil)
     |> assign(:tags, [])
     |> assign(:autocomplete_tags, [])
     |> assign(:curriculum, "")
+    |> assign(:curriculum_nav, nil)
     |> assign(:curriculum_error, nil)
     |> assign(:curriculum_items, [])
     |> assign(:autocomplete_curriculum, [])
@@ -404,57 +364,22 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   # Event Tag Input *************************************************************
-  def handle_event("tag-complete", %{"tag" => tag}, socket) do
+  def handle_event("remove-tag", %{"tag" => tag}, socket) do
+    tags = Enum.filter(socket.assigns.tags, fn entry -> entry != tag end)
+    {:noreply, assign(socket, :tags, tags) |> assign(:autocomplete_tags, [])}
+  end
+
+  @impl true
+  def handle_info({:tag_typing, value}, socket) do
     autocomplete_tags =
-      Workspace.autocomplete_tags(tag)
+      Workspace.autocomplete_tags(value)
       |> Enum.filter(fn entry -> !Enum.any?(socket.assigns.tags, fn tag -> tag == entry end) end)
 
     {:noreply, assign(socket, :autocomplete_tags, autocomplete_tags)}
   end
 
-  def handle_event("add-tag", %{"tag" => tag}, socket) do
+  def handle_info({:add_tag, %{value: tag}}, socket) do
     {:noreply, do_add_tag(socket, tag)}
-  end
-
-  def handle_event("remove-tag", %{"tag" => tag}, socket) do
-    tags = Enum.filter(socket.assigns.tags, fn entry -> entry != tag end)
-
-    {:noreply,
-     assign(socket, :tags, tags)
-     |> assign(:autocomplete_tags, [])
-     |> assign(:tag_input, "")}
-  end
-
-  def handle_event("close-tag-autocomplete", %{}, socket) do
-    {:noreply, assign(socket, :autocomplete_tags, [])}
-  end
-
-  def handle_event("nav-tag", %{"key" => key}, socket) do
-    max_idx = Enum.count(socket.assigns.autocomplete_tags)
-
-    case {key, socket.assigns.tag_nav} do
-      {"ArrowUp", nil} ->
-        {:noreply, assign(socket, :tag_nav, max_idx - 1)}
-
-      {"ArrowDown", nil} ->
-        {:noreply, assign(socket, :tag_nav, 0)}
-
-      {"ArrowUp", idx} ->
-        {:noreply, assign(socket, :tag_nav, calculate_new_nav(idx, max_idx, "up"))}
-
-      {"ArrowDown", idx} ->
-        {:noreply, assign(socket, :tag_nav, calculate_new_nav(idx, max_idx, "down"))}
-
-      {"Enter", idx} when not is_nil(idx) ->
-        tag = Enum.at(socket.assigns.autocomplete_tags, idx)
-        {:noreply, do_add_tag(socket, tag)}
-
-      {"Escape", _} ->
-        {:noreply, assign(socket, :tag_nav, nil) |> assign(:autocomplete_tags, [])}
-
-      _ ->
-        {:noreply, socket}
-    end
   end
 
   # Event Curriculum Input *************************************************************
@@ -643,9 +568,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
         socket
         |> assign(:tags, tags)
         |> assign(:tag_error, "")
-        |> assign(:tag_nav, nil)
         |> assign(:autocomplete_tags, [])
-        |> assign(:tag_input, "")
     end
   end
 end
