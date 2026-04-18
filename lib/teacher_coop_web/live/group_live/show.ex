@@ -5,9 +5,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
   alias TeacherCoop.Accounts
   alias TeacherCoopWeb.Reusables
 
-  # TODO:
-  # - [ ] Add colleague: just add people easily and fast that are in your graph
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -26,8 +23,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
           </.button>
         </:actions>
       </.header>
-      <.invite_colleague autocomplete={@autocomplete} />
-      <.members_list members={@members} />
+      <.invite_colleague :if={@is_admin} autocomplete={@autocomplete} />
+      <.members_list members={@members} current_scope={@current_scope} />
     </Layouts.app>
     """
   end
@@ -50,6 +47,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
   end
 
   attr :members, :list, default: []
+  attr :current_scope, :map, required: true
 
   def members_list(assigns) do
     ~H"""
@@ -63,6 +61,15 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
             {member.role}
           </span>
         </:col>
+        <:action :let={member}>
+          <.link
+            :if={member.user_id != @current_scope.user.id}
+            phx-click={JS.push("remove-member", value: %{membership_id: member.membership_id})}
+            data-confirm={gettext("Are you sure?")}
+          >
+            {gettext("Remove")}
+          </.link>
+        </:action>
       </.table>
     </section>
     """
@@ -72,11 +79,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
   def mount(%{"id" => id}, _session, socket) do
     group = Groups.get_group_for_member!(socket.assigns.current_scope, id)
     members = Groups.list_members(group.id)
+    is_admin = Groups.is_admin?(socket.assigns.current_scope, group.id)
 
     {:ok,
      socket
      |> assign(:page_title, group.name)
      |> assign(:group, group)
+     |> assign(:is_admin, is_admin)
      |> assign(:members, members)
      |> assign(:autocomplete, [])}
   end
@@ -84,10 +93,27 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
   defp badge_class("admin"), do: "badge-primary"
   defp badge_class(_), do: "badge-secondary"
 
+  # Handle Event *********************************
+  @impl true
+  def handle_event("remove-member", %{"membership_id" => member_id}, socket) do
+    Groups.remove_membership_by_id(socket.assigns.current_scope, member_id)
+    members = Groups.list_members(socket.assigns.group.id)
+    {:noreply, socket |> assign(:members, members)}
+  end
+
   # Handle Info ********************************
   @impl true
-  def handle_info({:user_submit, _value}, socket) do
-    {:noreply, socket}
+  def handle_info({:user_submit, value}, socket) do
+    # TODO: Handle error
+    Groups.invite_user_to_group(
+      socket.assigns.current_scope,
+      socket.assigns.group.id,
+      value.id
+    )
+
+    members = Groups.list_members(socket.assigns.group.id)
+
+    {:noreply, socket |> assign(:members, members)}
   end
 
   @impl true

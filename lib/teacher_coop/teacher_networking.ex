@@ -72,11 +72,13 @@ defmodule TeacherCoop.TeacherNetworking do
     end
   end
 
-  def remove_connection_by_id(%Scope{} = scope, id) do
+  def remove_connection_by_id(%Scope{} = _scope, id) do
+    # Check if scop.user is admin of the group or in the connection
+    IO.inspect(id)
+
     connection =
       Repo.get_by(Colleague,
-        id: id,
-        user1_id: scope.user.id
+        id: id
       )
 
     IO.inspect(connection)

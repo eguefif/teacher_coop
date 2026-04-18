@@ -48,7 +48,13 @@ defmodule TeacherCoop.Groups do
         join: u in User,
         on: u.id == m.user_id,
         where: m.working_group_id == ^group_id,
-        select: %{role: m.role, email: u.email, fullname: u.fullname, user_id: m.user_id}
+        select: %{
+          membership_id: m.id,
+          role: m.role,
+          email: u.email,
+          fullname: u.fullname,
+          user_id: m.user_id
+        }
 
     Repo.all(query)
   end
@@ -73,5 +79,30 @@ defmodule TeacherCoop.Groups do
   def update_group(%Scope{} = _scope, %WorkingGroup{} = group, attrs \\ %{}) do
     # TODO: check if user is group admin
     group |> WorkingGroup.changeset(attrs) |> Repo.update()
+  end
+
+  def invite_user_to_group(%Scope{} = _scope, group_id, user_id) do
+    # TODO: check if scope.user is admin // Also display the add user if the user is admin
+    %Membership{}
+    |> Membership.changeset(%{role: "invited"}, group_id, user_id)
+    |> Repo.insert!()
+  end
+
+  def is_admin?(%Scope{} = scope, group_id) do
+    query =
+      from m in Membership,
+        where: m.user_id == ^scope.user.id and m.role == "admin" and m.id == ^group_id
+
+    Repo.exists?(query)
+  end
+
+  def remove_membership_by_id(%Scope{} = _scope, id) do
+    # Check if scop.user is admin of the group or in the connection
+    connection =
+      Repo.get_by(Membership,
+        id: id
+      )
+
+    Repo.delete!(connection)
   end
 end
