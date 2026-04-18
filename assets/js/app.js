@@ -35,6 +35,9 @@ Hooks.SetValue = {
     this.handleEvent("set-value", ({value}) => {
       this.el.value = value
     })
+    this.handleEvent("reset-value", (_) => {
+      this.el.value = ""
+    })
   }
 }
 

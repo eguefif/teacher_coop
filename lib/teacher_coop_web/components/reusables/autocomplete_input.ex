@@ -7,7 +7,10 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
      socket
      |> assign(assigns)
      |> assign_new(:current_value, fn -> "" end)
-     |> assign_new(:on_add, fn -> nil end)}
+     |> assign_new(:on_add, fn -> nil end)
+     |> assign_new(:allow_input_edit, fn -> false end)
+     |> assign(:display_autocomplete, true)
+     |> assign(:nav, nil)}
   end
 
   @impl true
@@ -19,9 +22,10 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
           type="text"
           id={@name <> "-input-autocomplete"}
           name={@name}
-          value={@input_value}
+          value={@current_value}
           class="w-full input"
-          phx-hook={if @allow_input_edit, do: "SetValue"}
+          phx-hook="SetValue"
+          phx-focus="display-autocomplete"
           phx-change="user-typing"
           phx-keydown="user-navigate"
           phx-target={@myself}
@@ -33,7 +37,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
           aria-activedescendant={@nav && "#{@name}-option-#{@nav}"}
         />
         <button
-          :if={@on_add}
+          :if={@allow_input_edit}
           type="button"
           phx-click="add-item"
           phx-target={@myself}
@@ -43,7 +47,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
         </button>
       </div>
       <div
-        :if={@autocomplete_list != []}
+        :if={@autocomplete_list != [] && @display_autocomplete}
         class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
         phx-click-away="close-autocomplete"
         phx-target={@myself}
@@ -77,18 +81,17 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
 
   @impl true
   def handle_event("close-autocomplete", _, socket) do
-    socket.assigns.on_close.()
-    {:noreply, assign(socket, :autocomplete_list, [])}
+    {:noreply, assign(socket, :display_autocomplete, false)}
+  end
+
+  def handle_event("display-autocomplete", _, socket) do
+    {:noreply, assign(socket, :display_autocomplete, true)}
   end
 
   def handle_event("select-entry", %{"id" => id, "value" => value}, socket) do
     case socket.assigns.allow_input_edit do
       true ->
-        {:noreply,
-         socket
-         |> assign(:current_value, value)
-         |> assign(:autocomplete_list, [])
-         |> push_event("set-value", %{value: value})}
+        select_entry_when_allow_input_edit(value, socket)
 
       false ->
         user_submit(%{id: id, value: value}, socket)
@@ -102,8 +105,12 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
   end
 
   def handle_event("add-item", _, socket) do
-    socket.assigns.on_add.(socket.assigns.current_value)
-    {:noreply, assign(socket, :current_value, "")}
+    user_submit(
+      %{id: nil, value: socket.assigns.current_value},
+      socket
+      |> assign(:current_value, "")
+      |> push_event("reset-value", %{})
+    )
   end
 
   def handle_event("user-navigate", %{"key" => key}, socket) do
@@ -123,14 +130,32 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
         {:noreply, assign(socket, :nav, calculate_new_nav(idx, max_idx, "down"))}
 
       {"Enter", idx} when not is_nil(idx) ->
+        value = Enum.at(socket.assigns.autocomplete_list, idx)
+
         case socket.assigns.allow_input_edit do
           true ->
-            {:noreply, socket}
+            select_entry_when_allow_input_edit(
+              Map.fetch!(value, :value),
+              socket
+              |> assign(:nav, nil)
+            )
 
           false ->
-            value = Enum.at(socket.assigns.autocomplete_list, idx)
-            user_submit(value, socket)
+            user_submit(
+              value,
+              socket
+              |> assign(:nav, nil)
+              |> push_event("reset-value", %{})
+            )
         end
+
+      {"Enter", nil} ->
+        user_submit(
+          %{id: nil, value: socket.assigns.current_value},
+          socket
+          |> assign(:current_value, "")
+          |> push_event("reset-value", %{})
+        )
 
       {"Escape", _} ->
         {:noreply, assign(socket, :nav, nil) |> assign(:autocomplete_list, [])}
@@ -138,6 +163,15 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
       _ ->
         {:noreply, socket}
     end
+  end
+
+  def select_entry_when_allow_input_edit(value, socket) do
+    {:noreply,
+     socket
+     |> assign(:current_value, value)
+     |> assign(:autocomplete_list, [])
+     |> assign(:display_autocomplete, false)
+     |> push_event("set-value", %{value: value})}
   end
 
   def user_submit(%{id: id, value: value}, socket) do

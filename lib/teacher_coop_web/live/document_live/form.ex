@@ -34,10 +34,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           <span class="label mb-1">{gettext("Curriculum")}</span>
           <.curriculum_input
             autocomplete_list={@autocomplete_curriculum}
-            on_user_typing={fn value -> send(self(), {:curriculum_typing, value}) end}
-            on_autocomplete_submit={fn item -> send(self(), {:curriculum_selected, item}) end}
-            on_close={fn -> send(self(), :close_curriculum_autocomplete) end}
-            on_add={fn item -> send(self(), {:add_curriculum_item, item}) end}
             items={@curriculum_items}
             error={@curriculum_error}
           />
@@ -46,9 +42,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
           <span class="label mb-1">{gettext("Tags")}</span>
           <.tag_input
             autocomplete_list={Enum.map(@autocomplete_tags, &%{id: &1, value: &1})}
-            on_user_typing={fn value -> send(self(), {:tag_typing, value}) end}
-            on_autocomplete_submit={fn tag -> send(self(), {:add_tag, tag}) end}
-            on_close={fn -> send(self(), :close_tag_autocomplete) end}
             tags={@tags}
             error={@tag_error}
           />
@@ -72,10 +65,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   attr :autocomplete_list, :list, required: true
-  attr :on_user_typing, :any, required: true
-  attr :on_autocomplete_submit, :any, required: true
-  attr :on_close, :any, required: true
-  attr :on_add, :any, required: true
   attr :items, :list, default: []
   attr :error, :string, default: nil
 
@@ -86,13 +75,10 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       id="curriculum-input"
       name="curriculum-input"
       allow_input_edit={true}
-      input_value=""
       nav={nil}
       autocomplete_list={@autocomplete_list}
-      on_user_typing={@on_user_typing}
-      on_autocomplete_submit={@on_autocomplete_submit}
-      on_close={@on_close}
-      on_add={@on_add}
+      on_user_typing={fn value -> send(self(), {:curriculum_typing, value}) end}
+      on_autocomplete_submit={fn item -> send(self(), {:add_curriculum_item, item}) end}
     />
     <div :if={@items != []}>
       <ul class="m-2 p-2">
@@ -121,9 +107,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   end
 
   attr :autocomplete_list, :list, required: true
-  attr :on_user_typing, :any, required: true
-  attr :on_autocomplete_submit, :any, required: true
-  attr :on_close, :any, required: true
   attr :tags, :list, default: []
   attr :error, :string, default: ""
 
@@ -133,13 +116,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       module={Reusables.AutocompleteInput}
       id="tag-input"
       name="tag-input"
-      allow_input_edit={false}
-      input_value=""
-      nav={nil}
       autocomplete_list={@autocomplete_list}
-      on_user_typing={@on_user_typing}
-      on_autocomplete_submit={@on_autocomplete_submit}
-      on_close={@on_close}
+      on_user_typing={fn value -> send(self(), {:tag_typing, value}) end}
+      on_autocomplete_submit={fn tag -> send(self(), {:add_tag, tag}) end}
     />
     <div class="flex flex-row gap-4 m-4">
       <article
@@ -476,14 +455,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     {:noreply, do_add_tag(socket, tag)}
   end
 
-  def handle_info(:close_tag_autocomplete, socket) do
-    {:noreply, assign(socket, :autocomplete_tags, [])}
-  end
-
-  def handle_info(:close_curriculum_autocomplete, socket) do
-    {:noreply, assign(socket, :autocomplete_curriculum, [])}
-  end
-
   def handle_info({:curriculum_typing, value}, socket) when byte_size(value) > 3 do
     results = Workspace.autocomplete_curriculum(value)
     {:noreply, socket |> assign(:autocomplete_curriculum, results) |> assign(:curriculum, value)}
@@ -493,11 +464,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
     {:noreply, socket |> assign(:autocomplete_curriculum, []) |> assign(:curriculum, value)}
   end
 
-  def handle_info({:curriculum_selected, %{value: item}}, socket) do
-    {:noreply, socket |> assign(:curriculum, item) |> assign(:autocomplete_curriculum, [])}
-  end
-
-  def handle_info({:add_curriculum_item, item}, socket) do
+  def handle_info({:add_curriculum_item, %{value: item}}, socket) do
     {:noreply, do_add_curriculum_item(socket, item)}
   end
 end

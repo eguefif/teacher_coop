@@ -19,7 +19,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
           {gettext("Listing Documents")}
           <:actions>
             <.button variant="primary" navigate={~p"/workspace/documents/new"}>
-              <.icon name="hero-plus" /> {gettext("ew Document")}
+              <.icon name="hero-plus" /> {gettext("New Document")}
             </.button>
           </:actions>
         </.header>
