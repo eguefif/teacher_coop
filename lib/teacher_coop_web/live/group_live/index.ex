@@ -19,6 +19,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Index do
       <.header>
         {gettext("My Groups")}
         <:actions>
+          <.button navigate={~p"/workspace/"}><.icon name="hero-arrow-left" /></.button>
           <.button variant="primary" navigate={~p"/workspace/groups/new"}>
             <.icon name="hero-plus" /> {gettext("New Group")}
           </.button>

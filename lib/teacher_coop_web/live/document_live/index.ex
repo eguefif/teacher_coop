@@ -18,6 +18,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
         <.header>
           {gettext("Listing Documents")}
           <:actions>
+            <.button navigate={~p"/workspace/"}><.icon name="hero-arrow-left" /></.button>
             <.button variant="primary" navigate={~p"/workspace/documents/new"}>
               <.icon name="hero-plus" /> {gettext("New Document")}
             </.button>

@@ -5,8 +5,9 @@ defmodule TeacherCoop.Accounts do
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
+  alias TeacherCoop.Colleague
 
-  alias TeacherCoop.Accounts.{User, UserToken, UserNotifier}
+  alias TeacherCoop.Accounts.{User, UserToken, UserNotifier, Scope}
 
   ## Database getters
 
@@ -304,7 +305,6 @@ defmodule TeacherCoop.Accounts do
   end
 
   def search_user(search) do
-    # TODO: add option to exclude user connection
     query =
       from user in User,
         where: fragment("? <% ?", ^search, user.search_text),
@@ -314,6 +314,24 @@ defmodule TeacherCoop.Accounts do
           similarity: fragment("word_similarity(?, ?)", ^search, user.search_text)
         },
         order_by: [desc: fragment("word_similarity(?, ?)", ^search, user.search_text)]
+
+    Repo.all(query)
+  end
+
+  def search_user_in_current_user_connections(%Scope{} = scope, search) do
+    user_id = scope.user.id
+
+    query =
+      from colleagues in Colleague,
+        join: users in User,
+        on: users.id in [colleagues.user1_id, colleagues.user2_id] and users.id != ^user_id,
+        where: fragment("? <% ?", ^search, users.search_text),
+        select: %{
+          id: users.id,
+          fullname: users.fullname,
+          similarity: fragment("word_similarity(?, ?)", ^search, users.search_text)
+        },
+        order_by: [desc: fragment("word_similarity(?, ?)", ^search, users.search_text)]
 
     Repo.all(query)
   end

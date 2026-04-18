@@ -1,13 +1,60 @@
 defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
   use TeacherCoopWeb, :live_component
 
+  # Autocomplete text input live component.
+  #
+  # Required assigns:
+  #   - id, name               — must be unique per page
+  #   - autocomplete_list      — list of %{id: any, value: string} suggestions;
+  #                              kept in the parent's assigns and updated in the
+  #                              handle_info triggered by on_user_typing
+  #   - on_user_typing         — fn(value) called on each keystroke; must send a
+  #                              message to the parent (via send/2) so handle_info
+  #                              can query suggestions and update autocomplete_list
+  #   - on_autocomplete_submit — fn(%{id, value}) called when an entry is confirmed
+  #
+  # Optional assigns:
+  #   - allow_input_edit — boolean, default false (see modes below)
+  #
+  # Modes:
+  #   false (default) — select-only. The user picks from suggestions; the input
+  #                     clears after selection. Suited for tags or constrained fields.
+  #   true            — editable. The user may type freely or pick a suggestion to
+  #                     pre-fill the input, then confirm with "+" or Enter.
+  #                     Suited for fields that accept custom values (e.g. curriculum).
+  #
+  # JS hook:
+  #   Requires the `SetValue` hook in assets/js/app.js. It handles two server events:
+  #   "set-value" (fill input after suggestion pick) and "reset-value" (clear after submit).
+  #
+  # Example:
+  #
+  #   # In render/1:
+  #   <.live_component
+  #     module={Reusables.AutocompleteInput}
+  #     id="tag-input"
+  #     name="tag-input"
+  #     autocomplete_list={@autocomplete_tags}
+  #     on_user_typing={fn value -> send(self(), {:tag_typing, value}) end}
+  #     on_autocomplete_submit={fn item -> send(self(), {:add_tag, item}) end}
+  #   />
+  #
+  #   # In the parent LiveView:
+  #   def handle_info({:tag_typing, value}, socket) do
+  #     tags = MyApp.search_tags(value)
+  #     {:noreply, assign(socket, :autocomplete_tags, tags)}
+  #   end
+  #
+  #   def handle_info({:add_tag, %{value: tag}}, socket) do
+  #     {:noreply, assign(socket, :tags, socket.assigns.tags ++ [tag])}
+  #   end
+
   @impl true
   def update(assigns, socket) do
     {:ok,
      socket
      |> assign(assigns)
      |> assign_new(:current_value, fn -> "" end)
-     |> assign_new(:on_add, fn -> nil end)
      |> assign_new(:allow_input_edit, fn -> false end)
      |> assign(:display_autocomplete, true)
      |> assign(:nav, nil)}
@@ -26,7 +73,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
           class="w-full input"
           phx-hook="SetValue"
           phx-focus="display-autocomplete"
-          phx-change="user-typing"
+          phx-keyup="user-typing"
           phx-keydown="user-navigate"
           phx-target={@myself}
           onkeydown="if(event.key==='Enter'){event.preventDefault();}"
@@ -98,8 +145,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
     end
   end
 
-  def handle_event("user-typing", params, socket) do
-    value = params[socket.assigns.name] || ""
+  def handle_event("user-typing", %{"value" => value}, socket) do
     socket.assigns.on_user_typing.(value)
     {:noreply, assign(socket, :current_value, value)}
   end
@@ -116,6 +162,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
   def handle_event("user-navigate", %{"key" => key}, socket) do
     max_idx = Enum.count(socket.assigns.autocomplete_list)
 
+    # TODO: add tab navigation
     case {key, socket.assigns.nav} do
       {"ArrowUp", nil} ->
         {:noreply, assign(socket, :nav, max_idx - 1)}
