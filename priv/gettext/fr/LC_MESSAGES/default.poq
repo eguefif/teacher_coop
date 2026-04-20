@@ -96,3 +96,75 @@ msgstr "Supprimer"
 
 msgid "Edit document"
 msgstr "Modifier le document"
+
+## From Workspace
+msgid "My Groups"
+msgstr "Mes groupes"
+
+msgid "My Colleagues"
+msgstr "Mes collègues"
+
+msgid "Connection Requests"
+msgstr "Demandes de connexion"
+
+msgid "Accept"
+msgstr "Accepter"
+
+msgid "Reject"
+msgstr "Refuser"
+
+msgid "Group Invitations"
+msgstr "Invitations de groupe"
+
+msgid "You have been invited in the group"
+msgstr "Vous avez été invité dans le groupe"
+
+msgid "Connection request accepted"
+msgstr "Demande de connexion acceptée"
+
+msgid "Connection request rejected"
+msgstr "Demande de connexion refusée"
+
+msgid "An error occured, retry later."
+msgstr "Une erreur s'est produite, réessayez plus tard."
+
+## From Colleagues
+msgid "Invite"
+msgstr "Inviter"
+
+msgid "Are you sure?"
+msgstr "Êtes-vous sûr ?"
+
+## From Groups
+msgid "Edit Group"
+msgstr "Modifier le groupe"
+
+msgid "Members"
+msgstr "Membres"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Role"
+msgstr "Rôle"
+
+msgid "Remove"
+msgstr "Retirer"
+
+msgid "New Group"
+msgstr "Nouveau groupe"
+
+msgid "Group name"
+msgstr "Nom du groupe"
+
+msgid "Save Group"
+msgstr "Enregistrer le groupe"
+
+msgid "Group created successfully"
+msgstr "Groupe créé avec succès"
+
+msgid "Group updated successfully"
+msgstr "Groupe mis à jour avec succès"

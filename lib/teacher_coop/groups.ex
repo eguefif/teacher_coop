@@ -105,4 +105,33 @@ defmodule TeacherCoop.Groups do
 
     Repo.delete!(connection)
   end
+
+  def get_pending_group_invitations(%Scope{} = scope) do
+    query =
+      from m in Membership,
+        join: gr in WorkingGroup,
+        on: gr.id == m.working_group_id,
+        where: m.user_id == ^scope.user.id and m.role == "invited",
+        select: %{membership_id: m.id, group_name: gr.name}
+
+    Repo.all(query)
+  end
+
+  def accept_invitation(%Scope{} = scope, id) do
+    invitation = Repo.get_by!(Membership, user_id: scope.user.id, id: id)
+
+    invitation
+    |> Membership.changeset(%{role: "member"}, invitation.working_group_id, invitation.user_id)
+    |> Repo.update()
+    |> elem(0)
+  end
+
+  def reject_invitation(%Scope{} = scope, id) do
+    invitation = Repo.get_by!(Membership, user_id: scope.user.id, id: id)
+
+    invitation
+    |> Membership.changeset(%{role: "rejected"}, invitation.working_group_id, invitation.user_id)
+    |> Repo.update()
+    |> elem(0)
+  end
 end

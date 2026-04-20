@@ -23,9 +23,6 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-msgid "Files"
-msgstr ""
-
 msgid "Save Document"
 msgstr ""
 
@@ -85,4 +82,76 @@ msgid "Delete"
 msgstr ""
 
 msgid "Edit document"
+msgstr ""
+
+## From Workspace
+msgid "My Groups"
+msgstr ""
+
+msgid "My Colleagues"
+msgstr ""
+
+msgid "Connection Requests"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+msgid "Reject"
+msgstr ""
+
+msgid "Group Invitations"
+msgstr ""
+
+msgid "You have been invited in the group"
+msgstr ""
+
+msgid "Connection request accepted"
+msgstr ""
+
+msgid "Connection request rejected"
+msgstr ""
+
+msgid "An error occured, retry later."
+msgstr ""
+
+## From Colleagues
+msgid "Invite"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+## From Groups
+msgid "Edit Group"
+msgstr ""
+
+msgid "Members"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Role"
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "New Group"
+msgstr ""
+
+msgid "Group name"
+msgstr ""
+
+msgid "Save Group"
+msgstr ""
+
+msgid "Group created successfully"
+msgstr ""
+
+msgid "Group updated successfully"
 msgstr ""

@@ -2,7 +2,7 @@
 
 msgid ""
 msgstr ""
-"Language: fr\n"
+"Language: en\n"
 
 msgid "Search"
 msgstr "Search"
@@ -81,3 +81,75 @@ msgstr "Delete"
 
 msgid "Edit document"
 msgstr "Edit document"
+
+## From Workspace
+msgid "My Groups"
+msgstr "My Groups"
+
+msgid "My Colleagues"
+msgstr "My Colleagues"
+
+msgid "Connection Requests"
+msgstr "Connection Requests"
+
+msgid "Accept"
+msgstr "Accept"
+
+msgid "Reject"
+msgstr "Reject"
+
+msgid "Group Invitations"
+msgstr "Group Invitations"
+
+msgid "You have been invited in the group"
+msgstr "You have been invited in the group"
+
+msgid "Connection request accepted"
+msgstr "Connection request accepted"
+
+msgid "Connection request rejected"
+msgstr "Connection request rejected"
+
+msgid "An error occured, retry later."
+msgstr "An error occured, retry later."
+
+## From Colleagues
+msgid "Invite"
+msgstr "Invite"
+
+msgid "Are you sure?"
+msgstr "Are you sure?"
+
+## From Groups
+msgid "Edit Group"
+msgstr "Edit Group"
+
+msgid "Members"
+msgstr "Members"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "New Group"
+msgstr "New Group"
+
+msgid "Group name"
+msgstr "Group name"
+
+msgid "Save Group"
+msgstr "Save Group"
+
+msgid "Group created successfully"
+msgstr "Group created successfully"
+
+msgid "Group updated successfully"
+msgstr "Group updated successfully"
