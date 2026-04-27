@@ -304,10 +304,20 @@ defmodule TeacherCoop.Accounts do
     end)
   end
 
-  def search_user(search) do
+  def search_user(%Scope{} = scope, search) do
+    # TODO: 
+    # - [x] exclude the searcher user
+    # - [ ] exclude user where there is already a connection
+    # - [ ] Refactor Colleague => find a better name Connection?
+
     query =
       from user in User,
-        where: fragment("? <% ?", ^search, user.search_text),
+        left_join: c in Colleague,
+        on: c.user1_id == user.id or c.user2_id == user.id,
+        where:
+          fragment("? <% ?", ^search, user.search_text) and
+            user.id != ^scope.user.id and
+            is_nil(c.id),
         select: %{
           id: user.id,
           fullname: user.fullname,

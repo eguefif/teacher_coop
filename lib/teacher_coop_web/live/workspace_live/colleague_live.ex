@@ -20,9 +20,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
           module={Reusables.AutocompleteInput}
           id="teacher-search"
           name="teacher-search"
-          allow_input_edit={true}
+          allow_input_edit={false}
           autocomplete_list={@autocomplete}
-          on_user_typing={fn input_value -> send(self(), {:input_value, input_value}) end}
+          on_user_typing={fn input_value -> send(self(), {:user_typing, input_value}) end}
           on_autocomplete_submit={fn colleague -> send(self(), {:add_colleague, colleague}) end}
         />
         <ul class="list">
@@ -81,11 +81,12 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
   end
 
   @impl true
-  def handle_info({:input_value, input_value}, socket) do
+  def handle_info({:user_typing, input_value}, socket) do
     new_list =
-      Accounts.search_user(input_value)
+      Accounts.search_user(socket.assigns.current_scope, input_value)
       |> Enum.map(fn entry -> %{id: entry.id, value: entry.fullname} end)
 
+    IO.inspect(new_list)
     {:noreply, socket |> assign(:autocomplete, new_list)}
   end
 
