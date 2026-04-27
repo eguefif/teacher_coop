@@ -5,6 +5,7 @@ defmodule TeacherCoop.Workspace.Document do
   schema "documents" do
     field :title, :string
     field :description, :string
+    field :public, :boolean
     field :tags, {:array, :string}
     field :goals, {:array, :string}
     belongs_to :user, TeacherCoop.Accounts.User
