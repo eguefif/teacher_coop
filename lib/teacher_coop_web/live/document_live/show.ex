@@ -21,6 +21,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
           <.button navigate={~p"/workspace/documents"}>
             <.icon name="hero-arrow-left" />
           </.button>
+          <.button variant="primary" phx-click="toggle-public" phx-value-id={@document.id}>
+            {if @document.public, do: gettext("Make Private"), else: gettext("Make Public")}
+          </.button>
           <.button
             variant="primary"
             navigate={~p"/workspace/documents/#{@document}/edit?return_to=show"}
@@ -78,6 +81,14 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
      |> assign(:page_title, "Show Document")
      |> assign(:document, document)
      |> assign(:files, Workspace.get_files(document.id))}
+  end
+
+  @impl true
+  def handle_event("toggle-public", %{"id" => id}, socket) do
+    document =
+      Workspace.update_public(socket.assigns.current_scope, id, !socket.assigns.document.public)
+
+    {:noreply, socket |> assign(:document, document)}
   end
 
   @impl true

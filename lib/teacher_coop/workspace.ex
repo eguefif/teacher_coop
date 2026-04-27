@@ -219,4 +219,17 @@ defmodule TeacherCoop.Workspace do
       hits -> Enum.map(hits, fn hit -> %{id: Map.get(hit, "id"), value: Map.get(hit, "item")} end)
     end
   end
+
+  def update_public(%Scope{} = scope, id, value) do
+    # TODO: update Meilisearch
+    document = Repo.get!(Document, id)
+
+    true =
+      document.user_id ==
+        scope.user.id
+
+    document
+    |> Document.changeset(%{public: value}, scope)
+    |> Repo.update!()
+  end
 end
