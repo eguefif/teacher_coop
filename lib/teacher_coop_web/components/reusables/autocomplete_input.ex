@@ -154,8 +154,6 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
     user_submit(
       %{id: nil, value: socket.assigns.current_value},
       socket
-      |> assign(:current_value, "")
-      |> push_event("reset-value", %{})
     )
   end
 
@@ -223,7 +221,12 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
 
   def user_submit(%{id: id, value: value}, socket) do
     socket.assigns.on_autocomplete_submit.(%{id: id, value: value})
-    {:noreply, socket |> assign(:autocomplete_list, [])}
+
+    {:noreply,
+     socket
+     |> assign(:autocomplete_list, [])
+     |> assign(:current_value, "")
+     |> push_event("reset-value", %{})}
   end
 
   defp calculate_new_nav(idx, max_idx, "down") when idx + 1 == max_idx, do: 0
