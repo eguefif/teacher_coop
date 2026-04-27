@@ -32,8 +32,10 @@ import "./confirmation_modal.js"
 let Hooks = {}
 Hooks.SetValue = {
   mounted() {
-    this.handleEvent("set-value", ({value}) => {
-      this.el.value = value
+    this.el.addEventListener("input", e => {
+      if (this.el.id == e.detail.id) {
+        this.el.value = e.detail.value
+      }
     })
     this.handleEvent("reset-value", (_) => {
       this.el.value = ""
