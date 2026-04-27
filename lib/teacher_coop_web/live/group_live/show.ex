@@ -24,7 +24,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
         </:actions>
       </.header>
       <.invite_connection :if={@is_admin} autocomplete={@autocomplete} />
-      <.members_list members={@members} current_scope={@current_scope} />
+      <.members_list members={@members} current_scope={@current_scope} is_admin={@is_admin} />
     </Layouts.app>
     """
   end
@@ -48,6 +48,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
 
   attr :members, :list, default: []
   attr :current_scope, :map, required: true
+  attr :is_admin, :boolean, default: false
 
   def members_list(assigns) do
     ~H"""
@@ -61,7 +62,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
             {member.role}
           </span>
         </:col>
-        <:action :let={member}>
+        <:action :let={member} :if={@is_admin}>
           <.link
             :if={member.user_id != @current_scope.user.id}
             phx-click={JS.push("remove-member", value: %{membership_id: member.membership_id})}
