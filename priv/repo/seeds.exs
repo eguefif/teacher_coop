@@ -14,7 +14,7 @@ alias TeacherCoop.Repo
 alias TeacherCoop.Accounts.User
 alias TeacherCoop.Groups.WorkingGroup
 alias TeacherCoop.Groups.Membership
-alias TeacherCoop.Colleague
+alias TeacherCoop.Connection
 
 user =
   Repo.insert!(%User{
@@ -56,13 +56,13 @@ for {email, fullname} <- [
   users = [user_tmp | users]
 end
 
-Repo.insert!(%Colleague{
+Repo.insert!(%Connection{
   user1_id: user2.id,
   user2_id: user.id,
   state: "accepted"
 })
 
-Repo.insert!(%Colleague{
+Repo.insert!(%Connection{
   user1_id: user2.id,
   user2_id: user.id,
   state: "accepted"

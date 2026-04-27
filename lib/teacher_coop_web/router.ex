@@ -74,7 +74,7 @@ defmodule TeacherCoopWeb.Router do
       live "/groups/:id/edit", WorkspaceLive.GroupLive.Form, :edit
       live "/groups/:id", WorkspaceLive.GroupLive.Show, :show
 
-      live "/colleagues", WorkspaceLive.ColleagueLive.Index, :index
+      live "/connections", WorkspaceLive.ConnectionLive.Index, :index
     end
   end
 

@@ -5,7 +5,7 @@ defmodule TeacherCoop.Accounts do
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
-  alias TeacherCoop.Colleague
+  alias TeacherCoop.Connection
 
   alias TeacherCoop.Accounts.{User, UserToken, UserNotifier, Scope}
 
@@ -305,14 +305,9 @@ defmodule TeacherCoop.Accounts do
   end
 
   def search_user(%Scope{} = scope, search) do
-    # TODO: 
-    # - [x] exclude the searcher user
-    # - [ ] exclude user where there is already a connection
-    # - [ ] Refactor Colleague => find a better name Connection?
-
     query =
       from user in User,
-        left_join: c in Colleague,
+        left_join: c in Connection,
         on: c.user1_id == user.id or c.user2_id == user.id,
         where:
           fragment("? <% ?", ^search, user.search_text) and
@@ -332,9 +327,9 @@ defmodule TeacherCoop.Accounts do
     user_id = scope.user.id
 
     query =
-      from colleagues in Colleague,
+      from connections in Connection,
         join: users in User,
-        on: users.id in [colleagues.user1_id, colleagues.user2_id] and users.id != ^user_id,
+        on: users.id in [connections.user1_id, connections.user2_id] and users.id != ^user_id,
         where: fragment("? <% ?", ^search, users.search_text),
         select: %{
           id: users.id,

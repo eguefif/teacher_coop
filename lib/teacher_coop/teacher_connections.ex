@@ -4,13 +4,13 @@ defmodule TeacherCoop.TeacherNetworking do
   alias TeacherCoop.Repo
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Accounts.User
-  alias TeacherCoop.Colleague
+  alias TeacherCoop.Connection
 
   def get_pending_connections(%Scope{} = scope) do
     user_id = scope.user.id
 
     query =
-      from c in Colleague,
+      from c in Connection,
         join: user in User,
         on: user.id == c.user1_id,
         where: c.state == "pending" and c.user2_id == ^user_id,
@@ -23,44 +23,44 @@ defmodule TeacherCoop.TeacherNetworking do
     user_id = scope.user.id
 
     query =
-      from c in Colleague,
+      from c in Connection,
         join: user in User,
         on: (user.id == c.user1_id or user.id == c.user2_id) and user.id != ^user_id,
         where: c.user2_id == ^user_id or c.user1_id == ^user_id,
-        select: %{colleague_id: c.id, fullname: user.fullname, state: c.state}
+        select: %{connection_id: c.id, fullname: user.fullname, state: c.state}
 
     Repo.all(query)
   end
 
   def update_connection(%Scope{} = scope, :accept, id) do
-    case Repo.get_by(Colleague, id: id, user2_id: scope.user.id) do
+    case Repo.get_by(Connection, id: id, user2_id: scope.user.id) do
       nil ->
         :error
 
       connection ->
         connection
-        |> Colleague.changeset(%{state: "accepted"})
+        |> Connection.changeset(%{state: "accepted"})
         |> Repo.update()
     end
   end
 
   def update_connection(%Scope{} = scope, :reject, id) do
-    case Repo.get_by(Colleague, id: id, user2_id: scope.user.id) do
+    case Repo.get_by(Connection, id: id, user2_id: scope.user.id) do
       nil ->
         :error
 
       connection ->
         connection
-        |> Colleague.changeset(%{state: "rejected"})
+        |> Connection.changeset(%{state: "rejected"})
         |> Repo.update()
     end
   end
 
   def create_pending_connection(%Scope{} = scope, invited_user_id) do
-    case Repo.get_by(Colleague, user1_id: scope.user.id, user2_id: invited_user_id) do
+    case Repo.get_by(Connection, user1_id: scope.user.id, user2_id: invited_user_id) do
       nil ->
-        %Colleague{}
-        |> Colleague.changeset(%{
+        %Connection{}
+        |> Connection.changeset(%{
           user1_id: scope.user.id,
           user2_id: invited_user_id,
           state: "pending"
@@ -77,7 +77,7 @@ defmodule TeacherCoop.TeacherNetworking do
     IO.inspect(id)
 
     connection =
-      Repo.get_by(Colleague,
+      Repo.get_by(Connection,
         id: id
       )
 

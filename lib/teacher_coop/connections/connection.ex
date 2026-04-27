@@ -1,8 +1,8 @@
-defmodule TeacherCoop.Colleague do
+defmodule TeacherCoop.Connection do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "colleagues" do
+  schema "connections" do
     field :user1_id, :id
     field :user2_id, :id
     field :state, :string
@@ -11,8 +11,8 @@ defmodule TeacherCoop.Colleague do
   end
 
   @doc false
-  def changeset(colleague, attrs) do
-    colleague
+  def changeset(connection, attrs) do
+    connection
     |> cast(attrs, [:user1_id, :user2_id, :state])
     |> validate_required([:user1_id, :user2_id, :state])
   end

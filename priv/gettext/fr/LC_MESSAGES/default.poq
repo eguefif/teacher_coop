@@ -101,8 +101,8 @@ msgstr "Modifier le document"
 msgid "My Groups"
 msgstr "Mes groupes"
 
-msgid "My Colleagues"
-msgstr "Mes collègues"
+msgid "My Connections"
+msgstr "Mes connexions"
 
 msgid "Connection Requests"
 msgstr "Demandes de connexion"
@@ -128,7 +128,7 @@ msgstr "Demande de connexion refusée"
 msgid "An error occured, retry later."
 msgstr "Une erreur s'est produite, réessayez plus tard."
 
-## From Colleagues
+## From Connections
 msgid "Invite"
 msgstr "Inviter"
 

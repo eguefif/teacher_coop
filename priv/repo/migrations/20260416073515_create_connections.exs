@@ -1,8 +1,8 @@
-defmodule TeacherCoop.Repo.Migrations.CreateColleagues do
+defmodule TeacherCoop.Repo.Migrations.CreateConnection do
   use Ecto.Migration
 
   def change do
-    create table(:colleagues) do
+    create table(:connections) do
       add :user1_id, references(:users, on_delete: :nothing)
       add :user2_id, references(:users, on_delete: :nothing)
       add :state, :string
@@ -10,10 +10,10 @@ defmodule TeacherCoop.Repo.Migrations.CreateColleagues do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:colleagues, [:user1_id, :user2_id])
-    create index(:colleagues, [:user2_id, :user1_id])
+    create index(:connections, [:user1_id, :user2_id])
+    create index(:connections, [:user2_id, :user1_id])
 
-    create constraint(:colleagues, "user1 must be different than user2",
+    create constraint(:connections, "user1 must be different than user2",
              check: "user1_id <> user2_id"
            )
   end

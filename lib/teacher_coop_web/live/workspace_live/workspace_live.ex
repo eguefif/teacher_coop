@@ -21,7 +21,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.Workspace do
           </div>
 
           <div class="mx-auto">
-            <.button navigate={~p"/workspace/colleagues"}>{gettext("My Colleagues")}</.button>
+            <.button navigate={~p"/workspace/connections"}>{gettext("My Connections")}</.button>
           </div>
         </div>
         <.connection_invitations

@@ -1,4 +1,4 @@
-defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
+defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
   use TeacherCoopWeb, :live_view
 
   alias TeacherCoop.TeacherNetworking
@@ -10,7 +10,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        {gettext("My Colleagues")}
+        {gettext("My Connections")}
         <:actions>
           <.button navigate={~p"/workspace/"}><.icon name="hero-arrow-left" /></.button>
         </:actions>
@@ -23,18 +23,18 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
           allow_input_edit={false}
           autocomplete_list={@autocomplete}
           on_user_typing={fn input_value -> send(self(), {:user_typing, input_value}) end}
-          on_autocomplete_submit={fn colleague -> send(self(), {:add_colleague, colleague}) end}
+          on_autocomplete_submit={fn connection -> send(self(), {:add_connection, connection}) end}
         />
         <ul class="list">
-          <li :for={colleague <- @new_colleagues_list}>
-            {colleague.value}
-            <.button type="button" phx-click="user-invite-colleague" phx-value-id={colleague.id}>
+          <li :for={connection <- @new_connections_list}>
+            {connection.value}
+            <.button type="button" phx-click="user-invite-connection" phx-value-id={connection.id}>
               {gettext("Invite")}
             </.button>
             <.button
               type="button"
-              phx-click="user-remove-colleague-from-new-list"
-              phx-value-id={colleague.id}
+              phx-click="user-remove-connection-from-new-list"
+              phx-value-id={connection.id}
               variant="primary"
             >
               <.icon name="hero-x-mark" class="size-6" />
@@ -42,14 +42,14 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
           </li>
         </ul>
         <div class="flex flex-col gap-8">
-          <h1>{gettext("My Colleagues")}</h1>
+          <h1>{gettext("My Connections")}</h1>
           <ul class="list">
-            <li :for={colleague <- @colleagues} class="list-row">
-              {colleague.fullname}({colleague.state})
+            <li :for={connection <- @connections} class="list-row">
+              {connection.fullname}({connection.state})
               <.button
                 type="button"
                 phx-click="user-remove-connection"
-                phx-value-id={colleague.colleague_id}
+                phx-value-id={connection.connection_id}
                 data-confirm={gettext("Are you sure?")}
               >
                 <.icon name="hero-x-mark" class="size-6" />
@@ -64,20 +64,20 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
 
   @impl true
   def mount(_params, _sessions, socket) do
-    colleagues = TeacherNetworking.get_connections(socket.assigns.current_scope)
+    connections = TeacherNetworking.get_connections(socket.assigns.current_scope)
 
     {:ok,
      socket
      |> assign(:autocomplete, [])
-     |> assign(:colleagues, colleagues)
-     |> assign(:new_colleagues_list, [])}
+     |> assign(:connections, connections)
+     |> assign(:new_connections_list, [])}
   end
 
   @impl true
-  def handle_info({:add_colleague, colleague}, socket) do
-    new_list = socket.assigns.new_colleagues_list ++ [colleague]
+  def handle_info({:add_connection, connection}, socket) do
+    new_list = socket.assigns.new_connections_list ++ [connection]
     IO.inspect(new_list)
-    {:noreply, socket |> assign(:new_colleagues_list, new_list)}
+    {:noreply, socket |> assign(:new_connections_list, new_list)}
   end
 
   @impl true
@@ -91,37 +91,37 @@ defmodule TeacherCoopWeb.WorkspaceLive.ColleagueLive.Index do
   end
 
   @impl true
-  def handle_event("user-remove-colleague-from-new-list", %{"id" => id}, socket) do
+  def handle_event("user-remove-connection-from-new-list", %{"id" => id}, socket) do
     new_list =
-      Enum.reject(socket.assigns.new_colleagues_list, fn entry ->
+      Enum.reject(socket.assigns.new_connections_list, fn entry ->
         entry.id == String.to_integer(id)
       end)
 
-    {:noreply, socket |> assign(:new_colleagues_list, new_list)}
+    {:noreply, socket |> assign(:new_connections_list, new_list)}
   end
 
   @impl true
-  def handle_event("user-invite-colleague", %{"id" => id}, socket) do
+  def handle_event("user-invite-connection", %{"id" => id}, socket) do
     id = String.to_integer(id)
 
     new_list =
       case TeacherNetworking.create_pending_connection(socket.assigns.current_scope, id) do
         :already_pending_connection ->
-          socket.assigns.new_colleagues_list
+          socket.assigns.new_connections_list
 
         {:ok, _} ->
-          Enum.reject(socket.assigns.new_colleagues_list, fn entry -> entry.id == id end)
+          Enum.reject(socket.assigns.new_connections_list, fn entry -> entry.id == id end)
       end
 
-    colleagues = TeacherNetworking.get_connections(socket.assigns.current_scope)
+    connections = TeacherNetworking.get_connections(socket.assigns.current_scope)
 
     {:noreply,
-     socket |> assign(:new_colleagues_list, new_list) |> assign(:colleagues, colleagues)}
+     socket |> assign(:new_connections_list, new_list) |> assign(:connections, connections)}
   end
 
   def handle_event("user-remove-connection", %{"id" => id}, socket) do
     TeacherNetworking.remove_connection_by_id(socket.assigns.current_scope, id)
-    colleagues = TeacherNetworking.get_connections(socket.assigns.current_scope)
-    {:noreply, socket |> assign(:colleagues, colleagues)}
+    connections = TeacherNetworking.get_connections(socket.assigns.current_scope)
+    {:noreply, socket |> assign(:connections, connections)}
   end
 end

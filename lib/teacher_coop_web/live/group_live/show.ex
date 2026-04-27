@@ -23,7 +23,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
           </.button>
         </:actions>
       </.header>
-      <.invite_colleague :if={@is_admin} autocomplete={@autocomplete} />
+      <.invite_connection :if={@is_admin} autocomplete={@autocomplete} />
       <.members_list members={@members} current_scope={@current_scope} />
     </Layouts.app>
     """
@@ -31,7 +31,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
 
   attr :autocomplete, :list, default: []
 
-  def invite_colleague(assigns) do
+  def invite_connection(assigns) do
     ~H"""
     <section>
       <.live_component

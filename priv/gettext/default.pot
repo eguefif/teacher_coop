@@ -88,7 +88,7 @@ msgstr ""
 msgid "My Groups"
 msgstr ""
 
-msgid "My Colleagues"
+msgid "My Connections"
 msgstr ""
 
 msgid "Connection Requests"
@@ -115,7 +115,7 @@ msgstr ""
 msgid "An error occured, retry later."
 msgstr ""
 
-## From Colleagues
+## From Connections
 msgid "Invite"
 msgstr ""
 
