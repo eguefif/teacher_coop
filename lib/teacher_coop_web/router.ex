@@ -76,6 +76,8 @@ defmodule TeacherCoopWeb.Router do
 
       live "/connections", WorkspaceLive.ConnectionLive.Index, :index
     end
+
+    get "/file/:id/download", FileController, :download
   end
 
   scope "/", TeacherCoopWeb do

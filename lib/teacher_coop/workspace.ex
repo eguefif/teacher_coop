@@ -63,6 +63,16 @@ defmodule TeacherCoop.Workspace do
     Repo.get_by!(Document, id: id, user_id: scope.user.id)
   end
 
+  def get_file!(%Scope{} = scope, id) do
+    query =
+      from file in File,
+        join: document in Document,
+        on: document.id == file.document_id,
+        where: file.id == ^id and document.user_id == ^scope.user.id
+
+    Repo.one!(query)
+  end
+
   @doc """
   Creates a document.
 
@@ -182,10 +192,6 @@ defmodule TeacherCoop.Workspace do
 
   def validate_change(%Scope{} = scope, %Document{} = document, attrs \\ %{}) do
     Document.changeset(document, attrs, scope)
-  end
-
-  def get_file!(scope, id) do
-    Repo.get_by!(File, id: id, user_id: scope.user.id)
   end
 
   def get_files(id) do

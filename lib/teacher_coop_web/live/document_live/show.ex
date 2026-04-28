@@ -4,6 +4,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
   alias TeacherCoop.Workspace
   alias TeacherCoop.Groups
 
+  # TODO: Returns should return to group when coming from group.
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -84,6 +86,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
       >
         <:col :let={file} label={gettext("Filename")}>{file.filename}</:col>
         <:action :let={file}>
+          <.link navigate={~p"/workspace/file/#{file}/download"}>{gettext("Download")}</.link>
           <.link
             phx-click={JS.push("delete", value: %{id: file.id})}
             data-confirm={gettext("Do you really want to delete this file?")}

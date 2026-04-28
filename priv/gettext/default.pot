@@ -1,157 +1,413 @@
 ## From Search page
+#: lib/teacher_coop_web/live/search_live.ex:12
+#, elixir-autogen
 msgid "Search"
 msgstr ""
 
 ## From Modal
+#: lib/teacher_coop_web/components/core_components.ex:49
+#, elixir-autogen
 msgid "Confirm"
 msgstr ""
 
 ## From Document index
+#: lib/teacher_coop_web/live/document_live/index.ex:43
+#, elixir-autogen
 msgid "Do you really want to delete this document?"
 msgstr ""
 
 ## From Document form
+#: lib/teacher_coop_web/live/document_live/form.ex:31
+#, elixir-autogen
 msgid "Title"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:32
+#: lib/teacher_coop_web/live/document_live/show.ex:69
+#, elixir-autogen
 msgid "Description"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:34
+#, elixir-autogen
 msgid "Curriculum"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:42
+#: lib/teacher_coop_web/live/document_live/tag_input.ex:9
+#, elixir-autogen
 msgid "Tags"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:53
+#, elixir-autogen
 msgid "Save Document"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:52
+#: lib/teacher_coop_web/live/group_live/form.ex:22
+#, elixir-autogen
 msgid "Saving..."
 msgstr ""
 
+#: lib/teacher_coop_web/components/core_components.ex:52
+#: lib/teacher_coop_web/live/document_live/form.ex:56
+#: lib/teacher_coop_web/live/group_live/form.ex:26
+#, elixir-autogen
 msgid "Cancel"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:259
+#, elixir-autogen
 msgid "Edit Document"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:276
+#: lib/teacher_coop_web/live/document_live/index.ex:23
+#, elixir-autogen
 msgid "New Document"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:361
+#, elixir-autogen
 msgid "Document updated successfully"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:376
+#, elixir-autogen
 msgid "Document created successfully"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:163
+#, elixir-autogen
 msgid "Are you sure you want to delete this file?"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:189
+#, elixir-autogen
 msgid "Click to upload or drag and drop"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:191
+#, elixir-autogen
 msgid "up to 8MB"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:196
+#, elixir-autogen
 msgid "No files"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:390
+#, elixir-autogen
 msgid "You added too many files."
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:391
+#, elixir-autogen
 msgid "File too large."
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:392
+#, elixir-autogen
 msgid "This file format is not accepted."
 msgstr ""
 
 ## From Document show
+#: lib/teacher_coop_web/live/document_live/show.ex:62
+#, elixir-autogen
 msgid "Goals"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:156
+#: lib/teacher_coop_web/live/document_live/show.ex:82
+#, elixir-autogen
 msgid "Files"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/show.ex:87
+#, elixir-autogen
 msgid "Filename"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/show.ex:92
+#, elixir-autogen
 msgid "Do you really want to delete this file?"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/index.ex:45
+#: lib/teacher_coop_web/live/document_live/show.ex:94
+#, elixir-autogen
 msgid "Delete"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/show.ex:49
+#, elixir-autogen
 msgid "Edit document"
 msgstr ""
 
 ## From Workspace
+#: lib/teacher_coop_web/live/group_live/index.ex:20
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:20
+#, elixir-autogen
 msgid "My Groups"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/connections_live.ex:13
+#: lib/teacher_coop_web/live/workspace_live/connections_live.ex:45
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:24
+#, elixir-autogen
 msgid "My Connections"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:45
+#, elixir-autogen
 msgid "Connection Requests"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:59
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:94
+#, elixir-autogen
 msgid "Accept"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:66
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:101
+#, elixir-autogen
 msgid "Reject"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:80
+#, elixir-autogen
 msgid "Group Invitations"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:86
+#, elixir-autogen
 msgid "You have been invited in the group"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:133
+#, elixir-autogen
 msgid "Connection request accepted"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:150
+#, elixir-autogen
 msgid "Connection request rejected"
 msgstr ""
 
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:136
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:153
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:167
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:181
+#, elixir-autogen
 msgid "An error occured, retry later."
 msgstr ""
 
 ## From Connections
+#: lib/teacher_coop_web/live/workspace_live/connections_live.ex:32
+#, elixir-autogen
 msgid "Invite"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/show.ex:70
+#: lib/teacher_coop_web/live/workspace_live/connections_live.ex:53
+#, elixir-autogen
 msgid "Are you sure?"
 msgstr ""
 
 ## From Groups
+#: lib/teacher_coop_web/live/group_live/form.ex:58
+#: lib/teacher_coop_web/live/group_live/show.ex:22
+#, elixir-autogen
 msgid "Edit Group"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/show.ex:57
+#, elixir-autogen
 msgid "Members"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/show.ex:59
+#, elixir-autogen
 msgid "Name"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/show.ex:60
+#, elixir-autogen
 msgid "Email"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/show.ex:61
+#, elixir-autogen
 msgid "Role"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:91
+#: lib/teacher_coop_web/live/group_live/show.ex:72
+#, elixir-autogen
 msgid "Remove"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/form.ex:49
+#: lib/teacher_coop_web/live/group_live/index.ex:24
+#, elixir-autogen
 msgid "New Group"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/form.ex:20
+#, elixir-autogen
 msgid "Group name"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/form.ex:23
+#, elixir-autogen
 msgid "Save Group"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/form.ex:82
+#, elixir-autogen
 msgid "Group created successfully"
 msgstr ""
 
+#: lib/teacher_coop_web/live/group_live/form.ex:100
+#, elixir-autogen
 msgid "Group updated successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/components/core_components.ex:395
+#, elixir-autogen, elixir-format
+msgid "Actions"
+msgstr ""
+
+#: lib/teacher_coop_web/components/reusables/autocomplete_input.ex:91
+#, elixir-autogen, elixir-format
+msgid "Add item"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:103
+#: lib/teacher_coop_web/components/layouts.ex:115
+#, elixir-autogen, elixir-format
+msgid "Attempting to reconnect"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex:220
+#, elixir-autogen, elixir-format
+msgid "Cancel upload"
+msgstr ""
+
+#: lib/teacher_coop_web/live/group_live/show.ex:87
+#, elixir-autogen, elixir-format
+msgid "Document Name"
+msgstr ""
+
+#: lib/teacher_coop_web/live/group_live/show.ex:85
+#, elixir-autogen, elixir-format
+msgid "Documents"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex:89
+#, elixir-autogen, elixir-format
+msgid "Download"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/registration.ex:39
+#, elixir-autogen, elixir-format
+msgid "Fullname"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex:108
+#, elixir-autogen, elixir-format
+msgid "Groups"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/index.ex:19
+#, elixir-autogen, elixir-format
+msgid "Listing Documents"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:62
+#, elixir-autogen, elixir-format
+msgid "Log in"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:55
+#, elixir-autogen, elixir-format
+msgid "Log out"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex:43
+#, elixir-autogen, elixir-format
+msgid "Make Private"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex:43
+#, elixir-autogen, elixir-format
+msgid "Make Public"
+msgstr ""
+
+#: lib/teacher_coop_web/live/workspace_live/workspace_live.ex:16
+#, elixir-autogen, elixir-format
+msgid "My Documents"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:59
+#, elixir-autogen, elixir-format
+msgid "Register"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex:164
+#, elixir-autogen, elixir-format
+msgid "Remove file"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex:135
+#, elixir-autogen, elixir-format
+msgid "Remove tag"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:52
+#, elixir-autogen, elixir-format
+msgid "Settings"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex:121
+#, elixir-autogen, elixir-format
+msgid "Share"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:110
+#, elixir-autogen, elixir-format
+msgid "Something went wrong!"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex:129
+#, elixir-autogen, elixir-format
+msgid "Unshare"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:98
+#, elixir-autogen, elixir-format
+msgid "We can't find the internet"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex:113
+#, elixir-autogen, elixir-format
+msgid "Working Group"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts.ex:49
+#, elixir-autogen, elixir-format
+msgid "Workspace"
+msgstr ""
+
+#: lib/teacher_coop_web/components/core_components.ex:101
+#, elixir-autogen, elixir-format
+msgid "close"
+msgstr ""
+
+#: lib/teacher_coop_web/live/group_live/show.ex:89
+#, elixir-autogen, elixir-format
+msgid "show"
 msgstr ""

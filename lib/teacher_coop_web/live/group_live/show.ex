@@ -5,8 +5,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
   alias TeacherCoop.Accounts
   alias TeacherCoopWeb.Reusables
 
-  # TODO: Add download
-
   @impl true
   def render(assigns) do
     ~H"""
