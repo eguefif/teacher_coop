@@ -10,6 +10,7 @@ defmodule TeacherCoop.Workspace.Document do
     field :goals, {:array, :string}
     belongs_to :user, TeacherCoop.Accounts.User
     has_many :files, TeacherCoop.Workspace.File
+    has_many :document_working_group, TeacherCoop.Groups.DocumentWorkingGroup
 
     timestamps(type: :utc_datetime)
   end

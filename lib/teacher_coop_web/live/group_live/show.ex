@@ -5,6 +5,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
   alias TeacherCoop.Accounts
   alias TeacherCoopWeb.Reusables
 
+  # TODO: Add download
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -25,6 +27,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
       </.header>
       <.invite_connection :if={@is_admin} autocomplete={@autocomplete} />
       <.members_list members={@members} current_scope={@current_scope} is_admin={@is_admin} />
+      <.documents_list documents={@documents} />
     </Layouts.app>
     """
   end
@@ -76,11 +79,28 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
     """
   end
 
+  attr :documents, :list, default: []
+
+  def documents_list(assigns) do
+    ~H"""
+    <section :if={@documents != []}>
+      <h2 class="text-lg font-semibold mb-4">{gettext("Documents")}</h2>
+      <.table id="documents" rows={@documents}>
+        <:col :let={document} label={gettext("Document Name")}>{document.title}</:col>
+        <:action :let={document}>
+          <.link navigate={~p"/workspace/documents/#{document}"}>{gettext("show")}</.link>
+        </:action>
+      </.table>
+    </section>
+    """
+  end
+
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     group = Groups.get_group_for_member!(socket.assigns.current_scope, id)
     members = Groups.list_members(group.id)
     is_admin = Groups.is_admin?(socket.assigns.current_scope, group.id)
+    documents = Groups.get_shared_documents(group.id)
 
     {:ok,
      socket
@@ -88,7 +108,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
      |> assign(:group, group)
      |> assign(:is_admin, is_admin)
      |> assign(:members, members)
-     |> assign(:autocomplete, [])}
+     |> assign(:autocomplete, [])
+     |> assign(:documents, documents)}
   end
 
   defp badge_class("admin"), do: "badge-primary"

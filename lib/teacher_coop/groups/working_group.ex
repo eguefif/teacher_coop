@@ -4,6 +4,7 @@ defmodule TeacherCoop.Groups.WorkingGroup do
 
   schema "working_groups" do
     field :name, :string
+    has_many :document_working_group, TeacherCoop.Groups.DocumentWorkingGroup
 
     timestamps(type: :utc_datetime)
   end

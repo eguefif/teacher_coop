@@ -4,8 +4,10 @@ defmodule TeacherCoop.Groups do
   alias TeacherCoop.Repo
   alias TeacherCoop.Groups.Membership
   alias TeacherCoop.Groups.WorkingGroup
+  alias TeacherCoop.Groups.DocumentWorkingGroup
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Accounts.User
+  alias TeacherCoop.Workspace.Document
 
   def get_user_groups(%Scope{} = scope) do
     query =
@@ -133,5 +135,59 @@ defmodule TeacherCoop.Groups do
     |> Membership.changeset(%{role: "rejected"}, invitation.working_group_id, invitation.user_id)
     |> Repo.update()
     |> elem(0)
+  end
+
+  def get_document_groups(%Scope{} = scope, document_id) do
+    query =
+      from m in Membership,
+        join: gr in WorkingGroup,
+        on: gr.id == m.working_group_id,
+        left_join: dg in DocumentWorkingGroup,
+        on: gr.id == dg.working_group_id and ^document_id == dg.document_id,
+        where: m.user_id == ^scope.user.id,
+        select: %{id: gr.id, name: gr.name, shared: not is_nil(dg.id)}
+
+    Repo.all(query)
+  end
+
+  def share_document(%Scope{} = scope, working_group_id, document_id) do
+    query =
+      from gr in WorkingGroup,
+        join: m in Membership,
+        on: gr.id == m.working_group_id,
+        where: gr.id == ^working_group_id and m.user_id == ^scope.user.id
+
+    working_group = Repo.one!(query)
+
+    %DocumentWorkingGroup{}
+    |> DocumentWorkingGroup.changeset(%{
+      working_group_id: working_group.id,
+      document_id: document_id
+    })
+    |> Repo.insert!()
+  end
+
+  def unshare_document(%Scope{} = scope, working_group_id, document_id) do
+    query =
+      from dg in DocumentWorkingGroup,
+        join: gr in WorkingGroup,
+        on: gr.id == dg.working_group_id,
+        join: m in Membership,
+        on: gr.id == m.working_group_id,
+        where:
+          dg.working_group_id == ^working_group_id and dg.document_id == ^document_id and
+            m.user_id == ^scope.user.id
+
+    document_working_group = Repo.one!(query)
+    Repo.delete!(document_working_group)
+  end
+
+  def get_shared_documents(working_group_id) do
+    query =
+      from d in Document,
+        join: dg in DocumentWorkingGroup,
+        on: dg.working_group_id == ^working_group_id
+
+    Repo.all(query)
   end
 end
