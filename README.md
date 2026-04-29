@@ -32,16 +32,31 @@ Login is done via a magic link. In development, emails are not sent — access t
 
 ### Document
 
-- [ ] Tag input
-    - [ ] Reset content when added a new tag
-    - [ ] Fix style autocomplete, width should be stable
-    - [ ] Allow a user to navigate with the keyboard
-- [ ] Add Curriculum selector
+- [ ] Meilisearch
+    - [ ] Add index
+    - [ ] Add script that index new document
+- [ ] Create basic search
 
 ### General
 
 - [ ] Find the right color set
+- [ ] Remake UI
+    - [ ] Main page
+    - [ ] Workspace
+    - [ ] Documents page
+    - [ ] Groups page
+    - [ ] Connections page
+    - [ ] show Group page
+    - [ ] show document page
+    - [ ] form document
+    - [ ] form Group
+    - [ ] settings
 - [ ] Responsiveness
     - [ ] Fix style selector
-    - [ ] Check if document form works
-- [ ] Add authorization system
+- [ ] Finish authorization and check
+- [ ] clean all useless context functions
+
+### Architecture
+
+ - [ ] Refactor current architecture by defining the domain correctly
+ - [ ] Read about schema and context in Phoenix to make the right choice

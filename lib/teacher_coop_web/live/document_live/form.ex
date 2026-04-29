@@ -5,14 +5,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   alias TeacherCoop.Workspace.Document
   alias TeacherCoopWeb.Reusables
 
-  # TODO:
-  # - [ ] Improve UI
-
-  ## Curriculum
-  # The user can choose an curriculum item and customize it.
-  # They can add several curriculum item
-  # It's important that the user does not have to match the item. They can modify it if they want.
-
   @impl true
   def render(assigns) do
     ~H"""

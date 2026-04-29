@@ -4,8 +4,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
   alias TeacherCoop.Workspace
   alias TeacherCoop.Groups
 
-  # TODO: Returns should return to group when coming from group.
-
   @impl true
   def render(assigns) do
     ~H"""

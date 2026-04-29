@@ -2,16 +2,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Index do
   use TeacherCoopWeb, :live_view
   alias TeacherCoop.Groups
 
-  # TODO:
-  # - [ ] Add button to add groups
-  # - [ ] Add link and show group page and route
-  # - [ ] Add a search for group
-
-  # TODO: 
-  # - [ ] Show group
-  #   - [ ] Add member using a search
-  #   - [ ] list member and add a button to promote admin or demote
-
   @impl true
   def render(assigns) do
     ~H"""

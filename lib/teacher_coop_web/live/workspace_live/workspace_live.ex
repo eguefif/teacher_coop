@@ -4,8 +4,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.Workspace do
   alias TeacherCoop.TeacherNetworking
   alias TeacherCoop.Groups
 
-  # TODO: add group invitation, allow to accept or reject
-
   @impl true
   def render(assigns) do
     ~H"""
