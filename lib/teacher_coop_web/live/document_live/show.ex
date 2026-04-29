@@ -36,7 +36,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
         </article>
       </div>
       <:actions>
-        <.button navigate={~p"/workspace/documents"}>
+        <.button onclick="history.back(); return false;">
           <.icon name="hero-arrow-left" />
         </.button>
         <.button variant="primary" phx-click="toggle-public" phx-value-id={@document.id}>
@@ -135,11 +135,12 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
   end
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
+  def mount(params, _session, socket) do
     if connected?(socket) do
       Workspace.subscribe_documents(socket.assigns.current_scope)
     end
 
+    id = params["id"]
     document = Workspace.get_document!(socket.assigns.current_scope, id)
     groups = Groups.get_document_groups(socket.assigns.current_scope, id)
 

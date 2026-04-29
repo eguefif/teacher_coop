@@ -28,14 +28,18 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
         <.table
           id="documents"
           rows={@streams.documents}
-          row_click={fn {_id, document} -> JS.navigate(~p"/workspace/documents/#{document}") end}
+          row_click={
+            fn {_id, document} ->
+              JS.navigate(~p"/workspace/documents/#{document}?return_to=index")
+            end
+          }
         >
           <:col :let={{_id, document}} label="Title">{document.title}</:col>
           <:action :let={{_id, document}}>
             <div class="sr-only">
-              <.link navigate={~p"/workspace/documents/#{document}"}>Show</.link>
+              <.link navigate={~p"/workspace/documents/#{document}?return_to=index"}>Show</.link>
             </div>
-            <.link navigate={~p"/workspace/documents/#{document}/edit"}>Edit</.link>
+            <.link navigate={~p"/workspace/documents/#{document}/edit?return_to=index"}>Edit</.link>
           </:action>
           <:action :let={{_id, document}}>
             <.link

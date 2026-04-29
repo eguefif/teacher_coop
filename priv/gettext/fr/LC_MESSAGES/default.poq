@@ -168,3 +168,78 @@ msgstr "Groupe créé avec succès"
 
 msgid "Group updated successfully"
 msgstr "Groupe mis à jour avec succès"
+
+## From Document form (new)
+msgid "Curriculum"
+msgstr "Programme"
+
+msgid "Tags"
+msgstr "Étiquettes"
+
+msgid "Are you sure you want to delete this file?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce fichier ?"
+
+msgid "Cancel upload"
+msgstr "Annuler le téléversement"
+
+msgid "Remove tag"
+msgstr "Supprimer l'étiquette"
+
+msgid "Remove file"
+msgstr "Supprimer le fichier"
+
+## From Document show (new)
+msgid "Make Public"
+msgstr "Rendre public"
+
+msgid "Make Private"
+msgstr "Rendre privé"
+
+msgid "Groups"
+msgstr "Groupes"
+
+msgid "Working Group"
+msgstr "Groupe de travail"
+
+msgid "Share"
+msgstr "Partager"
+
+msgid "Unshare"
+msgstr "Ne plus partager"
+
+msgid "Download"
+msgstr "Télécharger"
+
+## From Document index (new)
+msgid "Listing Documents"
+msgstr "Liste des documents"
+
+## From Group show (new)
+msgid "Documents"
+msgstr "Documents"
+
+msgid "Document Name"
+msgstr "Nom du document"
+
+msgid "show"
+msgstr "afficher"
+
+## From Layout (new)
+msgid "Attempting to reconnect"
+msgstr "Tentative de reconnexion..."
+
+msgid "Something went wrong!"
+msgstr "Quelque chose s'est mal passé !"
+
+msgid "We can't find the internet"
+msgstr "Pas de connexion internet"
+
+## From Components (new)
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Add item"
+msgstr "Ajouter un élément"
+
+msgid "close"
+msgstr "fermer"

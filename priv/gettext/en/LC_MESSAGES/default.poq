@@ -153,3 +153,93 @@ msgstr "Group created successfully"
 
 msgid "Group updated successfully"
 msgstr "Group updated successfully"
+
+## From Document form (new)
+msgid "Curriculum"
+msgstr "Curriculum"
+
+msgid "Tags"
+msgstr "Tags"
+
+msgid "Are you sure you want to delete this file?"
+msgstr "Are you sure you want to delete this file?"
+
+msgid "Cancel upload"
+msgstr "Cancel upload"
+
+msgid "Remove tag"
+msgstr "Remove tag"
+
+msgid "Remove file"
+msgstr "Remove file"
+
+## From Document show (new)
+msgid "Make Public"
+msgstr "Make Public"
+
+msgid "Make Private"
+msgstr "Make Private"
+
+msgid "Groups"
+msgstr "Groups"
+
+msgid "Working Group"
+msgstr "Working Group"
+
+msgid "Share"
+msgstr "Share"
+
+msgid "Unshare"
+msgstr "Unshare"
+
+msgid "Download"
+msgstr "Download"
+
+## From Document index (new)
+msgid "Listing Documents"
+msgstr "Listing Documents"
+
+## From Group show (new)
+msgid "Documents"
+msgstr "Documents"
+
+msgid "Document Name"
+msgstr "Document Name"
+
+msgid "show"
+msgstr "show"
+
+## From Layout (new)
+msgid "Workspace"
+msgstr "Workspace"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Log out"
+msgstr "Log out"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Log in"
+msgstr "Log in"
+
+msgid "Attempting to reconnect"
+msgstr "Attempting to reconnect"
+
+msgid "Something went wrong!"
+msgstr "Something went wrong!"
+
+msgid "We can't find the internet"
+msgstr "We can't find the internet"
+
+## From Components (new)
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Add item"
+msgstr "Add item"
+
+msgid "close"
+msgstr "close"

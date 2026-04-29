@@ -83,11 +83,16 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
     ~H"""
     <section :if={@documents != []}>
       <h2 class="text-lg font-semibold mb-4">{gettext("Documents")}</h2>
-      <.table id="documents" rows={@documents}>
+      <.table
+        id="documents"
+        rows={@documents}
+        row_click={
+          fn document ->
+            JS.navigate(~p"/workspace/documents/#{document}")
+          end
+        }
+      >
         <:col :let={document} label={gettext("Document Name")}>{document.title}</:col>
-        <:action :let={document}>
-          <.link navigate={~p"/workspace/documents/#{document}"}>{gettext("show")}</.link>
-        </:action>
       </.table>
     </section>
     """
