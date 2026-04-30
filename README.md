@@ -53,8 +53,11 @@ Login is done via a magic link. In development, emails are not sent — access t
     - [ ] settings
 - [ ] Responsiveness
     - [ ] Fix style selector
-- [ ] Finish authorization and check
 - [ ] clean all useless context functions
+
+### Authorization
+- [ ] Find a pattern/architecture for authorization (see function `accessible_document`)
+- [ ] Do TODO authorization and check
 
 ### Architecture
 

@@ -9,6 +9,8 @@ defmodule TeacherCoop.Workspace do
   alias TeacherCoop.Workspace.Document
   alias TeacherCoop.Workspace.Tags
   alias TeacherCoop.Workspace.File
+  alias TeacherCoop.Workspace.Groups.Membership
+  alias TeacherCoop.Workspace.Groups.DocumentWorkingGroup
   alias TeacherCoop.Accounts.Scope
 
   def list_documents(%Scope{} = scope) do
@@ -16,7 +18,21 @@ defmodule TeacherCoop.Workspace do
   end
 
   def get_document!(%Scope{} = scope, id) do
-    Repo.get_by!(Document, id: id, user_id: scope.user.id)
+    accessible_document(scope)
+    |> Repo.get_by!(id: id)
+  end
+
+  defp accessible_document(%Scope{} = scope) do
+    # TODO: Test this function:
+    # 1. if the user is the owner
+    # 2. If the document is public
+    # 3. If the user is in a group that has the document
+    from d in Document,
+      join: m in Membership,
+      on: m.user_id == ^scope.user.id,
+      left_join: dg in DocumentWorkingGroup,
+      on: dg.working_group_id == m.working_group_id,
+      where: d.user_id == ^scope.user.id or d.public == true or not is_nil(dg.id)
   end
 
   def get_file!(%Scope{} = scope, id) do

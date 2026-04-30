@@ -124,6 +124,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
               JS.push("unshare-document", value: %{document_id: @document_id, group_id: group.id})
             }
           >
+            <!-- TODO: Check policy: only the owner of the document should be able to unshare -->
             {gettext("Unshare")}
           </.link>
         </:action>
