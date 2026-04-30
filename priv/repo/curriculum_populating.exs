@@ -1,3 +1,10 @@
+# Seed script for curriculum data.
+#
+# Reads curriculum files from priv/repo/curriculum/, parses them into structured
+# entries, and performs two operations:
+#   1. Populates the `curriculum_items` database table via Ecto (truncates first).
+#   2. Indexes the entries into Meilisearch under the "curriculum" index.
+
 import Ecto.Query, only: [from: 2]
 alias TeacherCoop.Repo
 alias TeacherCoop.Workspace.Curriculum.CurriculumItem
