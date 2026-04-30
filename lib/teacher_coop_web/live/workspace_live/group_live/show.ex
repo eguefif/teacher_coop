@@ -143,12 +143,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
 
   @impl true
   def handle_info({:user_typing, user_input}, socket) do
-    IO.puts("In handle info: " <> user_input)
-
     results =
       Accounts.search_user_in_current_user_connections(socket.assigns.current_scope, user_input)
       |> Enum.map(fn entry -> %{id: entry.id, value: entry.fullname} end)
 
+    IO.inspect(results)
     {:noreply, socket |> assign(:autocomplete, results)}
   end
 end

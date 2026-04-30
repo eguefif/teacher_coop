@@ -11,11 +11,10 @@ defmodule TeacherCoop.Workspace.Groups.Membership do
   end
 
   @doc false
-  def changeset(membership, attrs, group_id, user_id) do
+  def changeset(membership, attrs) do
     membership
-    |> cast(attrs, [:role])
-    |> validate_required([:role])
-    |> put_change(:user_id, user_id)
-    |> put_change(:working_group_id, group_id)
+    |> cast(attrs, [:role, :working_group_id, :user_id])
+    |> validate_required([:role, :working_group_id, :user_id])
+    |> unique_constraint([:working_group_id, :user_id])
   end
 end

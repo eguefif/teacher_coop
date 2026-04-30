@@ -89,7 +89,7 @@ defmodule TeacherCoop.MixProject do
         "run priv/repo/meilisearch_documents_populating.exs"
       ],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup", "run priv/repo/curriculum.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup", "run priv/repo/curriculum_populating.exs"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["compile", "tailwind teacher_coop", "esbuild teacher_coop"],

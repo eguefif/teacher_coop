@@ -57,10 +57,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Workspace.subscribe_documents(socket.assigns.current_scope)
-    end
-
     {:ok,
      socket
      |> assign(:page_title, "Listing Documents")

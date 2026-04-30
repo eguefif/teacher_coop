@@ -60,3 +60,7 @@ Login is done via a magic link. In development, emails are not sent — access t
 
  - [x] Refactor current architecture by defining the domain correctly
  - [ ] Read about schema and context in Phoenix to make the right choice
+
+
+### Fix
+- [ ] Fix autocomplete document form curriculum: when usingkeyboard nav, selection with enter does not work

@@ -73,7 +73,11 @@ defmodule TeacherCoop.Workspace.Groups do
         |> Repo.insert!()
 
       %Membership{}
-      |> Membership.changeset(%{role: "admin"}, group, scope)
+      |> Membership.changeset(%{
+        role: "admin",
+        working_group_id: group.id,
+        user_id: scope.user.id
+      })
       |> Repo.insert!()
     end)
   end
@@ -86,7 +90,11 @@ defmodule TeacherCoop.Workspace.Groups do
   def invite_user_to_group(%Scope{} = _scope, group_id, user_id) do
     # TODO: check if scope.user is admin // Also display the add user if the user is admin
     %Membership{}
-    |> Membership.changeset(%{role: "invited"}, group_id, user_id)
+    |> Membership.changeset(%{
+      role: "admin",
+      working_group_id: group_id,
+      user_id: user_id
+    })
     |> Repo.insert!()
   end
 
@@ -123,7 +131,11 @@ defmodule TeacherCoop.Workspace.Groups do
     invitation = Repo.get_by!(Membership, user_id: scope.user.id, id: id)
 
     invitation
-    |> Membership.changeset(%{role: "member"}, invitation.working_group_id, invitation.user_id)
+    |> Membership.changeset(%{
+      role: "member",
+      working_group_id: invitation.working_group_id,
+      user_id: invitation.user_id
+    })
     |> Repo.update()
     |> elem(0)
   end
@@ -132,7 +144,11 @@ defmodule TeacherCoop.Workspace.Groups do
     invitation = Repo.get_by!(Membership, user_id: scope.user.id, id: id)
 
     invitation
-    |> Membership.changeset(%{role: "rejected"}, invitation.working_group_id, invitation.user_id)
+    |> Membership.changeset(%{
+      role: "rejected",
+      working_group_id: invitation.working_group_id,
+      user_id: invitation.user_id
+    })
     |> Repo.update()
     |> elem(0)
   end
