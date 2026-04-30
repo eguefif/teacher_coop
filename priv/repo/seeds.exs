@@ -12,9 +12,9 @@
 
 alias TeacherCoop.Repo
 alias TeacherCoop.Accounts.User
-alias TeacherCoop.Groups.WorkingGroup
-alias TeacherCoop.Groups.Membership
-alias TeacherCoop.Connection
+alias TeacherCoop.Workspace.Groups.WorkingGroup
+alias TeacherCoop.Workspace.Groups.Membership
+alias TeacherCoop.Workspace.Connection
 
 user =
   Repo.insert!(%User{

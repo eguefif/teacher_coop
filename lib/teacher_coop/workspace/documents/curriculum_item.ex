@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Curriculum.CurriculumItem do
+defmodule TeacherCoop.Workspace.Curriculum.CurriculumItem do
   use Ecto.Schema
   import Ecto.Changeset
 

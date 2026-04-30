@@ -1,7 +1,7 @@
 defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
   use TeacherCoopWeb, :live_view
 
-  alias TeacherCoop.TeacherNetworking
+  alias TeacherCoop.Workspace.TeacherNetworking
   alias TeacherCoop.Accounts
   alias TeacherCoopWeb.Reusables
 

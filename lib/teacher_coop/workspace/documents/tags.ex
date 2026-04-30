@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Tags do
+defmodule TeacherCoop.Workspace.Tags do
   @tags %{
     # Grade
     1 => "ps",

@@ -5,7 +5,7 @@ defmodule TeacherCoop.Accounts do
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
-  alias TeacherCoop.Connection
+  alias TeacherCoop.Workspace.Connection
 
   alias TeacherCoop.Accounts.{User, UserToken, UserNotifier, Scope}
 

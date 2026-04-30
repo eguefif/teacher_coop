@@ -1,7 +1,7 @@
 defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
   use TeacherCoopWeb, :live_view
 
-  alias TeacherCoop.Groups
+  alias TeacherCoop.Workspace.Groups
   alias TeacherCoop.Accounts
   alias TeacherCoopWeb.Reusables
 

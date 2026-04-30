@@ -2,7 +2,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
   use TeacherCoopWeb, :live_view
 
   alias TeacherCoop.Workspace
-  alias TeacherCoop.Groups
+  alias TeacherCoop.Workspace.Groups
 
   @impl true
   def render(assigns) do

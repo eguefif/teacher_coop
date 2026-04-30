@@ -1,10 +1,10 @@
-defmodule TeacherCoop.TeacherNetworking do
+defmodule TeacherCoop.Workspace.TeacherNetworking do
   import Ecto.Query, only: [from: 2]
 
   alias TeacherCoop.Repo
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Accounts.User
-  alias TeacherCoop.Connection
+  alias TeacherCoop.Workspace.Connection
 
   def get_pending_connections(%Scope{} = scope) do
     user_id = scope.user.id

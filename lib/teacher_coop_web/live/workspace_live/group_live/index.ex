@@ -1,6 +1,6 @@
 defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Index do
   use TeacherCoopWeb, :live_view
-  alias TeacherCoop.Groups
+  alias TeacherCoop.Workspace.Groups
 
   @impl true
   def render(assigns) do

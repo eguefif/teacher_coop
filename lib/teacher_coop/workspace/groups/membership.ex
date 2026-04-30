@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Groups.Membership do
+defmodule TeacherCoop.Workspace.Groups.Membership do
   use Ecto.Schema
   import Ecto.Changeset
 

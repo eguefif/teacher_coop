@@ -1,6 +1,6 @@
 import Ecto.Query, only: [from: 2]
 alias TeacherCoop.Repo
-alias TeacherCoop.Curriculum.CurriculumItem
+alias TeacherCoop.Workspace.Curriculum.CurriculumItem
 
 {:ok, _} = Repo.query("TRUNCATE curriculum_items", [])
 

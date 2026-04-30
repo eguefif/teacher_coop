@@ -1,10 +1,10 @@
-defmodule TeacherCoop.Groups.WorkingGroup do
+defmodule TeacherCoop.Workspace.Groups.WorkingGroup do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "working_groups" do
     field :name, :string
-    has_many :document_working_group, TeacherCoop.Groups.DocumentWorkingGroup
+    has_many :document_working_group, TeacherCoop.Workspace.Groups.DocumentWorkingGroup
 
     timestamps(type: :utc_datetime)
   end

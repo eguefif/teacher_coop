@@ -1,10 +1,10 @@
-defmodule TeacherCoop.Groups do
+defmodule TeacherCoop.Workspace.Groups do
   import Ecto.Query, only: [from: 2]
 
   alias TeacherCoop.Repo
-  alias TeacherCoop.Groups.Membership
-  alias TeacherCoop.Groups.WorkingGroup
-  alias TeacherCoop.Groups.DocumentWorkingGroup
+  alias TeacherCoop.Workspace.Groups.Membership
+  alias TeacherCoop.Workspace.Groups.WorkingGroup
+  alias TeacherCoop.Workspace.Groups.DocumentWorkingGroup
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Accounts.User
   alias TeacherCoop.Workspace.Document

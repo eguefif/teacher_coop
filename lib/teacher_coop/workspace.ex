@@ -7,6 +7,7 @@ defmodule TeacherCoop.Workspace do
   alias TeacherCoop.Repo
 
   alias TeacherCoop.Workspace.Document
+  alias TeacherCoop.Workspace.Tags
   alias TeacherCoop.Workspace.File
   alias TeacherCoop.Accounts.Scope
 
@@ -210,7 +211,7 @@ defmodule TeacherCoop.Workspace do
   end
 
   def autocomplete_tags(tag) do
-    TeacherCoop.Tags.get_all_tags()
+    Tags.get_all_tags()
     |> Enum.map(fn entry -> {entry, String.jaro_distance(entry, tag)} end)
     |> Enum.filter(fn {_, jaro} -> jaro > 0.5 end)
     |> Enum.sort(fn {_, jaro1}, {_, jaro2} -> jaro1 > jaro2 end)

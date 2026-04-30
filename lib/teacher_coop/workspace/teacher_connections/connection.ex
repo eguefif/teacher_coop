@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Connection do
+defmodule TeacherCoop.Workspace.Connection do
   use Ecto.Schema
   import Ecto.Changeset
 

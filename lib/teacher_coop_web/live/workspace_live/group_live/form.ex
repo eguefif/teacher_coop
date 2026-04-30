@@ -1,8 +1,9 @@
 defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Form do
   use TeacherCoopWeb, :live_view
 
-  alias TeacherCoop.Groups
-  alias TeacherCoop.Groups.WorkingGroup
+  alias TeacherCoop.Workspace.Groups
+  alias TeacherCoop.Workspace.Groups.WorkingGroup
+
   @impl true
   def render(assigns) do
     ~H"""

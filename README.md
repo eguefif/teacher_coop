@@ -60,3 +60,6 @@ Login is done via a magic link. In development, emails are not sent — access t
 
  - [ ] Refactor current architecture by defining the domain correctly
  - [ ] Read about schema and context in Phoenix to make the right choice
+
+
+ ## Architecture
