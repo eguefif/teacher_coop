@@ -449,6 +449,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   def handle_info({:curriculum_typing, value}, socket) when byte_size(value) > 3 do
     results = Workspace.autocomplete_curriculum(value)
+    IO.inspect(results)
     {:noreply, socket |> assign(:autocomplete_curriculum, results) |> assign(:curriculum, value)}
   end
 

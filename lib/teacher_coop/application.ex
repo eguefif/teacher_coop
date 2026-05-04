@@ -7,14 +7,21 @@ defmodule TeacherCoop.Application do
 
   @impl true
   def start(_type, _args) do
+    unless Mix.env() == :prod do
+      Dotenv.load()
+    end
+
     children = [
       TeacherCoopWeb.Telemetry,
       TeacherCoop.Repo,
       {DNSCluster, query: Application.get_env(:teacher_coop, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TeacherCoop.PubSub},
-      # Start a worker by calling: TeacherCoop.Worker.start_link(arg)
-      # {TeacherCoop.Worker, arg},
-      # Start to serve requests, typically the last entry
+      {Finch, name: :search_finch},
+      {Meilisearch,
+       name: :meili_teachercoop,
+       endpoint: Dotenv.get("MEILISEARCH_HOST", "http://127.0.0.1:7700"),
+       key: Dotenv.get("MEILI_MASTER_KEY", ""),
+       finch: :search_finch},
       TeacherCoopWeb.Endpoint
     ]
 

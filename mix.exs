@@ -40,7 +40,9 @@ defmodule TeacherCoop.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:meilisearch, "~> 0.20.0"},
+      {:dotenv, "~> 3.1"},
+      {:finch, "~> 0.21.0"},
+      {:meilisearch_ex, "~> 1.2.1"},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.8.5"},
       {:phoenix_ecto, "~> 4.5"},
@@ -61,7 +63,7 @@ defmodule TeacherCoop.MixProject do
        compile: false,
        depth: 1},
       {:swoosh, "~> 1.16"},
-      {:req, "~> 0.5"},
+      {:req, "~> 0.5.17"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 1.0"},

@@ -46,21 +46,28 @@ defmodule TeacherCoop.Workspace do
   end
 
   def create_document(%Scope{} = scope, files, attrs) do
-    Repo.transaction(fn ->
-      document =
-        %Document{}
-        |> Document.changeset(attrs, scope)
-        |> Repo.insert!()
+    document =
+      Repo.transaction(fn ->
+        document =
+          %Document{}
+          |> Document.changeset(attrs, scope)
+          |> Repo.insert!()
 
-      Enum.each(files, fn file ->
-        %File{}
-        |> File.changeset(file, scope)
-        |> Ecto.Changeset.put_change(:document_id, document.id)
-        |> Repo.insert!()
+        Enum.each(files, fn file ->
+          %File{}
+          |> File.changeset(file, scope)
+          |> Ecto.Changeset.put_change(:document_id, document.id)
+          |> Repo.insert!()
+        end)
+
+        document
       end)
 
-      document
-    end)
+    :meili_teachercoop
+    |> Meilisearch.client()
+    |> Meilisearch.Document.create_or_update("documents", document)
+
+    document
   end
 
   def update_document(%Scope{} = scope, %Document{} = document, files, attrs) do
@@ -123,12 +130,12 @@ defmodule TeacherCoop.Workspace do
   end
 
   def autocomplete_curriculum(curriculum) do
-    {:ok, results} = Meilisearch.Search.search("curriculum", curriculum, limit: 15)
+    {:ok, results} =
+      :meili_teachercoop
+      |> Meilisearch.client()
+      |> Meilisearch.Search.search("curriculum", q: curriculum, limit: 15)
 
-    case Map.get(results, "hits") do
-      nil -> []
-      hits -> Enum.map(hits, fn hit -> %{id: Map.get(hit, "id"), value: Map.get(hit, "item")} end)
-    end
+    Enum.map(results.hits, fn hit -> %{id: Map.get(hit, "id"), value: Map.get(hit, "item")} end)
   end
 
   def update_public(%Scope{} = scope, id, value) do
