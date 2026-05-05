@@ -4,8 +4,9 @@ defmodule TeacherCoop.Workspace do
   """
 
   import Ecto.Query, warn: false
-  alias TeacherCoop.Repo
 
+  alias TeacherCoop.Repo
+  alias Ecto.Multi
   alias TeacherCoop.Workspace.Document
   alias TeacherCoop.Workspace.Tags
   alias TeacherCoop.Workspace.File
@@ -46,12 +47,12 @@ defmodule TeacherCoop.Workspace do
   end
 
   def create_document(%Scope{} = scope, files, attrs) do
-    document =
+    result =
       Repo.transaction(fn ->
         document =
           %Document{}
           |> Document.changeset(attrs, scope)
-          |> Repo.insert!()
+          |> Repo.insert()
 
         Enum.each(files, fn file ->
           %File{}
@@ -63,37 +64,78 @@ defmodule TeacherCoop.Workspace do
         document
       end)
 
+    document = elem(result, 1)
+
+    meili_doc = %{
+      id: document.id,
+      public: document.public,
+      tags: document.tags,
+      goals: document.goals,
+      author: document.user_id
+    }
+
     :meili_teachercoop
     |> Meilisearch.client()
-    |> Meilisearch.Document.create_or_update("documents", document)
+    |> Meilisearch.Document.create_or_update("documents", meili_doc)
 
-    document
+    result
   end
 
   def update_document(%Scope{} = scope, %Document{} = document, files, attrs) do
+    document = Repo.get!(Document, document.id)
     true = document.user_id == scope.user.id
 
-    Repo.transaction(fn ->
-      document =
-        document
-        |> Document.changeset(attrs, scope)
-        |> Repo.update!()
+    document_changeset = Document.changeset(document, attrs, scope)
 
-      Enum.each(files, fn file ->
-        %File{}
-        |> File.changeset(file, scope)
-        |> Ecto.Changeset.put_change(:document_id, document.id)
-        |> Repo.insert!()
-      end)
+    result =
+      Multi.new()
+      |> Multi.update(:update_document, document_changeset)
+      |> Multi.insert_all(:insert_files, File, files)
+      |> Repo.transact()
 
-      document
-    end)
+    case result do
+      {:ok, update_document: document, insert_files: _files} ->
+        update_meilisearch_document(document)
+
+      {:error, :update_document, failed_value, _changes_so_far} ->
+        {:error_document, failed_value}
+
+      {:error, :insert_files, failed_value, _changes_so_far} ->
+        {:error_files, failed_value}
+    end
+  end
+
+  defp update_meilisearch_document(document) do
+    meili_doc = %{
+      id: document.id,
+      public: document.public,
+      tags: document.tags,
+      goals: document.goals,
+      author: document.user_id
+    }
+
+    :meili_teachercoop
+    |> Meilisearch.client()
+    |> Meilisearch.Document.create_or_update("documents", meili_doc)
   end
 
   def delete_document(%Scope{} = scope, %Document{} = document) do
+    # TODO: Check authorization
+    document = Repo.get(Document, document.id)
     true = document.user_id == scope.user.id
 
-    Repo.delete(document)
+    files_query = from file in File, where: file.document_id == ^document.id, select: file.id
+
+    # TODO: Refactor meilisearch in background job to handle retry and make
+    # sure updates are eventually done.
+    :meili_teachercoop
+    |> Meilisearch.client()
+    |> Meilisearch.Document.delete_one("documents", document.id)
+
+    Repo.transaction(fn ->
+      Repo.delete_all(files_query)
+      Repo.delete(document)
+    end)
   end
 
   def change_document(%Scope{} = scope, %Document{} = document, attrs \\ %{}) do

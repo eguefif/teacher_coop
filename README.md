@@ -33,12 +33,19 @@ Login is done via a magic link. In development, emails are not sent — access t
 ### Document
 
 - [ ] Meilisearch
-    - [ ] Add index
-    - [ ] Add script that index new document
+    - [x] Add index
+    - [x] Add logic that index new/update/delete document
+    - [ ] Extract into background job to be sure we index things/ handle retry
 - [ ] Create basic search
+
+### Database
+- [ ] Add type: :utc_datetime to timestamps in migrations
+- [ ] Use elixir type and the right configuration: size default value is not always wanted
+- [ ] Check for null constraints. We want to put as many constraints in the database as possible
 
 ### General
 
+- [ ] Configure Elixir to use tzdata if Phoenix does not already do it
 - [ ] Find the right color set
 - [ ] Remake UI
     - [ ] Main page

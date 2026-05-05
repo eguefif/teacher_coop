@@ -28,8 +28,6 @@ user2 =
     fullname: "Gemini Jupiter"
   })
 
-users = []
-
 for {email, fullname} <- [
       {"marie@localhost.fr", "Marie Curie"},
       {"albert@localhost.fr", "Albert Einstein"},
@@ -53,7 +51,6 @@ for {email, fullname} <- [
       {"chloe@localhost.fr", "Chloe Dubois"}
     ] do
   user_tmp = Repo.insert!(%User{email: email, fullname: fullname})
-  users = [user_tmp | users]
 end
 
 Repo.insert!(%Connection{

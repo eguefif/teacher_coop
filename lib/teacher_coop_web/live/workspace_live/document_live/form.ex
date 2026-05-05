@@ -354,9 +354,6 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, document)
          )}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
 

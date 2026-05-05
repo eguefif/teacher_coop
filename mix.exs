@@ -90,7 +90,12 @@ defmodule TeacherCoop.MixProject do
         "run priv/repo/curriculum_populating.exs",
         "run priv/repo/meilisearch_documents_populating.exs"
       ],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": [
+        "ecto.create",
+        "ecto.migrate",
+        "run priv/repo/seeds.exs",
+        "run priv/repo/meilisearch_documents_populating.exs"
+      ],
       "ecto.reset": ["ecto.drop", "ecto.setup", "run priv/repo/curriculum_populating.exs"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
@@ -101,7 +106,7 @@ defmodule TeacherCoop.MixProject do
         "phx.digest"
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
-      curriculum: ["run priv/repo/curriculum.exs"]
+      curriculum: ["run priv/repo/curriculum_populating.exs"]
     ]
   end
 end

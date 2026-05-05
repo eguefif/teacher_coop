@@ -9,6 +9,8 @@ import Ecto.Query, only: [from: 2]
 alias TeacherCoop.Repo
 alias TeacherCoop.Workspace.Curriculum.CurriculumItem
 
+Dotenv.load()
+
 {:ok, _} = Repo.query("TRUNCATE curriculum_items", [])
 
 {:ok, cwd} = File.cwd()
@@ -84,32 +86,60 @@ defmodule CurriculumMeilisearch do
   """
 
   def index_entries(entries) do
-    if Meilisearch.Indexes.exists?("curriculum") == {:ok, false} do
-      {:ok, task} = Meilisearch.Indexes.delete("curriculum")
-      wait_for_task(task, "Delete index")
-      {:ok, task} = Meilisearch.Indexes.create("curriculum")
-      wait_for_task(task, "Create index")
+    meili_master_key = Dotenv.get("MEILI_MASTER_KEY")
+    meili_host = Dotenv.get("MEILISEARCH_HOST")
+    Finch.start_link(name: :meili_finch)
+
+    client =
+      [endpoint: meili_host, key: meili_master_key, finch: :meili_finch]
+      |> Meilisearch.Client.new()
+
+    case Meilisearch.Index.get(client, "curriculum") do
+      {:ok, _} ->
+        {:ok, task} = Meilisearch.Index.delete(client, "curriculum")
+        wait_for_task(client, task, "Delete index")
+
+      {:error,
+       %Meilisearch.Error{
+         message: "Index `curriculum` not found.",
+         link: "https://docs.meilisearch.com/errors#index_not_found",
+         type: :invalid_request,
+         code: :index_not_found
+       }, 404} ->
+        IO.puts("Index Curriculum not found")
+
+      _ ->
+        IO.puts("Error checking if index Curriculum exists")
     end
 
-    {:ok, task} = Meilisearch.Documents.add_or_replace("curriculum", entries)
-    wait_for_task(task, "Add documents")
-    IO.inspect(task)
+    {:ok, task} = Meilisearch.Index.create(client, %{uid: "curriculum", primaryKey: "id"})
+    wait_for_task(client, task, "Create index")
+
+    {:ok, task} = Meilisearch.Document.create_or_replace(client, "curriculum", entries)
+    wait_for_task(client, task, "Add documents")
     IO.puts("Indexed curriculum into meilisearch")
   end
 
-  defp wait_for_task(task, task_type) do
+  defp wait_for_task(client, task, task_type) do
     {:ok, response} =
-      Meilisearch.HTTP.get("/tasks/" <> Integer.to_string(Map.get(task, "taskUid")))
+      Meilisearch.Task.get(client, task.taskUid)
 
-    task_status = response.body
+    case Map.get(response, "status") do
+      :enqueued ->
+        Process.sleep(500)
+        wait_for_task(client, task, task_type)
 
-    case Map.get(task_status, "status") do
-      "enqueued" -> Process.sleep(500)
-      "processing" -> Process.sleep(500)
-      status -> IO.puts("Task " <> task_type <> " done with status " <> status)
+      :processing ->
+        Process.sleep(500)
+        wait_for_task(client, task, task_type)
+
+      status ->
+        IO.puts("Task " <> task_type <> " done with status #{status}")
     end
   end
 end
+
+IO.puts("\n************** Indexing Curriculum *********************\n")
 
 entries =
   CurriculumFile.build_curriculum_files(base_path)
@@ -121,5 +151,7 @@ query =
   from c in CurriculumItem,
     select: %{id: c.id, strand: c.strand, grade: c.grade, item: c.item, subject: c.subject},
     where: c.year == 2024
+
+entries = Repo.all(query)
 
 CurriculumMeilisearch.index_entries(entries)
