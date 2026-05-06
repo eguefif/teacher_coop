@@ -35,7 +35,7 @@ defmodule TeacherCoopWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8 max-w-sm lg:max-w-4xl mx-auto">
+    <header class="navbar px-4 sm:px-6 lg:px-8 max-w-sm lg:max-w-4xl mx-auto bg-base-300 rounded-xl mt-4">
       <div class="flex-1">
         <a href="/" class="flex-1 flex w-fit items-center gap-2">
           <h1 class="text-xl">Teacher Coop</h1>
@@ -126,7 +126,7 @@ defmodule TeacherCoopWeb.Layouts do
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
+    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-200 rounded-full">
       <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 transition-[left]" />
 
       <button
