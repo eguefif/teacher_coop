@@ -10,16 +10,15 @@ defmodule TeacherCoopWeb.SearchLive do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="flex flex-col items-center gap-4">
-        <.header>{gettext("Search")}</.header>
+      <div>
         <.form
           for={@form}
           id="search_form"
           phx-submit="search"
           phx-change="validate"
-          class="flex flex-col items-center gap-4"
+          class="flex flex-col items-center gap-12"
         >
-          <.input field={@form[:search]} type="text" />
+          <.input field={@form[:search]} type="search" />
           <.button>{gettext("Submit")}</.button>
         </.form>
       </div>
