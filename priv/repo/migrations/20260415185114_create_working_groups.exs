@@ -3,7 +3,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateWorkingGroups do
 
   def change do
     create table(:working_groups) do
-      add :name, :string
+      add :name, :string, null: false
 
       timestamps(type: :utc_datetime)
     end

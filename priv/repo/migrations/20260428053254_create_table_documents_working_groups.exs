@@ -3,8 +3,8 @@ defmodule TeacherCoop.Repo.Migrations.CreateTableDocumentsWorkingGroups do
 
   def change do
     create table(:documents_working_groups) do
-      add :document_id, references(:documents, on_delete: :delete_all)
-      add :working_group_id, references(:working_groups, on_delete: :delete_all)
+      add :document_id, references(:documents, on_delete: :delete_all), null: false
+      add :working_group_id, references(:working_groups, on_delete: :delete_all), null: false
 
       timestamps(type: :utc_datetime)
     end

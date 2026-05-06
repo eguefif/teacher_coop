@@ -5,13 +5,13 @@ defmodule TeacherCoop.Repo.Migrations.CreateCurriculumItems do
     create table(:curriculum_items) do
       add :year, :integer, null: false
       # Example: French, Mathematics, ...
-      add :subject, :string, null: false
+      add :subject, :string, null: false, size: 20
       # Example: writing, reading, ...
-      add :strand, :string, require: false
-      add :grade, :string, null: false
-      add :item, :text, null: false
+      add :strand, :string, null: true, size: 75
+      add :grade, :string, null: false, size: 20
+      add :item, :string, null: false, size: 250
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 end

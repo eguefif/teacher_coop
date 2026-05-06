@@ -5,7 +5,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateConnection do
     create table(:connections) do
       add :user1_id, references(:users, on_delete: :nothing)
       add :user2_id, references(:users, on_delete: :nothing)
-      add :state, :string
+      add :state, :string, null: false
 
       timestamps(type: :utc_datetime)
     end

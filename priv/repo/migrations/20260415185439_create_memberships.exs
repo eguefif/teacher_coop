@@ -3,9 +3,9 @@ defmodule TeacherCoop.Repo.Migrations.CreateMemberships do
 
   def change do
     create table(:memberships) do
-      add :role, :string
-      add :working_group_id, references(:working_groups, on_delete: :nothing)
-      add :user_id, references(:users, type: :id, on_delete: :delete_all)
+      add :role, :string, size: 25, null: false
+      add :working_group_id, references(:working_groups, on_delete: :nothing), null: false
+      add :user_id, references(:users, type: :id, on_delete: :delete_all), null: false
 
       timestamps(type: :utc_datetime)
     end

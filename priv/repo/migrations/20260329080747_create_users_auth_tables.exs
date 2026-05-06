@@ -6,7 +6,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateUsersAuthTables do
 
     create table(:users) do
       add :email, :citext, null: false
-      add :fullname, :string, size: 160
+      add :fullname, :string, size: 60, null: false
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime
 
