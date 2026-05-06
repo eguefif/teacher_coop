@@ -2,7 +2,9 @@ defmodule TeacherCoopWeb.SearchLive do
   use TeacherCoopWeb, :live_view
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, form: to_form(%{}, as: :search))}
+    {:ok,
+     socket
+     |> assign(form: to_form(%{}, as: :search))}
   end
 
   def render(assigns) do
@@ -18,7 +20,7 @@ defmodule TeacherCoopWeb.SearchLive do
           class="flex flex-col items-center gap-4"
         >
           <.input field={@form[:search]} type="text" />
-          <.button>Submit</.button>
+          <.button>{gettext("Submit")}</.button>
         </.form>
       </div>
     </Layouts.app>
