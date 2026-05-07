@@ -39,25 +39,41 @@ Login is done via a magic link. In development, emails are not sent — access t
 - [ ] Create basic search
 
 ### Database
-- [ ] Add type: :utc_datetime to timestamps in migrations
-- [ ] Use elixir type and the right configuration: size default value is not always wanted
+- [x] Add type: :utc_datetime to timestamps in migrations
+- [x] Use elixir type and the right configuration: size default value is not always wanted
 - [ ] Check for null constraints. We want to put as many constraints in the database as possible
+- [ ] Update changeset: makes sure everything has the correct validations
+- [ ] Add custom validations if necessary
+- [ ] Add changeset if necessary
+- [ ] Add  unique constraint on users: email
+- [ ] Check if we need more unique constraint
 
 ### General
 
 - [ ] Configure Elixir to use tzdata if Phoenix does not already do it
 - [ ] Find the right color set
-- [ ] Remake UI
-    - [ ] Main page
+- [ ] Remake UI and do localisatoin
+    - [ ] Search page
+    - [ ] Login page
+    - [ ] Register page
+    - [ ] Welcome/confirm page
+
     - [ ] Workspace
-    - [ ] Documents page
-    - [ ] Groups page
-    - [ ] Connections page
-    - [ ] show Group page
+
+    - [ ] Documents list page
     - [ ] show document page
     - [ ] form document
+
+    - [ ] Groups list page
+    - [ ] show Group page
     - [ ] form Group
+
+    - [ ] Connections list page
     - [ ] settings
+
+    - [ ] Autocomplete pop up
+- [ ] Fix Autocomplete with button +
+
 - [ ] Responsiveness
     - [ ] Fix style selector
 - [ ] clean all useless context functions
