@@ -59,12 +59,6 @@ Repo.insert!(%Connection{
   state: "accepted"
 })
 
-Repo.insert!(%Connection{
-  user1_id: user2.id,
-  user2_id: user.id,
-  state: "accepted"
-})
-
 group =
   Repo.insert!(%WorkingGroup{
     name: "Hello, World"

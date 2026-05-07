@@ -65,24 +65,67 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
     ~H"""
     <div>
       <div class="flex flex-row gap-2">
-        <input
-          type="text"
-          id={@name <> "-input-autocomplete"}
-          name={@name}
-          value={@current_value}
-          class="w-full input"
-          phx-hook="SetValue"
-          phx-focus="display-autocomplete"
-          phx-keyup="user-typing"
-          phx-keydown="user-navigate"
-          phx-target={@myself}
-          onkeydown="if(event.key==='Enter'){event.preventDefault();}"
-          role="combobox"
-          aria-expanded={@autocomplete_list != []}
-          aria-autocomplete="list"
-          aria-controls={@name <> "-listbox"}
-          aria-activedescendant={@nav && "#{@name}-option-#{@nav}"}
-        />
+        <label for={@id} class="input input-lg w-100 rounded-xl m-auto relative">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="2.5"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+          <input
+            type="text"
+            id={@name <> "-input-autocomplete"}
+            name={@name}
+            value={@current_value}
+            phx-hook="SetValue"
+            phx-focus="display-autocomplete"
+            phx-keyup="user-typing"
+            phx-keydown="user-navigate"
+            phx-target={@myself}
+            onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+            role="combobox"
+            aria-expanded={@autocomplete_list != []}
+            aria-autocomplete="list"
+            aria-controls={@name <> "-listbox"}
+            aria-activedescendant={@nav && "#{@name}-option-#{@nav}"}
+            class="w-max grow"
+          />
+          <div
+            :if={@autocomplete_list != [] && @display_autocomplete}
+            class="flex w-100 flex-col gap-2 border-2 absolute rounded-md z-10 inset-x-0 top-12"
+            phx-click-away="close-autocomplete"
+            phx-target={@myself}
+          >
+            <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id={"#{@name}-listbox"}>
+              <li
+                :for={{entry, index} <- Enum.with_index(@autocomplete_list)}
+                id={"#{@name}-option-#{index}"}
+                role="option"
+                aria-selected={@nav == index}
+                tabindex="0"
+                phx-target={@myself}
+                class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
+                phx-click={
+                  JS.dispatch("phx:set-input-value",
+                    detail: %{
+                      id: @name <> "-input-autocomplete",
+                      value: if(@allow_input_edit, do: entry.value, else: "")
+                    }
+                  )
+                  |> JS.push("select-entry", value: %{id: entry.id, value: entry.value})
+                }
+              >
+                {entry.value}
+              </li>
+            </ul>
+          </div>
+        </label>
         <button
           :if={@allow_input_edit}
           type="button"
@@ -92,35 +135,6 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
         >
           <.icon name="hero-plus-circle" class="size-8 shrink-0 text-gray-400 cursor-pointer" />
         </button>
-      </div>
-      <div
-        :if={@autocomplete_list != [] && @display_autocomplete}
-        class="flex flex-col gap-2 border-2 absolute rounded-md z-10"
-        phx-click-away="close-autocomplete"
-        phx-target={@myself}
-      >
-        <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id={"#{@name}-listbox"}>
-          <li
-            :for={{entry, index} <- Enum.with_index(@autocomplete_list)}
-            id={"#{@name}-option-#{index}"}
-            role="option"
-            aria-selected={@nav == index}
-            tabindex="0"
-            phx-target={@myself}
-            class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
-            phx-click={
-              JS.dispatch("phx:set-input-value",
-                detail: %{
-                  id: @name <> "-input-autocomplete",
-                  value: if(@allow_input_edit, do: entry.value, else: "")
-                }
-              )
-              |> JS.push("select-entry", value: %{id: entry.id, value: entry.value})
-            }
-          >
-            {entry.value}
-          </li>
-        </ul>
       </div>
     </div>
     """
