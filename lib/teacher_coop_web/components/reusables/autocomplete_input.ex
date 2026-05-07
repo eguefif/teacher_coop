@@ -56,6 +56,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
      |> assign(assigns)
      |> assign_new(:current_value, fn -> "" end)
      |> assign_new(:allow_input_edit, fn -> false end)
+     |> assign_new(:placeholder, fn -> "" end)
      |> assign(:display_autocomplete, true)
      |> assign(:nav, nil)}
   end
@@ -83,6 +84,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
             id={@name <> "-input-autocomplete"}
             name={@name}
             value={@current_value}
+            placeholder={@placeholder}
             phx-hook="SetValue"
             phx-focus="display-autocomplete"
             phx-keyup="user-typing"

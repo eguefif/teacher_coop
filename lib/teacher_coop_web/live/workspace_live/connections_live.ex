@@ -10,7 +10,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        {gettext("My Connections")}
+        {gettext("Manage My Connections")}
         <:actions>
           <.button navigate={~p"/workspace/"}><.icon name="hero-arrow-left" /></.button>
         </:actions>
@@ -20,42 +20,69 @@ defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
           module={Reusables.AutocompleteInput}
           id="teacher-search"
           name="teacher-search"
+          placeholder={gettext("Search new connections")}
           allow_input_edit={false}
           autocomplete_list={@autocomplete}
           on_user_typing={fn input_value -> send(self(), {:user_typing, input_value}) end}
           on_autocomplete_submit={fn connection -> send(self(), {:add_connection, connection}) end}
         />
-        <ul class="list">
-          <li :for={connection <- @new_connections_list}>
+        <div class="flex flex-col gap-2 w-100 m-auto">
+          <div
+            :for={connection <- @new_connections_list}
+            class="rounded-box shadow shadow-md p-2 flex flex-row gap-2 items-baseline"
+          >
             {connection.value}
-            <.button type="button" phx-click="user-invite-connection" phx-value-id={connection.id}>
+            <.button
+              type="button"
+              phx-click="user-invite-connection"
+              phx-value-id={connection.id}
+              class="btn btn-soft ml-auto btn-primary"
+            >
               {gettext("Invite")}
             </.button>
             <.button
               type="button"
               phx-click="user-remove-connection-from-new-list"
               phx-value-id={connection.id}
-              variant="primary"
+              class="btn btn-ghost"
             >
-              <.icon name="hero-x-mark" class="size-6" />
+              X
             </.button>
-          </li>
-        </ul>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
         <div class="flex flex-col gap-8">
-          <h1>{gettext("My Connections")}</h1>
-          <ul class="list">
-            <li :for={connection <- @connections} class="list-row">
-              {connection.fullname}({connection.state})
-              <.button
-                type="button"
-                phx-click="user-remove-connection"
-                phx-value-id={connection.connection_id}
-                data-confirm={gettext("Are you sure?")}
-              >
-                <.icon name="hero-x-mark" class="size-6" />
-              </.button>
-            </li>
-          </ul>
+          <div class="list rounded-box shadow-md">
+            <div
+              :for={connection <- @connections}
+              class="list-row w-full place-items-baseline"
+            >
+              <div>
+                {connection.fullname}
+              </div>
+              <div class="flex flex-row ml-auto w-35 justify-between items-baseline">
+                <div class={[
+                  "badge badge-soft rounded-xl",
+                  connection.state == "pending" && "badge-accent",
+                  connection.state == "accepted" && "badge-success",
+                  connection.state == "rejected" && "badge-error"
+                ]}>
+                  {connection.state}
+                </div>
+                <.button
+                  type="button"
+                  phx-click="user-remove-connection"
+                  phx-value-id={connection.connection_id}
+                  data-confirm={gettext("Are you sure?")}
+                  class="btn btn-soft btn-warning"
+                >
+                  X
+                </.button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Layouts.app>
@@ -64,7 +91,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
 
   @impl true
   def mount(_params, _sessions, socket) do
-    connections = TeacherNetworking.get_connections(socket.assigns.current_scope)
+    connections = get_ordered_connections(socket)
 
     {:ok,
      socket
@@ -113,7 +140,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
           Enum.reject(socket.assigns.new_connections_list, fn entry -> entry.id == id end)
       end
 
-    connections = TeacherNetworking.get_connections(socket.assigns.current_scope)
+    connections = get_ordered_connections(socket)
 
     {:noreply,
      socket |> assign(:new_connections_list, new_list) |> assign(:connections, connections)}
@@ -123,5 +150,16 @@ defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
     TeacherNetworking.remove_connection_by_id(socket.assigns.current_scope, id)
     connections = TeacherNetworking.get_connections(socket.assigns.current_scope)
     {:noreply, socket |> assign(:connections, connections)}
+  end
+
+  defp get_ordered_connections(socket) do
+    TeacherNetworking.get_connections(socket.assigns.current_scope)
+    |> Enum.sort(fn a, b ->
+      case {a.state, b.state} do
+        {"rejected", _} -> true
+        {"pending", "accepted"} -> true
+        _ -> false
+      end
+    end)
   end
 end
