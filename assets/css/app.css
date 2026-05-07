@@ -115,3 +115,7 @@
     transition-duration: 0.01ms !important;
   }
 }
+:root {
+  font-family: 'Roboto';
+  font-weight: 400;
+}

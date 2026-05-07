@@ -52,8 +52,11 @@ Login is done via a magic link. In development, emails are not sent — access t
 
 - [ ] Configure Elixir to use tzdata if Phoenix does not already do it
 - [ ] Find the right color set
+- [x] clean all useless context functions
+
+## UI
 - [ ] Remake UI and do localisatoin
-    - [ ] Search page
+    - [x] Search page
     - [ ] Login page
     - [ ] Register page
     - [ ] Welcome/confirm page
@@ -76,7 +79,6 @@ Login is done via a magic link. In development, emails are not sent — access t
 
 - [ ] Responsiveness
     - [ ] Fix style selector
-- [ ] clean all useless context functions
 
 ### Authorization
 - [ ] Find a pattern/architecture for authorization (see function `accessible_document`)
