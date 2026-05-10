@@ -54,7 +54,8 @@ Login is done via a magic link. In development, emails are not sent — access t
 - [ ] Find the right color set
 - [x] clean all useless context functions
 
-## UI
+### UI
+- [ ] Create a list/grid documents index show: use in documents index and group documents index
 - [ ] Remake UI and do localisatoin
     - [x] Search page
     - [ ] Login page
@@ -63,7 +64,7 @@ Login is done via a magic link. In development, emails are not sent — access t
 
     - [ ] Workspace
 
-    - [ ] Documents list page
+    - [x] Documents list page
     - [ ] show document page
     - [ ] form document
 
@@ -71,14 +72,14 @@ Login is done via a magic link. In development, emails are not sent — access t
     - [ ] show Group page
     - [ ] form Group
 
-    - [ ] Connections list page
+    - [x] Connections list page
     - [ ] settings
 
     - [ ] Autocomplete pop up
-- [ ] Fix Autocomplete with button +
+- [ ] Fix Autocomplete with + button for curriculum
 
 - [ ] Responsiveness
-    - [ ] Fix style selector
+    - [ ] Fix toggle dark/light component
 
 ### Authorization
 - [ ] Find a pattern/architecture for authorization (see function `accessible_document`)
@@ -92,3 +93,7 @@ Login is done via a magic link. In development, emails are not sent — access t
 
 ### Fix
 - [ ] Fix autocomplete document form curriculum: when usingkeyboard nav, selection with enter does not work
+
+
+### Workspace Document
+- [ ] Need a way to filter by tag
