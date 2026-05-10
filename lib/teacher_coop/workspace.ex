@@ -6,7 +6,6 @@ defmodule TeacherCoop.Workspace do
   import Ecto.Query, warn: false
 
   alias TeacherCoop.Repo
-  alias Ecto.Multi
   alias TeacherCoop.Workspace.Document
   alias TeacherCoop.Workspace.Tags
   alias TeacherCoop.Workspace.File
@@ -47,61 +46,69 @@ defmodule TeacherCoop.Workspace do
   end
 
   def create_document(%Scope{} = scope, files, attrs) do
+    # A document has many files
+    # Document is user input
+    # File is user input
+    # Use cast_assoc
+    attrs = Map.put(attrs, "files", files)
+
     result =
-      Repo.transaction(fn ->
+      %Document{}
+      |> Document.changeset(attrs, scope)
+      |> Repo.insert()
+
+    case result do
+      {:ok, record} ->
+        IO.inspect(record)
+
         document =
-          %Document{}
-          |> Document.changeset(attrs, scope)
-          |> Repo.insert()
+          record
+          |> Repo.preload(:user)
+          |> Repo.preload(:document_working_groups)
+          |> Document.to_map()
 
-        Enum.each(files, fn file ->
-          %File{}
-          |> File.changeset(file, scope)
-          |> Ecto.Changeset.put_change(:document_id, document.id)
-          |> Repo.insert!()
-        end)
+        IO.inspect(document)
 
-        document
-      end)
+        task =
+          :meili_teachercoop
+          |> Meilisearch.client()
+          |> Meilisearch.Document.create_or_update("documents", document)
 
-    document = elem(result, 1)
+        IO.inspect(task)
 
-    meili_doc = %{
-      id: document.id,
-      public: document.public,
-      tags: document.tags,
-      goals: document.goals,
-      author: document.user_id
-    }
+        result
 
-    :meili_teachercoop
-    |> Meilisearch.client()
-    |> Meilisearch.Document.create_or_update("documents", meili_doc)
-
-    result
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
   def update_document(%Scope{} = scope, %Document{} = document, files, attrs) do
-    document = Repo.get!(Document, document.id)
+    document =
+      Repo.get!(Document, document.id)
+      |> Repo.preload(:files)
+
     true = document.user_id == scope.user.id
 
-    document_changeset = Document.changeset(document, attrs, scope)
+    attrs = Map.put(attrs, "files", files)
 
     result =
-      Multi.new()
-      |> Multi.update(:update_document, document_changeset)
-      |> Multi.insert_all(:insert_files, File, files)
-      |> Repo.transact()
+      document
+      |> Document.changeset_update(attrs)
+      |> Repo.insert_or_update()
 
     case result do
-      {:ok, update_document: document, insert_files: _files} ->
+      {:ok, record} ->
+        document =
+          record
+          |> Map.from_struct()
+          |> Map.drop([:files, :__meta__])
+
         update_meilisearch_document(document)
+        {:ok, document}
 
-      {:error, :update_document, failed_value, _changes_so_far} ->
-        {:error_document, failed_value}
-
-      {:error, :insert_files, failed_value, _changes_so_far} ->
-        {:error_files, failed_value}
+      {:error, changeset} ->
+        {:error_document, changeset}
     end
   end
 
