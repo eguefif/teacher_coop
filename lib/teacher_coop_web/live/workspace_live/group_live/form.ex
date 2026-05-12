@@ -18,7 +18,11 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Form do
         phx-submit="save"
         class="flex flex-col gap-4"
       >
-        <.input field={@form[:name]} type="text" label={gettext("Group name")} />
+        <.input
+          field={@form[:name]}
+          type="text"
+          label={gettext("Group name")}
+        />
         <footer class="mx-auto">
           <.button phx-disable-with={gettext("Saving...")} variant="primary">
             {gettext("Save Group")}

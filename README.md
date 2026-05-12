@@ -65,19 +65,21 @@ Login is done via a magic link. In development, emails are not sent — access t
     - [ ] Workspace
 
     - [x] Documents list page
-    - [ ] show document page
+    - [x] show document page
     - [ ] form document
 
-    - [ ] Groups list page
-    - [ ] show Group page
-    - [ ] form Group
+    - [x] Groups list page
+    - [x] show Group page
+    - [x] form Group
 
     - [x] Connections list page
     - [ ] settings
 
     - [ ] Autocomplete pop up
+
 - [ ] Fix Autocomplete with + button for curriculum
 - [ ] Reusable
+    - [ ] Create headings components or modify h1/h2/h3
     - [ ] In core component: refactor header's layout model from show document
     - [ ] Update each page that uses the header
         - [ ] My Groups
@@ -88,6 +90,9 @@ Login is done via a magic link. In development, emails are not sent — access t
 
 - [ ] Responsiveness
     - [ ] Fix toggle dark/light component
+
+### UI second refactoring wave
+ - [ ] Find a better way to display connections, think about pagination
 
 ### Authorization
 - [ ] Find a pattern/architecture for authorization (see function `accessible_document`)

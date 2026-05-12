@@ -75,7 +75,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
                   type="button"
                   phx-click="user-remove-connection"
                   phx-value-id={connection.connection_id}
-                  data-confirm={gettext("Are you sure?")}
+                  data-confirm={gettext("Are you sure you want to remove this connections?")}
                   class="btn btn-soft btn-warning"
                 >
                   X

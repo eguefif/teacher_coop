@@ -42,6 +42,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Show do
         autocomplete_list={@autocomplete}
         on_user_typing={fn value -> send(self(), {:user_typing, value}) end}
         on_autocomplete_submit={fn value -> send(self(), {:user_submit, value}) end}
+        placeholder="Jules Vallès"
       />
     </section>
     """
