@@ -8,64 +8,77 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <.show_header document={@document} />
+      <div class="flex flex-col gap-8">
+        <.show_header document={@document} />
 
-      <.show_document goals={@document.goals} description={@document.description} />
+        <.show_document
+          goals={@document.goals}
+          description={@document.description}
+          tags={@document.tags}
+        />
 
-      <.show_files files={@files} />
+        <.show_files files={@files} />
 
-      <.show_groups_sharing document_id={@document.id} groups={@groups} />
+        <div class="divider"></div>
+        <.show_groups_sharing document_id={@document.id} groups={@groups} />
+      </div>
     </Layouts.app>
     """
   end
 
-  attr :document, :map
+  attr :document, :map, required: true
 
   def show_header(assigns) do
     ~H"""
-    <.header>
-      {@document.title}
-      <div :if={@document.tags != []} class="flex flex-row gap-4">
-        <article
-          :for={tag <- @document.tags}
-          class="badge badge-soft badge-lg badge-primary"
-        >
-          {tag}
-        </article>
+    <div class="flex flex-row items-baseline gap-4">
+      <.button navigate={~p"/workspace/documents/"} class="btn btn-ghost">
+        <.icon name="hero-arrow-left" />
+      </.button>
+      <div class="text-xl">
+        {@document.title}
       </div>
-      <:actions>
-        <.button onclick="history.back(); return false;">
-          <.icon name="hero-arrow-left" />
-        </.button>
-        <.button variant="primary" phx-click="toggle-public" phx-value-id={@document.id}>
+      <div class="ml-auto">
+        <.button phx-click="toggle-public" phx-value-id={@document.id}>
           {if @document.public, do: gettext("Make Private"), else: gettext("Make Public")}
         </.button>
-        <.button
-          variant="primary"
-          navigate={~p"/workspace/documents/#{@document}/edit?return_to=show"}
-        >
-          <.icon name="hero-pencil-square" /> {gettext("Edit document")}
+        <.button navigate={~p"/workspace/documents/#{@document}/edit?return_to=show"}>
+          <.icon name="hero-pencil-square" />
         </.button>
-      </:actions>
-    </.header>
+      </div>
+    </div>
     """
   end
 
   attr :goals, :list, default: []
   attr :description, :string, default: ""
+  attr :tags, :list, required: true
 
   def show_document(assigns) do
     ~H"""
-    <div :if={@goals != []} class="flex flex-col gap-4">
-      <h2>{gettext("Goals")}</h2>
-      <ul class="list-disc list-inside">
-        <li :for={entry <- @goals} class="ml-2">{entry}</li>
+    <div :if={@goals != []} class="flex flex-col gap-4 rounded-box shadow-md">
+      <ul class="list list-inside">
+        <li class="p-2 pb-4 text-m opacity-80 tracking-wide">{gettext("Document goals")}</li>
+        <li :for={{entry, idx} <- Enum.with_index(@goals)} class="list-row ml-2">
+          <div class="text-4xl font-thin tabular-nums">{idx + 1}</div>
+          <div class="list-col-grow">{entry}</div>
+        </li>
       </ul>
     </div>
 
+    <div class="flex flex-row justify-center">
+      <div :if={@tags != []} class="flex flex-row gap-4">
+        <article
+          :for={tag <- @tags}
+          class="badge badge-soft badge-lg badge-primary"
+        >
+          {tag}
+        </article>
+      </div>
+    </div>
+
     <div class="flex flex-col gap-8">
-      <h2>{gettext("Description")}</h2>
-      <div>
+      <h1 class="text-xl font-bold">{gettext("Description")}</h1>
+      <div class="indent-2">
         {@description}
       </div>
     </div>
@@ -77,12 +90,12 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
   def show_files(assigns) do
     ~H"""
     <section :if={@files != []}>
-      <h2>{gettext("Files")}</h2>
+      <h1 class="text-xl font-bold">{gettext("Files")}</h1>
       <.table
         id="files"
         rows={@files}
       >
-        <:col :let={file} label={gettext("Filename")}>{file.filename}</:col>
+        <:col :let={file}>{file.filename}</:col>
         <:action :let={file}>
           <.link navigate={~p"/workspace/file/#{file}/download"}>{gettext("Download")}</.link>
           <.link
@@ -103,12 +116,12 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
   def show_groups_sharing(assigns) do
     ~H"""
     <section>
-      <h2>{gettext("Groups")}</h2>
+      <h1 class="text-xl font-bold">{gettext("Groups")}</h1>
       <.table
         id="groups"
         rows={@groups}
       >
-        <:col :let={group} label={gettext("Working Group")}>{group.name}</:col>
+        <:col :let={group}>{group.name}</:col>
         <:action :let={group}>
           <.link
             :if={!group.shared}

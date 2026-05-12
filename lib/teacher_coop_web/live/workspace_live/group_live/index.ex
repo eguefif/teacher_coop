@@ -15,15 +15,19 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Index do
           </.button>
         </:actions>
       </.header>
-      <div :if={@groups != []} class="flex flex-row gap-4 justify-around flex-wrap">
-        <.button
+      <ul :if={@groups != []} class="list box-rounded shadow-md">
+        <li
           :for={group <- @groups}
-          navigate={~p"/workspace/groups/#{group.id}"}
-          class="p-4 border-2 rounded-md hover:scale-105 hover:shadow-lg cursor-pointer"
+          class="list-row"
         >
-          {group.name}
-        </.button>
-      </div>
+          <.link navigate={~p"/workspace/groups/#{group.id}"}>
+            <div class="font-bold">
+              {group.name}
+            </div>
+            <div class="text-clamp-2">Description</div>
+          </.link>
+        </li>
+      </ul>
     </Layouts.app>
     """
   end

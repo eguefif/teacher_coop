@@ -77,6 +77,14 @@ Login is done via a magic link. In development, emails are not sent — access t
 
     - [ ] Autocomplete pop up
 - [ ] Fix Autocomplete with + button for curriculum
+- [ ] Reusable
+    - [ ] In core component: refactor header's layout model from show document
+    - [ ] Update each page that uses the header
+        - [ ] My Groups
+        - [ ] My documents
+        - [ ] My Connections
+        - [ ] Form document
+        - [ ] Form group
 
 - [ ] Responsiveness
     - [ ] Fix toggle dark/light component
@@ -93,6 +101,7 @@ Login is done via a magic link. In development, emails are not sent — access t
 
 ### Fix
 - [ ] Fix autocomplete document form curriculum: when usingkeyboard nav, selection with enter does not work
+- [ ] When adding or modifying a document, it deletes all the previous files
 
 
 ### Workspace Document

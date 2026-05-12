@@ -103,7 +103,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
             <div class="card-title">
               {document.title}
             </div>
-            <p>
+            <p class="line-clamp-3">
               {document.description}
             </p>
           </.link>
@@ -117,8 +117,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, gettext("Listing Documents"))
-     |> assign(:document_layout, :list)
+     |> assign(:page_title, gettext("Your Documents"))
+     |> assign(:document_layout, :grid)
      |> assign(:documents, list_documents(socket.assigns.current_scope))}
   end
 
