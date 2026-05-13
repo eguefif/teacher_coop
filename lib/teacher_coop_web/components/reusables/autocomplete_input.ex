@@ -57,6 +57,7 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
      |> assign_new(:current_value, fn -> "" end)
      |> assign_new(:allow_input_edit, fn -> false end)
      |> assign_new(:placeholder, fn -> "" end)
+     |> assign_new(:width, fn -> "w-100" end)
      |> assign(:display_autocomplete, true)
      |> assign(:nav, nil)}
   end
@@ -66,7 +67,10 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
     ~H"""
     <div>
       <div class="flex flex-row gap-2">
-        <label for={@id} class="input input-lg w-100 rounded-xl m-auto relative">
+        <label
+          for={@id}
+          class={["input input-lg w-100 rounded-xl m-auto relative", @width || "w-100"]}
+        >
           <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <g
               stroke-linejoin="round"

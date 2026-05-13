@@ -71,19 +71,13 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       autocomplete_list={@autocomplete_list}
       on_user_typing={fn value -> send(self(), {:curriculum_typing, value}) end}
       on_autocomplete_submit={fn item -> send(self(), {:add_curriculum_item, item}) end}
+      width="w-full"
     />
     <div :if={@items != []}>
-      <ul class="m-2 p-2">
-        <li :for={item <- @items}>
+      <ul class="list m-2 p-2">
+        <li :for={item <- @items} class="list-row">
+          <.remove_button ref={item} action="remove-curriculum-item" />
           {item}
-          <button
-            type="button"
-            phx-click="remove-curriculum-item"
-            phx-value-item={item}
-            aria-label={gettext("Remove") <> " #{item}"}
-          >
-            <.icon name="hero-x-circle" class="size-6 hover:bg-primary" />
-          </button>
         </li>
       </ul>
     </div>
@@ -111,6 +105,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       autocomplete_list={@autocomplete_list}
       on_user_typing={fn value -> send(self(), {:tag_typing, value}) end}
       on_autocomplete_submit={fn tag -> send(self(), {:add_tag, tag}) end}
+      width="w-full"
     />
     <div class="flex flex-row gap-4 m-4">
       <article
@@ -187,32 +182,35 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
       <div :if={@uploads.files.entries == []}>
         <p>{gettext("No files")}</p>
       </div>
-      <div class="flex flex-col gap-1">
-        <article :for={entry <- @uploads.files.entries}>
-          <.remove_button entry={entry} action="cancel-upload" />
+      <ul class="list">
+        <li :for={entry <- @uploads.files.entries} class="list-row">
+          <.remove_button
+            action="cancel-upload"
+            ref={entry.ref}
+          />
           <span class="text-xs">{entry.client_name}</span>
           <.file_error errors={upload_errors(@uploads.files, entry)} />
-        </article>
-      </div>
+        </li>
+      </ul>
     </div>
     """
   end
 
-  attr :entry, :map, required: true
   attr :action, :string, required: true
+  attr :ref, :string, required: true
 
   def remove_button(assigns) do
     ~H"""
-    <.button
+    <button
       type="button"
-      class="btn btn-primary w-4 h-4"
       variant="primary"
+      class="cursor-pointer"
+      aria-label={gettext("Cancel upload")}
       phx-click={@action}
-      phx-value-ref={@entry.ref}
-      aria-label={gettext("Cancel upload") <> " #{@entry.client_name}"}
+      phx-value-ref={@ref}
     >
-      X
-    </.button>
+      <.icon name="hero-x-mark" class="size-6 hover:bg-primary" />
+    </button>
     """
   end
 
@@ -280,6 +278,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
   # Event file Input **********************************************************
   @impl Phoenix.LiveView
   def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    IO.puts("HEY")
     {:noreply, cancel_upload(socket, :files, ref)}
   end
 
@@ -311,7 +310,7 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Form do
 
   # Event Curriculum Input *************************************************************
 
-  def handle_event("remove-curriculum-item", %{"item" => item}, socket) do
+  def handle_event("remove-curriculum-item", %{"ref" => item}, socket) do
     filtered_items = Enum.filter(socket.assigns.curriculum_items, fn entry -> entry != item end)
     {:noreply, assign(socket, :curriculum_items, filtered_items)}
   end
