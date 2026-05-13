@@ -15,10 +15,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Index do
       />
     <% else %>
       <Layouts.app flash={@flash} current_scope={@current_scope}>
-        <.header>
+        <.header return={~p"/workspace/"}>
           {gettext("Listing Documents")}
           <:actions>
-            <.button navigate={~p"/workspace/"}><.icon name="hero-arrow-left" /></.button>
             <.button variant="primary" navigate={~p"/workspace/documents/new"}>
               <.icon name="hero-plus" /> {gettext("New Document")}
             </.button>

@@ -9,11 +9,8 @@ defmodule TeacherCoopWeb.WorkspaceLive.ConnectionLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <.header>
+      <.header return={~p"/workspace/"}>
         {gettext("Manage My Connections")}
-        <:actions>
-          <.button navigate={~p"/workspace/"}><.icon name="hero-arrow-left" /></.button>
-        </:actions>
       </.header>
       <div class="flex flex-col gap-8">
         <.live_component

@@ -368,11 +368,15 @@ defmodule TeacherCoopWeb.CoreComponents do
   slot :inner_block, required: true
   slot :subtitle
   slot :actions
+  attr :return, :string, default: ""
 
   def header(assigns) do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", "pb-4"]}>
-      <div>
+      <div class={[@return != "" && "flex items-center justify-left"]}>
+        <div :if={@return != ""}>
+          <.button navigate={@return} class="btn btn-ghost"><.icon name="hero-arrow-left" /></.button>
+        </div>
         <h1 class="text-lg font-semibold leading-8">
           {render_slot(@inner_block)}
         </h1>

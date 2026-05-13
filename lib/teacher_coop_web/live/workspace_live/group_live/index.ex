@@ -6,10 +6,9 @@ defmodule TeacherCoopWeb.WorkspaceLive.GroupLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <.header>
+      <.header return={~p"/workspace/"}>
         {gettext("My Groups")}
         <:actions>
-          <.button navigate={~p"/workspace/"}><.icon name="hero-arrow-left" /></.button>
           <.button variant="primary" navigate={~p"/workspace/groups/new"}>
             <.icon name="hero-plus" /> {gettext("New Group")}
           </.button>

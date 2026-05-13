@@ -30,22 +30,17 @@ defmodule TeacherCoopWeb.WorkspaceLive.DocumentLive.Show do
 
   def show_header(assigns) do
     ~H"""
-    <div class="flex flex-row items-baseline gap-4">
-      <.button navigate={~p"/workspace/documents/"} class="btn btn-ghost">
-        <.icon name="hero-arrow-left" />
-      </.button>
-      <div class="text-xl">
-        {@document.title}
-      </div>
-      <div class="ml-auto">
+    <.header return={~p"/workspace/documents/"}>
+      {@document.title}
+      <:actions>
         <.button phx-click="toggle-public" phx-value-id={@document.id}>
           {if @document.public, do: gettext("Make Private"), else: gettext("Make Public")}
         </.button>
         <.button navigate={~p"/workspace/documents/#{@document}/edit?return_to=show"}>
           <.icon name="hero-pencil-square" />
         </.button>
-      </div>
-    </div>
+      </:actions>
+    </.header>
     """
   end
 

@@ -80,13 +80,11 @@ Login is done via a magic link. In development, emails are not sent — access t
 - [ ] Fix Autocomplete with + button for curriculum
 - [ ] Reusable
     - [ ] Create headings components or modify h1/h2/h3
-    - [ ] In core component: refactor header's layout model from show document
-    - [ ] Update each page that uses the header
-        - [ ] My Groups
-        - [ ] My documents
-        - [ ] My Connections
-        - [ ] Form document
-        - [ ] Form group
+    - [x] In core component: refactor header's layout model from show document
+    - [x] Update each page that uses the header
+        - [x] My Groups
+        - [x] My documents
+        - [x] My Connections
 
 - [ ] Responsiveness
     - [ ] Fix toggle dark/light component
