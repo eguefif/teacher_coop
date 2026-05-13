@@ -102,35 +102,41 @@ defmodule TeacherCoopWeb.Reusables.AutocompleteInput do
             aria-activedescendant={@nav && "#{@name}-option-#{@nav}"}
             class="w-max grow"
           />
-          <div
+          <ul
             :if={@autocomplete_list != [] && @display_autocomplete}
-            class="flex w-100 flex-col gap-2 border-2 absolute rounded-md z-10 inset-x-0 top-12"
             phx-click-away="close-autocomplete"
             phx-target={@myself}
+            class={[
+              "list absolute left-0 top-12  bg-base-100 shadow-md rounded-xl rounded-t-none",
+              @width || "w-100"
+            ]}
+            role="listbox"
+            id={"#{@name}-listbox"}
           >
-            <ul class="list bg-base-100 rounded-box shadow-md" role="listbox" id={"#{@name}-listbox"}>
-              <li
-                :for={{entry, index} <- Enum.with_index(@autocomplete_list)}
-                id={"#{@name}-option-#{index}"}
-                role="option"
-                aria-selected={@nav == index}
-                tabindex="0"
-                phx-target={@myself}
-                class={["list-row hover:bg-primary", @nav == index && "bg-primary"]}
-                phx-click={
-                  JS.dispatch("phx:set-input-value",
-                    detail: %{
-                      id: @name <> "-input-autocomplete",
-                      value: if(@allow_input_edit, do: entry.value, else: "")
-                    }
-                  )
-                  |> JS.push("select-entry", value: %{id: entry.id, value: entry.value})
-                }
-              >
-                {entry.value}
-              </li>
-            </ul>
-          </div>
+            <li
+              :for={{entry, index} <- Enum.with_index(@autocomplete_list)}
+              id={"#{@name}-option-#{index}"}
+              role="option"
+              aria-selected={@nav == index}
+              tabindex="0"
+              phx-target={@myself}
+              class={[
+                "list-row hover:bg-primary text-wrap rounded-none  last:rounded-b-xl",
+                @nav == index && "bg-primary"
+              ]}
+              phx-click={
+                JS.dispatch("phx:set-input-value",
+                  detail: %{
+                    id: @name <> "-input-autocomplete",
+                    value: if(@allow_input_edit, do: entry.value, else: "")
+                  }
+                )
+                |> JS.push("select-entry", value: %{id: entry.id, value: entry.value})
+              }
+            >
+              {entry.value}
+            </li>
+          </ul>
         </label>
         <button
           :if={@allow_input_edit}
