@@ -1,18 +1,37 @@
 # TeacherCoop
 
-To start your Phoenix server:
+## Document
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+Document are the resource.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+The context will be called: Library since it is shared by all teachers. They put resource in this
+shared library.
 
-Ready to run in production? Please [check our deployment guides](https://phoenix.hexdocs.pm/deployment.html).
+This context will be split into two parts:
+* the documents.ex for crude operation
+* the search.ex for indexing/search with meilisearch
 
-## Learn more
 
-* Official website: https://www.phoenixframework.org/
-* Guides: https://phoenix.hexdocs.pm/overview.html
-* Docs: https://phoenix.hexdocs.pm
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+## TODO
+
+ - [ ] create a context/ressource for documents: Library Document documents
+ - [ ] Start with a minimal schema: document title + description
+ - [ ] Simplify interface to its minimal: no theme choice, take the default one
+ - [ ] Index to meilisearch
+ - [ ] Add search lj
+
+  lib/teacher_coop/library.ex          # public API, delegates to sub-modules
+  lib/teacher_coop/library/
+    document.ex                        # Library.Document schema
+    documents.ex                       # Library.Documents CRUD
+    search.ex                          # Library.Search (Meilisearch)
+
+  library.ex is just the public-facing module that calls into the sub-modules:
+
+  defmodule TeacherCoop.Library do
+    alias TeacherCoop.Library.{Documents, Search}
+
+    defdelegate list_documents(scope), to: Documents
+    defdelegate create_document(scope, attrs), to: Documents
+    defdelegate search_documents(query), to: Search
+  end
