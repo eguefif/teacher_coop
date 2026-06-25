@@ -6,14 +6,21 @@ defmodule TeacherCoop.Library do
     - Search operations handled by the sub context Library.Search
   """
 
-  alias TeacherCoop.Library.{Documents}
+  alias TeacherCoop.Library.{Documents, Search}
+  alias TeacherCoop.Library.Document
+
+  def create_document(scope, attrs \\ %{}) do
+    with {:ok, document = %Document{}} <- Documents.create_document(scope, attrs),
+         :ok <- Search.index_document(document) do
+      {:ok, document}
+    end
+  end
 
   # Delegates functions for CRUDE operations ****************************************
 
   defdelegate subscribe_documents(scope), to: Documents
   defdelegate list_documents(scope), to: Documents
   defdelegate get_document!(scope, id), to: Documents
-  defdelegate create_document(scope, attrs \\ %{}), to: Documents
   defdelegate update_document(scope, document, attrs \\ %{}), to: Documents
   defdelegate delete_document(scope, document), to: Documents
   defdelegate change_document(scope, document, attrs \\ %{}), to: Documents

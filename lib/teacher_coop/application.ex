@@ -15,7 +15,9 @@ defmodule TeacherCoop.Application do
       # Start a worker by calling: TeacherCoop.Worker.start_link(arg)
       # {TeacherCoop.Worker, arg},
       # Start to serve requests, typically the last entry
-      TeacherCoopWeb.Endpoint
+      TeacherCoopWeb.Endpoint,
+      {Finch, name: :search_finch},
+      {Meilisearch, name: :meilisearch, endpoint: "http://127.0.0.1:7700", key: "masterkey", finch: :search_finch},
     ]
 
     # See https://elixir.hexdocs.pm/Supervisor.html

@@ -66,7 +66,8 @@ defmodule TeacherCoop.MixProject do
       {:gettext, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:meilisearch_ex, "~> 1.2.1"}
     ]
   end
 
@@ -78,7 +79,9 @@ defmodule TeacherCoop.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
+      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "meilisearch.setup"],
+      reset: ["meilisearch.setup", "ecto.reset"],
+      "meilisearch.setup": ["run priv/meilisearch/create_index.ex"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],

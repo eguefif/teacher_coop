@@ -79,6 +79,7 @@ defmodule TeacherCoop.Library.Documents do
            %Document{}
            |> Document.changeset(attrs, scope)
            |> Repo.insert() do
+      TeacherCoop.Library.Search.index_document(document)
       broadcast_document(scope, {:created, document})
       {:ok, document}
     end
