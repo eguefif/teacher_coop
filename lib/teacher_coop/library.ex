@@ -13,10 +13,10 @@ defmodule TeacherCoop.Library do
   defdelegate subscribe_documents(scope), to: Documents
   defdelegate list_documents(scope), to: Documents
   defdelegate get_document!(scope, id), to: Documents
-  defdelegate create_document(scope, attrs), to: Documents
-  defdelegate update_document(scope, document, attrs), to: Documents
+  defdelegate create_document(scope, attrs \\ %{}), to: Documents
+  defdelegate update_document(scope, document, attrs \\ %{}), to: Documents
   defdelegate delete_document(scope, document), to: Documents
-  defdelegate change_document(scope, document, attrs), to: Documents
+  defdelegate change_document(scope, document, attrs \\ %{}), to: Documents
 
   # Delegates functions for search operations ***************************************
 end

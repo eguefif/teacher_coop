@@ -20,7 +20,7 @@ defmodule TeacherCoopWeb.Router do
   scope "/", TeacherCoopWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", DocumentLive.Search
   end
 
   # Other scopes may use custom stacks.

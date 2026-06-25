@@ -14,9 +14,14 @@ This context will be split into two parts:
 
 ## TODO
 
- - [ ] create a context/ressource for documents: Library Document documents
- - [ ] Start with a minimal schema: document title + description
+ - [x] create a context/ressource for documents: Library Document documents
+ - [x] Start with a minimal schema: document title + description
+ - [ ] Seed documents
  - [ ] Simplify interface to its minimal: no theme choice, take the default one
+    - [ ] Minimal search box
+    - [ ] Document form and list for user
+    - [ ] Search result
+ - [ ] When first end-to-end over: add gettext
  - [ ] Index to meilisearch
  - [ ] Add search lj
 
