@@ -11,34 +11,27 @@ This context will be split into two parts:
 * the documents.ex for crude operation
 * the search.ex for indexing/search with meilisearch
 
+We have two context:
+* Library: where we gather documents
+* Discovery: where we gather searches
 
 ## TODO
 
  - [x] create a context/ressource for documents: Library Document documents
  - [x] Start with a minimal schema: document title + description
  - [x] Seed documents
- - [ ] Simplify interface to its minimal: no theme choice, take the default one
+ - [x] Simplify interface to its minimal: no theme choice, take the default one
     - [x] Minimal search box
     - [x] Document form and list for user
     - [ ] Search result
 - [x] Meilisearch
     -[x] find a way to setup index
  - [ ] When first end-to-end over: add gettext
- - [ ] Index to meilisearch
- - [ ] Add search lj
 
-  lib/teacher_coop/library.ex          # public API, delegates to sub-modules
-  lib/teacher_coop/library/
-    document.ex                        # Library.Document schema
-    documents.ex                       # Library.Documents CRUD
-    search.ex                          # Library.Search (Meilisearch)
+- [ ] Solve the Meilisearch test problems with indexing
 
-  library.ex is just the public-facing module that calls into the sub-modules:
+ ## Test
 
-  defmodule TeacherCoop.Library do
-    alias TeacherCoop.Library.{Documents, Search}
+ At the moment, we index as many document as the test run. It is a problem since we do not separate Meilisearch test and Meilisearch Dev. We need to find a solution for that.
 
-    defdelegate list_documents(scope), to: Documents
-    defdelegate create_document(scope, attrs), to: Documents
-    defdelegate search_documents(query), to: Search
-  end
+

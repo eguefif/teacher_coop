@@ -20,7 +20,9 @@ defmodule TeacherCoopWeb.Router do
   scope "/", TeacherCoopWeb do
     pipe_through :browser
 
-    live "/", DocumentLive.Search
+    live "/", SearchLive.Form, :index
+    live "/searches", SearchLive.Index, :index
+    live "/searches/new", SearchLive.Form, :new
   end
 
   # Other scopes may use custom stacks.

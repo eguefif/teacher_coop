@@ -81,7 +81,7 @@ defmodule TeacherCoop.MixProject do
     [
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "meilisearch.setup"],
       reset: ["meilisearch.setup", "ecto.reset"],
-      "meilisearch.setup": ["run priv/meilisearch/create_index.ex"],
+      "meilisearch.setup": ["run --no-start priv/meilisearch/create_index.ex"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],

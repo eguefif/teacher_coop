@@ -1,11 +1,11 @@
-defmodule TeacherCoop.Library.Search do
-  alias TeacherCoop.Library.Document
-
+defmodule TeacherCoop.SearchEngineRepo do
   @moduledoc """
-  Sub Library context for search.
-
-  We use Meilisearch, this context allows for indexing/searching documents.
+  This module is a layer between the Search Engine and the application.
+  It handles indexing document and search.
+  It uses the Document struct as an input for indexing.
   """
+
+  alias TeacherCoop.Library.Document
 
   @doc """
   Index a document in Meilisearch
@@ -26,8 +26,8 @@ defmodule TeacherCoop.Library.Search do
     }
 
     case Meilisearch.Document.create_or_replace(client, "documents", meilisearch_attrs) do
-      {:ok, _} -> :ok
-      {:error, _task_details} -> :error
+      {:ok, _task = %Meilisearch.SummarizedTask{taskUid: _taskUid}} -> :ok
+      {:error, _error_details} -> :error
     end
   end
 end

@@ -1,4 +1,4 @@
-defmodule TeacherCoopWeb.DocumentLive.Search do
+defmodule TeacherCoopWeb.SearchLive.Form do
   use TeacherCoopWeb, :live_view
 
   @impl true

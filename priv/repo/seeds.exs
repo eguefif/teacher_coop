@@ -15,7 +15,7 @@ alias TeacherCoop.Accounts
 
 # TODO: Create a user
 
-user_attrs = %{:email => "rob@rob.org"}
+user_attrs = %{:email => "eguefif@fastmail.com"}
 
 {:ok, user} = Accounts.register_user(user_attrs)
 

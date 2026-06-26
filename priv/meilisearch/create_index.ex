@@ -13,7 +13,6 @@ defmodule TeacherCoop.Meilisearch do
     tasks =
       @indexes
       |> Enum.map(&{&1, Meilisearch.Index.get(client, &1)})
-      |> IO.inspect()
       |> Enum.reject(&(elem(elem(&1, 1), 0) == :error))
       |> Enum.map(&elem(&1, 0))
       |> Enum.map(&Meilisearch.Index.delete(client, &1))
