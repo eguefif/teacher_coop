@@ -4,8 +4,8 @@ defmodule TeacherCoop.SearchEngineRepo do
   It handles indexing document and search.
   It uses the Document struct as an input for indexing.
   """
-
   alias TeacherCoop.Library.Document
+  alias TeacherCoop.Discovery.SearchResult
 
   @doc """
   Index a document in Meilisearch
@@ -20,7 +20,7 @@ defmodule TeacherCoop.SearchEngineRepo do
     client = Meilisearch.client(:meilisearch)
 
     meilisearch_attrs = %{
-      uid: document.id,
+      id: document.id,
       title: document.title,
       description: document.description
     }
@@ -29,5 +29,25 @@ defmodule TeacherCoop.SearchEngineRepo do
       {:ok, _task = %Meilisearch.SummarizedTask{taskUid: _taskUid}} -> :ok
       {:error, _error_details} -> :error
     end
+  end
+
+  def search_document(search_terms) when is_bitstring(search_terms) do
+    client = Meilisearch.client(:meilisearch)
+
+    case Meilisearch.Search.search(client, "documents", q: search_terms) do
+      {:ok, response} ->
+        IO.inspect(response)
+        {:ok, create_search_result(response)}
+
+      _ ->
+        :error
+    end
+  end
+
+  defp create_search_result(result) when is_map(result) do
+    %SearchResult{
+      facets: %{},
+      hits: result.hits
+    }
   end
 end

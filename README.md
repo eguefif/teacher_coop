@@ -23,7 +23,10 @@ We have two context:
  - [x] Simplify interface to its minimal: no theme choice, take the default one
     - [x] Minimal search box
     - [x] Document form and list for user
-    - [ ] Search result
+    - [x] Add search in liveview
+    - [ ] Add search function in SearchEngineRepo
+    - [ ] Display result in index
+    - [ ] Finish reading p114
 - [x] Meilisearch
     -[x] find a way to setup index
  - [ ] When first end-to-end over: add gettext

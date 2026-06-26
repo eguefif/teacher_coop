@@ -5,6 +5,7 @@ defmodule TeacherCoop.Discovery do
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
+  alias TeacherCoop.SearchEngineRepo
 
   alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Accounts.Scope
@@ -52,10 +53,22 @@ defmodule TeacherCoop.Discovery do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_search(%Scope{} = scope, attrs) do
-    %Search{}
-    |> Search.changeset(attrs, scope)
-    |> Repo.insert()
+  def create_search(%Scope{} = _scope, %{search_terms: search_terms} = _) do
+    # %Search{}
+    # |> Search.changeset(attrs, scope)
+    # |> Repo.insert()
+    make_search(search_terms)
+  end
+
+  def create_search(nil, %{search_terms: search_terms} = _) do
+    # %Search{}
+    # |> Search.changeset(attrs, scope)
+    # |> Repo.insert()
+    make_search(search_terms)
+  end
+
+  defp make_search(search_terms) do
+    SearchEngineRepo.search_document(search_terms)
   end
 
   @doc """
