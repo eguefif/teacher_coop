@@ -1,5 +1,5 @@
-defmodule TeacherCoop.Meilisearch do
-  @indexes ["documents", "documents_test"]
+defmodule TeacherCoop.Meilisearch.Reset do
+  @indexes ["documents_test"]
 
   def get_client() do
     # Create a Meilisearch client whenever and wherever you need it.
@@ -12,28 +12,10 @@ defmodule TeacherCoop.Meilisearch do
 
     tasks =
       @indexes
-      |> Enum.map(&{&1, Meilisearch.Index.get(client, &1)})
-      |> Enum.reject(&(elem(elem(&1, 1), 0) == :error))
-      |> Enum.map(&elem(&1, 0))
-      |> Enum.map(&Meilisearch.Index.delete(client, &1))
+      |> Enum.map(&Meilisearch.Document.delete_all(client, &1))
       |> Enum.map(&elem(&1, 1))
 
     :ok = wait_for_tasks(tasks)
-  end
-
-  def create_indexes() do
-    client = get_client()
-
-    tasks =
-      @indexes
-      |> Enum.map(&Meilisearch.Index.create(client, %{uid: &1, primaryKey: "id"}))
-      |> Enum.map(&elem(&1, 1))
-
-    result = wait_for_tasks(tasks)
-
-    if result == :ok,
-      do: IO.puts("All index created"),
-      else: IO.puts("Error while creating indexes")
   end
 
   defp wait_for_tasks(tasks) when tasks == [] do
@@ -64,9 +46,4 @@ end
 
 Finch.start_link(name: :finch_meilisearch)
 
-IO.puts("Starting meilisearch operations for reset")
-TeacherCoop.Meilisearch.drop_all()
-IO.puts(" 1. Dropped all index")
-TeacherCoop.Meilisearch.create_indexes()
-IO.puts(" 2. Recreated index")
-IO.puts("Meilisearch end of operations")
+TeacherCoop.Meilisearch.Reset.drop_all()

@@ -25,7 +25,7 @@ defmodule TeacherCoop.SearchEngineRepo do
       description: document.description
     }
 
-    case Meilisearch.Document.create_or_replace(client, "documents", meilisearch_attrs) do
+    case Meilisearch.Document.create_or_replace(client, document_index_name(), meilisearch_attrs) do
       {:ok, _task = %Meilisearch.SummarizedTask{taskUid: _taskUid}} -> :ok
       {:error, _error_details} -> :error
     end
@@ -49,5 +49,23 @@ defmodule TeacherCoop.SearchEngineRepo do
       facets: %{},
       hits: result.hits
     }
+  end
+
+  defp document_index_name() do
+    if is_env_test(), do: "documents_test", else: "documents"
+  end
+
+  defp is_env_test() do
+    app = Application.get_application(__MODULE__)
+
+    {:database, database} =
+      Application.get_env(app, TeacherCoop.Repo) |> List.keyfind(:database, 0)
+
+    String.contains?(database, "test")
+  end
+
+  def reset_tests() do
+    client = Meilisearch.client(:meilisearch)
+    Meilisearch.Index.delete(client, "documents_tests")
   end
 end

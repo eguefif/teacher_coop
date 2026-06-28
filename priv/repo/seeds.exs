@@ -60,5 +60,8 @@ attrs = [
   }
 ]
 
-attrs
-|> Enum.map(&Library.create_document(user_scope, &1))
+true =
+  attrs
+  |> Enum.map(&Library.create_document(user_scope, &1))
+  |> Enum.map(&elem(&1, 0))
+  |> Enum.all?(&(&1 == :ok))
