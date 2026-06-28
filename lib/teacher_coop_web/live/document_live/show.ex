@@ -8,8 +8,7 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Document {@document.id}
-        <:subtitle>This is a document record from your database.</:subtitle>
+        {gettext("Document")} {@document.id}
         <:actions>
           <.button navigate={@return_to}>
             <.icon name="hero-arrow-left" />
@@ -19,14 +18,14 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
             variant="primary"
             navigate={~p"/documents/#{@document}/edit?return_to=show"}
           >
-            <.icon name="hero-pencil-square" /> Edit document
+            <.icon name="hero-pencil-square" /> {gettext("Edit")} {gettext("document")}
           </.button>
         </:actions>
       </.header>
 
       <.list>
-        <:item title="Title">{@document.title}</:item>
-        <:item title="Description">{@document.description}</:item>
+        <:item title={gettext("title") |> String.capitalize()}>{@document.title}</:item>
+        <:item title={gettext("description") |> String.capitalize()}>{@document.description}</:item>
       </.list>
     </Layouts.app>
     """

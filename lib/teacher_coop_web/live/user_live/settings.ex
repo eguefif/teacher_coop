@@ -11,8 +11,8 @@ defmodule TeacherCoopWeb.UserLive.Settings do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="text-center">
         <.header>
-          Account Settings
-          <:subtitle>Manage your account email address and password settings</:subtitle>
+          {gettext("Account Settings")}
+          <:subtitle>{gettext("Manage your account email address and password settings")}</:subtitle>
         </.header>
       </div>
 
@@ -25,7 +25,7 @@ defmodule TeacherCoopWeb.UserLive.Settings do
           spellcheck="false"
           required
         />
-        <.button variant="primary" phx-disable-with="Changing...">Change Email</.button>
+        <.button variant="primary" phx-disable-with="Changing...">{gettext("Change Email")}</.button>
       </.form>
 
       <div class="divider" />
@@ -62,7 +62,7 @@ defmodule TeacherCoopWeb.UserLive.Settings do
           spellcheck="false"
         />
         <.button variant="primary" phx-disable-with="Saving...">
-          Save Password
+          {gettext("Save Password")}"
         </.button>
       </.form>
     </Layouts.app>

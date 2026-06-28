@@ -1,0 +1,226 @@
+## "msgid"s in this file come from POT (.pot) files.
+###
+### Do not add, change, or remove "msgid"s manually here as
+### they're tied to the ones in the corresponding POT file
+### (with the same domain).
+###
+### Use "mix gettext.extract --merge" or "mix gettext.merge"
+### to merge POT files into PO files.
+msgid ""
+msgstr ""
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n>1);\n"
+
+#: lib/teacher_coop_web/components/core_components.ex:375
+#, elixir-autogen, elixir-format
+msgid "Actions"
+msgstr "Actions"
+
+#: lib/teacher_coop_web/components/layouts.ex:75
+#: lib/teacher_coop_web/components/layouts.ex:90
+#, elixir-autogen, elixir-format
+msgid "Attempting to reconnect"
+msgstr "Tentative de reconnexion"
+
+#: lib/teacher_coop_web/components/layouts.ex:82
+#, elixir-autogen, elixir-format
+msgid "Something went wrong!"
+msgstr "Il y a un problème"
+
+#: lib/teacher_coop_web/components/layouts.ex:67
+#, elixir-autogen, elixir-format
+msgid "We can't find the internet"
+msgstr "Nous ne trouvons pas internet"
+
+#: lib/teacher_coop_web/components/core_components.ex:81
+#, elixir-autogen, elixir-format
+msgid "close"
+msgstr "fermer"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:28
+#, elixir-autogen, elixir-format
+msgid "Search"
+msgstr "Rechercher"
+
+#: lib/teacher_coop_web/live/user_live/settings.ex:14
+#, elixir-autogen, elixir-format
+msgid "Account Settings"
+msgstr "Paramétre de comptes"
+
+#: lib/teacher_coop_web/live/user_live/registration.ex:16
+#, elixir-autogen, elixir-format
+msgid "Already registered?"
+msgstr "Vous avez déjà un compte?"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:37
+#, elixir-autogen, elixir-format
+msgid "Are you sure?"
+msgstr "Etes vous sûr?"
+
+#: lib/teacher_coop_web/live/document_live/form.ex:22
+#, elixir-autogen, elixir-format
+msgid "Cancel"
+msgstr "Annuler"
+
+#: lib/teacher_coop_web/live/user_live/settings.ex:28
+#, elixir-autogen, elixir-format
+msgid "Change Email"
+msgstr "Modifier le courriel"
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex:34
+#, elixir-autogen, elixir-format
+msgid "Confirm and log in only this time"
+msgstr "Confirmer et se connecter seulement cette fois"
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex:31
+#, elixir-autogen, elixir-format
+msgid "Confirm and stay logged in"
+msgstr "Confirmer et rester connecter"
+
+#: lib/teacher_coop_web/live/user_live/registration.ex:37
+#, elixir-autogen, elixir-format
+msgid "Create an account"
+msgstr "Créer un compte"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:39
+#, elixir-autogen, elixir-format
+msgid "Delete"
+msgstr "Supprimer"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:27
+#, elixir-autogen, elixir-format
+msgid "Description"
+msgstr "Description"
+
+#: lib/teacher_coop_web/live/document_live/form.ex:19
+#: lib/teacher_coop_web/live/document_live/index.ex:14
+#: lib/teacher_coop_web/live/document_live/show.ex:11
+#, elixir-autogen, elixir-format
+msgid "Document"
+msgstr "Document"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:18
+#, elixir-autogen, elixir-format
+msgid "Don't have an account?"
+msgstr "Vous n'avez pas de compte?"
+
+#: lib/teacher_coop_web/live/document_live/show.ex:21
+#, elixir-autogen, elixir-format
+msgid "Edit"
+msgstr "Modifier"
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex:59
+#, elixir-autogen, elixir-format
+msgid "Keep me logged in on this device"
+msgstr "Rester connecté sur cet appareil"
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex:50
+#, elixir-autogen, elixir-format
+msgid "Log in"
+msgstr "Se connecter"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:87
+#, elixir-autogen, elixir-format
+msgid "Log in and stay logged in"
+msgstr "Se connecter et rester connecté.e"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:90
+#, elixir-autogen, elixir-format
+msgid "Log in only this time"
+msgstr "Se connecter seulement cette fois"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:56
+#, elixir-autogen, elixir-format
+msgid "Log in with email"
+msgstr "Se connecter avec le courriel"
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex:62
+#, elixir-autogen, elixir-format
+msgid "Log me in only this time"
+msgstr "Me connecter seulement cette fois"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:13
+#: lib/teacher_coop_web/live/user_live/registration.ex:18
+#, elixir-autogen, elixir-format
+msgid "Login in"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex:15
+#, elixir-autogen, elixir-format
+msgid "Manage your account email address and password settings"
+msgstr "Gérer son courriel et son mot de passe"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:11
+#, elixir-autogen, elixir-format
+msgid "My Documents"
+msgstr "Mes documents"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:14
+#, elixir-autogen, elixir-format
+msgid "New"
+msgstr "Nouveau"
+
+#: lib/teacher_coop_web/live/user_live/registration.ex:14
+#, elixir-autogen, elixir-format
+msgid "Register for an account"
+msgstr "Créer un compte"
+
+#: lib/teacher_coop_web/live/document_live/form.ex:19
+#, elixir-autogen, elixir-format
+msgid "Save"
+msgstr "Sauvegarder"
+
+#: lib/teacher_coop_web/live/user_live/settings.ex:65
+#, elixir-autogen, elixir-format
+msgid "Save Password"
+msgstr "Sauvegarder le mo de passe"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:22
+#, elixir-autogen, elixir-format
+msgid "Sign up"
+msgstr "Créer un compte"
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex:68
+#, elixir-autogen, elixir-format
+msgid "Tip: If you prefer passwords, you can enable them in the user settings."
+msgstr "Conseil: si vous préférez le mots de passe, vous pouvez l'activer dans vos paramètres de compte."
+
+#: lib/teacher_coop_web/live/document_live/index.ex:26
+#, elixir-autogen, elixir-format
+msgid "Title"
+msgstr "Titre"
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex:12
+#, elixir-autogen, elixir-format
+msgid "Welcome"
+msgstr "Bienvenu.e"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:16
+#, elixir-autogen, elixir-format
+msgid "You need to reauthenticate to perform sensitive actions on your account."
+msgstr "Vous devez vous reconnecter pour faires des actions sensibles sur votre compte...."
+
+#: lib/teacher_coop_web/live/document_live/show.ex:28
+#, elixir-autogen, elixir-format
+msgid "description"
+msgstr "description"
+
+#: lib/teacher_coop_web/live/document_live/show.ex:21
+#, elixir-autogen, elixir-format
+msgid "document"
+msgstr "document"
+
+#: lib/teacher_coop_web/live/user_live/login.ex:22
+#, elixir-autogen, elixir-format
+msgid "for an account now."
+msgstr "pour un compte maintenant."
+
+#: lib/teacher_coop_web/live/document_live/show.ex:27
+#, elixir-autogen, elixir-format
+msgid "title"
+msgstr "titre"
+
+#: lib/teacher_coop_web/live/user_live/registration.ex:20
+#, elixir-autogen, elixir-format
+msgid "to your account now."
+msgstr "pour votre compte maintenant"

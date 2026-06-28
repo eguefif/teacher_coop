@@ -30,6 +30,14 @@ We have two context:
 - [x] Meilisearch
     -[x] find a way to setup index
  - [ ] When first end-to-end over: add gettext
+    - [ ] In search live view
+    - [ ] In document form
+    - [ ] In document show
+    - [ ] In document index
+    - [ ] In register
+    - [ ] In log-in
+    - [ ] in settings
+    - [ ] In confirm-email
 
 - [ ] Solve the Meilisearch test problems with indexing
 
