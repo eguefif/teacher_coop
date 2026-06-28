@@ -26,15 +26,18 @@ user_scope = Accounts.Scope.for_user(user)
 attrs = [
   %{
     :title => "Fraction en ligne",
-    :description => "Some fraction description"
+    :description => "Some fraction description",
+    :institution_type => "école élémentaire"
   },
   %{
     :title => "Les verbes pronominaux",
-    :description => "Séance de conjugaison"
+    :description => "Séance de conjugaison",
+    :institution_type => "école élémentaire"
   },
   %{
     :title => "Le système métrique",
-    :description => "Présentation du système métrique et son histoire."
+    :description => "Présentation du système métrique et son histoire.",
+    :institution_type => "école maternelle"
   }
 ]
 

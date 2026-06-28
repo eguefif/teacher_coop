@@ -16,15 +16,20 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
         </:actions>
       </.header>
 
-      <pre><%= inspect assigns, pretty: true %></pre>
-
       <.table
         id="documents"
         rows={@streams.documents}
         row_click={fn {_id, document} -> JS.navigate(~p"/documents/#{document}") end}
       >
-        <:col :let={{_id, document}} label={gettext("Title")}>{document.title}</:col>
-        <:col :let={{_id, document}} label={gettext("Description")}>{document.description}</:col>
+        <:col :let={{_id, document}} label={gettext("titre") |> String.capitalize()}>
+          {document.title}
+        </:col>
+        <:col :let={{_id, document}} label={gettext("description") |> String.capitalize()}>
+          {document.description}
+        </:col>
+        <:col :let={{_id, document}} label={gettext("institution type") |> String.capitalize()}>
+          {document.description}
+        </:col>
         <:action :let={{_id, document}}>
           <div class="sr-only">
             <.link navigate={~p"/documents/#{document}"}>Show</.link>
