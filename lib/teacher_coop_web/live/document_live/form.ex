@@ -15,6 +15,14 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       <.form for={@form} id="document-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:title]} type="text" label="Title" />
         <.input field={@form[:description]} type="text" label="Description" />
+        <.input
+          field={@form[:description]}
+          type="select"
+          label="Description"
+          options={
+            TeacherCoop.Library.Document.institution_types_options() |> Enum.map(&String.capitalize/1)
+          }
+        />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">{gettext("Save")} {gettext(
             "Document"

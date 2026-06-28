@@ -6,6 +6,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateDocuments do
       add :title, :string
       add :description, :string
       add :user_id, references(:users, on_delete: :delete_all)
+      add :institution_type, :string
 
       timestamps(type: :utc_datetime)
     end
