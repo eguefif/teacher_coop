@@ -28,12 +28,20 @@ defmodule TeacherCoop.LibraryTest do
     end
 
     test "create_document/2 with valid data creates a document" do
-      valid_attrs = %{description: "some description", title: "some title"}
+      institution_type = Document.institution_types_options() |> Enum.at(0)
+
+      valid_attrs = %{
+        description: "some description",
+        title: "some title",
+        institution_type: institution_type
+      }
+
       scope = user_scope_fixture()
 
       assert {:ok, %Document{} = document} = Library.create_document(scope, valid_attrs)
       assert document.description == "some description"
       assert document.title == "some title"
+      assert document.institution_type == institution_type
       assert document.user_id == scope.user.id
     end
 
@@ -92,6 +100,20 @@ defmodule TeacherCoop.LibraryTest do
       scope = user_scope_fixture()
       document = document_fixture(scope)
       assert %Ecto.Changeset{} = Library.change_document(scope, document)
+    end
+
+    test "change_document/23 returns error with invalid institution_types" do
+      scope = user_scope_fixture()
+
+      attrs = %{
+        title: "test",
+        description: "test",
+        institution_type: "wrong type"
+      }
+
+      changeset = Document.changeset(%Document{}, attrs, scope)
+      assert changeset.valid? == false
+      assert List.keymember?(changeset.errors, :institution_type, 0)
     end
   end
 end

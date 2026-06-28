@@ -3,7 +3,7 @@ defmodule TeacherCoop.Library.Document do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @institution_types ["école maternelle", "école élémentaire"]
+  @institution_types ["Tout le monde", "École maternelle", "École élémentaire"]
 
   schema "documents" do
     field :title, :string
@@ -16,9 +16,12 @@ defmodule TeacherCoop.Library.Document do
 
   @doc false
   def changeset(document, attrs, user_scope) do
+    permitted = [:title, :description, :institution_type]
+    required = permitted
+
     document
-    |> cast(attrs, [:title, :description, :institution_type])
-    |> validate_required([:title, :description])
+    |> cast(attrs, permitted)
+    |> validate_required(required)
     |> validate_institution_types
     |> put_change(:user_id, user_scope.user.id)
   end
@@ -26,7 +29,6 @@ defmodule TeacherCoop.Library.Document do
   def validate_institution_types(changeset) do
     field = get_field(changeset, :institution_type)
 
-    # TODO: add test for validation
     case field do
       nil ->
         add_error(
@@ -40,12 +42,12 @@ defmodule TeacherCoop.Library.Document do
       value when value in @institution_types ->
         changeset
 
-      _ ->
+      value ->
         add_error(
           changeset,
           :institution_type,
-          "missing fiel in changeset `{institution_type}`",
-          field: :institution_type,
+          "Wrong type of institution:`{institution_type}`",
+          field: value,
           validations: :institution_type
         )
     end

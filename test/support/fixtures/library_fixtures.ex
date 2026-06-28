@@ -11,7 +11,8 @@ defmodule TeacherCoop.LibraryFixtures do
     attrs =
       Enum.into(attrs, %{
         description: "some description",
-        title: "some title"
+        title: "some title",
+        institution_type: "Tout le monde"
       })
 
     {:ok, document} = TeacherCoop.Library.create_document(scope, attrs)

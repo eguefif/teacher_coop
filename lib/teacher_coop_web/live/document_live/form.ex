@@ -13,12 +13,16 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       </.header>
 
       <.form for={@form} id="document-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:title]} type="text" label="Title" />
-        <.input field={@form[:description]} type="text" label="Description" />
+        <.input field={@form[:title]} type="text" label={gettext("titre") |> String.capitalize()} />
         <.input
           field={@form[:description]}
+          type="text"
+          label={gettext("description") |> String.capitalize()}
+        />
+        <.input
+          field={@form[:institution_type]}
           type="select"
-          label="Description"
+          label={gettext("institution type") |> String.capitalize()}
           options={
             TeacherCoop.Library.Document.institution_types_options() |> Enum.map(&String.capitalize/1)
           }
