@@ -80,9 +80,10 @@ defmodule TeacherCoop.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "meilisearch.setup"],
-      reset: ["meilisearch.setup", "ecto.reset"],
+      reset: ["meilisearch.setup", "ecto.reset", "seed"],
+      seed: ["run priv/repo/seeds.exs"],
       "meilisearch.setup": ["run --no-start priv/meilisearch/create_index.ex"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],

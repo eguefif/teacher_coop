@@ -28,7 +28,7 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
           {document.description}
         </:col>
         <:col :let={{_id, document}} label={gettext("institution type") |> String.capitalize()}>
-          {document.description}
+          {document.institution_type}
         </:col>
         <:action :let={{_id, document}}>
           <div class="sr-only">

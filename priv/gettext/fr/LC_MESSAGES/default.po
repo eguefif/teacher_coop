@@ -16,11 +16,21 @@ msgstr ""
 msgid "Actions"
 msgstr "Actions"
 
+#: lib/teacher_coop_web/live/document_live/index.ex:42
+#, elixir-autogen, elixir-format
+msgid "Are you sure?"
+msgstr "Etes vous sûr?"
+
 #: lib/teacher_coop_web/components/layouts.ex:75
 #: lib/teacher_coop_web/components/layouts.ex:90
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
 msgstr "Tentative de reconnexion"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:44
+#, elixir-autogen, elixir-format
+msgid "Delete"
+msgstr "Supprimer"
 
 #: lib/teacher_coop_web/components/layouts.ex:82
 #, elixir-autogen, elixir-format
@@ -52,12 +62,7 @@ msgstr "Paramétre de comptes"
 msgid "Already registered?"
 msgstr "Vous avez déjà un compte?"
 
-#: lib/teacher_coop_web/live/document_live/index.ex:37
-#, elixir-autogen, elixir-format
-msgid "Are you sure?"
-msgstr "Etes vous sûr?"
-
-#: lib/teacher_coop_web/live/document_live/form.ex:22
+#: lib/teacher_coop_web/live/document_live/form.ex:30
 #, elixir-autogen, elixir-format
 msgid "Cancel"
 msgstr "Annuler"
@@ -82,17 +87,7 @@ msgstr "Confirmer et rester connecter"
 msgid "Create an account"
 msgstr "Créer un compte"
 
-#: lib/teacher_coop_web/live/document_live/index.ex:39
-#, elixir-autogen, elixir-format
-msgid "Delete"
-msgstr "Supprimer"
-
-#: lib/teacher_coop_web/live/document_live/index.ex:27
-#, elixir-autogen, elixir-format
-msgid "Description"
-msgstr "Description"
-
-#: lib/teacher_coop_web/live/document_live/form.ex:19
+#: lib/teacher_coop_web/live/document_live/form.ex:27
 #: lib/teacher_coop_web/live/document_live/index.ex:14
 #: lib/teacher_coop_web/live/document_live/show.ex:11
 #, elixir-autogen, elixir-format
@@ -115,6 +110,8 @@ msgid "Keep me logged in on this device"
 msgstr "Rester connecté sur cet appareil"
 
 #: lib/teacher_coop_web/live/user_live/confirmation.ex:50
+#: lib/teacher_coop_web/live/user_live/login.ex:13
+#: lib/teacher_coop_web/live/user_live/registration.ex:18
 #, elixir-autogen, elixir-format
 msgid "Log in"
 msgstr "Se connecter"
@@ -139,12 +136,6 @@ msgstr "Se connecter avec le courriel"
 msgid "Log me in only this time"
 msgstr "Me connecter seulement cette fois"
 
-#: lib/teacher_coop_web/live/user_live/login.ex:13
-#: lib/teacher_coop_web/live/user_live/registration.ex:18
-#, elixir-autogen, elixir-format
-msgid "Login in"
-msgstr ""
-
 #: lib/teacher_coop_web/live/user_live/settings.ex:15
 #, elixir-autogen, elixir-format
 msgid "Manage your account email address and password settings"
@@ -165,7 +156,7 @@ msgstr "Nouveau"
 msgid "Register for an account"
 msgstr "Créer un compte"
 
-#: lib/teacher_coop_web/live/document_live/form.ex:19
+#: lib/teacher_coop_web/live/document_live/form.ex:27
 #, elixir-autogen, elixir-format
 msgid "Save"
 msgstr "Sauvegarder"
@@ -185,11 +176,6 @@ msgstr "Créer un compte"
 msgid "Tip: If you prefer passwords, you can enable them in the user settings."
 msgstr "Conseil: si vous préférez le mots de passe, vous pouvez l'activer dans vos paramètres de compte."
 
-#: lib/teacher_coop_web/live/document_live/index.ex:26
-#, elixir-autogen, elixir-format
-msgid "Title"
-msgstr "Titre"
-
 #: lib/teacher_coop_web/live/user_live/confirmation.ex:12
 #, elixir-autogen, elixir-format
 msgid "Welcome"
@@ -200,6 +186,7 @@ msgstr "Bienvenu.e"
 msgid "You need to reauthenticate to perform sensitive actions on your account."
 msgstr "Vous devez vous reconnecter pour faires des actions sensibles sur votre compte...."
 
+#: lib/teacher_coop_web/live/document_live/index.ex:27
 #: lib/teacher_coop_web/live/document_live/show.ex:28
 #, elixir-autogen, elixir-format
 msgid "description"
@@ -224,3 +211,13 @@ msgstr "titre"
 #, elixir-autogen, elixir-format
 msgid "to your account now."
 msgstr "pour votre compte maintenant"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:30
+#, elixir-autogen, elixir-format
+msgid "institution type"
+msgstr "type d'instutition scolaire"
+
+#: lib/teacher_coop_web/live/document_live/index.ex:24
+#, elixir-autogen, elixir-format, fuzzy
+msgid "titre"
+msgstr "titre"

@@ -17,28 +17,9 @@ We have two context:
 
 ## TODO
 
- - [x] create a context/ressource for documents: Library Document documents
- - [x] Start with a minimal schema: document title + description
- - [x] Seed documents
- - [x] Simplify interface to its minimal: no theme choice, take the default one
-    - [x] Minimal search box
-    - [x] Document form and list for user
-    - [x] Add search in liveview
-    - [x] Add search function in SearchEngineRepo
-    - [x] Display result in index
-    - [ ] Finish reading p125
-- [x] Meilisearch
-    -[x] find a way to setup index
- - [ ] When first end-to-end over: add gettext
-    - [ ] In search live view
-    - [ ] In document form
-    - [ ] In document show
-    - [ ] In document index
-    - [ ] In register
-    - [ ] In log-in
-    - [ ] in settings
-    - [ ] In confirm-email
-
+- [ ] Finish reading p125
+- [ ] Improve research layout
+- [ ] Increase the seed to have several research for the word fraction
 - [ ] Solve the Meilisearch test problems with indexing
 
  ## Test
