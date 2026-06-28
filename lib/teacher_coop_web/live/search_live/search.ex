@@ -1,4 +1,4 @@
-defmodule TeacherCoopWeb.SearchLive.Form do
+defmodule TeacherCoopWeb.SearchLive.Search do
   use TeacherCoopWeb, :live_view
   alias TeacherCoop.Discovery
 
@@ -33,7 +33,11 @@ defmodule TeacherCoopWeb.SearchLive.Form do
         <ul :for={result <- @results} class="list">
           <li class="list-row">
             <div class="flex flex-col gap-2 m-4 p-4 rounded-box shadow-md">
-              <div class="text-lg">{result["title"]}</div>
+              <div class="text-lg">
+                <.link navigate={~p"/documents/#{result["id"]}?return_to=search"}>
+                  {result["title"]}
+                </.link>
+              </div>
               <div>{result["description"]}</div>
             </div>
           </li>

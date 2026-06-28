@@ -23,9 +23,8 @@ defmodule TeacherCoop.LibraryTest do
     test "get_document!/2 returns the document with given id" do
       scope = user_scope_fixture()
       document = document_fixture(scope)
-      other_scope = user_scope_fixture()
-      assert Library.get_document!(scope, document.id) == document
-      assert_raise Ecto.NoResultsError, fn -> Library.get_document!(other_scope, document.id) end
+      assert Library.get_document!(document.id) == document
+      assert_raise Ecto.NoResultsError, fn -> Library.get_document!(document.id + 1) end
     end
 
     test "create_document/2 with valid data creates a document" do
@@ -48,7 +47,9 @@ defmodule TeacherCoop.LibraryTest do
       document = document_fixture(scope)
       update_attrs = %{description: "some updated description", title: "some updated title"}
 
-      assert {:ok, %Document{} = document} = Library.update_document(scope, document, update_attrs)
+      assert {:ok, %Document{} = document} =
+               Library.update_document(scope, document, update_attrs)
+
       assert document.description == "some updated description"
       assert document.title == "some updated title"
     end
@@ -66,15 +67,18 @@ defmodule TeacherCoop.LibraryTest do
     test "update_document/3 with invalid data returns error changeset" do
       scope = user_scope_fixture()
       document = document_fixture(scope)
-      assert {:error, %Ecto.Changeset{}} = Library.update_document(scope, document, @invalid_attrs)
-      assert document == Library.get_document!(scope, document.id)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Library.update_document(scope, document, @invalid_attrs)
+
+      assert document == Library.get_document!(document.id)
     end
 
     test "delete_document/2 deletes the document" do
       scope = user_scope_fixture()
       document = document_fixture(scope)
       assert {:ok, %Document{}} = Library.delete_document(scope, document)
-      assert_raise Ecto.NoResultsError, fn -> Library.get_document!(scope, document.id) end
+      assert_raise Ecto.NoResultsError, fn -> Library.get_document!(document.id) end
     end
 
     test "delete_document/2 with invalid scope raises" do

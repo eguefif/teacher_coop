@@ -24,9 +24,9 @@ We have two context:
     - [x] Minimal search box
     - [x] Document form and list for user
     - [x] Add search in liveview
-    - [ ] Add search function in SearchEngineRepo
-    - [ ] Display result in index
-    - [ ] Finish reading p114
+    - [x] Add search function in SearchEngineRepo
+    - [x] Display result in index
+    - [ ] Finish reading p125
 - [x] Meilisearch
     -[x] find a way to setup index
  - [ ] When first end-to-end over: add gettext

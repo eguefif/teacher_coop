@@ -58,7 +58,7 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    document = Library.get_document!(socket.assigns.current_scope, id)
+    document = Library.get_document!(id)
     {:ok, _} = Library.delete_document(socket.assigns.current_scope, document)
 
     {:noreply, stream_delete(socket, :documents, document)}

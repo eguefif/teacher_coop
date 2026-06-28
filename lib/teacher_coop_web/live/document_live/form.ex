@@ -37,7 +37,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   defp return_to(_), do: "index"
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    document = Library.get_document!(socket.assigns.current_scope, id)
+    document = Library.get_document!(id)
 
     socket
     |> assign(:page_title, "Edit Document")
@@ -56,7 +56,13 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   @impl true
   def handle_event("validate", %{"document" => document_params}, socket) do
-    changeset = Library.change_document(socket.assigns.current_scope, socket.assigns.document, document_params)
+    changeset =
+      Library.change_document(
+        socket.assigns.current_scope,
+        socket.assigns.document,
+        document_params
+      )
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -65,7 +71,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   defp save_document(socket, :edit, document_params) do
-    case Library.update_document(socket.assigns.current_scope, socket.assigns.document, document_params) do
+    case Library.update_document(
+           socket.assigns.current_scope,
+           socket.assigns.document,
+           document_params
+         ) do
       {:ok, document} ->
         {:noreply,
          socket

@@ -11,10 +11,14 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
         Document {@document.id}
         <:subtitle>This is a document record from your database.</:subtitle>
         <:actions>
-          <.button navigate={~p"/documents"}>
+          <.button navigate={@return_to}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/documents/#{@document}/edit?return_to=show"}>
+          <.button
+            :if={@current_scope != nil && @current_scope.user.id == @document.user_id}
+            variant="primary"
+            navigate={~p"/documents/#{@document}/edit?return_to=show"}
+          >
             <.icon name="hero-pencil-square" /> Edit document
           </.button>
         </:actions>
@@ -29,15 +33,21 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
   end
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    if connected?(socket) do
-      Library.subscribe_documents(socket.assigns.current_scope)
-    end
-
+  def mount(%{"id" => id, "return_to" => "search"}, _session, socket) do
     {:ok,
      socket
      |> assign(:page_title, "Show Document")
-     |> assign(:document, Library.get_document!(socket.assigns.current_scope, id))}
+     |> assign(:document, Library.get_document!(id))
+     |> assign(:return_to, ~p"/search")}
+  end
+
+  @impl true
+  def mount(%{"id" => id}, _session, socket) do
+    {:ok,
+     socket
+     |> assign(:page_title, "Show Document")
+     |> assign(:document, Library.get_document!(id))
+     |> assign(:return_to, ~p"/documents")}
   end
 
   @impl true

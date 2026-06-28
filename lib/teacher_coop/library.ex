@@ -48,15 +48,15 @@ defmodule TeacherCoop.Library do
 
   ## Examples
 
-      iex> get_document!(scope, 123)
+      iex> get_document!(123)
       %Document{}
 
-      iex> get_document!(scope, 456)
+      iex> get_document!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_document!(%Scope{} = scope, id) do
-    Repo.get_by!(Document, id: id, user_id: scope.user.id)
+  def get_document!(id) do
+    Repo.get_by!(Document, id: id)
   end
 
   @doc """
