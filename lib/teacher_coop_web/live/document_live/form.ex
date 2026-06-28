@@ -10,15 +10,16 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage document records in your database.</:subtitle>
       </.header>
 
       <.form for={@form} id="document-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:title]} type="text" label="Title" />
         <.input field={@form[:description]} type="text" label="Description" />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Document</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @document)}>Cancel</.button>
+          <.button phx-disable-with="Saving..." variant="primary">{gettext("Save")} {gettext(
+            "Document"
+          )}</.button>
+          <.button navigate={return_path(@current_scope, @return_to, @document)}>{gettext("Cancel")}</.button>
         </footer>
       </.form>
     </Layouts.app>

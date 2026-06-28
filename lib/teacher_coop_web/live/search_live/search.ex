@@ -25,7 +25,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
             class="btn btn-primary btn-soft btn-lg rounded-xl"
             phx-click="trigger-search"
           >
-            Search
+            {gettext("Search")}
           </.button>
         </div>
       </form>

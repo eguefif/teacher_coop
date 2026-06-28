@@ -8,10 +8,10 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Documents
+        {gettext("My Documents")}
         <:actions>
           <.button variant="primary" navigate={~p"/documents/new"}>
-            <.icon name="hero-plus" /> New Document
+            <.icon name="hero-plus" /> {gettext("New")} {gettext("Document")}
           </.button>
         </:actions>
       </.header>
@@ -23,8 +23,8 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
         rows={@streams.documents}
         row_click={fn {_id, document} -> JS.navigate(~p"/documents/#{document}") end}
       >
-        <:col :let={{_id, document}} label="Title">{document.title}</:col>
-        <:col :let={{_id, document}} label="Description">{document.description}</:col>
+        <:col :let={{_id, document}} label={gettext("Title")}>{document.title}</:col>
+        <:col :let={{_id, document}} label={gettext("Description")}>{document.description}</:col>
         <:action :let={{_id, document}}>
           <div class="sr-only">
             <.link navigate={~p"/documents/#{document}"}>Show</.link>
@@ -34,9 +34,9 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
         <:action :let={{id, document}}>
           <.link
             phx-click={JS.push("delete", value: %{id: document.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm={gettext("Are you sure?")}
           >
-            Delete
+            {gettext("Delete")}
           </.link>
         </:action>
       </.table>
