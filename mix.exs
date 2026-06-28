@@ -82,10 +82,9 @@ defmodule TeacherCoop.MixProject do
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "meilisearch.setup"],
       reset: ["meilisearch.setup", "ecto.reset", "seed"],
       seed: ["run priv/repo/seeds.exs"],
-      "meilisearch.setup": ["run --no-start priv/meilisearch/create_index.ex"],
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test", "meilisearch.reset_test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["compile", "tailwind teacher_coop", "esbuild teacher_coop"],
       "assets.deploy": [
@@ -93,7 +92,9 @@ defmodule TeacherCoop.MixProject do
         "esbuild teacher_coop --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
+      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
+      "meilisearch.setup": ["run --no-start priv/meilisearch/create_index.ex"],
+      "meilisearch.reset_test": ["run --no-start priv/meilisearch/meilisearch_reset_test.exs"]
     ]
   end
 end
