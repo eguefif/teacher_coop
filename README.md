@@ -17,7 +17,11 @@ We have two context:
 
 ## TODO
 - [ ] Finish reading chapter 5
-- [ ] Improve research layout <-------------- WIP
+- [x] Improve research layout
+- [ ] Add user fullname
+    - [x] Make the form works
+    - [x] Add test for update
+    - [ ] Anytime a user changes their fullname, reindex all documents to update fullname
 - [ ] Improve documents
     - [ ] Add grade
     - [ ] Add tags

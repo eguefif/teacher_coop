@@ -76,7 +76,7 @@ defmodule TeacherCoop.Library do
            %Document{}
            |> Document.changeset(attrs, scope)
            |> Repo.insert(),
-         :ok <- SearchEngineRepo.index_document(document) do
+         :ok <- SearchEngineRepo.index_document(scope, document) do
       broadcast_document(scope, {:created, document})
       {:ok, document}
     end
