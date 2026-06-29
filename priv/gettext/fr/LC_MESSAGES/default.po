@@ -47,7 +47,7 @@ msgstr "Nous ne trouvons pas internet"
 msgid "close"
 msgstr "fermer"
 
-#: lib/teacher_coop_web/live/search_live/search.ex:28
+#: lib/teacher_coop_web/live/search_live/search.ex:29
 #, elixir-autogen, elixir-format
 msgid "Search"
 msgstr "Rechercher"
@@ -62,7 +62,7 @@ msgstr "Paramétre de comptes"
 msgid "Already registered?"
 msgstr "Vous avez déjà un compte?"
 
-#: lib/teacher_coop_web/live/document_live/form.ex:30
+#: lib/teacher_coop_web/live/document_live/form.ex:34
 #, elixir-autogen, elixir-format
 msgid "Cancel"
 msgstr "Annuler"
@@ -87,7 +87,7 @@ msgstr "Confirmer et rester connecter"
 msgid "Create an account"
 msgstr "Créer un compte"
 
-#: lib/teacher_coop_web/live/document_live/form.ex:27
+#: lib/teacher_coop_web/live/document_live/form.ex:31
 #: lib/teacher_coop_web/live/document_live/index.ex:14
 #: lib/teacher_coop_web/live/document_live/show.ex:11
 #, elixir-autogen, elixir-format
@@ -109,6 +109,7 @@ msgstr "Modifier"
 msgid "Keep me logged in on this device"
 msgstr "Rester connecté sur cet appareil"
 
+#: lib/teacher_coop_web/components/layouts/root.html.heex:67
 #: lib/teacher_coop_web/live/user_live/confirmation.ex:50
 #: lib/teacher_coop_web/live/user_live/login.ex:13
 #: lib/teacher_coop_web/live/user_live/registration.ex:18
@@ -156,7 +157,7 @@ msgstr "Nouveau"
 msgid "Register for an account"
 msgstr "Créer un compte"
 
-#: lib/teacher_coop_web/live/document_live/form.ex:27
+#: lib/teacher_coop_web/live/document_live/form.ex:31
 #, elixir-autogen, elixir-format
 msgid "Save"
 msgstr "Sauvegarder"
@@ -186,6 +187,7 @@ msgstr "Bienvenu.e"
 msgid "You need to reauthenticate to perform sensitive actions on your account."
 msgstr "Vous devez vous reconnecter pour faires des actions sensibles sur votre compte...."
 
+#: lib/teacher_coop_web/live/document_live/form.ex:20
 #: lib/teacher_coop_web/live/document_live/index.ex:27
 #: lib/teacher_coop_web/live/document_live/show.ex:28
 #, elixir-autogen, elixir-format
@@ -212,12 +214,94 @@ msgstr "titre"
 msgid "to your account now."
 msgstr "pour votre compte maintenant"
 
+#: lib/teacher_coop_web/live/document_live/form.ex:25
 #: lib/teacher_coop_web/live/document_live/index.ex:30
 #, elixir-autogen, elixir-format
 msgid "institution type"
 msgstr "type d'instutition scolaire"
 
+#: lib/teacher_coop_web/live/document_live/form.ex:16
 #: lib/teacher_coop_web/live/document_live/index.ex:24
 #, elixir-autogen, elixir-format, fuzzy
 msgid "titre"
 msgstr "titre"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:109
+#, elixir-autogen, elixir-format
+msgid "april"
+msgstr "avril"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:113
+#, elixir-autogen, elixir-format
+msgid "august"
+msgstr "août"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:117
+#, elixir-autogen, elixir-format
+msgid "december"
+msgstr "décembre"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:107
+#, elixir-autogen, elixir-format
+msgid "february"
+msgstr "février"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:106
+#, elixir-autogen, elixir-format
+msgid "january"
+msgstr "janvier"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:112
+#, elixir-autogen, elixir-format
+msgid "july"
+msgstr "juillet"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:111
+#, elixir-autogen, elixir-format
+msgid "june"
+msgstr "juin"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:108
+#, elixir-autogen, elixir-format, fuzzy
+msgid "march"
+msgstr "Rechercher"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:110
+#, elixir-autogen, elixir-format
+msgid "may"
+msgstr "mai"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:116
+#, elixir-autogen, elixir-format
+msgid "november"
+msgstr "novembre"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:115
+#, elixir-autogen, elixir-format
+msgid "october"
+msgstr "octobre"
+
+#: lib/teacher_coop_web/live/search_live/search.ex:114
+#, elixir-autogen, elixir-format
+msgid "september"
+msgstr "septembre"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:54
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Documents"
+msgstr "document"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:60
+#, elixir-autogen, elixir-format
+msgid "Log out"
+msgstr "Se déconnecter"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:64
+#, elixir-autogen, elixir-format
+msgid "Register"
+msgstr "Créer un compte"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:57
+#, elixir-autogen, elixir-format
+msgid "Settings"
+msgstr "Paramètre"

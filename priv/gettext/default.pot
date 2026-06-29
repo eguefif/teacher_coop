@@ -47,7 +47,7 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:28
+#: lib/teacher_coop_web/live/search_live/search.ex:29
 #, elixir-autogen, elixir-format
 msgid "Search"
 msgstr ""
@@ -62,7 +62,7 @@ msgstr ""
 msgid "Already registered?"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:30
+#: lib/teacher_coop_web/live/document_live/form.ex:34
 #, elixir-autogen, elixir-format
 msgid "Cancel"
 msgstr ""
@@ -87,7 +87,7 @@ msgstr ""
 msgid "Create an account"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:27
+#: lib/teacher_coop_web/live/document_live/form.ex:31
 #: lib/teacher_coop_web/live/document_live/index.ex:14
 #: lib/teacher_coop_web/live/document_live/show.ex:11
 #, elixir-autogen, elixir-format
@@ -109,6 +109,7 @@ msgstr ""
 msgid "Keep me logged in on this device"
 msgstr ""
 
+#: lib/teacher_coop_web/components/layouts/root.html.heex:67
 #: lib/teacher_coop_web/live/user_live/confirmation.ex:50
 #: lib/teacher_coop_web/live/user_live/login.ex:13
 #: lib/teacher_coop_web/live/user_live/registration.ex:18
@@ -156,7 +157,7 @@ msgstr ""
 msgid "Register for an account"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:27
+#: lib/teacher_coop_web/live/document_live/form.ex:31
 #, elixir-autogen, elixir-format
 msgid "Save"
 msgstr ""
@@ -186,6 +187,7 @@ msgstr ""
 msgid "You need to reauthenticate to perform sensitive actions on your account."
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:20
 #: lib/teacher_coop_web/live/document_live/index.ex:27
 #: lib/teacher_coop_web/live/document_live/show.ex:28
 #, elixir-autogen, elixir-format
@@ -212,12 +214,94 @@ msgstr ""
 msgid "to your account now."
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:25
 #: lib/teacher_coop_web/live/document_live/index.ex:30
 #, elixir-autogen, elixir-format
 msgid "institution type"
 msgstr ""
 
+#: lib/teacher_coop_web/live/document_live/form.ex:16
 #: lib/teacher_coop_web/live/document_live/index.ex:24
 #, elixir-autogen, elixir-format
 msgid "titre"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:109
+#, elixir-autogen, elixir-format
+msgid "april"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:113
+#, elixir-autogen, elixir-format
+msgid "august"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:117
+#, elixir-autogen, elixir-format
+msgid "december"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:107
+#, elixir-autogen, elixir-format
+msgid "february"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:106
+#, elixir-autogen, elixir-format
+msgid "january"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:112
+#, elixir-autogen, elixir-format
+msgid "july"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:111
+#, elixir-autogen, elixir-format
+msgid "june"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:108
+#, elixir-autogen, elixir-format
+msgid "march"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:110
+#, elixir-autogen, elixir-format
+msgid "may"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:116
+#, elixir-autogen, elixir-format
+msgid "november"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:115
+#, elixir-autogen, elixir-format
+msgid "october"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex:114
+#, elixir-autogen, elixir-format
+msgid "september"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:54
+#, elixir-autogen, elixir-format
+msgid "Documents"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:60
+#, elixir-autogen, elixir-format
+msgid "Log out"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:64
+#, elixir-autogen, elixir-format
+msgid "Register"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex:57
+#, elixir-autogen, elixir-format
+msgid "Settings"
 msgstr ""

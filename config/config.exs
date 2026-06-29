@@ -24,6 +24,9 @@ config :teacher_coop,
   ecto_repos: [TeacherCoop.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :teacher_coop, TeacherCoop.Gettext, locales: ~w(en fr)
+config :gettext, :default_locale, "fr"
+
 # Configure the endpoint
 config :teacher_coop, TeacherCoopWeb.Endpoint,
   url: [host: "localhost"],
