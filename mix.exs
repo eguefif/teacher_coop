@@ -93,7 +93,7 @@ defmodule TeacherCoop.MixProject do
         "phx.digest"
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
-      "meilisearch.setup": ["run --no-start priv/meilisearch/create_index.ex"],
+      "meilisearch.setup": ["run --no-start priv/meilisearch/meilisearch_init.exs"],
       "meilisearch.reset_test": ["run --no-start priv/meilisearch/meilisearch_reset_test.exs"]
     ]
   end
