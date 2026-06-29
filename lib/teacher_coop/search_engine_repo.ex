@@ -14,14 +14,19 @@ defmodule TeacherCoop.SearchEngineRepo do
   """
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Discovery.SearchResult
+  alias TeacherCoop.Accounts.Scope
 
   @indexes ["documents", "documents_test"]
 
   @doc """
   Index a document in Meilisearch
   """
-  def index_document(%Document{} = document) do
-    attrs = Map.from_struct(document) |> Map.filter(&(elem(&1, 0) != :__meta__))
+  def index_document(%Scope{} = scope, %Document{} = document) do
+    attrs =
+      Map.from_struct(document)
+      |> Map.filter(&(elem(&1, 0) != :__meta__))
+      |> Map.put(:email, scope.user.email)
+      |> Map.put(:fullname, scope.user.fullname)
 
     case Meilisearch.Document.create_or_replace(get_client(), index_name("documents"), attrs) do
       {:ok, _task = %Meilisearch.SummarizedTask{taskUid: _taskUid}} -> :ok

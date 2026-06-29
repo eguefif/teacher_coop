@@ -4,6 +4,7 @@ defmodule TeacherCoop.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :fullname, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
@@ -54,6 +55,15 @@ defmodule TeacherCoop.Accounts.User do
     else
       changeset
     end
+  end
+
+  def update_changeset(user, attrs, opts \\ []) do
+    permitted = [:email, :fullname]
+
+    user
+    |> cast(attrs, permitted)
+    |> validate_email(opts)
+    |> validate_length(:fullname, min: 3, max: 255)
   end
 
   @doc """
