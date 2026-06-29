@@ -16,12 +16,18 @@ We have two context:
 * Discovery: where we gather searches
 
 ## TODO
-
-- [x] Refactor handling of test for meilisearch: our logic is too scattered and undocumented
 - [ ] Finish reading chapter 5
-- [ ] Improve research layout
-- [ ] Increase the seed to have several research for the word fraction
-- [ ] Solve the Meilisearch test problems with indexing
+- [ ] Improve research layout <-------------- WIP
+- [ ] Improve documents
+    - [ ] Add grade
+    - [ ] Add tags
+    - [ ] Add files
+
+
+## Ways to improve search
+
+I want to change the layout when a search is launched for the first time.
+Maximum space should be dedicated to show answer and ways to improve search.
 
 ## Meilisearch
 

@@ -21,11 +21,7 @@ defmodule TeacherCoop.SearchEngineRepo do
   Index a document in Meilisearch
   """
   def index_document(%Document{} = document) do
-    attrs = %{
-      id: document.id,
-      title: document.title,
-      description: document.description
-    }
+    attrs = Map.from_struct(document) |> Map.filter(&(elem(&1, 0) != :__meta__))
 
     case Meilisearch.Document.create_or_replace(get_client(), index_name("documents"), attrs) do
       {:ok, _task = %Meilisearch.SummarizedTask{taskUid: _taskUid}} -> :ok
@@ -41,7 +37,6 @@ defmodule TeacherCoop.SearchEngineRepo do
 
     case Meilisearch.Search.search(client, "documents", q: search_terms) do
       {:ok, response} ->
-        IO.inspect(response)
         {:ok, create_search_result(response)}
 
       _ ->
