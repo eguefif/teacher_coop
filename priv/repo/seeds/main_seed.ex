@@ -4,11 +4,18 @@ defmodule TeacherCoop.Repo.Seeds.MainSeed do
 
   def seed() do
     user_email = "eguefif@fastmail.com"
-
-    user_attrs = %{:email => user_email, :fullname => "Emmanuel Guefif"}
+    fullname = "Emmanuel Guefif"
 
     user =
-      case Accounts.register_user(user_attrs) do
+      case Accounts.register_user(%{:email => user_email}) do
+        {:ok, user} -> user
+        {:error, _} -> Accounts.get_user_by_email(user_email)
+      end
+
+    user =
+      case Accounts.update_user(TeacherCoop.Accounts.Scope.for_user(user), %{
+             :fullname => fullname
+           }) do
         {:ok, user} -> user
         {:error, _} -> Accounts.get_user_by_email(user_email)
       end

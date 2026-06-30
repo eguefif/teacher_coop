@@ -92,7 +92,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       {:ok, document} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Document updated successfully")
+         |> put_flash(:info, gettext("Document updated successfully"))
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, document)
          )}
@@ -107,7 +107,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       {:ok, document} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Document created successfully")
+         |> put_flash(:info, gettext("Document created successfully"))
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, document)
          )}

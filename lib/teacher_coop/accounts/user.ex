@@ -57,12 +57,11 @@ defmodule TeacherCoop.Accounts.User do
     end
   end
 
-  def update_changeset(user, attrs, opts \\ []) do
-    permitted = [:email, :fullname]
+  def update_changeset(user, attrs, _opts \\ []) do
+    permitted = [:fullname]
 
     user
     |> cast(attrs, permitted)
-    |> validate_email(opts)
     |> validate_length(:fullname, min: 3, max: 255)
   end
 

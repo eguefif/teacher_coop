@@ -6,7 +6,7 @@ defmodule TeacherCoop.Accounts do
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
 
-  alias TeacherCoop.Accounts.{User, UserToken, UserNotifier}
+  alias TeacherCoop.Accounts.{User, UserToken, UserNotifier, Scope}
 
   ## Database getters
 
@@ -130,6 +130,37 @@ defmodule TeacherCoop.Accounts do
         _ -> {:error, :transaction_aborted}
       end
     end)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for changing the user informations.
+
+  ## Examples
+
+      iex> change_user(user)
+      %Ecto.Changeset{data: %User{}}
+
+  """
+  def change_user(user, attrs \\ %{}, opts \\ []) do
+    User.update_changeset(user, attrs, opts)
+  end
+
+  @doc """
+  Updates a user information
+
+  ## Examples
+
+      iex> update_user(user, %{fullname: new_value})
+      {:ok, %User{}}
+
+      iex> update_user(user, %{fullname: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_user(%Scope{} = scope, attrs \\ %{}, opts \\ []) do
+    scope.user
+    |> User.update_changeset(attrs, opts)
+    |> Repo.update()
   end
 
   @doc """

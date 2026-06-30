@@ -1,5 +1,6 @@
 defmodule TeacherCoopWeb.UserLive.SettingsTest do
   use TeacherCoopWeb.ConnCase, async: true
+  use Gettext, backend: TeacherCoopWeb.Gettext
 
   alias TeacherCoop.Accounts
   import Phoenix.LiveViewTest
@@ -207,6 +208,30 @@ defmodule TeacherCoopWeb.UserLive.SettingsTest do
       assert path == ~p"/users/log-in"
       assert %{"error" => message} = flash
       assert message == "You must log in to access this page."
+    end
+  end
+
+  describe "update user information form" do
+    setup %{conn: conn} do
+      user = user_fixture()
+      %{conn: log_in_user(conn, user), user: user}
+    end
+
+    test "updates the user fullname", %{conn: conn, user: user} do
+      new_fullname = unique_user_fullname()
+
+      {:ok, lv, _html} = live(conn, ~p"/users/settings")
+
+      {:ok, _lv, html} =
+        lv
+        |> form("#user_form", %{
+          "user" => %{"fullname" => new_fullname}
+        })
+        |> render_submit()
+        |> follow_redirect(conn, "/users/settings")
+
+      assert html =~ gettext("User information updated succesfully")
+      assert Accounts.get_user!(user.id).fullname == new_fullname
     end
   end
 end
