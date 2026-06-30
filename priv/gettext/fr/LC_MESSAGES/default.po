@@ -165,7 +165,7 @@ msgstr "Sauvegarder"
 #: lib/teacher_coop_web/live/user_live/settings.ex:65
 #, elixir-autogen, elixir-format
 msgid "Save Password"
-msgstr "Sauvegarder le mo de passe"
+msgstr "Sauvegarder le mot de passe"
 
 #: lib/teacher_coop_web/live/user_live/login.ex:22
 #, elixir-autogen, elixir-format
@@ -304,4 +304,4 @@ msgstr "Créer un compte"
 #: lib/teacher_coop_web/components/layouts/root.html.heex:57
 #, elixir-autogen, elixir-format
 msgid "Settings"
-msgstr "Paramètre"
+msgstr "Paramètres"

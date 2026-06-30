@@ -20,12 +20,27 @@ defmodule TeacherCoopWeb.UserLive.Settings do
         <.input
           field={@email_form[:email]}
           type="email"
-          label="Email"
+          label={gettext("Email")}
           autocomplete="username"
           spellcheck="false"
           required
         />
-        <.button variant="primary" phx-disable-with="Changing...">{gettext("Change Email")}</.button>
+        <.button variant="primary" phx-disable-with={gettext("Changing...")}>{gettext("Change Email")}</.button>
+      </.form>
+
+      <div class="divider" />
+
+      <.form for={@user_form} id="user_form" phx-submit="update_user" phx-change="validate_user">
+        <.input
+          field={@user_form[:fullname]}
+          type="text"
+          label={gettext("Fullname")}
+          spellcheck="false"
+          required
+        />
+        <.button variant="primary" phx-disable-with={gettext("Changing...")}>{gettext(
+          "Update user information"
+        )}</.button>
       </.form>
 
       <div class="divider" />
@@ -49,7 +64,7 @@ defmodule TeacherCoopWeb.UserLive.Settings do
         <.input
           field={@password_form[:password]}
           type="password"
-          label="New password"
+          label={gettext("New password")}
           autocomplete="new-password"
           spellcheck="false"
           required
@@ -57,11 +72,11 @@ defmodule TeacherCoopWeb.UserLive.Settings do
         <.input
           field={@password_form[:password_confirmation]}
           type="password"
-          label="Confirm new password"
+          label={gettext("Confirm new password")}
           autocomplete="new-password"
           spellcheck="false"
         />
-        <.button variant="primary" phx-disable-with="Saving...">
+        <.button variant="primary" phx-disable-with={gettext("Saving...")}>
           {gettext("Save Password")}"
         </.button>
       </.form>
@@ -74,10 +89,10 @@ defmodule TeacherCoopWeb.UserLive.Settings do
     socket =
       case Accounts.update_user_email(socket.assigns.current_scope.user, token) do
         {:ok, _user} ->
-          put_flash(socket, :info, "Email changed successfully.")
+          put_flash(socket, :info, gettext("Email changed successfully."))
 
         {:error, _} ->
-          put_flash(socket, :error, "Email change link is invalid or it has expired.")
+          put_flash(socket, :error, gettext("Email change link is invalid or it has expired."))
       end
 
     {:ok, push_navigate(socket, to: ~p"/users/settings")}
@@ -87,12 +102,14 @@ defmodule TeacherCoopWeb.UserLive.Settings do
     user = socket.assigns.current_scope.user
     email_changeset = Accounts.change_user_email(user, %{}, validate_unique: false)
     password_changeset = Accounts.change_user_password(user, %{}, hash_password: false)
+    user_changeset = Accounts.change_user(user, %{})
 
     socket =
       socket
       |> assign(:current_email, user.email)
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
+      |> assign(:user_form, to_form(user_changeset))
       |> assign(:trigger_submit, false)
 
     {:ok, socket}
@@ -124,7 +141,7 @@ defmodule TeacherCoopWeb.UserLive.Settings do
           &url(~p"/users/settings/confirm-email/#{&1}")
         )
 
-        info = "A link to confirm your email change has been sent to the new address."
+        info = gettext("A link to confirm your email change has been sent to the new address.")
         {:noreply, socket |> put_flash(:info, info)}
 
       changeset ->
@@ -155,6 +172,35 @@ defmodule TeacherCoopWeb.UserLive.Settings do
 
       changeset ->
         {:noreply, assign(socket, password_form: to_form(changeset, action: :insert))}
+    end
+  end
+
+  def handle_event("validate_user", params, socket) do
+    %{"user" => user_params} = params
+
+    user_form =
+      socket.assigns.current_scope.user
+      |> Accounts.change_user(user_params)
+      |> Map.put(:action, :validate)
+      |> to_form
+
+    {:noreply, socket |> assign(user_form: user_form)}
+  end
+
+  def handle_event("update_user", params, socket) do
+    %{"user" => user_params} = params
+
+    case Accounts.update_user(socket.assigns.current_scope, user_params) do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, gettext("User information updated succesfully"))
+         |> push_navigate(to: ~p"/users/settings")}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply,
+         socket
+         |> assign(user_form: changeset)}
     end
   end
 end
