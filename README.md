@@ -15,6 +15,17 @@ We have two context:
 * Library: where we gather documents
 * Discovery: where we gather searches
 
+## Setup
+
+```bash
+$ mix deps.get
+$ mix setup
+$ docker compose up
+$ mix phx.server
+```
+
+The website is available on `teachercoop:4000`
+
 ## TODO
 - [ ] Finish reading chapter 5
 - [x] Improve research layout
