@@ -15,18 +15,39 @@ We have two context:
 * Library: where we gather documents
 * Discovery: where we gather searches
 
+## Setup
+
+```bash
+$ mix deps.get
+$ mix setup
+$ docker compose up
+$ mix phx.server
+```
+
+The website is available on `teachercoop:4000`
+
 ## TODO
 - [ ] Finish reading chapter 5
 - [x] Improve research layout
 - [ ] Add user fullname
     - [x] Make the form works
     - [x] Add test for update
-    - [ ] Anytime a user changes their fullname, reindex all documents to update fullname
+    - [x] Anytime a user changes their fullname, reindex all documents to update fullname
 - [ ] Improve documents
     - [ ] Add grade
     - [ ] Add tags
     - [ ] Add files
 
+
+### Meilisearch
+For now we don't handle retry and error for: indexing, update. This will have to change. We need to add a background task mechanism and handle/log retry
+- [ ] Add retry mechanism
+    - [ ] indexing
+    - [ ] Update documents when user info change
+
+### Tests
+
+I need to find a better way to test meilisearch. At the moment, anytime we create a document or update user information, it will do something in meilisearch.
 
 ## Ways to improve search
 

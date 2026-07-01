@@ -3,8 +3,8 @@ defmodule TeacherCoop.Repo.Seeds.MainSeed do
   alias TeacherCoop.Accounts
 
   def seed() do
-    user_email = "eguefif@fastmail.com"
-    fullname = "Emmanuel Guefif"
+    user_email = "robert_do@lost.com"
+    fullname = "Robert Do"
 
     user =
       case Accounts.register_user(%{:email => user_email}) do

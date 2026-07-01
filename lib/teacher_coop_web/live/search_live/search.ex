@@ -62,19 +62,11 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     scope =
       if Map.has_key?(socket.assigns, :current_scope), do: socket.assigns.current_scope, else: nil
 
-    {:ok, _results} =
-      Discovery.create_search(nil, %{
-        search_terms: "fraction"
-      })
-
-    # results = results.hits
-    results = nil
-
     {:ok,
      socket
      |> assign_new(:current_scope, fn -> scope end)
      |> assign(:search_terms, "")
-     |> assign(:results, results)}
+     |> assign(:results, nil)}
   end
 
   @impl true
