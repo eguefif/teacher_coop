@@ -5,6 +5,7 @@ defmodule TeacherCoop.Accounts do
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
+  alias TeacherCoop.SearchEngineRepo
 
   alias TeacherCoop.Accounts.{User, UserToken, UserNotifier, Scope}
 
@@ -125,6 +126,7 @@ defmodule TeacherCoop.Accounts do
            {:ok, user} <- Repo.update(User.email_changeset(user, %{email: email})),
            {_count, _result} <-
              Repo.delete_all(from(UserToken, where: [user_id: ^user.id, context: ^context])) do
+        SearchEngineRepo.update_user_info_for_documents(user)
         {:ok, user}
       else
         _ -> {:error, :transaction_aborted}
@@ -158,9 +160,15 @@ defmodule TeacherCoop.Accounts do
 
   """
   def update_user(%Scope{} = scope, attrs \\ %{}, opts \\ []) do
-    scope.user
-    |> User.update_changeset(attrs, opts)
-    |> Repo.update()
+    with {:ok, user} <-
+           scope.user
+           |> User.update_changeset(attrs, opts)
+           |> Repo.update() do
+      SearchEngineRepo.update_user_info_for_documents(user)
+      {:ok, user}
+    else
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """

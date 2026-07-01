@@ -1,9 +1,11 @@
 defmodule TeacherCoop.AccountsTest do
   use TeacherCoop.DataCase
 
+  alias TeacherCoop.SearchEngineRepo
   alias TeacherCoop.Accounts
 
   import TeacherCoop.AccountsFixtures
+  import TeacherCoop.LibraryFixtures
   alias TeacherCoop.Accounts.{User, UserToken}
 
   describe "get_user_by_email/1" do
@@ -177,6 +179,43 @@ defmodule TeacherCoop.AccountsTest do
 
       assert Repo.get!(User, user.id).email == user.email
       assert Repo.get_by(UserToken, user_id: user.id)
+    end
+
+    test "it updates user's documents in NoSQL db", %{user: user, token: token, email: email} do
+      scope = Accounts.Scope.for_user(user)
+      document_fixture(scope)
+      Accounts.update_user_email(user, token)
+
+      {:ok, documents} = SearchEngineRepo.get_user_documents(user)
+      documents = documents.results |> Enum.map(& &1["email"])
+      assert documents == [email]
+    end
+  end
+
+  describe "update__user/4" do
+    test "it updates the fullname" do
+      user = user_fixture()
+      scope = Accounts.Scope.for_user(user)
+      attrs = %{fullname: "robert"}
+
+      Accounts.update_user(scope, attrs)
+      changed_user = Repo.get!(User, user.id)
+
+      assert changed_user.fullname == "robert"
+      assert changed_user.fullname != user.fullname
+    end
+
+    test "it updates user's documents in NoSQL db" do
+      user = user_fixture()
+      scope = Accounts.Scope.for_user(user)
+      document = document_fixture(scope)
+      attrs = %{fullname: "robert"}
+
+      Accounts.update_user(scope, attrs)
+      {:ok, documents} = SearchEngineRepo.get_user_documents(user)
+      documents = documents.results |> Enum.map(& &1["fullname"])
+      assert documents == ["robert"]
+      assert Map.has_key?(document, "fullname") == false
     end
   end
 
