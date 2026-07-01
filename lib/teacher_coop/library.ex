@@ -61,7 +61,6 @@ defmodule TeacherCoop.Library do
 
   @doc """
   Creates a document.
-
   ## Examples
 
       iex> create_document(scope, %{field: value})

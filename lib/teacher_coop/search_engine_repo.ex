@@ -15,6 +15,7 @@ defmodule TeacherCoop.SearchEngineRepo do
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Discovery.SearchResult
   alias TeacherCoop.Accounts.Scope
+  alias TeacherCoop.Repo
 
   @indexes ["documents", "documents_test"]
 
@@ -25,12 +26,39 @@ defmodule TeacherCoop.SearchEngineRepo do
     attrs =
       Map.from_struct(document)
       |> Map.filter(&(elem(&1, 0) != :__meta__))
+      |> Map.put(:user_id, scope.user.id)
       |> Map.put(:email, scope.user.email)
       |> Map.put(:fullname, scope.user.fullname)
 
     case Meilisearch.Document.create_or_replace(get_client(), index_name("documents"), attrs) do
-      {:ok, _task = %Meilisearch.SummarizedTask{taskUid: _taskUid}} -> :ok
-      {:error, _error_details} -> :error
+      {:ok, %Meilisearch.SummarizedTask{} = task} ->
+        wait_for_tasks([task])
+        :ok
+
+      {:error, _error_details} ->
+        :error
+    end
+  end
+
+  @doc """
+  Update documents user info for all the user's document in the NoSQLDB
+  """
+  def update_user_info_for_documents(user) do
+    client = get_client()
+
+    users_documents =
+      Repo.all_by(Document, user_id: user.id)
+      |> Enum.map(&Map.from_struct(&1))
+      |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :__meta__ end))
+      |> Enum.map(&Map.merge(&1, %{email: user.email, fullname: user.fullname}))
+
+    case Meilisearch.Document.create_or_update(client, index_name("documents"), users_documents) do
+      {:ok, task = %Meilisearch.SummarizedTask{}} ->
+        wait_for_tasks([task])
+        :ok
+
+      {:error, error} ->
+        {:ok, error}
     end
   end
 
@@ -38,15 +66,24 @@ defmodule TeacherCoop.SearchEngineRepo do
   Specialized function to look into documents
   """
   def search_document(search_terms) when is_bitstring(search_terms) do
-    client = Meilisearch.client(:meilisearch)
+    client = get_client()
 
-    case Meilisearch.Search.search(client, "documents", q: search_terms) do
+    case Meilisearch.Search.search(client, index_name("documents"), q: search_terms) do
       {:ok, response} ->
         {:ok, create_search_result(response)}
 
       _ ->
         :error
     end
+  end
+
+  @doc """
+  Get all the documents related to a user
+  """
+  def get_user_documents(user) do
+    client = get_client()
+
+    Meilisearch.Document.list(client, index_name("documents"), filter: "user_id=#{user.id}")
   end
 
   @doc """
@@ -72,6 +109,7 @@ defmodule TeacherCoop.SearchEngineRepo do
       |> Enum.map(&{&1, Meilisearch.Index.get(client, &1)})
       |> Enum.reject(&(elem(elem(&1, 1), 0) == :error))
       |> Enum.map(&elem(&1, 0))
+      |> IO.inspect()
       |> Enum.map(&Meilisearch.Index.delete(client, &1))
       |> Enum.map(&elem(&1, 1))
 
@@ -122,9 +160,17 @@ defmodule TeacherCoop.SearchEngineRepo do
 
     result = wait_for_tasks(tasks)
 
+    update_index_settings()
+
     if result == :ok,
       do: IO.puts("All index created"),
       else: IO.puts("Error while creating indexes")
+  end
+
+  defp update_index_settings() do
+    # TODO: put the settings in a map along with indexes => this should work for test and regular
+    client = get_client()
+    Meilisearch.Settings.FilterableAttributes.update(client, "documents_test", ["user_id"])
   end
 
   defp wait_for_tasks(tasks) when tasks == [] do
@@ -143,9 +189,10 @@ defmodule TeacherCoop.SearchEngineRepo do
   defp wait_for_task(task) do
     {:ok, task_details} = Meilisearch.Task.get(get_client(), task.taskUid)
     status = Map.get(task_details, :status)
+    wait_time = if is_env_test(), do: 1, else: 250
 
-    if status in [:enqueud, :processing] do
-      Process.sleep(1000)
+    if status in [:enqueued, :processing] do
+      Process.sleep(wait_time)
       wait_for_task(task)
     else
       status
