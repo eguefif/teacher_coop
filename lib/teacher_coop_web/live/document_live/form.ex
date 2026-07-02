@@ -33,6 +33,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           label={gettext("grade") |> String.capitalize()}
           options={TeacherCoop.Library.Document.grades_options()}
         />
+        <.input
+          field={@form[:objectives]}
+          type="text"
+          label={gettext("objectives") |> String.capitalize()}
+        />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">{gettext("Save")} {gettext(
             "Document"

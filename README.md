@@ -33,15 +33,15 @@ The website is available on `teachercoop:4000`
     - [x] Add test for update
     - [x] Anytime a user changes their fullname, reindex all documents to update fullname
 - [ ] Improve documents
-    - [ ] Add grade
+    - [x] Add grade
     - [ ] Add tags
     - [ ] Add goals
     - [ ] Add files
 - [ ] Handle curriculum
-    - [ ] Write etl script to populate db
-    - [ ] Add table
-    - [ ] Update Documents table to take a goal
-    - [ ] Add auto complete input
+    - [x] Write etl script to populate db
+    - [x] Add table
+    - [x] Update Documents table to take a goal
+    - [ ] See todo in Documents schema
 
 
 ### Meilisearch
