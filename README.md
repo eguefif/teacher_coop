@@ -37,6 +37,11 @@ The website is available on `teachercoop:4000`
     - [ ] Add tags
     - [ ] Add goals
     - [ ] Add files
+- [ ] Handle curriculum
+    - [ ] Write etl script to populate db
+    - [ ] Add table
+    - [ ] Update Documents table to take a goal
+    - [ ] Add auto complete input
 
 
 ### Meilisearch
