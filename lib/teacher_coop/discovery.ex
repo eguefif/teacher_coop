@@ -5,7 +5,7 @@ defmodule TeacherCoop.Discovery do
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
-  alias TeacherCoop.SearchEngineRepo
+  alias TeacherCoop.SearchEngineRepo.SearchDocuments
 
   alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Accounts.Scope
@@ -68,7 +68,7 @@ defmodule TeacherCoop.Discovery do
   end
 
   defp make_search(search_terms) do
-    SearchEngineRepo.search_document(search_terms)
+    SearchDocuments.search_document(search_terms)
   end
 
   @doc """

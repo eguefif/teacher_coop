@@ -12,79 +12,9 @@ defmodule TeacherCoop.SearchEngineRepo do
 
    TODO: thing about the public interface, it might be too specialized with the data architecture
   """
-  alias TeacherCoop.Library.Document
   alias TeacherCoop.Discovery.SearchResult
-  alias TeacherCoop.Accounts.Scope
-  alias TeacherCoop.Repo
 
-  @indexes ["documents", "documents_test"]
-
-  @doc """
-  Index a document in Meilisearch
-  """
-  def index_document(%Scope{} = scope, %Document{} = document) do
-    attrs =
-      Map.from_struct(document)
-      |> Map.filter(&(elem(&1, 0) != :__meta__))
-      |> Map.put(:user_id, scope.user.id)
-      |> Map.put(:email, scope.user.email)
-      |> Map.put(:fullname, scope.user.fullname)
-
-    case Meilisearch.Document.create_or_replace(get_client(), index_name("documents"), attrs) do
-      {:ok, %Meilisearch.SummarizedTask{} = task} ->
-        wait_for_tasks([task])
-        :ok
-
-      {:error, _error_details} ->
-        :error
-    end
-  end
-
-  @doc """
-  Update documents user info for all the user's document in the NoSQLDB
-  """
-  def update_user_info_for_documents(user) do
-    client = get_client()
-
-    users_documents =
-      Repo.all_by(Document, user_id: user.id)
-      |> Enum.map(&Map.from_struct(&1))
-      |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :__meta__ end))
-      |> Enum.map(&Map.merge(&1, %{email: user.email, fullname: user.fullname}))
-
-    case Meilisearch.Document.create_or_update(client, index_name("documents"), users_documents) do
-      {:ok, task = %Meilisearch.SummarizedTask{}} ->
-        wait_for_tasks([task])
-        :ok
-
-      {:error, error} ->
-        {:ok, error}
-    end
-  end
-
-  @doc """
-  Specialized function to look into documents
-  """
-  def search_document(search_terms) when is_bitstring(search_terms) do
-    client = get_client()
-
-    case Meilisearch.Search.search(client, index_name("documents"), q: search_terms) do
-      {:ok, response} ->
-        {:ok, create_search_result(response)}
-
-      _ ->
-        :error
-    end
-  end
-
-  @doc """
-  Get all the documents related to a user
-  """
-  def get_user_documents(user) do
-    client = get_client()
-
-    Meilisearch.Document.list(client, index_name("documents"), filter: "user_id=#{user.id}")
-  end
+  @indexes ["documents", "documents_test", "objectives", "objectives_test"]
 
   @doc """
   Initliazes all the indexes after dropping them.
@@ -127,14 +57,14 @@ defmodule TeacherCoop.SearchEngineRepo do
     drop_all(indexes)
   end
 
-  defp create_search_result(result) when is_map(result) do
+  def create_search_result(result) when is_map(result) do
     %SearchResult{
       facets: %{},
       hits: result.hits
     }
   end
 
-  defp index_name(index) do
+  def index_name(index) do
     # This function is fondamental to make it work locally.
     # We check if we are running in test environement. This way, we index document
     # in the corresponding test index
@@ -173,11 +103,11 @@ defmodule TeacherCoop.SearchEngineRepo do
     Meilisearch.Settings.FilterableAttributes.update(client, "documents_test", ["user_id"])
   end
 
-  defp wait_for_tasks(tasks) when tasks == [] do
+  def wait_for_tasks(tasks) when tasks == [] do
     :ok
   end
 
-  defp wait_for_tasks(tasks) do
+  def wait_for_tasks(tasks) do
     result =
       tasks
       |> Enum.map(&wait_for_task(&1))
@@ -199,7 +129,7 @@ defmodule TeacherCoop.SearchEngineRepo do
     end
   end
 
-  defp get_client() do
+  def get_client() do
     # Convenient function that initialize finch client if necessary and returns
     # a Meilisearch client.
     init_finch()

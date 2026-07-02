@@ -1,7 +1,7 @@
 defmodule TeacherCoop.Library do
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
-  alias TeacherCoop.SearchEngineRepo
+  alias TeacherCoop.SearchEngineRepo.SearchDocuments
 
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Accounts.Scope
@@ -75,7 +75,7 @@ defmodule TeacherCoop.Library do
            %Document{}
            |> Document.changeset(attrs, scope)
            |> Repo.insert(),
-         :ok <- SearchEngineRepo.index_document(scope, document) do
+         :ok <- SearchDocuments.index_document(scope, document) do
       broadcast_document(scope, {:created, document})
       {:ok, document}
     end
