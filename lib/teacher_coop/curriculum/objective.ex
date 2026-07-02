@@ -6,6 +6,7 @@ defmodule TeacherCoop.Curriculum.Objective do
     field :year, :integer
     field :subject, :string
     field :grade, :string
+    field :strand, :string
     field :goal, :string
 
     timestamps(type: :utc_datetime)

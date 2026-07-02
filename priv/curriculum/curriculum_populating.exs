@@ -11,11 +11,6 @@ alias TeacherCoop.Curriculum.Objective
 
 Dotenv.load()
 
-{:ok, _} = Repo.query("TRUNCATE objectives", [])
-
-{:ok, cwd} = File.cwd()
-base_path = Path.join(cwd, "/priv/repo/curriculum/")
-
 defmodule CurriculumFile do
   @moduledoc """
   This module contains utilities function to seed the database with curriculum entries.  
@@ -29,6 +24,10 @@ defmodule CurriculumFile do
   """
   defstruct year: 0, subject: "", content: ""
 
+  @doc """
+  Returns a list of files from a base path.
+  It follows every possible directory to get all the files
+  """
   def build_curriculum_files(path) do
     case File.dir?(path) do
       false ->
@@ -40,11 +39,14 @@ defmodule CurriculumFile do
     end
   end
 
+  @doc """
+  Parse a file and returns a list of Maps.
+  """
   def parse_file(base_path, file) do
     [year | rest] =
       String.replace(file, base_path, "")
       |> Path.split()
-      |> Enum.slice(1..-1//1)
+      |> Enum.drop(1)
 
     subject = List.last(rest) |> Path.rootname()
     content = File.read!(file)
@@ -64,7 +66,7 @@ defmodule CurriculumFile do
             subject: String.trim(subject),
             strand: String.trim(entry.strand),
             grade: String.trim(entry.grade),
-            item: String.trim(entry.item),
+            goal: String.trim(entry.goal),
             inserted_at: date_time,
             updated_at: date_time
           }
@@ -76,23 +78,30 @@ defmodule CurriculumFile do
     [first_line | rest] = String.split(block, "\n", trim: true)
     [strand, grade] = String.split(first_line, "-", trim: true)
 
-    Enum.map(rest, fn entry -> %{strand: strand, grade: grade, item: entry} end)
+    Enum.map(rest, fn entry -> %{strand: strand, grade: grade, goal: entry} end)
   end
 end
 
 IO.puts("\n************** Indexing Curriculum *********************\n")
 
+{:ok, _} = Repo.query("TRUNCATE objectives", [])
+TeacherCoop.SearchRepo.SearchObjectives.reset_objectives_index()
+
+{:ok, cwd} = File.cwd()
+base_path = Path.join(cwd, "/priv/curriculum/curriculum/")
+
 entries =
   CurriculumFile.build_curriculum_files(base_path)
+  |> IO.inspect()
   |> Enum.flat_map(fn file -> CurriculumFile.parse_file(base_path, file) end)
 
 Repo.insert_all(Objective, entries)
 
 query =
   from c in Objective,
-    select: %{id: c.id, strand: c.strand, grade: c.grade, item: c.item, subject: c.subject},
+    select: %{id: c.id, strand: c.strand, grade: c.grade, goal: c.goal, subject: c.subject},
     where: c.year == 2024
 
 entries = Repo.all(query)
 
-# TeacherCoop.SearchRepo.SearchObjectives.populate_objectives_index(entries)
+TeacherCoop.SearchRepo.SearchObjectives.populate_objectives_index(entries)

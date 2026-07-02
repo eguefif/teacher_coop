@@ -1,13 +1,8 @@
 defmodule TeacherCoop.SearchRepo.SearchObjectives do
   import TeacherCoop.SearchRepo
-  alias TeacherCoop.Curriculum.Objective
 
-  def index_objective(%Objective{} = objective, wait_task \\ false) do
-    attrs =
-      Map.from_struct(objective)
-      |> Map.delete(:__meta__)
-
-    case Meilisearch.Document.create_or_replace(get_client(), index_name("objectives"), attrs) do
+  def index_objective(attrs, wait_task \\ false) do
+    case Meilisearch.Document.create_or_replace(get_client(), "objectives", attrs) do
       {:ok, %Meilisearch.SummarizedTask{} = task} when wait_task == true ->
         wait_for_tasks([task])
         :ok
@@ -20,10 +15,25 @@ defmodule TeacherCoop.SearchRepo.SearchObjectives do
     end
   end
 
-  def populate_objectives_index(entries \\ []) when is_list(entries) do
-    [:ok] =
-      entries
-      |> Enum.map(&index_objective/1)
-      |> Enum.uniq()
+  def populate_objectives_index(attrs \\ []) when is_list(attrs) do
+    case Meilisearch.Document.create_or_replace(get_client(), "objectives", attrs) do
+      {:ok, %Meilisearch.SummarizedTask{} = task} ->
+        wait_for_tasks([task])
+        :ok
+
+      {:error, _} ->
+        :error
+    end
+  end
+
+  def reset_objectives_index() do
+    case Meilisearch.Index.delete(get_client(), "objectives") do
+      {:ok, %Meilisearch.SummarizedTask{} = task} ->
+        wait_for_tasks([task])
+        :ok
+
+      {:error, _} ->
+        :error
+    end
   end
 end
