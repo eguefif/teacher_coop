@@ -9,7 +9,7 @@ defmodule TeacherCoop.LibraryTest do
     import TeacherCoop.AccountsFixtures, only: [user_scope_fixture: 0]
     import TeacherCoop.LibraryFixtures
 
-    @invalid_attrs %{description: nil, title: nil}
+    @invalid_attrs %{description: nil, title: nil, institution_type: "wrong", grade: "wrong"}
 
     test "list_documents/1 returns all scoped documents" do
       scope = user_scope_fixture()
@@ -33,7 +33,8 @@ defmodule TeacherCoop.LibraryTest do
       valid_attrs = %{
         description: "some description",
         title: "some title",
-        institution_type: institution_type
+        institution_type: institution_type,
+        grade: "CM2"
       }
 
       scope = user_scope_fixture()
@@ -47,7 +48,9 @@ defmodule TeacherCoop.LibraryTest do
 
     test "create_document/2 with invalid data returns error changeset" do
       scope = user_scope_fixture()
-      assert {:error, %Ecto.Changeset{}} = Library.create_document(scope, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Library.create_document(scope, @invalid_attrs)
     end
 
     test "update_document/3 with valid data updates the document" do
@@ -102,18 +105,34 @@ defmodule TeacherCoop.LibraryTest do
       assert %Ecto.Changeset{} = Library.change_document(scope, document)
     end
 
-    test "change_document/23 returns error with invalid institution_types" do
+    test "change_document/2 returns error with invalid institution_types" do
       scope = user_scope_fixture()
 
       attrs = %{
         title: "test",
         description: "test",
-        institution_type: "wrong type"
+        institution_type: "wrong type",
+        grade: "CM2"
       }
 
       changeset = Document.changeset(%Document{}, attrs, scope)
       assert changeset.valid? == false
       assert List.keymember?(changeset.errors, :institution_type, 0)
+    end
+
+    test "change_document/2 returns error with invalid grade" do
+      scope = user_scope_fixture()
+
+      attrs = %{
+        title: "test",
+        description: "test",
+        institution_type: "Tout le monde",
+        grade: "wrong"
+      }
+
+      changeset = Document.changeset(%Document{}, attrs, scope)
+      assert changeset.valid? == false
+      assert List.keymember?(changeset.errors, :grade, 0)
     end
   end
 end

@@ -18,7 +18,6 @@ We have two context:
 ## Setup
 
 ```bash
-$ mix deps.get
 $ mix setup
 $ docker compose up
 $ mix phx.server
@@ -36,6 +35,7 @@ The website is available on `teachercoop:4000`
 - [ ] Improve documents
     - [ ] Add grade
     - [ ] Add tags
+    - [ ] Add goals
     - [ ] Add files
 
 
