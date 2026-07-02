@@ -7,7 +7,7 @@ defmodule TeacherCoop.CurriculumFixtures do
   @doc """
   Generate a objective.
   """
-  def objective_fixture(scope, attrs \\ %{}) do
+  def objective_fixture(attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{
         goal: "some goal",
@@ -16,7 +16,7 @@ defmodule TeacherCoop.CurriculumFixtures do
         year: 42
       })
 
-    {:ok, objective} = TeacherCoop.Curriculum.create_objective(scope, attrs)
+    {:ok, objective} = TeacherCoop.Curriculum.create_objective(attrs)
     objective
   end
 end

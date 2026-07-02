@@ -7,42 +7,6 @@ defmodule TeacherCoop.Curriculum do
   alias TeacherCoop.Repo
 
   alias TeacherCoop.Curriculum.Objective
-  alias TeacherCoop.Accounts.Scope
-
-  @doc """
-  Subscribes to scoped notifications about any objective changes.
-
-  The broadcasted messages match the pattern:
-
-    * {:created, %Objective{}}
-    * {:updated, %Objective{}}
-    * {:deleted, %Objective{}}
-
-  """
-  def subscribe_objectives(%Scope{} = scope) do
-    key = scope.user.id
-
-    Phoenix.PubSub.subscribe(TeacherCoop.PubSub, "user:#{key}:objectives")
-  end
-
-  defp broadcast_objective(%Scope{} = scope, message) do
-    key = scope.user.id
-
-    Phoenix.PubSub.broadcast(TeacherCoop.PubSub, "user:#{key}:objectives", message)
-  end
-
-  @doc """
-  Returns the list of objectives.
-
-  ## Examples
-
-      iex> list_objectives(scope)
-      [%Objective{}, ...]
-
-  """
-  def list_objectives(%Scope{} = scope) do
-    Repo.all_by(Objective, user_id: scope.user.id)
-  end
 
   @doc """
   Gets a single objective.
@@ -51,15 +15,15 @@ defmodule TeacherCoop.Curriculum do
 
   ## Examples
 
-      iex> get_objective!(scope, 123)
+      iex> get_objective!(123)
       %Objective{}
 
-      iex> get_objective!(scope, 456)
+      iex> get_objective!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_objective!(%Scope{} = scope, id) do
-    Repo.get_by!(Objective, id: id, user_id: scope.user.id)
+  def get_objective!(id) do
+    Repo.get_by!(Objective, id: id)
   end
 
   @doc """
@@ -74,12 +38,11 @@ defmodule TeacherCoop.Curriculum do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_objective(%Scope{} = scope, attrs) do
+  def create_objective(attrs) do
     with {:ok, objective = %Objective{}} <-
            %Objective{}
-           |> Objective.changeset(attrs, scope)
+           |> Objective.changeset(attrs)
            |> Repo.insert() do
-      broadcast_objective(scope, {:created, objective})
       {:ok, objective}
     end
   end
@@ -89,21 +52,18 @@ defmodule TeacherCoop.Curriculum do
 
   ## Examples
 
-      iex> update_objective(scope, objective, %{field: new_value})
+      iex> update_objective(ope, objective, %{field: new_value})
       {:ok, %Objective{}}
 
-      iex> update_objective(scope, objective, %{field: bad_value})
+      iex> update_objective(ope, objective, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_objective(%Scope{} = scope, %Objective{} = objective, attrs) do
-    true = objective.user_id == scope.user.id
-
+  def update_objective(%Objective{} = objective, attrs) do
     with {:ok, objective = %Objective{}} <-
            objective
-           |> Objective.changeset(attrs, scope)
+           |> Objective.changeset(attrs)
            |> Repo.update() do
-      broadcast_objective(scope, {:updated, objective})
       {:ok, objective}
     end
   end
@@ -113,19 +73,16 @@ defmodule TeacherCoop.Curriculum do
 
   ## Examples
 
-      iex> delete_objective(scope, objective)
+      iex> delete_objective(ope, objective)
       {:ok, %Objective{}}
 
       iex> delete_objective(scope, objective)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_objective(%Scope{} = scope, %Objective{} = objective) do
-    true = objective.user_id == scope.user.id
-
+  def delete_objective(%Objective{} = objective) do
     with {:ok, objective = %Objective{}} <-
            Repo.delete(objective) do
-      broadcast_objective(scope, {:deleted, objective})
       {:ok, objective}
     end
   end
@@ -139,9 +96,7 @@ defmodule TeacherCoop.Curriculum do
       %Ecto.Changeset{data: %Objective{}}
 
   """
-  def change_objective(%Scope{} = scope, %Objective{} = objective, attrs \\ %{}) do
-    true = objective.user_id == scope.user.id
-
-    Objective.changeset(objective, attrs, scope)
+  def change_objective(%Objective{} = objective, attrs \\ %{}) do
+    Objective.changeset(objective, attrs)
   end
 end
