@@ -1,7 +1,7 @@
 defmodule TeacherCoop.AccountsTest do
   use TeacherCoop.DataCase
 
-  alias TeacherCoop.SearchEngineRepo
+  alias TeacherCoop.SearchEngineRepo.SearchDocuments
   alias TeacherCoop.Accounts
 
   import TeacherCoop.AccountsFixtures
@@ -186,7 +186,7 @@ defmodule TeacherCoop.AccountsTest do
       document_fixture(scope)
       Accounts.update_user_email(user, token)
 
-      {:ok, documents} = SearchEngineRepo.get_user_documents(user)
+      {:ok, documents} = SearchDocuments.get_user_documents(user)
       documents = documents.results |> Enum.map(& &1["email"])
       assert documents == [email]
     end
@@ -212,7 +212,7 @@ defmodule TeacherCoop.AccountsTest do
       attrs = %{fullname: "robert"}
 
       Accounts.update_user(scope, attrs)
-      {:ok, documents} = SearchEngineRepo.get_user_documents(user)
+      {:ok, documents} = SearchDocuments.get_user_documents(user)
       documents = documents.results |> Enum.map(& &1["fullname"])
       assert documents == ["robert"]
       assert Map.has_key?(document, "fullname") == false
