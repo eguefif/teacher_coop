@@ -67,7 +67,8 @@ defmodule TeacherCoop.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:meilisearch_ex, "~> 1.2.1"}
+      {:meilisearch_ex, "~> 1.2.1"},
+      {:dotenv, "~> 3.1.0"}
     ]
   end
 
@@ -94,7 +95,8 @@ defmodule TeacherCoop.MixProject do
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"],
       "meilisearch.setup": ["run --no-start priv/meilisearch/meilisearch_init.exs"],
-      "meilisearch.reset_test": ["run --no-start priv/meilisearch/meilisearch_reset_test.exs"]
+      "meilisearch.reset_test": ["run --no-start priv/meilisearch/meilisearch_reset_test.exs"],
+      populate_curriculum: ["run priv/curriculum/curriculum_populating.exs"]
     ]
   end
 end
