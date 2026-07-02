@@ -27,37 +27,43 @@ defmodule TeacherCoop.Repo.Seeds.MainSeed do
         :title => "Fraction en ligne",
         :description =>
           "Séance d'introduction aux fractions à l'aide d'outils numériques interactifs. Les élèves manipulent des fractions sur une droite graduée et explorent les notions de numérateur et dénominateur à travers des activités en ligne guidées.",
-        :institution_type => "École élémentaire"
+        :institution_type => "École élémentaire",
+        :grade => "CE2"
       },
       %{
         :title => "Addition de fraction",
         :description =>
           "Séance qui traite des additions des fractions et des techniques de calculs mentales en lien. Les élèves apprennent à additionner des fractions de même dénominateur puis de dénominateurs différents, avec des exercices progressifs et des stratégies de calcul mental adaptées.",
-        :institution_type => "École élémentaire"
+        :institution_type => "École élémentaire",
+        :grade => "CE2"
       },
       %{
         :title => "Problèmes de fraction",
         :description =>
           "Liste de problèmes de difficultés croissantes faisant beaucoup usage de représentation. Chaque problème invite les élèves à mobiliser des schémas, des dessins ou des partages concrets pour donner du sens aux fractions dans des contextes variés de la vie quotidienne.",
-        :institution_type => "École élémentaire"
+        :institution_type => "École élémentaire",
+        :grade => "CE2"
       },
       %{
         :title => "Introduction aux nombres décimaux",
         :description =>
           "Séance qui fait le lien entre les fractions décimales et les nombres décimaux. À partir de situations concrètes (mesures, monnaie), les élèves découvrent la notation décimale et comprennent la correspondance entre 1/10, 1/100 et leurs écritures à virgule.",
-        :institution_type => "École élémentaire"
+        :institution_type => "École élémentaire",
+        :grade => "CM1"
       },
       %{
         :title => "Les verbes pronominaux",
         :description =>
           "Séance de conjugaison centrée sur les verbes pronominaux au présent et au passé composé. Les élèves identifient les pronoms réfléchis, s'exercent à conjuguer des verbes courants comme se lever ou se laver, et travaillent l'accord du participe passé en contexte.",
-        :institution_type => "École élémentaire"
+        :institution_type => "École élémentaire",
+        :grade => "CM1"
       },
       %{
         :title => "Le système métrique",
         :description =>
           "Présentation du système métrique et son histoire. Les élèves découvrent l'origine révolutionnaire du mètre, explorent les principales unités de longueur, masse et contenance, et s'entraînent à effectuer des conversions à l'aide de tableaux et d'exercices pratiques.",
-        :institution_type => "École maternelle"
+        :institution_type => "École maternelle",
+        :grade => "CM2"
       }
     ]
 

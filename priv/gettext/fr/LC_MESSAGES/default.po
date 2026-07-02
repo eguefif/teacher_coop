@@ -289,7 +289,7 @@ msgstr "septembre"
 #: lib/teacher_coop_web/components/layouts/root.html.heex:54
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Documents"
-msgstr "document"
+msgstr "Documents"
 
 #: lib/teacher_coop_web/components/layouts/root.html.heex:60
 #, elixir-autogen, elixir-format

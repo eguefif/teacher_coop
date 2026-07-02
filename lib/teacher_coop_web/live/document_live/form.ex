@@ -27,6 +27,12 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
             TeacherCoop.Library.Document.institution_types_options() |> Enum.map(&String.capitalize/1)
           }
         />
+        <.input
+          field={@form[:grade]}
+          type="select"
+          label={gettext("grade") |> String.capitalize()}
+          options={TeacherCoop.Library.Document.grades_options()}
+        />
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">{gettext("Save")} {gettext(
             "Document"
