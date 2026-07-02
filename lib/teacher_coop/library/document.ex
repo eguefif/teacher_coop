@@ -25,14 +25,15 @@ defmodule TeacherCoop.Library.Document do
     field :user_id, :id
     field :institution_type, :string
     field :grade, :string
+    field :objectives, :string
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(document, attrs, user_scope) do
-    permitted = [:title, :description, :institution_type, :grade]
-    required = permitted
+    permitted = [:title, :description, :institution_type, :grade, :objectives]
+    required = permitted |> List.delete(:objectives)
 
     document
     |> cast(attrs, permitted)

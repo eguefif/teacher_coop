@@ -1,6 +1,11 @@
 defmodule TeacherCoop.Repo.Migrations.CreateDocuments do
   use Ecto.Migration
 
+  # TODO: Work on objectives
+  # - [ ] It should be a list of item
+  # - [ ] Work on a autocomplete
+  # - [ ] First implement a basic UI thing. Need the logic add objectives remove first.
+  # - [ ] Add UI
   def change do
     create table(:documents) do
       add :title, :string
@@ -8,6 +13,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateDocuments do
       add :user_id, references(:users, on_delete: :delete_all)
       add :institution_type, :string
       add :grade, :string
+      add :objectives, :string, size: 500
 
       timestamps(type: :utc_datetime)
     end
