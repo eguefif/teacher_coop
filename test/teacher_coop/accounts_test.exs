@@ -1,7 +1,7 @@
 defmodule TeacherCoop.AccountsTest do
   use TeacherCoop.DataCase
 
-  alias TeacherCoop.SearchEngineRepo.SearchDocuments
+  alias TeacherCoop.SearchRepo.SearchDocuments
   alias TeacherCoop.Accounts
 
   import TeacherCoop.AccountsFixtures

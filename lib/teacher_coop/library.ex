@@ -1,7 +1,7 @@
 defmodule TeacherCoop.Library do
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
-  alias TeacherCoop.SearchEngineRepo.SearchDocuments
+  alias TeacherCoop.SearchRepo.SearchDocuments
 
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Accounts.Scope
