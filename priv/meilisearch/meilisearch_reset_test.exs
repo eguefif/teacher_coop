@@ -1,2 +1,2 @@
-TeacherCoop.SearchEngineRepo.reset_tests()
-TeacherCoop.SearchEngineRepo.init_indexes()
+TeacherCoop.SearchRepo.reset_tests()
+TeacherCoop.SearchRepo.init_indexes()

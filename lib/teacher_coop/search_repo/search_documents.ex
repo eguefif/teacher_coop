@@ -1,5 +1,5 @@
-defmodule TeacherCoop.SearchEngineRepo.SearchDocuments do
-  import TeacherCoop.SearchEngineRepo
+defmodule TeacherCoop.SearchRepo.SearchDocuments do
+  import TeacherCoop.SearchRepo
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Repo

@@ -1,1 +1,1 @@
-TeacherCoop.SearchEngineRepo.init_indexes()
+TeacherCoop.SearchRepo.init_indexes()

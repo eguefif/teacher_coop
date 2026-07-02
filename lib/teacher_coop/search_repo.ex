@@ -1,4 +1,4 @@
-defmodule TeacherCoop.SearchEngineRepo do
+defmodule TeacherCoop.SearchRepo do
   @moduledoc """
   This module is a layer between the Search Engine and the application.
   It handles indexing document and search.
