@@ -26,7 +26,7 @@ $ mix phx.server
 The website is available on `teachercoop:4000`
 
 ## TODO
-- [ ] Finish reading chapter 5
+- [ ] Finish reading chapter 5: p 156
 - [x] Improve research layout
 - [ ] Add user fullname
     - [x] Make the form works
