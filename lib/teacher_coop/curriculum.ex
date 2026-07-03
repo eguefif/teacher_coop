@@ -8,6 +8,10 @@ defmodule TeacherCoop.Curriculum do
 
   alias TeacherCoop.Curriculum.Objective
 
+  def search_objectives(input) when is_bitstring(input) do
+    TeacherCoop.SearchRepo.SearchObjectives.search(input)
+  end
+
   @doc """
   Gets a single objective.
 
