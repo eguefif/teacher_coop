@@ -55,6 +55,7 @@ defmodule TeacherCoop.SearchRepo do
       |> Enum.filter(&String.contains?(&1, "test"))
 
     drop_all(indexes)
+    create_indexes(indexes)
   end
 
   def create_search_result(result) when is_map(result) do

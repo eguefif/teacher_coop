@@ -3,6 +3,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   alias TeacherCoop.Library
   alias TeacherCoop.Library.Document
+  alias TeacherCoop.Curriculum
 
   @impl true
   def render(assigns) do
@@ -33,13 +34,36 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           label={gettext("grade") |> String.capitalize()}
           options={TeacherCoop.Library.Document.grades_options()}
         />
-        <.input
-          field={@form[:objectives]}
-          type="text"
-          label={gettext("objectives") |> String.capitalize()}
-        />
+        <div phx-click-away="hide-objective-results">
+          <.input
+            field={@form[:objectives]}
+            type="text"
+            phx-focus="show-objective-results"
+            label={gettext("objectives") |> String.capitalize()}
+          />
+          <div :if={@objectives_result != [] && @show_objective_results} class="relative">
+            <ul class="list absolute rounded-box shadow-md bg-base-200 max-h-150 overflow-auto">
+              <li
+                :for={result <- @objectives_result}
+                class="list-row hover:bg-base-100"
+                phx-click="select-objective"
+                phx-value-id={result["id"]}
+                phx-value-goal={result["goal"]}
+              >
+                {result["goal"]}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div :if={@selected_objectives != []}>
+          <ul class="list">
+            <li :for={objective <- @selected_objectives}>
+              {objective["goal"]}
+            </li>
+          </ul>
+        </div>
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">{gettext("Save")} {gettext(
+          <.button phx-disable-with={gettext("Saving...")} variant="primary">{gettext("Save")} {gettext(
             "Document"
           )}</.button>
           <.button navigate={return_path(@current_scope, @return_to, @document)}>{gettext("Cancel")}</.button>
@@ -54,6 +78,9 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
+     |> assign(:objectives_result, [])
+     |> assign(:selected_objectives, [])
+     |> assign(:show_objective_results, false)
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -87,7 +114,30 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         document_params
       )
 
-    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+    {objectives_result, show_objective_results} =
+      if String.length(document_params["objectives"]) >= 3 do
+        {Curriculum.search_objectives(document_params["objectives"]), true}
+      else
+        {[], false}
+      end
+
+    {:noreply,
+     assign(socket, form: to_form(changeset, action: :validate))
+     |> assign(:objectives_result, objectives_result)
+     |> assign(:show_objective_results, show_objective_results)}
+  end
+
+  def handle_event("hide-objective-results", _, socket) do
+    {:noreply, socket |> assign(:show_objective_results, false)}
+  end
+
+  def handle_event("show-objective-results", _, socket) do
+    {:noreply, socket |> assign(:show_objective_results, true)}
+  end
+
+  def handle_event("select-objective", goal, socket) do
+    {:noreply,
+     socket |> assign(:selected_objectives, [goal | socket.assigns.selected_objectives])}
   end
 
   def handle_event("save", %{"document" => document_params}, socket) do

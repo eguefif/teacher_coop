@@ -1,6 +1,13 @@
 defmodule TeacherCoop.SearchRepo.SearchObjectives do
   import TeacherCoop.SearchRepo
 
+  def search(input) do
+    case Meilisearch.Search.search(get_client(), "objectives", q: input) do
+      {:ok, results} -> results.hits
+      _ -> :error
+    end
+  end
+
   def index_objective(attrs, wait_task \\ false) do
     case Meilisearch.Document.create_or_replace(get_client(), "objectives", attrs) do
       {:ok, %Meilisearch.SummarizedTask{} = task} when wait_task == true ->
