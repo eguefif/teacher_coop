@@ -25,7 +25,7 @@ defmodule TeacherCoop.Library.Document do
     field :user_id, :id
     field :institution_type, :string
     field :grade, :string
-    field :objectives, :string
+    field :objectives, {:array, :map}
 
     timestamps(type: :utc_datetime)
   end

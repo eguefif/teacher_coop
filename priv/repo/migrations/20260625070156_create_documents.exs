@@ -13,7 +13,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateDocuments do
       add :user_id, references(:users, on_delete: :delete_all)
       add :institution_type, :string
       add :grade, :string
-      add :objectives, :string, size: 500
+      add :objectives, {:array, :map}
 
       timestamps(type: :utc_datetime)
     end
