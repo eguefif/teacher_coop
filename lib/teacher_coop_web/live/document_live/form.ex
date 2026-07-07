@@ -4,6 +4,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Library
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Curriculum
+  # - [ ] Persist objectives
 
   @impl true
   def render(assigns) do
@@ -34,21 +35,39 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           label={gettext("grade") |> String.capitalize()}
           options={TeacherCoop.Library.Document.grades_options()}
         />
-        <div phx-click-away="hide-objective-results">
+        <script :type={Phoenix.LiveView.ColocatedHook} name=".ClearObjectivesInput">
+          export default {
+            mounted() {
+              this.el.addEventListener("objectives_input:clear", (e) => {
+              e.target.value = ""
+              e.target.dispatchEvent(new Event("input", {bubles: true}))
+              })
+            }
+          }
+        </script>
+        <div phx-click-away={
+          JS.dispatch("objectives_input:clear", to: "#objectives_input")
+          |> JS.push("reset-objective-results")
+        }>
           <.input
-            field={@form[:objectives]}
+            id="objectives_input"
+            name="objectives_input"
             type="text"
-            phx-focus="show-objective-results"
+            phx-focus="user-focus-objectives-input"
+            phx-hook=".ClearObjectivesInput"
+            value=""
             label={gettext("objectives") |> String.capitalize()}
           />
-          <div :if={@objectives_result != [] && @show_objective_results} class="relative">
-            <ul class="list absolute rounded-box shadow-md bg-base-200 max-h-150 overflow-auto">
+          <div :if={@objective_results != [] && @show_objective_results} class="relative">
+            <ul class="list absolute rounded-box shadow-md bg-base-200 max-h-150 overflow-auto z-2">
               <li
-                :for={result <- @objectives_result}
+                :for={result <- @objective_results}
                 class="list-row hover:bg-base-100"
-                phx-click="select-objective"
+                phx-click={
+                  JS.dispatch("objectives_input:clear", to: "#objectives_input")
+                  |> JS.push("select-objective")
+                }
                 phx-value-id={result["id"]}
-                phx-value-goal={result["goal"]}
               >
                 {result["goal"]}
               </li>
@@ -57,7 +76,22 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         </div>
         <div :if={@selected_objectives != []}>
           <ul class="list">
-            <li :for={objective <- @selected_objectives}>
+            <li
+              :for={objective <- @selected_objectives}
+              class="list-row"
+            >
+              <span
+                phx-click={
+                  JS.dispatch("objectives_input:clear", to: "#objectives_input")
+                  |> JS.push("remove-objective")
+                }
+                phx-value-id={objective["id"]}
+              >
+                <.icon
+                  name="hero-x-mark"
+                  class="scale-90 hover:scale-115 transition-transform ease-in-out duration-200 cursor-pointer"
+                />
+              </span>
               {objective["goal"]}
             </li>
           </ul>
@@ -78,7 +112,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(:objectives_result, [])
+     |> assign(:objective_results, [])
      |> assign(:selected_objectives, [])
      |> assign(:show_objective_results, false)
      |> apply_action(socket.assigns.live_action, params)}
@@ -106,7 +140,13 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   @impl true
-  def handle_event("validate", %{"document" => document_params}, socket) do
+  def handle_event(
+        "validate",
+        %{"document" => document_params, "objectives_input" => objectives_input},
+        socket
+      ) do
+    document_params = Map.put(document_params, "objectives", socket.assigns.selected_objectives)
+
     changeset =
       Library.change_document(
         socket.assigns.current_scope,
@@ -114,33 +154,60 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         document_params
       )
 
-    {objectives_result, show_objective_results} =
-      if String.length(document_params["objectives"]) >= 3 do
-        {Curriculum.search_objectives(document_params["objectives"]), true}
+    {objective_results, show_objective_results} =
+      if String.length(objectives_input) >= 3 do
+        {Curriculum.search_objectives(objectives_input), true}
       else
         {[], false}
       end
 
     {:noreply,
      assign(socket, form: to_form(changeset, action: :validate))
-     |> assign(:objectives_result, objectives_result)
+     |> assign(:objective_results, objective_results)
      |> assign(:show_objective_results, show_objective_results)}
   end
 
-  def handle_event("hide-objective-results", _, socket) do
-    {:noreply, socket |> assign(:show_objective_results, false)}
+  def handle_event("reset-objective-results", _, socket) do
+    {:noreply, socket |> assign(:objective_results, []) |> assign(:show_objective_results, false)}
   end
 
-  def handle_event("show-objective-results", _, socket) do
+  def handle_event("user-focus-objectives-input", _, socket) do
     {:noreply, socket |> assign(:show_objective_results, true)}
   end
 
-  def handle_event("select-objective", goal, socket) do
+  def handle_event("select-objective", %{"id" => id}, socket) do
+    id = String.to_integer(id)
+
+    objective =
+      Enum.find(socket.assigns.objective_results, fn objective -> objective["id"] == id end)
+
     {:noreply,
-     socket |> assign(:selected_objectives, [goal | socket.assigns.selected_objectives])}
+     socket
+     |> assign(:selected_objectives, [objective | socket.assigns.selected_objectives])
+     |> assign(:objective_results, [])
+     |> assign(:show_objective_results, false)}
+  end
+
+  def handle_event("remove-objective", %{"id" => id}, socket) do
+    id = String.to_integer(id)
+
+    objectives =
+      Enum.reject(socket.assigns.selected_objectives, fn objective -> objective["id"] == id end)
+
+    {:noreply,
+     socket
+     |> assign(:selected_objectives, objectives)
+     |> assign(:show_objective_results, false)}
   end
 
   def handle_event("save", %{"document" => document_params}, socket) do
+    document_params =
+      if socket.assigns.selected_objectives != [] do
+        Map.put(document_params, "objectives", socket.assigns.selected_objectives)
+      else
+        document_params
+      end
+
     save_document(socket, socket.assigns.live_action, document_params)
   end
 
