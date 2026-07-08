@@ -1,11 +1,6 @@
 defmodule TeacherCoop.Repo.Migrations.CreateDocuments do
   use Ecto.Migration
 
-  # TODO: Work on objectives
-  # - [ ] It should be a list of item
-  # - [ ] Work on a autocomplete
-  # - [ ] First implement a basic UI thing. Need the logic add objectives remove first.
-  # - [ ] Add UI
   def change do
     create table(:documents) do
       add :title, :string
