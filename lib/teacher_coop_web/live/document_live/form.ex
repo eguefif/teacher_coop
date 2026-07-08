@@ -4,7 +4,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Library
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Curriculum
-  # - [ ] Persist objectives
+  # - [ ] fix test after comopnents extraction
 
   @impl true
   def render(assigns) do
@@ -35,67 +35,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           label={gettext("grade") |> String.capitalize()}
           options={TeacherCoop.Library.Document.grades_options()}
         />
-        <script :type={Phoenix.LiveView.ColocatedHook} name=".ClearObjectivesInput">
-          export default {
-            mounted() {
-              this.el.addEventListener("objectives_input:clear", (e) => {
-              e.target.value = ""
-              e.target.dispatchEvent(new Event("input", {bubles: true}))
-              })
-            }
-          }
-        </script>
-        <div phx-click-away={
-          JS.dispatch("objectives_input:clear", to: "#objectives_input")
-          |> JS.push("reset-objective-results")
-        }>
-          <.input
-            id="objectives_input"
-            name="objectives_input"
-            type="text"
-            phx-focus="user-focus-objectives-input"
-            phx-hook=".ClearObjectivesInput"
-            value=""
-            label={gettext("objectives") |> String.capitalize()}
-          />
-          <div :if={@objective_results != [] && @show_objective_results} class="relative">
-            <ul class="list absolute rounded-box shadow-md bg-base-200 max-h-150 overflow-auto z-2">
-              <li
-                :for={result <- @objective_results}
-                class="list-row hover:bg-base-100"
-                phx-click={
-                  JS.dispatch("objectives_input:clear", to: "#objectives_input")
-                  |> JS.push("select-objective")
-                }
-                phx-value-id={result["id"]}
-              >
-                {result["goal"]}
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div :if={@selected_objectives != []}>
-          <ul class="list">
-            <li
-              :for={objective <- @selected_objectives}
-              class="list-row"
-            >
-              <span
-                phx-click={
-                  JS.dispatch("objectives_input:clear", to: "#objectives_input")
-                  |> JS.push("remove-objective")
-                }
-                phx-value-id={objective["id"]}
-              >
-                <.icon
-                  name="hero-x-mark"
-                  class="scale-90 hover:scale-115 transition-transform ease-in-out duration-200 cursor-pointer"
-                />
-              </span>
-              {objective["goal"]}
-            </li>
-          </ul>
-        </div>
+        <.objectives_autocomplete_input
+          objective_results={@objective_results}
+          show_objective_results={@show_objective_results}
+        />
+        <.selected_objectives_view objectives={@selected_objectives} />
         <footer>
           <.button phx-disable-with={gettext("Saving...")} variant="primary">{gettext("Save")} {gettext(
             "Document"
@@ -104,6 +48,82 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         </footer>
       </.form>
     </Layouts.app>
+    """
+  end
+
+  attr :objective_results, :list, default: []
+  attr :show_objective_results, :boolean, default: false
+
+  def objectives_autocomplete_input(assigns) do
+    ~H"""
+    <div phx-click-away={
+      JS.dispatch("objectives_input:clear", to: "#objectives_input")
+      |> JS.push("reset-objective-results")
+    }>
+      <.input
+        id="objectives_input"
+        name="objectives_input"
+        type="text"
+        phx-focus="user-focus-objectives-input"
+        phx-hook=".ClearObjectivesInput"
+        value=""
+        label={gettext("objectives") |> String.capitalize()}
+      />
+      <script :type={Phoenix.LiveView.ColocatedHook} name=".ClearObjectivesInput">
+        export default {
+          mounted() {
+            this.el.addEventListener("objectives_input:clear", (e) => {
+            e.target.value = ""
+            e.target.dispatchEvent(new Event("input", {bubles: true}))
+            })
+          }
+        }
+      </script>
+      <div :if={@objective_results != [] && @show_objective_results} class="relative">
+        <ul class="list absolute rounded-box shadow-md bg-base-200 max-h-150 overflow-auto z-2">
+          <li
+            :for={result <- @objective_results}
+            class="list-row hover:bg-base-100"
+            phx-click={
+              JS.dispatch("objectives_input:clear", to: "#objectives_input")
+              |> JS.push("select-objective")
+            }
+            phx-value-id={result["id"]}
+          >
+            {result["goal"]}
+          </li>
+        </ul>
+      </div>
+    </div>
+    """
+  end
+
+  attr :objectives, :list, default: []
+
+  def selected_objectives_view(assigns) do
+    ~H"""
+    <div :if={@objectives != []}>
+      <ul class="list">
+        <li
+          :for={objective <- @objectives}
+          class="list-row"
+        >
+          <span
+            phx-click={
+              JS.dispatch("objectives_input:clear", to: "#objectives_input")
+              |> JS.push("remove-objective")
+            }
+            phx-value-id={objective["id"]}
+          >
+            <.icon
+              name="hero-x-mark"
+              class="scale-90 hover:scale-115 transition-transform ease-in-out duration-200 cursor-pointer"
+            />
+          </span>
+          {objective["goal"]}
+        </li>
+      </ul>
+    </div>
     """
   end
 

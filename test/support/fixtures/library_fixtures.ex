@@ -9,10 +9,10 @@ defmodule TeacherCoop.LibraryFixtures do
   """
   def document_fixture(scope, attrs \\ %{}) do
     objective_fixture = %{
-      goal: "some goal",
-      grade: "some grade",
-      subject: "some subject",
-      year: 42
+      "goal" => "some goal",
+      "grade" => "some grade",
+      "subject" => "some subject",
+      "year" => 42
     }
 
     attrs =
