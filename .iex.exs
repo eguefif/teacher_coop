@@ -1,3 +1,12 @@
 alias TeacherCoop.Repo
-alias TeacherCoop.Library.Document
+
+# User Context/Resource
 alias TeacherCoop.Accounts.User
+alias TeacherCoop.Accounts
+
+# Library Context
+alias TeacherCoop.Library
+alias TeacherCoop.Library.Document
+
+# Ingestion
+alias TeacherCoop.Ingestion

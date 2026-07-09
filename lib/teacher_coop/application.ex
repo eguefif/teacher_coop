@@ -8,6 +8,7 @@ defmodule TeacherCoop.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      PdfExtractor,
       TeacherCoopWeb.Telemetry,
       TeacherCoop.Repo,
       {DNSCluster, query: Application.get_env(:teacher_coop, :dns_cluster_query) || :ignore},
@@ -17,7 +18,11 @@ defmodule TeacherCoop.Application do
       # Start to serve requests, typically the last entry
       TeacherCoopWeb.Endpoint,
       {Finch, name: :search_finch},
-      {Meilisearch, name: :meilisearch, endpoint: "http://127.0.0.1:7700", key: "masterkey", finch: :search_finch},
+      {Meilisearch,
+       name: :meilisearch,
+       endpoint: "http://127.0.0.1:7700",
+       key: "masterkey",
+       finch: :search_finch}
     ]
 
     # See https://elixir.hexdocs.pm/Supervisor.html
