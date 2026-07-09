@@ -4,7 +4,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Library
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Curriculum
-  # - [ ] fix test after comopnents extraction
 
   @impl true
   def render(assigns) do

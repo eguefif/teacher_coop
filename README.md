@@ -37,12 +37,20 @@ The website is available on `teachercoop:4000`
     - [ ] Add tags
     - [ ] Add goals
     - [ ] Add files
+<<<<<<< Updated upstream
 - [ ] Autocomplete
     -[ ] Allow arrow navigation and selection
     -[ ] Accessibility
     -[ ] Select item and add to the list
     -[ ] Click outside will hidde results
     -[ ] Extract into reusable component ? Let form handle event/state. Takes only a list of results. Check if the input will be part of the form change. Should it be its own live component to handle some events like click outisde and navigation and select items?
+=======
+- [x] Handle curriculum
+    - [x] Write etl script to populate db
+    - [x] Add table
+    - [x] Update Documents table to take a goal
+    - [x] Add auto complete input
+>>>>>>> Stashed changes
 
 
 ### Meilisearch
