@@ -27,7 +27,14 @@ The website is available on `teachercoop:4000`
 
 ## TODO
 - [ ] Finish reading chapter 5: p 156
-- [x] Improve research layout
+- [ ] Search
+    - [ ] Optimize full text search
+- [ ] Document ingestion
+    - [ ] Add pipeline: to md, chunk, embed, store
+    - [ ] To md
+    - [ ] Chunk pdf/docx
+    - [ ] embed with TEI
+    - [ ] store to Meilisearch
 - [ ] Add user fullname
     - [x] Make the form works
     - [x] Add test for update
@@ -35,22 +42,13 @@ The website is available on `teachercoop:4000`
 - [ ] Improve documents
     - [x] Add grade
     - [ ] Add tags
-    - [ ] Add goals
+    - [x] Add goals
     - [ ] Add files
-<<<<<<< Updated upstream
+    - [ ] Improve index page
+    - [ ] Improve show page
 - [ ] Autocomplete
     -[ ] Allow arrow navigation and selection
     -[ ] Accessibility
-    -[ ] Select item and add to the list
-    -[ ] Click outside will hidde results
-    -[ ] Extract into reusable component ? Let form handle event/state. Takes only a list of results. Check if the input will be part of the form change. Should it be its own live component to handle some events like click outisde and navigation and select items?
-=======
-- [x] Handle curriculum
-    - [x] Write etl script to populate db
-    - [x] Add table
-    - [x] Update Documents table to take a goal
-    - [x] Add auto complete input
->>>>>>> Stashed changes
 
 
 ### Meilisearch
