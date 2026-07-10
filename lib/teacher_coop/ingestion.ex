@@ -1,11 +1,19 @@
 defmodule TeacherCoop.Ingestion do
-  # TODO:
-  # - [ ] Work on chunking, it seems that chunk_every won't do the job, be sure of that.
+  alias TeacherCoop.Ingestion.Embeddings
+
+  # TODO: storing in Meilisearch
+  # - [ ] Remove embeddings part in
+  # - [ ] Configure embedders in the Meilisearch set up part
+  # - [ ] Store each chunks in the db
+  # - [ ] Next iteration: need to pass a list of files to ingest_documents
+  # - [ ] Create a File resource in Library
+
   def ingest_documents(documents \\ []) when is_list(documents) do
     documents
     |> Stream.map(&to_text/1)
-    |> Stream.chunk_every(100, 75)
-    |> Enum.map(&IO.inspect/1)
+    |> Stream.map(&chunk/1)
+    |> Stream.map(&embeds/1)
+    |> Enum.map(&load/1)
   end
 
   def to_text(document) do
@@ -17,5 +25,22 @@ defmodule TeacherCoop.Ingestion do
       end
 
     %{filename: document, content: content}
+  end
+
+  def chunk(%{filename: filename, content: content} = _) do
+    chunks =
+      TextChunker.split(content, chunk_size: 200, chunk_overlap: 25)
+      |> Enum.map(& &1.text)
+
+    %{filename: filename, chunks: chunks}
+  end
+
+  def embeds(%{filename: filename, chunks: chunks} = _) do
+    embeddings = Embeddings.embed(chunks)
+    %{filename: filename, embeddings: embeddings}
+  end
+
+  def load(documents) do
+    IO.inspect(documents)
   end
 end

@@ -40,6 +40,7 @@ defmodule TeacherCoop.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:text_chunker, "~> 0.6.1"},
       {:pdf_extractor, "~> 0.6"},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.8.8"},

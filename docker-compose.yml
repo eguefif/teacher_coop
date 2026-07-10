@@ -20,6 +20,15 @@ services:
     volumes:
       - meilisearch_data:/meili_data
 
+  embeddings:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.8
+    command: ["--model-id", "BAAI/bge-small-en-v1.5"]
+    ports:
+      - "8080:80"
+    volumes:
+      - tei_data:/data
+
 volumes:
   postgres_data:
   meilisearch_data:
+  tei_data:
