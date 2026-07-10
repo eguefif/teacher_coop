@@ -5,6 +5,8 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Curriculum
 
+  @max_files 5
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -14,11 +16,17 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       </.header>
 
       <.form for={@form} id="document-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:title]} type="text" label={gettext("titre") |> String.capitalize()} />
+        <.input
+          field={@form[:title]}
+          type="text"
+          label={gettext("titre") |> String.capitalize()}
+          phx-debounce="blur"
+        />
         <.input
           field={@form[:description]}
           type="text"
           label={gettext("description") |> String.capitalize()}
+          phx-debounce="blur"
         />
         <.input
           field={@form[:institution_type]}
@@ -128,10 +136,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
+    # These should go in apply_action and depending on the action, the content will change.
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(:objective_results, [])
+     # TODO: one validations is to check if the sum of all these files will put the user above its files space limitations
      |> assign(:selected_objectives, [])
      |> assign(:show_objective_results, false)
      |> apply_action(socket.assigns.live_action, params)}
@@ -146,6 +155,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     socket
     |> assign(:page_title, "Edit Document")
     |> assign(:document, document)
+    |> assign(:objective_results, document.objectives)
     |> assign(:form, to_form(Library.change_document(socket.assigns.current_scope, document)))
   end
 
@@ -154,7 +164,14 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
     socket
     |> assign(:page_title, "New Document")
+    |> assign(:objective_results, [])
     |> assign(:document, document)
+    |> allow_upload(:files,
+      accept: ~w(.docx .pdf .txt .xlsx),
+      max_entries: @max_files,
+      max_file_size: 5_000_000,
+      auto_upload: true
+    )
     |> assign(:form, to_form(Library.change_document(socket.assigns.current_scope, document)))
   end
 
