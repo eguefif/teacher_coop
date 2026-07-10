@@ -17,6 +17,7 @@ defmodule TeacherCoop.Application do
       # {TeacherCoop.Worker, arg},
       # Start to serve requests, typically the last entry
       TeacherCoopWeb.Endpoint,
+      {Finch, name: :embeddings_finch},
       {Finch, name: :search_finch},
       {Meilisearch,
        name: :meilisearch,
