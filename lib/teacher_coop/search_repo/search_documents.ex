@@ -11,6 +11,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
     attrs =
       Map.from_struct(document)
       |> Map.filter(&(elem(&1, 0) != :__meta__))
+      |> Map.filter(&(elem(&1, 0) != :files))
       |> Map.put(:user_id, scope.user.id)
       |> Map.put(:email, scope.user.email)
       |> Map.put(:fullname, scope.user.fullname)
@@ -34,6 +35,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
     users_documents =
       Repo.all_by(Document, user_id: user.id)
       |> Enum.map(&Map.from_struct(&1))
+      |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :files end))
       |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :__meta__ end))
       |> Enum.map(&Map.merge(&1, %{email: user.email, fullname: user.fullname}))
 

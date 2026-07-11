@@ -6,11 +6,11 @@ defmodule TeacherCoop.Repo.Migrations.CreateFiles do
       add :filename, :string
       add :format, :string
       add :filepath, :string
-      add :document_id, references(:documents, on_delete: :nullify_all)
+      add :document_id, references(:documents, on_delete: :nilify_all)
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:files, [:user_id])
+    create index(:files, [:document_id])
   end
 end

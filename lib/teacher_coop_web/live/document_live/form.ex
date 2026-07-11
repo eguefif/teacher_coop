@@ -47,6 +47,16 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           show_objective_results={@show_objective_results}
         />
         <.selected_objectives_view objectives={@selected_objectives} />
+        <div
+          phx-drop-target={@uploads.files.ref}
+          class="border-2 border-dashed border-gray-300 rounded-lg p-6 mb-4 cursor-pointer"
+        >
+          <label for={@uploads.files.ref} class="block text-sm font-medium cursor-pointer">
+            {gettext("Upload files")}
+          </label>
+          <.live_file_input upload={@uploads.files} />
+        </div>
+        <.display_files uploads={@uploads} files={@document.files} />
         <footer>
           <.button phx-disable-with={gettext("Saving...")} variant="primary">{gettext("Save")} {gettext(
             "Document"
@@ -54,6 +64,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           <.button navigate={return_path(@current_scope, @return_to, @document)}>{gettext("Cancel")}</.button>
         </footer>
       </.form>
+      <pre><%= inspect assigns.uploads, pretty: true %></pre>
     </Layouts.app>
     """
   end
@@ -134,6 +145,19 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     """
   end
 
+  attr :uploads, :list, default: []
+  attr :files, :list, default: []
+
+  def display_files(assigns) do
+    ~H"""
+    <ul class="list">
+      <li :for={file <- @uploads.files.entries} :if={@uploads.files.entries != []} class="list-row">
+        <span>{file.client_name} - {file.progress}%</span>
+      </li>
+    </ul>
+    """
+  end
+
   @impl true
   def mount(params, _session, socket) do
     # These should go in apply_action and depending on the action, the content will change.
@@ -143,6 +167,12 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      # TODO: one validations is to check if the sum of all these files will put the user above its files space limitations
      |> assign(:selected_objectives, [])
      |> assign(:show_objective_results, false)
+     |> allow_upload(:files,
+       accept: ~w(.docx .pdf .txt .xlsx),
+       max_entries: @max_files,
+       max_file_size: 50_000_000,
+       auto_upload: true
+     )
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -166,12 +196,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     |> assign(:page_title, "New Document")
     |> assign(:objective_results, [])
     |> assign(:document, document)
-    |> allow_upload(:files,
-      accept: ~w(.docx .pdf .txt .xlsx),
-      max_entries: @max_files,
-      max_file_size: 5_000_000,
-      auto_upload: true
-    )
     |> assign(:form, to_form(Library.change_document(socket.assigns.current_scope, document)))
   end
 
@@ -181,7 +205,9 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         %{"document" => document_params, "objectives_input" => objectives_input},
         socket
       ) do
-    document_params = Map.put(document_params, "objectives", socket.assigns.selected_objectives)
+    document_params =
+      Map.put(document_params, "objectives", socket.assigns.selected_objectives)
+      |> Map.put("files", [])
 
     changeset =
       Library.change_document(
@@ -251,7 +277,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     case Library.update_document(
            socket.assigns.current_scope,
            socket.assigns.document,
-           document_params
+           document_params |> Map.put("files", [])
          ) do
       {:ok, document} ->
         {:noreply,
@@ -267,6 +293,8 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   defp save_document(socket, :new, document_params) do
+    document_params = Map.put(document_params, "files", [])
+
     case Library.create_document(socket.assigns.current_scope, document_params) do
       {:ok, document} ->
         {:noreply,
