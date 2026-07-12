@@ -57,6 +57,7 @@ defmodule TeacherCoop.Library do
   """
   def get_document!(id) do
     Repo.get_by!(Document, id: id)
+    |> Repo.preload(:files)
   end
 
   @doc """

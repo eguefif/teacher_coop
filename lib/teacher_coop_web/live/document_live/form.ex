@@ -5,6 +5,15 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Curriculum
 
+  # TODO: 
+  # - [ ] Display files delete button
+  # - [ ] Persist files on disc
+  # - [ ] Display errors for files
+  # - [ ] Add loading for files based on entries % and DaisyUI
+  # - [ ] Edit
+  #   - [ ] Display list of objectives and allow to delete some
+  #   - [ ] Display list of files and allow to delete some
+  #   - [ ] Make sure when updating that file and objectives are still there.
   @max_files 5
 
   @impl true
@@ -64,7 +73,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           <.button navigate={return_path(@current_scope, @return_to, @document)}>{gettext("Cancel")}</.button>
         </footer>
       </.form>
-      <pre><%= inspect assigns.uploads, pretty: true %></pre>
+      <pre><%= inspect assigns, pretty: true %></pre>
     </Layouts.app>
     """
   end
@@ -150,11 +159,22 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   def display_files(assigns) do
     ~H"""
-    <ul class="list">
-      <li :for={file <- @uploads.files.entries} :if={@uploads.files.entries != []} class="list-row">
-        <span>{file.client_name} - {file.progress}%</span>
-      </li>
-    </ul>
+    <div
+      :for={file <- @uploads.files.entries}
+      :if={@uploads.files.entries != []}
+      class="bg-info/30 border border-info/70 text-info/100 px-4 py-3 rounded mb-4 flex flex-row justify-between content-baseline"
+    >
+      <div>{file.client_name} - {file.progress}%</div>
+      <div
+        phx-click="remove-file"
+        phx-value-file={file.client_name}
+      >
+        <.icon
+          name="hero-x-mark"
+          class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+        />
+      </div>
+    </div>
     """
   end
 
@@ -171,7 +191,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
        accept: ~w(.docx .pdf .txt .xlsx),
        max_entries: @max_files,
        max_file_size: 50_000_000,
-       auto_upload: true
+       auto_upload: false
      )
      |> apply_action(socket.assigns.live_action, params)}
   end
@@ -250,6 +270,15 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> assign(:show_objective_results, false)}
   end
 
+  def handle_event("remove-file", %{"file" => file}, socket) do
+    socket =
+      update_in(socket.assigns.uploads.files.entries, fn entries ->
+        Enum.reject(entries, fn entry -> entry.client_name == file end)
+      end)
+
+    {:noreply, socket}
+  end
+
   def handle_event("remove-objective", %{"id" => id}, socket) do
     id = String.to_integer(id)
 
@@ -274,6 +303,8 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   defp save_document(socket, :edit, document_params) do
+    document_params = params_with_files(socket, document_params)
+
     case Library.update_document(
            socket.assigns.current_scope,
            socket.assigns.document,
@@ -294,6 +325,8 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   defp save_document(socket, :new, document_params) do
     document_params = Map.put(document_params, "files", [])
+    document_params = params_with_files(socket, document_params)
+    IO.inspect(document_params)
 
     case Library.create_document(socket.assigns.current_scope, document_params) do
       {:ok, document} ->
@@ -307,6 +340,27 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
+  end
+
+  defp params_with_files(socket, document_params) do
+    files =
+      socket
+      |> consume_uploaded_entries(:files, &upload_static_file/2)
+      |> Enum.map(fn %{filename: filename, filepath: filepath} ->
+        format = Path.extname(filename) |> String.slice(1..-1//1)
+        %{"filename" => filename, "filepath" => filepath, "format" => format}
+      end)
+
+    Map.put(document_params, "files", files)
+  end
+
+  defp upload_static_file(%{path: path}, entry) do
+    IO.inspect(entry)
+    filename = Path.basename(path)
+    filepath = Path.join("priv/static/files", filename)
+    File.cp!(path, filepath)
+
+    {:ok, %{filename: entry.client_name, filepath: "/files/#{filename}"}}
   end
 
   defp return_path(_scope, "index", _document), do: ~p"/documents"

@@ -38,6 +38,7 @@ defmodule TeacherCoop.Library.Document do
 
     document
     |> cast(attrs, permitted)
+    |> cast_assoc(:files, with: &TeacherCoop.Library.File.changeset/2)
     |> validate_required(required)
     |> validate_enum(@institution_types, :institution_type)
     |> validate_enum(@grades, :grade)

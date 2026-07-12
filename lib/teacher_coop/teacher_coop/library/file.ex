@@ -4,19 +4,20 @@ defmodule TeacherCoop.Library.File do
 
   schema "files" do
     field :filename, :string
-    field :format, :string
     field :filepath, :string
-    field :user_id, :id
+    field :format, :string
     belongs_to(:document, TeacherCoop.Library.Document)
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(file, attrs, document_id) do
+  def changeset(file, attrs) do
+    permitted = [:filename, :filepath, :format]
+    required = permitted
+
     file
-    |> cast(attrs, [:filename, :format, :filepath])
-    |> validate_required([:filename, :format, :filepath])
-    |> put_change(:document_id, document_id)
+    |> cast(attrs, permitted)
+    |> validate_required(required)
   end
 end
