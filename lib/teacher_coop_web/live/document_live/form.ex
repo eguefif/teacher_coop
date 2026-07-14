@@ -6,8 +6,10 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Curriculum
 
   # TODO: 
-  # - [ ] Display files delete button
-  # - [ ] Persist files on disc
+  # - [x] Display files delete button
+  #   - [x] Make it work, check if the list of files is well updated before going in the context
+  # - [x] Fix bug where the save button does not work when adding a new file.
+  # - [x] Persist files on disc
   # - [ ] Display errors for files
   # - [ ] Add loading for files based on entries % and DaisyUI
   # - [ ] Edit
@@ -65,7 +67,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           </label>
           <.live_file_input upload={@uploads.files} />
         </div>
-        <.display_files uploads={@uploads} files={@document.files} />
+        <.display_files
+          uploads={@uploads}
+          files={@current_document_files}
+          files_to_delete={@files_to_delete}
+        />
         <footer>
           <.button phx-disable-with={gettext("Saving...")} variant="primary">{gettext("Save")} {gettext(
             "Document"
@@ -73,7 +79,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           <.button navigate={return_path(@current_scope, @return_to, @document)}>{gettext("Cancel")}</.button>
         </footer>
       </.form>
-      <pre><%= inspect assigns, pretty: true %></pre>
+      <pre><%= inspect assigns.uploads, pretty: true %></pre>
     </Layouts.app>
     """
   end
@@ -156,23 +162,62 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   attr :uploads, :list, default: []
   attr :files, :list, default: []
+  attr :files_to_delete, :list, default: []
 
   def display_files(assigns) do
     ~H"""
-    <div
-      :for={file <- @uploads.files.entries}
-      :if={@uploads.files.entries != []}
-      class="bg-info/30 border border-info/70 text-info/100 px-4 py-3 rounded mb-4 flex flex-row justify-between content-baseline"
-    >
-      <div>{file.client_name} - {file.progress}%</div>
+    <div>
+      <div :if={@files != nil && @files != []}>
+        <div
+          :for={file <- @files}
+          class={[
+            "px-4 py-3 rounded mb-4 flex flex-row justify-between content-successline",
+            file.id in (Enum.map(@files, & &1.id) -- @files_to_delete) &&
+              "bg-success/30 border border-success/70 text-success/100",
+            file.id in @files_to_delete && "bg-warning/30 border border-warning/70 text-warning/100"
+          ]}
+        >
+          <div>{file.filename}</div>
+          <div
+            :if={file.id in (Enum.map(@files, & &1.id) -- @files_to_delete)}
+            phx-click="delete-file"
+            phx-value-file-id={file.id}
+          >
+            <.icon
+              name="hero-x-mark"
+              class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+            />
+          </div>
+
+          <div
+            :if={file.id in @files_to_delete}
+            phx-click="restore-file"
+            phx-value-file-id={file.id}
+          >
+            <.icon
+              name="hero-arrow-uturn-down"
+              class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div :if={@uploads.files.entries != []}>{gettext("New file")}</div>
       <div
-        phx-click="remove-file"
-        phx-value-file={file.client_name}
+        :for={file <- @uploads.files.entries}
+        :if={@uploads.files.entries != []}
+        class="bg-info/30 border border-info/70 text-info/100 px-4 py-3 rounded mb-4 flex flex-row justify-between content-baseline"
       >
-        <.icon
-          name="hero-x-mark"
-          class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
-        />
+        <div>{file.client_name} - {file.progress}%</div>
+        <div
+          phx-click="remove-file"
+          phx-value-ref={file.ref}
+        >
+          <.icon
+            name="hero-x-mark"
+            class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+          />
+        </div>
       </div>
     </div>
     """
@@ -186,6 +231,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> assign(:return_to, return_to(params["return_to"]))
      # TODO: one validations is to check if the sum of all these files will put the user above its files space limitations
      |> assign(:selected_objectives, [])
+     |> assign(:files_to_delete, [])
      |> assign(:show_objective_results, false)
      |> allow_upload(:files,
        accept: ~w(.docx .pdf .txt .xlsx),
@@ -205,16 +251,18 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     socket
     |> assign(:page_title, "Edit Document")
     |> assign(:document, document)
+    |> assign(:current_document_files, document.files)
     |> assign(:objective_results, document.objectives)
     |> assign(:form, to_form(Library.change_document(socket.assigns.current_scope, document)))
   end
 
   defp apply_action(socket, :new, _params) do
-    document = %Document{user_id: socket.assigns.current_scope.user.id}
+    document = %Document{user_id: socket.assigns.current_scope.user.id, files: []}
 
     socket
     |> assign(:page_title, "New Document")
     |> assign(:objective_results, [])
+    |> assign(:current_document_files, [])
     |> assign(:document, document)
     |> assign(:form, to_form(Library.change_document(socket.assigns.current_scope, document)))
   end
@@ -227,7 +275,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       ) do
     document_params =
       Map.put(document_params, "objectives", socket.assigns.selected_objectives)
-      |> Map.put("files", [])
 
     changeset =
       Library.change_document(
@@ -270,13 +317,17 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> assign(:show_objective_results, false)}
   end
 
-  def handle_event("remove-file", %{"file" => file}, socket) do
-    socket =
-      update_in(socket.assigns.uploads.files.entries, fn entries ->
-        Enum.reject(entries, fn entry -> entry.client_name == file end)
-      end)
+  def handle_event("remove-file", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :files, ref)}
+  end
 
-    {:noreply, socket}
+  def handle_event("delete-file", %{"file-id" => file_id}, socket) do
+    {:noreply,
+     update(socket, :files_to_delete, fn files -> [String.to_integer(file_id) | files] end)}
+  end
+
+  def handle_event("restore-file", %{"file-id" => file_id}, socket) do
+    {:noreply, update(socket, :files_to_delete, fn files -> [file_id] -- files end)}
   end
 
   def handle_event("remove-objective", %{"id" => id}, socket) do
@@ -308,7 +359,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     case Library.update_document(
            socket.assigns.current_scope,
            socket.assigns.document,
-           document_params |> Map.put("files", [])
+           document_params
          ) do
       {:ok, document} ->
         {:noreply,
@@ -326,7 +377,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   defp save_document(socket, :new, document_params) do
     document_params = Map.put(document_params, "files", [])
     document_params = params_with_files(socket, document_params)
-    IO.inspect(document_params)
 
     case Library.create_document(socket.assigns.current_scope, document_params) do
       {:ok, document} ->
@@ -343,6 +393,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   defp params_with_files(socket, document_params) do
+    existing_files =
+      socket.assigns.current_document_files
+      |> Enum.reject(fn file -> file.id in socket.assigns.files_to_delete end)
+      |> Enum.map(&Map.take(&1, [:id, :filename, :filepath, :format]))
+
     files =
       socket
       |> consume_uploaded_entries(:files, &upload_static_file/2)
@@ -351,11 +406,10 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         %{"filename" => filename, "filepath" => filepath, "format" => format}
       end)
 
-    Map.put(document_params, "files", files)
+    Map.put(document_params, "files", files ++ existing_files)
   end
 
   defp upload_static_file(%{path: path}, entry) do
-    IO.inspect(entry)
     filename = Path.basename(path)
     filepath = Path.join("priv/static/files", filename)
     File.cp!(path, filepath)

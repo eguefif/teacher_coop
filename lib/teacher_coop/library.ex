@@ -97,10 +97,13 @@ defmodule TeacherCoop.Library do
   def update_document(%Scope{} = scope, %Document{} = document, attrs) do
     true = document.user_id == scope.user.id
 
+    IO.inspect(document)
+
     with {:ok, document = %Document{}} <-
            document
            |> Document.changeset(attrs, scope)
-           |> Repo.update() do
+           |> IO.inspect()
+           |> Repo.insert_or_update() do
       broadcast_document(scope, {:updated, document})
       {:ok, document}
     end
@@ -141,5 +144,13 @@ defmodule TeacherCoop.Library do
     true = document.user_id == scope.user.id
 
     Document.changeset(document, attrs, scope)
+  end
+
+  @doc """
+  Delete a `%File{}` by id
+  """
+  def delete_file_by_id(id) do
+    file = Repo.get(File, id)
+    Repo.delete(file)
   end
 end

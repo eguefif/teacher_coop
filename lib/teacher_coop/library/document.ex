@@ -26,7 +26,7 @@ defmodule TeacherCoop.Library.Document do
     field :institution_type, :string
     field :grade, :string
     field :objectives, {:array, :map}
-    has_many :files, TeacherCoop.Library.File
+    has_many :files, TeacherCoop.Library.File, on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
