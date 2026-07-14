@@ -6,17 +6,15 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Curriculum
 
   # TODO: 
-  # - [x] Display files delete button
-  #   - [x] Make it work, check if the list of files is well updated before going in the context
-  # - [x] Fix bug where the save button does not work when adding a new file.
-  # - [x] Persist files on disc
   # - [ ] Display errors for files
+  #   - [ ] Handles too many files: add a div after the list of files for that
   # - [ ] Add loading for files based on entries % and DaisyUI
-  # - [ ] Edit
-  #   - [ ] Display list of objectives and allow to delete some
-  #   - [ ] Display list of files and allow to delete some
-  #   - [ ] Make sure when updating that file and objectives are still there.
-  @max_files 5
+  # - [ ] Handles objectives
+  #   - [ ] Add a join table for objectives
+  #   - [ ] Handle delete add new objectives in edit mode
+
+  @max_files 3
+  @formats ~w(.docx .pdf .txt .xlsx)
 
   @impl true
   def render(assigns) do
@@ -202,41 +200,76 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         </div>
       </div>
 
-      <div :if={@uploads.files.entries != []}>{gettext("New file")}</div>
-      <div
-        :for={file <- @uploads.files.entries}
-        :if={@uploads.files.entries != []}
-        class="bg-info/30 border border-info/70 text-info/100 px-4 py-3 rounded mb-4 flex flex-row justify-between content-baseline"
-      >
-        <div>{file.client_name} - {file.progress}%</div>
-        <div
-          phx-click="remove-file"
-          phx-value-ref={file.ref}
-        >
-          <.icon
-            name="hero-x-mark"
-            class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
-          />
-        </div>
+      <div :if={@uploads.files.entries != []}>
+        <div>{gettext("New file")}</div>
+        <.new_file_row
+          :for={file <- @uploads.files.entries}
+          file={file}
+          error={
+            Enum.filter(@uploads.files.errors, &(elem(&1, 0) == file.ref))
+            |> Enum.map(&error_to_string(elem(&1, 1)))
+            |> Enum.at(0)
+          }
+        />
       </div>
     </div>
     """
   end
 
+  attr :file, :map, default: %{}
+  attr :error, :string, default: nil
+
+  def new_file_row(assigns) do
+    ~H"""
+    <div class={[
+      "px-4 py-3 rounded mb-4 flex flex-row justify-between content-baseline",
+      @error == nil && "bg-info/30 border border-info/70 text-info/100 ",
+      @error != nil && "bg-error/30 border border-error/70 text-error/100"
+    ]}>
+      <div>
+        <span :if={@error != nil} class="text-lg text-bold mr-4">
+          {@error}
+        </span>
+        <span>
+          {@file.client_name} -
+        </span>
+        <span :if={@error == nil}>
+          {@file.progress}%
+        </span>
+      </div>
+      <div
+        phx-click="remove-file"
+        phx-value-ref={@file.ref}
+      >
+        <.icon
+          name="hero-x-mark"
+          class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+        />
+      </div>
+    </div>
+    """
+  end
+
+  defp error_to_string(error) when is_atom(error) do
+    case error do
+      :too_large -> gettext("File too large")
+      :not_accepted -> gettext("Wrong format, must be one of ") <> Enum.join(@formats)
+      value -> Atom.to_string(value)
+    end
+  end
+
   @impl true
   def mount(params, _session, socket) do
-    # These should go in apply_action and depending on the action, the content will change.
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     # TODO: one validations is to check if the sum of all these files will put the user above its files space limitations
      |> assign(:selected_objectives, [])
      |> assign(:files_to_delete, [])
      |> assign(:show_objective_results, false)
      |> allow_upload(:files,
-       accept: ~w(.docx .pdf .txt .xlsx),
+       accept: @formats,
        max_entries: @max_files,
-       max_file_size: 50_000_000,
+       max_file_size: 300_000,
        auto_upload: false
      )
      |> apply_action(socket.assigns.live_action, params)}
