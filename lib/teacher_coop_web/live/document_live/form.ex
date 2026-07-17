@@ -6,14 +6,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Curriculum
 
   # TODO: 
-  # - [ ] Display errors for files
-  #   - [ ] Handles too many files: add a div after the list of files for that
-  # - [ ] Add loading for files based on entries % and DaisyUI
   # - [ ] Handles objectives
-  #   - [ ] Add a join table for objectives
+  #   - [ ] Add a join table for objectives between document and objectives
   #   - [ ] Handle delete add new objectives in edit mode
 
-  @max_files 3
+  @max_files 2
   @formats ~w(.docx .pdf .txt .xlsx)
 
   @impl true
@@ -56,12 +53,29 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           show_objective_results={@show_objective_results}
         />
         <.selected_objectives_view objectives={@selected_objectives} />
+
+        <!-- File selection Input -->
         <div
           phx-drop-target={@uploads.files.ref}
-          class="border-2 border-dashed border-gray-300 rounded-lg p-6 mb-4 cursor-pointer"
+          class={[
+            "border-2 border-dashed rounded-lg p-6 mb-4 cursor-pointer",
+            @uploads.files.errors == [] && "border-gray-300",
+            @uploads.files.errors != [] && "border-error"
+          ]}
         >
-          <label for={@uploads.files.ref} class="block text-sm font-medium cursor-pointer">
-            {gettext("Upload files")}
+          <label
+            for={@uploads.files.ref}
+            class="block text-sm font-medium cursor-pointer mb-2"
+          >
+            <div :if={Enum.all?(@uploads.files.errors, &(elem(&1, 1) != :too_many_files)) == true}>
+              {gettext("Upload files") <> "(maximum: #{@max_files})"}
+            </div>
+            <div
+              :if={Enum.any?(@uploads.files.errors, &(elem(&1, 1) == :too_many_files)) == true}
+              class="text-error"
+            >
+              {gettext("Too many files. Maximum is ")} {"#{@max_files}"}
+            </div>
           </label>
           <.live_file_input upload={@uploads.files} />
         </div>
@@ -266,6 +280,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> assign(:selected_objectives, [])
      |> assign(:files_to_delete, [])
      |> assign(:show_objective_results, false)
+     |> assign(:max_files, @max_files)
      |> allow_upload(:files,
        accept: @formats,
        max_entries: @max_files,
