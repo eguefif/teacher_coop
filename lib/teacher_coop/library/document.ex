@@ -25,7 +25,7 @@ defmodule TeacherCoop.Library.Document do
     field :user_id, :id
     field :institution_type, :string
     field :grade, :string
-    field :objectives, {:array, :map}
+    has_many :document_objectives, TeacherCoop.TeacherCoop.Library.DocumentObjective
     has_many :files, TeacherCoop.Library.File, on_replace: :delete
 
     timestamps(type: :utc_datetime)
@@ -39,6 +39,7 @@ defmodule TeacherCoop.Library.Document do
     document
     |> cast(attrs, permitted)
     |> cast_assoc(:files, with: &TeacherCoop.Library.File.changeset/2)
+    |> cast_assoc(:document_objectives, with: &TeacherCoop.Library.DocumentObjective.changeset/2)
     |> validate_required(required)
     |> validate_enum(@institution_types, :institution_type)
     |> validate_enum(@grades, :grade)
