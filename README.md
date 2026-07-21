@@ -41,9 +41,9 @@ The website is available on `teachercoop:4000`
     - [x] Anytime a user changes their fullname, reindex all documents to update fullname
 - [ ] Improve documents
     - [x] Add grade
-    - [ ] Add tags
+    - [x] Add tags
     - [x] Add goals
-    - [ ] Add files
+    - [x] Add files
     - [ ] Improve index page
     - [ ] Improve show page
 - [ ] Autocomplete

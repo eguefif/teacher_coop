@@ -5,12 +5,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Curriculum
 
-  # TODO: 
-  # [ ] Test Check
-  # - [ ] Handles objectives
-  #   - [ ] Work on the join table, it's not clear what relation in document_objectives
-  #   - [ ] Improve objectives displays.
-
   @max_files 2
   @formats ~w(.docx .pdf .txt .xlsx)
 
@@ -164,6 +158,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
             "bg-warning/30 border border-warning/70 text-warning/100"
         ]}
       >
+        {objective.goal}
         <div
           phx-click="delete-objective"
           phx-value-id={objective.id}
@@ -184,8 +179,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
             class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
           />
         </div>
-
-        {objective.goal}
       </div>
     </div>
 
@@ -193,9 +186,10 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       <div class="text-lg">New objectives</div>
       <div
         :for={objective <- @selected_objectives}
-        class="px-4 py-3 rounded mb-4 flex flex-row justify-between content-successline bg-success/30 border border-success/70 text-success/100"
+        class="px-4 py-3 rounded mb-4 flex flex-row justify-between content-successline bg-info/30 border border-info/70 text-info/100"
         ,
       >
+        {objective["goal"]}
         <div
           phx-click="remove-objective"
           phx-value-id={objective["id"]}
@@ -205,8 +199,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
             class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
           />
         </div>
-
-        {objective["goal"]}
       </div>
     </div>
     """

@@ -72,7 +72,9 @@ defmodule TeacherCoop.MixProject do
       {:meilisearch_ex, "~> 1.2.1"},
       {:dotenv, "~> 3.1.0"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false}
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:oban, "~> 2.23"},
+      {:igniter, "~> 0.5", only: [:dev]}
     ]
   end
 

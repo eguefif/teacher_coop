@@ -8,15 +8,20 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
   Index a document in Meilisearch
   """
   def index_document(%Scope{} = scope, %Document{} = document) do
+    objectives_field = create_objectives_field(document.objectives)
+
     attrs =
       Map.from_struct(document)
       |> Map.filter(&(elem(&1, 0) != :__meta__))
       |> Map.filter(&(elem(&1, 0) != :files))
       |> Map.filter(&(elem(&1, 0) != :objectives))
       |> Map.filter(&(elem(&1, 0) != :document_objectives))
+      |> Map.put(:objectives, objectives_field)
       |> Map.put(:user_id, scope.user.id)
       |> Map.put(:email, scope.user.email)
       |> Map.put(:fullname, scope.user.fullname)
+
+    IO.inspect(attrs)
 
     case Meilisearch.Document.create_or_replace(get_client(), index_name("documents"), attrs) do
       {:ok, %Meilisearch.SummarizedTask{} = task} ->
@@ -26,6 +31,12 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
       {:error, _error_details} ->
         :error
     end
+  end
+
+  defp create_objectives_field(objectives) do
+    objectives
+    |> Enum.map(& &1.goal)
+    |> Enum.join(". ")
   end
 
   @doc """

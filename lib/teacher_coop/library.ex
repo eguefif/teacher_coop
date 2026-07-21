@@ -105,7 +105,8 @@ defmodule TeacherCoop.Library do
     with {:ok, document = %Document{}} <-
            document
            |> Document.changeset(attrs, scope, objectives)
-           |> Repo.insert_or_update() do
+           |> Repo.insert_or_update(),
+         :ok <- SearchDocuments.index_document(scope, document) do
       broadcast_document(scope, {:updated, document})
       {:ok, document}
     end
