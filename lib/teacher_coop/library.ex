@@ -4,6 +4,7 @@ defmodule TeacherCoop.Library do
   alias TeacherCoop.SearchRepo.SearchDocuments
 
   alias TeacherCoop.Library.Document
+  alias TeacherCoop.Curriculum
   alias TeacherCoop.Accounts.Scope
 
   @doc """
@@ -38,7 +39,7 @@ defmodule TeacherCoop.Library do
 
   """
   def list_documents(%Scope{} = scope) do
-    Repo.all_by(Document, user_id: scope.user.id)
+    Repo.all_by(Document, user_id: scope.user.id) |> Repo.preload(:objectives)
   end
 
   @doc """
@@ -57,6 +58,8 @@ defmodule TeacherCoop.Library do
   """
   def get_document!(id) do
     Repo.get_by!(Document, id: id)
+    |> Repo.preload(:files)
+    |> Repo.preload(:objectives)
   end
 
   @doc """
@@ -70,10 +73,12 @@ defmodule TeacherCoop.Library do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_document(%Scope{} = scope, attrs) do
+  def create_document(%Scope{} = scope, attrs, objective_ids \\ []) do
+    objectives = Repo.all(from c in Curriculum.Objective, where: c.id in ^objective_ids)
+
     with {:ok, document = %Document{}} <-
            %Document{}
-           |> Document.changeset(attrs, scope)
+           |> Document.changeset(attrs, scope, objectives)
            |> Repo.insert(),
          :ok <- SearchDocuments.index_document(scope, document) do
       broadcast_document(scope, {:created, document})
@@ -93,13 +98,14 @@ defmodule TeacherCoop.Library do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_document(%Scope{} = scope, %Document{} = document, attrs) do
+  def update_document(%Scope{} = scope, %Document{} = document, attrs, objective_ids \\ []) do
     true = document.user_id == scope.user.id
+    objectives = Repo.all(from c in Curriculum.Objective, where: c.id in ^objective_ids)
 
     with {:ok, document = %Document{}} <-
            document
-           |> Document.changeset(attrs, scope)
-           |> Repo.update() do
+           |> Document.changeset(attrs, scope, objectives)
+           |> Repo.insert_or_update() do
       broadcast_document(scope, {:updated, document})
       {:ok, document}
     end
@@ -140,5 +146,13 @@ defmodule TeacherCoop.Library do
     true = document.user_id == scope.user.id
 
     Document.changeset(document, attrs, scope)
+  end
+
+  @doc """
+  Delete a `%File{}` by id
+  """
+  def delete_file_by_id(id) do
+    file = Repo.get(File, id)
+    Repo.delete(file)
   end
 end

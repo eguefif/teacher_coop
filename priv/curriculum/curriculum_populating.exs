@@ -84,7 +84,6 @@ end
 
 IO.puts("\n************** Indexing Curriculum *********************\n")
 
-{:ok, _} = Repo.query("TRUNCATE objectives", [])
 TeacherCoop.SearchRepo.SearchObjectives.reset_objectives_index()
 
 {:ok, cwd} = File.cwd()
@@ -92,14 +91,20 @@ base_path = Path.join(cwd, "/priv/curriculum/curriculum/")
 
 entries =
   CurriculumFile.build_curriculum_files(base_path)
-  |> IO.inspect()
   |> Enum.flat_map(fn file -> CurriculumFile.parse_file(base_path, file) end)
 
 Repo.insert_all(Objective, entries)
 
 query =
   from c in Objective,
-    select: %{id: c.id, strand: c.strand, grade: c.grade, goal: c.goal, subject: c.subject},
+    select: %{
+      id: c.id,
+      strand: c.strand,
+      grade: c.grade,
+      goal: c.goal,
+      subject: c.subject,
+      year: c.year
+    },
     where: c.year == 2024
 
 entries = Repo.all(query)

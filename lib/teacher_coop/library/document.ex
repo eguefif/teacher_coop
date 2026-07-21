@@ -3,6 +3,8 @@ defmodule TeacherCoop.Library.Document do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias TeacherCoop.{Library, Curriculum}
+
   @institution_types ["Tout le monde", "École maternelle", "École élémentaire"]
   @grades [
     "Aucun",
@@ -25,18 +27,26 @@ defmodule TeacherCoop.Library.Document do
     field :user_id, :id
     field :institution_type, :string
     field :grade, :string
-    field :objectives, {:array, :map}
+    has_many :document_objectives, TeacherCoop.Library.DocumentObjective, on_replace: :delete
+
+    many_to_many :objectives, Curriculum.Objective,
+      join_through: Library.DocumentObjective,
+      on_replace: :delete
+
+    has_many :files, Library.File, on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(document, attrs, user_scope) do
-    permitted = [:title, :description, :institution_type, :grade, :objectives]
-    required = permitted |> List.delete(:objectives)
+  def changeset(document, attrs, user_scope, objectives \\ []) do
+    permitted = [:title, :description, :institution_type, :grade]
+    required = permitted
 
     document
     |> cast(attrs, permitted)
+    |> cast_assoc(:files, with: &TeacherCoop.Library.File.changeset/2)
+    |> put_assoc(:objectives, objectives)
     |> validate_required(required)
     |> validate_enum(@institution_types, :institution_type)
     |> validate_enum(@grades, :grade)

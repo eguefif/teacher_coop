@@ -1,0 +1,16 @@
+defmodule TeacherCoop.Repo.Migrations.CreateFiles do
+  use Ecto.Migration
+
+  def change do
+    create table(:files) do
+      add :filename, :string
+      add :filepath, :string
+      add :format, :string
+      add :document_id, references(:documents, on_delete: :nilify_all)
+
+      timestamps(type: :utc_datetime)
+    end
+
+    create index(:files, [:document_id])
+  end
+end

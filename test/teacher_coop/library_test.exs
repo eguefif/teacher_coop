@@ -23,7 +23,18 @@ defmodule TeacherCoop.LibraryTest do
     test "get_document!/2 returns the document with given id" do
       scope = user_scope_fixture()
       document = document_fixture(scope)
-      assert Library.get_document!(document.id) == document
+
+      document =
+        document
+        |> Map.filter(&(elem(&1, 0) != :files))
+        |> Map.filter(&(elem(&1, 0) != :document_objectives))
+
+      expected_document =
+        Library.get_document!(document.id)
+        |> Map.filter(&(elem(&1, 0) != :files))
+        |> Map.filter(&(elem(&1, 0) != :document_objectives))
+
+      assert expected_document == document
       assert_raise Ecto.NoResultsError, fn -> Library.get_document!(document.id + 1) end
     end
 
@@ -82,7 +93,17 @@ defmodule TeacherCoop.LibraryTest do
       assert {:error, %Ecto.Changeset{}} =
                Library.update_document(scope, document, @invalid_attrs)
 
-      assert document == Library.get_document!(document.id)
+      document =
+        document
+        |> Map.filter(&(elem(&1, 0) != :files))
+        |> Map.filter(&(elem(&1, 0) != :document_objectives))
+
+      expected_document =
+        Library.get_document!(document.id)
+        |> Map.filter(&(elem(&1, 0) != :files))
+        |> Map.filter(&(elem(&1, 0) != :document_objectives))
+
+      assert document == expected_document
     end
 
     test "delete_document/2 deletes the document" do
