@@ -10,12 +10,12 @@ import Config
 config :teacher_coop, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [default: 10],
+  queues: [default: 10, document_ingestion: 20],
   repo: TeacherCoop.Repo,
   plugins: [
     # 7 days job retention
-    {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7} <
-      {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(30)}
+    {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7},
+    {Oban.Plugins.Lifeline, rescue_after: :timer.minutes(30)}
   ]
 
 config :teacher_coop, :scopes,

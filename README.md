@@ -26,24 +26,25 @@ $ mix phx.server
 The website is available on `teachercoop:4000`
 
 ## TODO
+### Next
+- [ ] Setup embedder with TEI from huggind face
+
+### List
 - [ ] Finish reading chapter 5: p 156
 - [ ] Search
     - [ ] Optimize full text search
 - [ ] Document ingestion
+    - [ ] embed with TEI
+    - [ ] store to Meilisearch
     - [ ] Add pipeline: to md, chunk, embed, store
     - [ ] To md
     - [ ] Chunk pdf/docx
-    - [ ] embed with TEI
-    - [ ] store to Meilisearch
 - [ ] Add user fullname
     - [x] Make the form works
     - [x] Add test for update
     - [x] Anytime a user changes their fullname, reindex all documents to update fullname
 - [ ] Improve documents
-    - [x] Add grade
-    - [x] Add tags
-    - [x] Add goals
-    - [x] Add files
+    - [ ] Be sure that delete works for every scenario: files and objectives.
     - [ ] Improve index page
     - [ ] Improve show page
 - [ ] Autocomplete
