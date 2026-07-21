@@ -6,6 +6,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Curriculum
 
   # TODO: 
+  # [ ] Test Check
   # - [ ] Handles objectives
   #   - [ ] Work on the join table, it's not clear what relation in document_objectives
   #   - [ ] Improve objectives displays.
@@ -95,7 +96,6 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           <.button navigate={return_path(@current_scope, @return_to, @document)}>{gettext("Cancel")}</.button>
         </footer>
       </.form>
-      <pre><%= inspect assigns.uploads, pretty: true %></pre>
     </Layouts.app>
     """
   end
@@ -158,15 +158,15 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         :for={objective <- @objectives}
         class={[
           "px-4 py-3 rounded mb-4 flex flex-row justify-between content-successline",
-          objective["id"] in (Enum.map(@objectives, & &1["id"]) -- @objectives_to_delete) &&
+          objective.id in (Enum.map(@objectives, & &1.id) -- @objectives_to_delete) &&
             "bg-success/30 border border-success/70 text-success/100",
-          objective["id"] in @objectives_to_delete &&
+          objective.id in @objectives_to_delete &&
             "bg-warning/30 border border-warning/70 text-warning/100"
         ]}
       >
         <div
           phx-click="delete-objective"
-          phx-value-id={objective["id"]}
+          phx-value-id={objective.id}
         >
           <.icon
             name="hero-x-mark"
@@ -175,9 +175,9 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         </div>
 
         <div
-          :if={objective["id"] in @objectives_to_delete}
+          :if={objective.id in @objectives_to_delete}
           phx-click="restore-objective"
-          phx-value-id={objective["id"]}
+          phx-value-id={objective.id}
         >
           <.icon
             name="hero-arrow-uturn-down"
@@ -185,7 +185,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           />
         </div>
 
-        {objective["goal"]}
+        {objective.goal}
       </div>
     </div>
 
@@ -338,7 +338,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   defp apply_action(socket, :new, _params) do
-    document = %Document{user_id: socket.assigns.current_scope.user.id, files: []}
+    document = %Document{user_id: socket.assigns.current_scope.user.id, files: [], objectives: []}
 
     socket
     |> assign(:page_title, "New Document")
@@ -364,9 +364,16 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     objective =
       Enum.find(socket.assigns.objective_results, fn objective -> objective["id"] == id end)
 
+    objectives =
+      if is_objective_in_objectives(id, socket) do
+        socket.assigns.selected_objectives
+      else
+        [objective | socket.assigns.selected_objectives]
+      end
+
     {:noreply,
      socket
-     |> assign(:selected_objectives, [objective | socket.assigns.selected_objectives])
+     |> assign(:selected_objectives, objectives)
      |> assign(:objective_results, [])
      |> assign(:show_objective_results, false)}
   end
@@ -440,7 +447,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
     {objective_results, show_objective_results} =
       if String.length(objectives_input) >= 3 do
-        {Curriculum.search_objectives(objectives_input), true}
+        results =
+          Curriculum.search_objectives(objectives_input)
+          |> Enum.reject(&is_objective_in_objectives(&1["id"], socket))
+
+        {results, true}
       else
         {[], false}
       end
@@ -452,17 +463,18 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   def handle_event("save", %{"document" => document_params}, socket) do
-    document_params = params_with_objectives(socket, document_params)
-    save_document(socket, socket.assigns.live_action, document_params)
+    document_params = document_params |> params_with_files(socket)
+    objective_ids = get_objective_ids(socket)
+
+    save_document(socket, socket.assigns.live_action, document_params, objective_ids)
   end
 
-  defp save_document(socket, :edit, document_params) do
-    document_params = params_with_files(socket, document_params)
-
+  defp save_document(socket, :edit, document_params, objective_ids) do
     case Library.update_document(
            socket.assigns.current_scope,
            socket.assigns.document,
-           document_params
+           document_params,
+           objective_ids
          ) do
       {:ok, document} ->
         {:noreply,
@@ -477,11 +489,8 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     end
   end
 
-  defp save_document(socket, :new, document_params) do
-    document_params = Map.put(document_params, "files", [])
-    document_params = params_with_files(socket, document_params)
-
-    case Library.create_document(socket.assigns.current_scope, document_params) do
+  defp save_document(socket, :new, document_params, objective_ids) do
+    case Library.create_document(socket.assigns.current_scope, document_params, objective_ids) do
       {:ok, document} ->
         {:noreply,
          socket
@@ -495,18 +504,20 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     end
   end
 
-  defp params_with_objectives(socket, document_params) do
-    existing_objectives =
+  defp get_objective_ids(socket) do
+    existing_objectives_ids =
       socket.assigns.document.objectives
-      |> Enum.reject(fn obj -> obj["id"] in socket.assigns.objectives_to_delete end)
-      |> Enum.map(&Map.take(&1, [:id, :year, :subject, :grade, :strand, :goal]))
+      |> Enum.reject(fn obj -> obj.id in socket.assigns.objectives_to_delete end)
+      |> Enum.map(& &1.id)
 
-    IO.inspect(existing_objectives)
-    objectives = socket.assigns.selected_objectives ++ existing_objectives
-    Map.update(document_params, "objectives", objectives, fn _ -> objectives end)
+    selected_objective_ids =
+      socket.assigns.selected_objectives
+      |> Enum.map(& &1["id"])
+
+    selected_objective_ids ++ existing_objectives_ids
   end
 
-  defp params_with_files(socket, document_params) do
+  defp params_with_files(document_params, socket) do
     existing_files =
       socket.assigns.current_document_files
       |> Enum.reject(fn file -> file.id in socket.assigns.files_to_delete end)
@@ -540,5 +551,31 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       :not_accepted -> gettext("Wrong format, must be one of ") <> Enum.join(@formats)
       value -> Atom.to_string(value)
     end
+  end
+
+  defp is_objective_in_objectives(id, socket) when is_bitstring(id) do
+    id = String.to_integer(id)
+
+    document_objective_ids =
+      socket.assigns.document.objectives
+      |> Enum.map(& &1.id)
+
+    selected_objective_ids =
+      socket.assigns.selected_objectives
+      |> Enum.map(& &1["id"])
+
+    id in (document_objective_ids ++ selected_objective_ids)
+  end
+
+  defp is_objective_in_objectives(id, socket) when is_integer(id) do
+    document_objective_ids =
+      socket.assigns.document.objectives
+      |> Enum.map(& &1.id)
+
+    selected_objective_ids =
+      socket.assigns.selected_objectives
+      |> Enum.map(& &1["id"])
+
+    id in (document_objective_ids ++ selected_objective_ids)
   end
 end

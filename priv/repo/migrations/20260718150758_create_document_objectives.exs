@@ -11,5 +11,6 @@ defmodule TeacherCoop.Repo.Migrations.CreateDocumentObjectives do
 
     create index(:document_objectives, [:document_id])
     create index(:document_objectives, [:objective_id])
+    create unique_index(:document_objectives, [:document_id, :objective_id])
   end
 end

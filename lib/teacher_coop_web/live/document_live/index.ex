@@ -32,7 +32,7 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
         </:col>
         <:col :let={{_id, document}} label={gettext("objectives") |> String.capitalize()}>
           <div :if={document.objectives != nil && document.objectives != []}>
-            {document.objectives |> Enum.at(0) |> then(& &1["goal"])}>
+            {document.objectives |> Enum.at(0) |> then(& &1.goal)}
           </div>
           <div :if={document.objectives == nil || document.objectives == []}>
             {gettext("No objectives")}

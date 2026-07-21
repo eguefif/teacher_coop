@@ -39,7 +39,6 @@ defmodule TeacherCoop.SearchRepo do
       |> Enum.map(&{&1, Meilisearch.Index.get(client, &1)})
       |> Enum.reject(&(elem(elem(&1, 1), 0) == :error))
       |> Enum.map(&elem(&1, 0))
-      |> IO.inspect()
       |> Enum.map(&Meilisearch.Index.delete(client, &1))
       |> Enum.map(&elem(&1, 1))
 
