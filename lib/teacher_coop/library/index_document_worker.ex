@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Library.IngestionWorkers.IndexDocument do
+defmodule TeacherCoop.Library.Workers.IndexDocument do
   use Oban.Worker,
     queue: :document_ingestion,
     unique: true

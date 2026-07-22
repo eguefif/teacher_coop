@@ -2,7 +2,7 @@ defmodule TeacherCoop.Library do
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
 
-  alias TeacherCoop.Library.{Document, IngestionWorkers}
+  alias TeacherCoop.Library.{Document, Workers}
   alias TeacherCoop.Curriculum
   alias TeacherCoop.Accounts.Scope
 
@@ -90,13 +90,13 @@ defmodule TeacherCoop.Library do
       TeacherCoop.SearchRepo.SearchDocuments.create_attributes_from_document(scope, document)
 
     %{attrs: attrs}
-    |> IngestionWorkers.IndexDocument.new()
+    |> Workers.IndexDocument.new()
     |> Oban.insert()
   end
 
   defp schedule_delete_document_from_index_job(document_id) do
     %{document_id: document_id}
-    |> IngestionWorkers.DeleteDocument.new()
+    |> Workers.DeleteDocument.new()
     |> Oban.insert()
   end
 
@@ -140,13 +140,22 @@ defmodule TeacherCoop.Library do
   """
   def delete_document(%Scope{} = scope, %Document{} = document) do
     true = document.user_id == scope.user.id
+    files = Enum.map(document.files, fn file -> file.filepath end)
 
     with {:ok, document = %Document{}} <-
            Repo.delete(document) do
+      # TODO: add delete all files in a job
+      schedule_files_deleting(files)
       schedule_delete_document_from_index_job(document.id)
       broadcast_document(scope, {:deleted, document})
       {:ok, document}
     end
+  end
+
+  defp schedule_files_deleting(files) do
+    %{files: files}
+    |> Workers.DeleteFiles.new()
+    |> Oban.insert()
   end
 
   @doc """

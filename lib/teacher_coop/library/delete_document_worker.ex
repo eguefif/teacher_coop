@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Library.IngestionWorkers.DeleteDocument do
+defmodule TeacherCoop.Library.Workers.DeleteDocument do
   use Oban.Worker,
     queue: :document_ingestion,
     unique: true
