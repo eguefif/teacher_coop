@@ -34,11 +34,9 @@ The website is available on `teachercoop:4000`
 - [ ] Search
     - [ ] Optimize full text search
 - [ ] Document ingestion
-    - [ ] embed with TEI
-    - [ ] store to Meilisearch
-    - [ ] Add pipeline: to md, chunk, embed, store
-    - [ ] To md
-    - [ ] Chunk pdf/docx
+    - [x] Switch indexing in Oban
+    - [x] Setup embedder
+    - [ ] See to add a file, chunking and indexing with vector search
 - [ ] Add user fullname
     - [x] Make the form works
     - [x] Add test for update
