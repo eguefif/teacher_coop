@@ -27,13 +27,18 @@ defmodule TeacherCoop.Library.Document do
     field :user_id, :id
     field :institution_type, :string
     field :grade, :string
-    has_many :document_objectives, TeacherCoop.Library.DocumentObjective, on_replace: :delete
+
+    has_many :document_objectives, TeacherCoop.Library.DocumentObjective,
+      on_replace: :delete,
+      on_delete: :delete_all
 
     many_to_many :objectives, Curriculum.Objective,
       join_through: Library.DocumentObjective,
       on_replace: :delete
 
-    has_many :files, Library.File, on_replace: :delete
+    has_many :files, Library.File,
+      on_replace: :delete,
+      on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

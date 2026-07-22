@@ -31,6 +31,8 @@ The website is available on `teachercoop:4000`
 
 ### List
 - [ ] Finish reading chapter 5: p 156
+- [ ] Have a helper module that allows to retrieve information based on env: 
+        (file_path for example, meilisearch server, postgres)
 - [ ] Search
     - [ ] Optimize full text search
 - [ ] Document ingestion
@@ -43,6 +45,10 @@ The website is available on `teachercoop:4000`
     - [x] Anytime a user changes their fullname, reindex all documents to update fullname
 - [ ] Improve documents
     - [ ] Be sure that delete works for every scenario: files and objectives.
+        - [ ] Delete files
+        - [x] Delete join table for objectives
+        - [ ] Delete actual files
+        - [ ] Delete in Meilisearch
     - [ ] Improve index page
     - [ ] Improve show page
 - [ ] Autocomplete
