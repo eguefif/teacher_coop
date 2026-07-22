@@ -7,11 +7,14 @@ defmodule TeacherCoop.Application do
 
   @impl true
   def start(_type, _args) do
+    Oban.Telemetry.attach_default_logger()
+
     children = [
       PdfExtractor,
       TeacherCoopWeb.Telemetry,
       TeacherCoop.Repo,
       {DNSCluster, query: Application.get_env(:teacher_coop, :dns_cluster_query) || :ignore},
+      {Oban, Application.fetch_env!(:teacher_coop, Oban)},
       {Phoenix.PubSub, name: TeacherCoop.PubSub},
       # Start a worker by calling: TeacherCoop.Worker.start_link(arg)
       # {TeacherCoop.Worker, arg},

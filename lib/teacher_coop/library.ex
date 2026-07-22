@@ -1,9 +1,8 @@
 defmodule TeacherCoop.Library do
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
-  alias TeacherCoop.SearchRepo.SearchDocuments
 
-  alias TeacherCoop.Library.Document
+  alias TeacherCoop.Library.{Document, IngestionWorkers}
   alias TeacherCoop.Curriculum
   alias TeacherCoop.Accounts.Scope
 
@@ -79,11 +78,26 @@ defmodule TeacherCoop.Library do
     with {:ok, document = %Document{}} <-
            %Document{}
            |> Document.changeset(attrs, scope, objectives)
-           |> Repo.insert(),
-         :ok <- SearchDocuments.index_document(scope, document) do
+           |> Repo.insert() do
+      schedule_indexing_document_job(scope, document)
       broadcast_document(scope, {:created, document})
       {:ok, document}
     end
+  end
+
+  defp schedule_indexing_document_job(%Scope{} = scope, %Document{} = document) do
+    attrs =
+      TeacherCoop.SearchRepo.SearchDocuments.create_attributes_from_document(scope, document)
+
+    %{attrs: attrs}
+    |> IngestionWorkers.IndexDocument.new()
+    |> Oban.insert()
+  end
+
+  defp schedule_delete_document_from_index_job(document_id) do
+    %{document_id: document_id}
+    |> IngestionWorkers.DeleteDocument.new()
+    |> Oban.insert()
   end
 
   @doc """
@@ -106,6 +120,7 @@ defmodule TeacherCoop.Library do
            document
            |> Document.changeset(attrs, scope, objectives)
            |> Repo.insert_or_update() do
+      schedule_indexing_document_job(scope, document)
       broadcast_document(scope, {:updated, document})
       {:ok, document}
     end
@@ -128,6 +143,7 @@ defmodule TeacherCoop.Library do
 
     with {:ok, document = %Document{}} <-
            Repo.delete(document) do
+      schedule_delete_document_from_index_job(document.id)
       broadcast_document(scope, {:deleted, document})
       {:ok, document}
     end
@@ -154,5 +170,6 @@ defmodule TeacherCoop.Library do
   def delete_file_by_id(id) do
     file = Repo.get(File, id)
     Repo.delete(file)
+    schedule_delete_document_from_index_job(id)
   end
 end

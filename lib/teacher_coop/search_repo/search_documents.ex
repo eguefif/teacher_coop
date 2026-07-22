@@ -1,23 +1,27 @@
 defmodule TeacherCoop.SearchRepo.SearchDocuments do
   import TeacherCoop.SearchRepo
-  alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Repo
+  alias TeacherCoop.Accounts.Scope
+
+  @doc """
+  Delete a document from Meilisearch
+  """
+  def delete_document(document_id) do
+    case Meilisearch.Document.delete_one(get_client(), index_name("documents"), document_id) do
+      {:ok, %Meilisearch.SummarizedTask{} = task} ->
+        wait_for_tasks([task])
+        :ok
+
+      {:error, _error_details} ->
+        :error
+    end
+  end
 
   @doc """
   Index a document in Meilisearch
   """
-  def index_document(%Scope{} = scope, %Document{} = document) do
-    attrs =
-      Map.from_struct(document)
-      |> Map.filter(&(elem(&1, 0) != :__meta__))
-      |> Map.filter(&(elem(&1, 0) != :files))
-      |> Map.filter(&(elem(&1, 0) != :objectives))
-      |> Map.filter(&(elem(&1, 0) != :document_objectives))
-      |> Map.put(:user_id, scope.user.id)
-      |> Map.put(:email, scope.user.email)
-      |> Map.put(:fullname, scope.user.fullname)
-
+  def index_document(%{} = attrs) do
     case Meilisearch.Document.create_or_replace(get_client(), index_name("documents"), attrs) do
       {:ok, %Meilisearch.SummarizedTask{} = task} ->
         wait_for_tasks([task])
@@ -26,6 +30,26 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
       {:error, _error_details} ->
         :error
     end
+  end
+
+  def create_attributes_from_document(%Scope{} = scope, %Document{} = document) do
+    objectives_field = create_objectives_field(document.objectives)
+
+    Map.from_struct(document)
+    |> Map.filter(&(elem(&1, 0) != :__meta__))
+    |> Map.filter(&(elem(&1, 0) != :files))
+    |> Map.filter(&(elem(&1, 0) != :objectives))
+    |> Map.filter(&(elem(&1, 0) != :document_objectives))
+    |> Map.put(:objectives, objectives_field)
+    |> Map.put(:user_id, scope.user.id)
+    |> Map.put(:email, scope.user.email)
+    |> Map.put(:fullname, scope.user.fullname)
+  end
+
+  defp create_objectives_field(objectives) do
+    objectives
+    |> Enum.map(& &1.goal)
+    |> Enum.join(" ")
   end
 
   @doc """

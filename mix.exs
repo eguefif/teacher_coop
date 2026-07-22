@@ -72,7 +72,9 @@ defmodule TeacherCoop.MixProject do
       {:meilisearch_ex, "~> 1.2.1"},
       {:dotenv, "~> 3.1.0"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false}
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:oban, "~> 2.23"},
+      {:igniter, "~> 0.5", only: [:dev]}
     ]
   end
 
@@ -85,7 +87,7 @@ defmodule TeacherCoop.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "meilisearch.setup"],
-      reset: ["meilisearch.setup", "ecto.reset", "seed", "populate_curriculum"],
+      reset: ["meilisearch.setup", "ecto.reset", "populate_curriculum", "seed"],
       seed: ["run priv/repo/seeds.exs"],
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],

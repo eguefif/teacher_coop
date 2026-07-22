@@ -26,29 +26,31 @@ $ mix phx.server
 The website is available on `teachercoop:4000`
 
 ## TODO
+### Next
+- [ ] Setup embedder with TEI from huggind face
+
+### List
 - [ ] Finish reading chapter 5: p 156
 - [ ] Search
     - [ ] Optimize full text search
 - [ ] Document ingestion
-    - [ ] Add pipeline: to md, chunk, embed, store
-    - [ ] To md
-    - [ ] Chunk pdf/docx
-    - [ ] embed with TEI
-    - [ ] store to Meilisearch
+    - [x] Switch indexing in Oban
+    - [x] Setup embedder
+    - [ ] See to add a file, chunking and indexing with vector search
 - [ ] Add user fullname
     - [x] Make the form works
     - [x] Add test for update
     - [x] Anytime a user changes their fullname, reindex all documents to update fullname
 - [ ] Improve documents
-    - [x] Add grade
-    - [ ] Add tags
-    - [x] Add goals
-    - [ ] Add files
+    - [ ] Be sure that delete works for every scenario: files and objectives.
     - [ ] Improve index page
     - [ ] Improve show page
 - [ ] Autocomplete
     -[ ] Allow arrow navigation and selection
     -[ ] Accessibility
+- [ ] Architecture
+    - [ ] Define a protocol for SearchRepo and create a concrete implementation for Meilisearch. This will allow to switch search engine quickly for test purposes. We can even thing of
+            switching between different instance of Meilisearch that has different configuration.
 
 
 ### Meilisearch

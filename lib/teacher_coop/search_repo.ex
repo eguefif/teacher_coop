@@ -25,6 +25,8 @@ defmodule TeacherCoop.SearchRepo do
     IO.puts(" 1. Dropped all index")
     create_indexes(@indexes)
     IO.puts(" 2. Recreated index")
+    configure_embedder()
+    IO.puts(" 3. Define embedders")
     IO.puts("Meilisearch end of operations")
   end
 
@@ -110,20 +112,20 @@ defmodule TeacherCoop.SearchRepo do
   def wait_for_tasks(tasks) do
     result =
       tasks
-      |> Enum.map(&wait_for_task(&1))
+      |> Enum.map(&wait_for_task(&1.taskUid))
       |> Enum.all?(fn status -> status in [:succeeded] end)
 
     if result == true, do: :ok, else: :error
   end
 
-  defp wait_for_task(task) do
-    {:ok, task_details} = Meilisearch.Task.get(get_client(), task.taskUid)
+  defp wait_for_task(task_uid) do
+    {:ok, task_details} = Meilisearch.Task.get(get_client(), task_uid)
     status = Map.get(task_details, :status)
     wait_time = if is_env_test(), do: 1, else: 250
 
     if status in [:enqueued, :processing] do
       Process.sleep(wait_time)
-      wait_for_task(task)
+      wait_for_task(task_uid)
     else
       status
     end
@@ -148,5 +150,28 @@ defmodule TeacherCoop.SearchRepo do
     if Process.get(:finch_meilisearch) == nil do
       Finch.start_link(name: :finch_meilisearch)
     end
+  end
+
+  defp configure_embedder() do
+    embedder = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+    embedder_config = %{
+      "default" => %{
+        "source" => "huggingFace",
+        "model" => embedder,
+        "documentTemplate" => get_template()
+      }
+    }
+
+    {:ok, task} =
+      get_client()
+      |> Tesla.patch("/indexes/documents/settings/embedders", embedder_config)
+      |> Meilisearch.Client.handle_response()
+
+    :succeeded = wait_for_task(task["taskUid"])
+  end
+
+  defp get_template() do
+    "Un document nommé {{doc.title}} avec pour description {{doc.description}} et dont les objectifs sont: {{doc.objectives}}."
   end
 end
