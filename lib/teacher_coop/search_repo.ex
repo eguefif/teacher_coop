@@ -1,32 +1,38 @@
 defmodule TeacherCoop.SearchRepo do
   @moduledoc """
-  This module is a layer between the Search Engine and the application.
-  It handles indexing document and search.
-
-   TODO: Should happend in a background job with retry. We want to make sure it happens
-   Meilisearch indexes document asynchrounously, we need to check if it worked.
-   Potential strategy:
-   1. start trying indexing here
-   2. Schedule a check job with task_details and retry mechanism
-   3. Keep track in the document database to know if a document was indexed or in a table
-
-   TODO: thing about the public interface, it might be too specialized with the data architecture
+  SearchRepo is a layer between the Search Engine and the application
+  This module in particular is used to setup Meilisearch.
   """
-  alias TeacherCoop.Discovery.SearchResult
-
   @indexes ["documents", "documents_test", "objectives", "objectives_test"]
+
+  @doc """
+   Convenient function that initialize finch client if necessary and returns
+   a Meilisearch client.
+  """
+  def get_client() do
+    init_finch()
+    # Create a Meilisearch client whenever and wherever you need it.
+    case Process.get(:meilisearch) do
+      nil ->
+        [endpoint: "http://127.0.0.1:7700", key: "masterkey", finch: :finch_meilisearch]
+        |> Meilisearch.Client.new()
+
+      _ ->
+        Meilisearch.client(:meilisearch)
+    end
+  end
 
   @doc """
   Initliazes all the indexes after dropping them.
   """
   def init_indexes() do
     IO.puts("Starting meilisearch operations for reset")
-    drop_all(@indexes)
     IO.puts(" 1. Dropped all index")
-    create_indexes(@indexes)
+    drop_all(@indexes)
     IO.puts(" 2. Recreated index")
-    configure_embedder()
+    create_indexes(@indexes)
     IO.puts(" 3. Define embedders")
+    configure_embedder()
     IO.puts("Meilisearch end of operations")
   end
 
@@ -59,17 +65,10 @@ defmodule TeacherCoop.SearchRepo do
     create_indexes(indexes)
   end
 
-  def create_search_result(result) when is_map(result) do
-    %SearchResult{
-      facets: %{},
-      hits: result.hits
-    }
-  end
-
+  @doc """
+  This function returns the correct index_name depending on the environment
+  """
   def index_name(index) do
-    # This function is fondamental to make it work locally.
-    # We check if we are running in test environement. This way, we index document
-    # in the corresponding test index
     if is_env_test(), do: index <> "_test", else: index
   end
 
@@ -100,7 +99,6 @@ defmodule TeacherCoop.SearchRepo do
   end
 
   defp update_index_settings() do
-    # TODO: put the settings in a map along with indexes => this should work for test and regular
     client = get_client()
     Meilisearch.Settings.FilterableAttributes.update(client, "documents_test", ["user_id"])
   end
@@ -128,21 +126,6 @@ defmodule TeacherCoop.SearchRepo do
       wait_for_task(task_uid)
     else
       status
-    end
-  end
-
-  def get_client() do
-    # Convenient function that initialize finch client if necessary and returns
-    # a Meilisearch client.
-    init_finch()
-    # Create a Meilisearch client whenever and wherever you need it.
-    case Process.get(:meilisearch) do
-      nil ->
-        [endpoint: "http://127.0.0.1:7700", key: "masterkey", finch: :finch_meilisearch]
-        |> Meilisearch.Client.new()
-
-      _ ->
-        Meilisearch.client(:meilisearch)
     end
   end
 

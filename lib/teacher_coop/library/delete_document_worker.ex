@@ -1,4 +1,7 @@
 defmodule TeacherCoop.Library.Workers.DeleteDocument do
+  @moduledoc """
+  Remove a document from SearchRepo
+  """
   use Oban.Worker,
     queue: :document_ingestion,
     unique: true

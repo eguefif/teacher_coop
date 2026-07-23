@@ -1,4 +1,23 @@
 defmodule TeacherCoop.Library do
+  @moduledoc """
+  The Library context handles operations on documents. It has three schemas:
+  * document
+  * file
+  * document_objective which is a many-to-many join table
+
+  A document is composed of metadata (title, description, objectives) and files.
+
+  Any time a user is creating/updating/deleting a document, we do three things:
+  * Update the database with metadata and file's informations
+  * Index/Reindex in SearchRepo
+  * Add or delete a files on the disc
+
+  Some operations trigger background jobs. Delete a document trigger two background jobs:
+  * `Workers.DeleteDocument` will remove indexing from SearchRepo
+  * `Workers.DeleteFile` will delete files
+
+  Creating/Updating will trigger `Workers.IndexDocument` to index a document in SearchRepo.
+  """
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
 
@@ -62,7 +81,7 @@ defmodule TeacherCoop.Library do
   end
 
   @doc """
-  Creates a document.
+  Creates a document in database, index to SearchRepo and save files on disc.
   ## Examples
 
       iex> create_document(scope, %{field: value})
@@ -94,14 +113,8 @@ defmodule TeacherCoop.Library do
     |> Oban.insert()
   end
 
-  defp schedule_delete_document_from_index_job(document_id) do
-    %{document_id: document_id}
-    |> Workers.DeleteDocument.new()
-    |> Oban.insert()
-  end
-
   @doc """
-  Updates a document.
+  Updates a document in database, index to SearchRepo and save files on disc.
 
   ## Examples
 
@@ -127,7 +140,7 @@ defmodule TeacherCoop.Library do
   end
 
   @doc """
-  Deletes a document.
+  Deletes a document from database, removes from SearchRepo and delete files on disc.
 
   ## Examples
 
@@ -144,12 +157,26 @@ defmodule TeacherCoop.Library do
 
     with {:ok, document = %Document{}} <-
            Repo.delete(document) do
-      # TODO: add delete all files in a job
       schedule_files_deleting(files)
       schedule_delete_document_from_index_job(document.id)
       broadcast_document(scope, {:deleted, document})
       {:ok, document}
     end
+  end
+
+  @doc """
+  Delete a `%File{}` by id, remove from disc and SearchRepo.
+  """
+  def delete_file_by_id(id) do
+    file = Repo.get(File, id)
+    Repo.delete(file)
+    schedule_delete_document_from_index_job(id)
+  end
+
+  defp schedule_delete_document_from_index_job(document_id) do
+    %{document_id: document_id}
+    |> Workers.DeleteDocument.new()
+    |> Oban.insert()
   end
 
   defp schedule_files_deleting(files) do
@@ -171,14 +198,5 @@ defmodule TeacherCoop.Library do
     true = document.user_id == scope.user.id
 
     Document.changeset(document, attrs, scope)
-  end
-
-  @doc """
-  Delete a `%File{}` by id
-  """
-  def delete_file_by_id(id) do
-    file = Repo.get(File, id)
-    Repo.delete(file)
-    schedule_delete_document_from_index_job(id)
   end
 end

@@ -109,6 +109,7 @@ defmodule TeacherCoop.LibraryTest do
     test "delete_document/2 deletes the document" do
       scope = user_scope_fixture()
       document = document_fixture(scope)
+      document = Repo.get(Document, document.id) |> Repo.preload(:files)
       assert {:ok, %Document{}} = Library.delete_document(scope, document)
       assert_raise Ecto.NoResultsError, fn -> Library.get_document!(document.id) end
     end

@@ -1,6 +1,9 @@
 defmodule TeacherCoop.Curriculum do
   @moduledoc """
-  The Curriculum context.
+  The curriculum is a set of learning objectives defines by a text.
+  In our project, we work with the curriculum defined by France's Education Ministry.
+
+  See [CurriculumScripts](../priv/curriculum/curriculum_populating.exs) for how we ingest the cuccirulum.
   """
 
   import Ecto.Query, warn: false

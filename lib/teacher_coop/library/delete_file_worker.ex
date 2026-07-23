@@ -1,4 +1,7 @@
 defmodule TeacherCoop.Library.Workers.DeleteFiles do
+  @moduledoc """
+  Remove files from the disc
+  """
   use Oban.Worker,
     queue: :document_ingestion,
     unique: true

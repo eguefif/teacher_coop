@@ -10,18 +10,12 @@ defmodule TeacherCoop.Application do
     Oban.Telemetry.attach_default_logger()
 
     children = [
-      PdfExtractor,
       TeacherCoopWeb.Telemetry,
       TeacherCoop.Repo,
       {DNSCluster, query: Application.get_env(:teacher_coop, :dns_cluster_query) || :ignore},
       {Oban, Application.fetch_env!(:teacher_coop, Oban)},
       {Phoenix.PubSub, name: TeacherCoop.PubSub},
-      # Start a worker by calling: TeacherCoop.Worker.start_link(arg)
-      # {TeacherCoop.Worker, arg},
-      # Start to serve requests, typically the last entry
       TeacherCoopWeb.Endpoint,
-      {Finch, name: :llm_finch},
-      {Finch, name: :embeddings_finch},
       {Finch, name: :search_finch},
       {Meilisearch,
        name: :meilisearch,

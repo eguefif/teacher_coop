@@ -1,4 +1,5 @@
 # Seed script for curriculum data.
+# Note that we ingest items from the 2024 curriculum.
 #
 # Reads curriculum files from priv/repo/curriculum/, parses them into structured
 # entries, and performs two operations:
@@ -82,7 +83,7 @@ defmodule CurriculumFile do
   end
 end
 
-IO.puts("\n************** Indexing Curriculum *********************\n")
+IO.puts("\n************** Populating Curriculum *********************\n")
 
 TeacherCoop.SearchRepo.SearchObjectives.reset_objectives_index()
 

@@ -11,7 +11,12 @@ defmodule TeacherCoop.MixProject do
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      name: "Teacher Coop",
+      source_url: "https://github.com/eguefif/teacher_coop",
+      docs: [
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -40,8 +45,7 @@ defmodule TeacherCoop.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:text_chunker, "~> 0.6.1"},
-      {:pdf_extractor, "~> 0.6"},
+      {:ex_doc, "~> 0.34", only: :dev, runtime: false},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.8.8"},
       {:phoenix_ecto, "~> 4.5"},

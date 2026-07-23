@@ -1,4 +1,7 @@
 defmodule TeacherCoop.Library.Workers.IndexDocument do
+  @moduledoc """
+  Index a document in SearchRepo
+  """
   use Oban.Worker,
     queue: :document_ingestion,
     unique: true

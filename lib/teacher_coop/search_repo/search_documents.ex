@@ -3,6 +3,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Repo
   alias TeacherCoop.Accounts.Scope
+  alias TeacherCoop.Discovery.SearchResult
 
   @doc """
   Delete a document from Meilisearch
@@ -90,6 +91,13 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
       _ ->
         :error
     end
+  end
+
+  defp create_search_result(result) when is_map(result) do
+    %SearchResult{
+      facets: %{},
+      hits: result.hits
+    }
   end
 
   @doc """

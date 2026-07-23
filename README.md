@@ -1,19 +1,12 @@
 # TeacherCoop
 
-## Document
+## Table of content
 
-Document are the resource.
-
-The context will be called: Library since it is shared by all teachers. They put resource in this
-shared library.
-
-This context will be split into two parts:
-* the documents.ex for crude operation
-* the search.ex for indexing/search with meilisearch
-
-We have two context:
-* Library: where we gather documents
-* Discovery: where we gather searches
+- [Setup](#setup)
+- [Contexts](#contexts)
+- [Repos](#repos)
+- [Meilisearch](#meilisearch)
+- [TODO](#todo)
 
 ## Setup
 
@@ -25,20 +18,54 @@ $ mix phx.server
 
 The website is available on `teachercoop:4000`
 
+If you want to reset developement database and search engine: `mix reset`
+
+
+## Contexts
+
+### Library
+
+Library is the context responsable for `Document` handling. A document is created by a teacher to gather files and metadata. It has three schemas:
+* `Document`
+* `File`
+* `DocumentObjective` which is a join table for the many-to-many association with `Objective`
+
+### Discovery
+
+This context is responsible fo handling search. 
+* Discovery: where we gather searches
+
+This will handle two aspects of the search:
+* Operations made by the user to find a document
+* Tracking of search performance. We want the user to find what they need. Therefore, we want to evaluate the search and improve it.
+
+## Repos
+
+The project contains two repositories: `Repo`, `SearchRepo`. The former is the regular repo created with Phoenix to handle the Database. `SearchRepo` is a custom one that handles the SearchEngine.
+
+[Repo Documention](TeacherCoop.Repo.html)
+[SearchRepo Documention](TeacherCoop.SearchRepo.html)
+
+### SearchRepo
+
+This one will be peculiar. We want to improve search and test if improvement are better or not.
+To do that, we might want to test different configuration on different instance.
+
 ## TODO
 ### Next
-- [ ] Setup embedder with TEI from huggind face
+- [ ] Improve index page
+- [ ] Improve show page
 
 ### List
 - [ ] Finish reading chapter 5: p 156
-- [ ] Have a helper module that allows to retrieve information based on env: 
-        (file_path for example, meilisearch server, postgres)
 - [ ] Search
+    - [ ] Improve search result
+    - [ ] Configure vector search
     - [ ] Optimize full text search
 - [ ] Document ingestion
     - [x] Switch indexing in Oban
     - [x] Setup embedder
-    - [ ] See to add a file, chunking and indexing with vector search
+    - [ ] See to add a file, chunking and indexing with vector search (use text_chunker and pdf_extractor)
 - [ ] Add user fullname
     - [x] Make the form works
     - [x] Add test for update
@@ -54,37 +81,6 @@ The website is available on `teachercoop:4000`
 - [ ] Autocomplete
     -[ ] Allow arrow navigation and selection
     -[ ] Accessibility
-- [ ] Architecture
-    - [ ] Define a protocol for SearchRepo and create a concrete implementation for Meilisearch. This will allow to switch search engine quickly for test purposes. We can even thing of
-            switching between different instance of Meilisearch that has different configuration.
 
-
-### Meilisearch
-For now we don't handle retry and error for: indexing, update. This will have to change. We need to add a background task mechanism and handle/log retry
-- [ ] Add retry mechanism
-    - [ ] indexing
-    - [ ] Update documents when user info change
-
-### Tests
-
-I need to find a better way to test meilisearch. At the moment, anytime we create a document or update user information, it will do something in meilisearch.
-
-## Ways to improve search
-
-I want to change the layout when a search is launched for the first time.
-Maximum space should be dedicated to show answer and ways to improve search.
-
-## Meilisearch
-
-### Mix commands
-There are two commands to manage Meilisearch:
-* meilisearch.setup: init indexes
-* meiliearch.reset_test: used to removes all documents from the tests indexes
-
-
-### How to use
-
-Meilisearch is ran in a process and started in [application.ex](./lib/teacher_coop/application.ex).
-Interactions are abstracted away using the Repo pattern. All the logic is in the file: [search_engine_repo](./lib/teacher_coop/search_engine_repo.ex)
-If we were to change the search engin, we would only have to modify these two files.
-
+- [ ] Have a helper module that allows to retrieve information based on env: 
+        (file_path for example, meilisearch server, postgres)

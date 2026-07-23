@@ -1,6 +1,9 @@
 defmodule TeacherCoop.Discovery do
   @moduledoc """
-  The Discovery context.
+  The Discovery context handles user search operations and search evaluation.
+  When a user do a search, it uses SearchRepo to make the search. It also uses
+  Repo to register a new search and track performance and user satisfaction. 
+  We want to be able to improve our serach engine.
   """
 
   import Ecto.Query, warn: false
