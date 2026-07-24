@@ -11,10 +11,17 @@ defmodule TeacherCoop.SearchRepo do
   """
   def get_client() do
     init_finch()
+    meilisearch_config = Application.fetch_env!(:teacher_coop, TeacherCoop.SearchRepo)
+    masterkey = meilisearch_config |> List.keyfind(:masterkey, 0) |> elem(1)
+    host = meilisearch_config |> List.keyfind(:hostname, 0) |> elem(1)
+    port = meilisearch_config |> List.keyfind(:port, 0) |> elem(1)
+    hostname = "#{host}:#{port}"
+    IO.puts(masterkey)
+    IO.puts(hostname)
     # Create a Meilisearch client whenever and wherever you need it.
     case Process.get(:meilisearch) do
       nil ->
-        [endpoint: "http://127.0.0.1:7700", key: "masterkey", finch: :finch_meilisearch]
+        [endpoint: hostname, key: masterkey, finch: :finch_meilisearch]
         |> Meilisearch.Client.new()
 
       _ ->
