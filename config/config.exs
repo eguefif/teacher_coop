@@ -35,6 +35,10 @@ config :teacher_coop,
   ecto_repos: [TeacherCoop.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :teacher_coop, TeacherCoop.SearchRepo,
+  hostname: "http://localhost",
+  port: 7700
+
 config :teacher_coop, TeacherCoop.Gettext, locales: ~w(en fr)
 config :gettext, :default_locale, "fr"
 

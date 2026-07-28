@@ -81,7 +81,7 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
     test "deletes document in listing", %{conn: conn, document: document} do
       {:ok, index_live, _html} = live(conn, ~p"/documents")
 
-      assert index_live |> element("#documents-#{document.id} a", "Delete") |> render_click()
+      assert index_live |> element("a[phx-value-id='#{document.id}']") |> render_click()
       refute has_element?(index_live, "#documents-#{document.id}")
     end
   end

@@ -16,8 +16,6 @@ defmodule TeacherCoop.SearchRepo do
     host = meilisearch_config |> List.keyfind(:hostname, 0) |> elem(1)
     port = meilisearch_config |> List.keyfind(:port, 0) |> elem(1)
     hostname = "#{host}:#{port}"
-    IO.puts(masterkey)
-    IO.puts(hostname)
     # Create a Meilisearch client whenever and wherever you need it.
     case Process.get(:meilisearch) do
       nil ->
