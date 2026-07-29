@@ -3,10 +3,6 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
 
   alias TeacherCoop.Library
 
-  # TODO:
-  # - [ ] Add delete button top right corner
-  # - [ ] Add edit button card botton
-
   @impl true
   def render(assigns) do
     ~H"""

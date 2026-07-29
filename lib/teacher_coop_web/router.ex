@@ -61,6 +61,8 @@ defmodule TeacherCoopWeb.Router do
     post "/users/update-password", UserSessionController, :update_password
   end
 
+  ## No authentication routes
+
   scope "/", TeacherCoopWeb do
     pipe_through [:browser]
 
@@ -76,6 +78,7 @@ defmodule TeacherCoopWeb.Router do
       live "/users/log-in/:token", UserLive.Confirmation, :new
     end
 
+    get "/files/:id", FileController, :get
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end

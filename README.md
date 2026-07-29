@@ -53,8 +53,7 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Improve index page
-- [ ] Improve show page
+- [ ] search result layout
 
 ### List
 - [ ] Finish reading chapter 5: p 156
@@ -84,3 +83,6 @@ To do that, we might want to test different configuration on different instance.
 
 - [ ] Have a helper module that allows to retrieve information based on env: 
         (file_path for example, meilisearch server, postgres)
+
+- [ ] Subject color handling: should go in css as a variable and used like we use primary class
+- [ ] We add a Meilisearch client in application that we don't use in SearchRepo: make it consistent.
