@@ -16,43 +16,29 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
         </:actions>
       </.header>
 
-      <.table
-        id="documents"
-        rows={@streams.documents}
-        row_click={fn {_id, document} -> JS.navigate(~p"/documents/#{document}") end}
-      >
-        <:col :let={{_id, document}} label={gettext("titre") |> String.capitalize()}>
-          {document.title}
-        </:col>
-        <:col :let={{_id, document}} label={gettext("description") |> String.capitalize()}>
-          {document.description}
-        </:col>
-        <:col :let={{_id, document}} label={gettext("institution type") |> String.capitalize()}>
-          {document.institution_type}
-        </:col>
-        <:col :let={{_id, document}} label={gettext("objectives") |> String.capitalize()}>
-          <div :if={document.objectives != nil && document.objectives != []}>
-            {document.objectives |> Enum.at(0) |> then(& &1.goal)}
-          </div>
-          <div :if={document.objectives == nil || document.objectives == []}>
-            {gettext("No objectives")}
-          </div>
-        </:col>
-        <:action :let={{_id, document}}>
-          <div class="sr-only">
-            <.link navigate={~p"/documents/#{document}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/documents/#{document}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, document}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: document.id}) |> hide("##{id}")}
-            data-confirm={gettext("Are you sure?")}
+      <div class="flex flex-wrap flex-row gap-8 justify-start w-[740px] mx-auto">
+        <div
+          :for={{id, document} <- @streams.documents}
+          id={id}
+          class="card card-xs shadow-sm w-[224px] bg-base-200 p-4 scale-100 hover:scale-101 transition-transform duration-100 ease-in-out relative"
+        >
+          <a
+            class="btn btn-neutral btn-circle absolute -top-2 -right-2"
+            phx-click="delete"
+            phx-value-id={document.id}
+          ><.icon name="hero-x-mark" /></a>
+          <div
+            class="card-body hover:cursor-pointer"
+            phx-click={JS.navigate(~p"/documents/#{document}")}
           >
-            {gettext("Delete")}
-          </.link>
-        </:action>
-      </.table>
+            <div class="card-title">{document.title}</div>
+            <div>{document.description}</div>
+          </div>
+          <div class="card-actions justify-end">
+            <.button variant="soft" navigate={~p"/documents/#{document}/edit"}>{gettext("Edit")}</.button>
+          </div>
+        </div>
+      </div>
     </Layouts.app>
     """
   end

@@ -21,7 +21,7 @@ defmodule TeacherCoop.Library do
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
 
-  alias TeacherCoop.Library.{Document, Workers}
+  alias TeacherCoop.Library.{Document, Workers, File}
   alias TeacherCoop.Curriculum
   alias TeacherCoop.Accounts.Scope
 
@@ -78,6 +78,10 @@ defmodule TeacherCoop.Library do
     Repo.get_by!(Document, id: id)
     |> Repo.preload(:files)
     |> Repo.preload(:objectives)
+  end
+
+  def get_file!(id) do
+    Repo.get_by(File, id: id)
   end
 
   @doc """

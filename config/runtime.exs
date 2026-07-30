@@ -23,6 +23,9 @@ end
 config :teacher_coop, TeacherCoopWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+config :teacher_coop, TeacherCoop.SearchRepo,
+  masterkey: System.get_env("MEILISEARCH_MASTERKEY", "masterkey")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

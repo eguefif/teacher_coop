@@ -308,7 +308,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> allow_upload(:files,
        accept: @formats,
        max_entries: @max_files,
-       max_file_size: 300_000,
+       max_file_size: 800_000,
        auto_upload: false
      )
      |> apply_action(socket.assigns.live_action, params)}

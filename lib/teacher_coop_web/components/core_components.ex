@@ -97,11 +97,16 @@ defmodule TeacherCoopWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :any
-  attr :variant, :string, values: ~w(primary)
+  attr :variant, :string, values: ~w(primary soft ghost)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-primary", nil => "btn-primary btn-soft"}
+    variants = %{
+      "primary" => "btn-primary",
+      "ghost" => "btn-ghost",
+      "soft" => "btn-soft",
+      nil => "btn-primary btn-soft"
+    }
 
     assigns =
       assign_new(assigns, :class, fn ->
@@ -323,7 +328,7 @@ defmodule TeacherCoopWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", "pb-4"]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8">
+        <h1 class="text-xl font-semibold leading-8">
           {render_slot(@inner_block)}
         </h1>
         <p :if={@subtitle != []} class="text-sm text-base-content/70">
@@ -501,5 +506,35 @@ defmodule TeacherCoopWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  @doc """
+  Provides a color based badge for subject.
+  """
+
+  attr :subject, :string, default: ""
+
+  def subject_badge(assigns) do
+    ~H"""
+    <div class="tooltip" data-tip={@subject |> String.capitalize()}>
+      <div class={"p-[8px] #{get_subject_color(@subject)} size-[48px] rounded-xl shadow-xl"}>
+        <.icon name={get_subject_icon(@subject)} class="size-[32px]" />
+      </div>
+    </div>
+    """
+  end
+
+  defp get_subject_color(subject) do
+    case subject |> String.downcase() do
+      "mathématiques" -> "bg-blue-500"
+      "français" -> "bg-yellow-500"
+    end
+  end
+
+  defp get_subject_icon(subject) do
+    case subject |> String.downcase() do
+      "mathématiques" -> "hero-calculator"
+      "français" -> "hero-pencil"
+    end
   end
 end
