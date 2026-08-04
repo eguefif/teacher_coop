@@ -46,6 +46,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         <.objectives_autocomplete_input
           objective_results={@objective_results}
           show_objective_results={@show_objective_results}
+          arrow_navigation_index={@arrow_navigation_index}
         />
         <.selected_objectives_view
           objectives={@document.objectives}
@@ -96,6 +97,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   attr :objective_results, :list, default: []
   attr :show_objective_results, :boolean, default: false
+  attr :arrow_navigation_index, :integer, default: nil
 
   def objectives_autocomplete_input(assigns) do
     ~H"""
@@ -122,11 +124,17 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           }
         }
       </script>
-      <div :if={@objective_results != [] && @show_objective_results} class="relative">
-        <ul class="list absolute rounded-box shadow-md bg-base-200 max-h-150 overflow-auto z-2">
+      <div
+        :if={@objective_results != [] && @show_objective_results}
+        class="relative"
+      >
+        <ul
+          phx-keyup="user-presses-keyboard"
+          class="list absolute rounded-box shadow-md bg-base-200 max-h-150 overflow-auto z-2"
+        >
           <li
-            :for={result <- @objective_results}
-            class="list-row hover:bg-base-100"
+            :for={{result, index} <- Enum.with_index(@objective_results)}
+            class={["list-row hover:bg-base-100", @arrow_navigation_index == index && "bg-base-100"]}
             phx-click={
               JS.dispatch("objectives_input:clear", to: "#objectives_input")
               |> JS.push("select-objective")
@@ -304,6 +312,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> assign(:files_to_delete, [])
      |> assign(:objectives_to_delete, [])
      |> assign(:show_objective_results, false)
+     |> assign(:arrow_navigation_index, nil)
      |> assign(:max_files, @max_files)
      |> allow_upload(:files,
        accept: @formats,
@@ -341,9 +350,64 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     |> assign(:form, to_form(Library.change_document(socket.assigns.current_scope, document)))
   end
 
+  # Keyboard events -----------------------------------------------
+  def handle_event("user-presses-keyboard", %{"key" => "ArrowDown"}, socket)
+      when socket.assigns.show_objective_results == true do
+    arrow_navigation_index =
+      if socket.assigns.arrow_navigation_index != nil do
+        socket.assigns.arrow_navigation_index + 1
+      else
+        0
+      end
+
+    arrow_navigation_index =
+      if arrow_navigation_index >= length(socket.assigns.objective_results) do
+        0
+      else
+        arrow_navigation_index
+      end
+
+    {:noreply,
+     socket
+     |> assign(:arrow_navigation_index, arrow_navigation_index)}
+  end
+
+  def handle_event("user-presses-keyboard", %{"key" => "ArrowUp"}, socket)
+      when socket.assigns.show_objective_results do
+    arrow_navigation_index =
+      if socket.assigns.arrow_navigation_index != nil do
+        socket.assigns.arrow_navigation_index - 1
+      else
+        0
+      end
+
+    arrow_navigation_index =
+      if arrow_navigation_index < 0 do
+        length(socket.assigns.objective_results) - 1
+      else
+        arrow_navigation_index
+      end
+
+    {:noreply,
+     socket
+     |> assign(:arrow_navigation_index, arrow_navigation_index)}
+  end
+
+  def handle_event("user-presses-keyboard", %{"key" => "Escape"}, socket) do
+    {:noreply,
+     socket
+     |> assign(:show_objective_results, false)
+     |> assign(:arrow_navigation_index, nil)}
+  end
+
+  def handle_event("user-presses-keyboard", _, socket), do: {:noreply, socket}
   # Objectives events ---------------------------------------------
   def handle_event("reset-objective-results", _, socket) do
-    {:noreply, socket |> assign(:objective_results, []) |> assign(:show_objective_results, false)}
+    {:noreply,
+     socket
+     |> assign(:objective_results, [])
+     |> assign(:show_objective_results, false)
+     |> assign(:arrow_navigation_index, nil)}
   end
 
   def handle_event("user-focus-objectives-input", _, socket) do
