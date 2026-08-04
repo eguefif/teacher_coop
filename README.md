@@ -53,7 +53,15 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] search result layout
+
+- [ ] Accessibility
+    - [ ] Form
+    - [ ] Document index
+    - [ ] Document show
+    - [ ] Search result
+    - [ ] Connection page
+    - [ ] Settings
+
 
 ### List
 - [ ] Finish reading chapter 5: p 156
@@ -75,12 +83,8 @@ To do that, we might want to test different configuration on different instance.
         - [x] Delete join table for objectives
         - [x] Delete actual files
         - [x] Delete in Meilisearch
-    - [ ] Improve index page
-    - [ ] Improve show page
-- [ ] Autocomplete
-    -[ ] Allow arrow navigation and selection
-    -[ ] Accessibility
-
+    - [x] Improve index page
+    - [x] Improve show page
 - [ ] Have a helper module that allows to retrieve information based on env: 
         (file_path for example, meilisearch server, postgres)
 
