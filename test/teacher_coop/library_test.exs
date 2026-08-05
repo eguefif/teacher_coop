@@ -27,12 +27,14 @@ defmodule TeacherCoop.LibraryTest do
       document =
         document
         |> Map.filter(&(elem(&1, 0) != :files))
+        |> Map.filter(&(elem(&1, 0) != :user))
         |> Map.filter(&(elem(&1, 0) != :document_objectives))
 
       expected_document =
         Library.get_document!(document.id)
         |> Map.filter(&(elem(&1, 0) != :files))
         |> Map.filter(&(elem(&1, 0) != :document_objectives))
+        |> Map.filter(&(elem(&1, 0) != :user))
 
       assert expected_document == document
       assert_raise Ecto.NoResultsError, fn -> Library.get_document!(document.id + 1) end
@@ -96,12 +98,14 @@ defmodule TeacherCoop.LibraryTest do
       document =
         document
         |> Map.filter(&(elem(&1, 0) != :files))
+        |> Map.filter(&(elem(&1, 0) != :user))
         |> Map.filter(&(elem(&1, 0) != :document_objectives))
 
       expected_document =
         Library.get_document!(document.id)
         |> Map.filter(&(elem(&1, 0) != :files))
         |> Map.filter(&(elem(&1, 0) != :document_objectives))
+        |> Map.filter(&(elem(&1, 0) != :user))
 
       assert document == expected_document
     end

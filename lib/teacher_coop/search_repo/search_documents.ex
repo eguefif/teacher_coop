@@ -41,6 +41,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
     |> Map.filter(&(elem(&1, 0) != :files))
     |> Map.filter(&(elem(&1, 0) != :objectives))
     |> Map.filter(&(elem(&1, 0) != :document_objectives))
+    |> Map.filter(&(elem(&1, 0) != :user))
     |> Map.put(:objectives, objectives_field)
     |> Map.put(:user_id, scope.user.id)
     |> Map.put(:email, scope.user.email)
@@ -66,6 +67,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
       |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :objectives end))
       |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :document_objectives end))
       |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :__meta__ end))
+      |> Enum.map(&Map.filter(&1, fn m -> elem(m, 0) != :user end))
       |> Enum.map(&Map.merge(&1, %{email: user.email, fullname: user.fullname}))
 
     case Meilisearch.Document.create_or_update(client, index_name("documents"), users_documents) do

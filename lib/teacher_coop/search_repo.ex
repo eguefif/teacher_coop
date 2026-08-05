@@ -105,7 +105,12 @@ defmodule TeacherCoop.SearchRepo do
 
   defp update_index_settings() do
     client = get_client()
-    Meilisearch.Settings.FilterableAttributes.update(client, "documents_test", ["user_id"])
+
+    Meilisearch.Settings.FilterableAttributes.update(client, "documents_test", [
+      "user_id",
+      "institution_type",
+      "grade"
+    ])
   end
 
   def wait_for_tasks(tasks) when tasks == [] do

@@ -15,6 +15,9 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
       <div class="flex flex-col gap-[64px]">
         <.header>
           {@document.title}
+          <span :if={@current_scope.user.id != @document.user_id}>
+            {@document.user.id}
+          </span>
           <:actions>
             <.button navigate={@return_to}>
               <.icon name="hero-arrow-left" />
