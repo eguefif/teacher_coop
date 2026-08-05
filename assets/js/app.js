@@ -81,3 +81,9 @@ if (process.env.NODE_ENV === "development") {
   })
 }
 
+window.addEventListener("modal:open", (e) => {
+  const modalId = e.target.getAttribute("data")
+  const modal = document.getElementById(modalId)
+  modal.show()
+})
+

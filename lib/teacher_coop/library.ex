@@ -57,7 +57,21 @@ defmodule TeacherCoop.Library do
 
   """
   def list_documents(%Scope{} = scope) do
-    Repo.all_by(Document, user_id: scope.user.id) |> Repo.preload(:objectives)
+    Repo.all_by(Document, user_id: scope.user.id)
+    |> Repo.preload(:objectives)
+    |> Repo.preload(:files)
+  end
+
+  def list_documents_by_ids(ids) when ids != [] do
+    Document.Query.base()
+    |> Document.Query.by_ids(ids)
+    |> Document.Query.with_files()
+    |> Document.Query.with_objectives()
+    |> Repo.all()
+  end
+
+  def list_documents_by_ids(ids) when ids == [] do
+    ids
   end
 
   @doc """
@@ -103,6 +117,7 @@ defmodule TeacherCoop.Library do
            %Document{}
            |> Document.changeset(attrs, scope, objectives)
            |> Repo.insert() do
+      document = Repo.preload(document, :files)
       schedule_indexing_document_job(scope, document)
       broadcast_document(scope, {:created, document})
       {:ok, document}

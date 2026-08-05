@@ -55,7 +55,23 @@ To do that, we might want to test different configuration on different instance.
 ### Next
 
 
+- [ ]Improve search result with accordeon
+    - [x] Add filepaths in Meilisearch
+    - [ ] Add collapsable with objectives and list files
+    - [ ] Add preview for document
+    - [ ] Add download all button
+	- [ ] Add facets: grade, school type, subject
+	- [ ] Add an advanced search with facet preselections
+- [ ] Add a SearchSession table
+	- [ ] session_id, user_id (nullable), query, created_at, num_results, downloaded_all_click, dwell_time, click_position (the index of the document clicked, if it's the 11nth, it means we have a ranking issue maybe), query_id (PK)
+
+- [ ] Improve document: add the following as tags ?
+	- [ ] Add a pedagogy style: standard, Montessori, Institutionnel, Freinet, alternative
+	- [ ] Add a public target: country, city, REP/REP+, Autiste, (find more categories) there can be several of them
+
+
 ### List
+- [ ] Document creation: generate a document file in pdf that will be shiped with download all
 - [ ] Finish reading chapter 5: p 156
 - [ ] Search
     - [ ] Improve search result

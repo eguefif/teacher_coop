@@ -35,6 +35,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
 
   def create_attributes_from_document(%Scope{} = scope, %Document{} = document) do
     objectives_field = create_objectives_field(document.objectives)
+    files_field = create_files_field(document.files)
 
     Map.from_struct(document)
     |> Map.filter(&(elem(&1, 0) != :__meta__))
@@ -43,6 +44,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
     |> Map.filter(&(elem(&1, 0) != :document_objectives))
     |> Map.filter(&(elem(&1, 0) != :user))
     |> Map.put(:objectives, objectives_field)
+    |> Map.put(:files, files_field)
     |> Map.put(:user_id, scope.user.id)
     |> Map.put(:email, scope.user.email)
     |> Map.put(:fullname, scope.user.fullname)
@@ -51,7 +53,13 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
   defp create_objectives_field(objectives) do
     objectives
     |> Enum.map(& &1.goal)
-    |> Enum.join(" ")
+    |> Enum.join(";")
+  end
+
+  defp create_files_field(files) do
+    files
+    |> Enum.map(& &1.filepath)
+    |> Enum.join(";")
   end
 
   @doc """

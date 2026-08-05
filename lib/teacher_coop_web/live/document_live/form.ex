@@ -177,7 +177,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         >
           <.icon
             name="hero-x-mark"
-            class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+            class="size-6 scale-100 hover:scale-120 transform-transition duration-100 ease-in-out cursor-pointer"
           />
         </button>
 
@@ -190,7 +190,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         >
           <.icon
             name="hero-arrow-uturn-down"
-            class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+            class="size-6 scale-100 hover:scale-120 transform-transition duration-100 ease-in-out cursor-pointer"
           />
         </button>
       </div>
@@ -212,7 +212,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         >
           <.icon
             name="hero-x-mark"
-            class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer text-warning"
+            class="size-6 scale-100 hover:scale-120 transform-transition duration-100 ease-in-out cursor-pointer text-warning"
           />
         </button>
       </div>
@@ -247,7 +247,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           >
             <.icon
               name="hero-x-mark"
-              class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+              class="size-6 scale-100 hover:scale-120 transform-transition duration-100 ease-in-out cursor-pointer"
             />
           </button>
 
@@ -260,7 +260,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           >
             <.icon
               name="hero-arrow-uturn-down"
-              class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+              class="size-6 scale-100 hover:scale-120 transform-transition duration-100 ease-in-out cursor-pointer"
             />
           </button>
         </div>
@@ -311,7 +311,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       >
         <.icon
           name="hero-x-mark"
-          class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+          class="size-6 scale-100 hover:scale-120 transform-transition duration-100 ease-in-out cursor-pointer"
         />
       </button>
     </div>
@@ -331,7 +331,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> allow_upload(:files,
        accept: @formats,
        max_entries: @max_files,
-       max_file_size: 800_000,
+       max_file_size: 15_000_000,
        auto_upload: false
      )
      |> apply_action(socket.assigns.live_action, params)}
