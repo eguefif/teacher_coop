@@ -107,6 +107,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     }>
       <.input
         id="objectives_input"
+        aria-autocomplete
         name="objectives_input"
         type="text"
         phx-focus="user-focus-objectives-input"
@@ -167,7 +168,10 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         ]}
       >
         {objective.goal}
-        <div
+        <button
+          :if={objective.id not in @objectives_to_delete}
+          type="button"
+          aria-label={gettext("Delete objective") <> objective.goal}
           phx-click="delete-objective"
           phx-value-id={objective.id}
         >
@@ -175,10 +179,12 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
             name="hero-x-mark"
             class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
           />
-        </div>
+        </button>
 
-        <div
+        <button
           :if={objective.id in @objectives_to_delete}
+          type="button"
+          aria-label={gettext("Restore objective") <> objective.goal}
           phx-click="restore-objective"
           phx-value-id={objective.id}
         >
@@ -186,7 +192,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
             name="hero-arrow-uturn-down"
             class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
           />
-        </div>
+        </button>
       </div>
     </div>
 
@@ -198,15 +204,17 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         ,
       >
         {objective["goal"]}
-        <div
+        <button
+          type="button"
           phx-click="remove-objective"
+          aria-label={gettext("remove objective") <> objective["goal"]}
           phx-value-id={objective["id"]}
         >
           <.icon
             name="hero-x-mark"
-            class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
+            class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer text-warning"
           />
-        </div>
+        </button>
       </div>
     </div>
     """
@@ -230,8 +238,10 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           ]}
         >
           <div>{file.filename}</div>
-          <div
+          <button
             :if={file.id in (Enum.map(@files, & &1.id) -- @files_to_delete)}
+            type="button"
+            aria-label={gettext("Delete file") <> file.filename}
             phx-click="delete-file"
             phx-value-file-id={file.id}
           >
@@ -239,10 +249,12 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
               name="hero-x-mark"
               class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
             />
-          </div>
+          </button>
 
-          <div
+          <button
             :if={file.id in @files_to_delete}
+            type="button"
+            aria-label={gettext("Restore file") <> file.filename}
             phx-click="restore-file"
             phx-value-file-id={file.id}
           >
@@ -250,7 +262,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
               name="hero-arrow-uturn-down"
               class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
             />
-          </div>
+          </button>
         </div>
       </div>
 
@@ -291,15 +303,17 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
           {@file.progress}%
         </span>
       </div>
-      <div
+      <button
+        type="button"
         phx-click="remove-file"
+        aria-label={gettext("remove file") <> @file.client_name}
         phx-value-ref={@file.ref}
       >
         <.icon
           name="hero-x-mark"
           class="size-6 scale-100 hover:scale-120 transition-scale ease-in-out cursor-pointer"
         />
-      </div>
+      </button>
     </div>
     """
   end
@@ -400,7 +414,13 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> assign(:arrow_navigation_index, nil)}
   end
 
+  def handle_event("user-presses-keyboard", %{"key" => "Enter"}, socket) do
+    objective = Enum.at(socket.assigns.objective_results, socket.assigns.arrow_navigation_index)
+    select_objective(socket, objective)
+  end
+
   def handle_event("user-presses-keyboard", _, socket), do: {:noreply, socket}
+
   # Objectives events ---------------------------------------------
   def handle_event("reset-objective-results", _, socket) do
     {:noreply,
@@ -420,18 +440,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     objective =
       Enum.find(socket.assigns.objective_results, fn objective -> objective["id"] == id end)
 
-    objectives =
-      if is_objective_in_objectives(id, socket) do
-        socket.assigns.selected_objectives
-      else
-        [objective | socket.assigns.selected_objectives]
-      end
-
-    {:noreply,
-     socket
-     |> assign(:selected_objectives, objectives)
-     |> assign(:objective_results, [])
-     |> assign(:show_objective_results, false)}
+    select_objective(socket, objective)
   end
 
   def handle_event("remove-objective", %{"id" => id}, socket) do
@@ -633,5 +642,20 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       |> Enum.map(& &1["id"])
 
     id in (document_objective_ids ++ selected_objective_ids)
+  end
+
+  defp select_objective(socket, objective) do
+    objectives =
+      if is_objective_in_objectives(objective["id"], socket) do
+        socket.assigns.selected_objectives
+      else
+        [objective | socket.assigns.selected_objectives]
+      end
+
+    {:noreply,
+     socket
+     |> assign(:selected_objectives, objectives)
+     |> assign(:objective_results, [])
+     |> assign(:show_objective_results, false)}
   end
 end
