@@ -24,9 +24,10 @@ defmodule TeacherCoop.Library.Document do
   schema "documents" do
     field :title, :string
     field :description, :string
-    field :user_id, :id
     field :institution_type, :string
     field :grade, :string
+
+    belongs_to :user, TeacherCoop.Accounts.User
 
     has_many :document_objectives, TeacherCoop.Library.DocumentObjective,
       on_replace: :delete,

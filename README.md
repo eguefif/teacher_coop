@@ -54,14 +54,6 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 
-- [ ] Accessibility
-    - [ ] Form
-    - [ ] Document index
-    - [ ] Document show
-    - [ ] Search result
-    - [ ] Connection page
-    - [ ] Settings
-
 
 ### List
 - [ ] Finish reading chapter 5: p 156
