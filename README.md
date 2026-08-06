@@ -57,11 +57,12 @@ To do that, we might want to test different configuration on different instance.
 
 - [ ]Improve search result with accordeon
     - [x] Add filepaths in Meilisearch
-    - [ ] Add collapsable with objectives and list files
-    - [ ] Add preview for document
+    - [x] Add collapsable with objectives and list files
+    - [x] Add preview for document
     - [ ] Add download all button
 	- [ ] Add facets: grade, school type, subject
 	- [ ] Add an advanced search with facet preselections
+- [ ] Copy each files to create a lightweight preview files. Same name, different paths.
 - [ ] Add a SearchSession table
 	- [ ] session_id, user_id (nullable), query, created_at, num_results, downloaded_all_click, dwell_time, click_position (the index of the document clicked, if it's the 11nth, it means we have a ranking issue maybe), query_id (PK)
 
@@ -95,6 +96,9 @@ To do that, we might want to test different configuration on different instance.
     - [x] Improve show page
 - [ ] Have a helper module that allows to retrieve information based on env: 
         (file_path for example, meilisearch server, postgres)
+
+- [ ] Extract path to file in a global constant: see File and Document controller
+- [ ] When Adding a new document, schedule a task that will create a compressed version of the document in PDF: use ghostscript
 
 - [ ] Subject color handling: should go in css as a variable and used like we use primary class
 - [ ] We add a Meilisearch client in application that we don't use in SearchRepo: make it consistent.

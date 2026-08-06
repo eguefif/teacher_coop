@@ -3,7 +3,7 @@ defmodule TeacherCoopWeb.FileController do
 
   alias TeacherCoop.Library
 
-  def show(conn, %{"id" => id, "preview" => preview}) when preview == "true" do
+  def show(conn, %{"id" => id, "preview" => "true"}) do
     file = Library.get_file!(id)
 
     file_content = get_file_content(:compressed, file.filepath)

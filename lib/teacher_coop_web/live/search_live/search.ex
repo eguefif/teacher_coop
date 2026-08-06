@@ -1,9 +1,10 @@
 defmodule TeacherCoopWeb.SearchLive.Search do
   use TeacherCoopWeb, :live_view
+
+  import TeacherCoop.DocumentLive.Component
   alias TeacherCoop.Discovery
 
   # TODO:
-  # - [ ] add option preview instead of inline and it will inline and used compress file
   # - [ ] solve bug with preview button and collapse
 
   @impl true
@@ -66,13 +67,16 @@ defmodule TeacherCoopWeb.SearchLive.Search do
       </div>
       <div class="text-base text-justify">{@result.description}</div>
       <div class="collapse collapse-arrow bg-base-100 border-base-300">
-        <input type="checkbox" />
+        <input id={"collapsable-checkbox-#{@result.id}"} type="checkbox" phx-update="ignore" />
         <div class="collapse-title font-semibold after:start-5 after:end-auto pe-4 ps-12">
           {gettext("See more")}
         </div>
         <div class="collapse-content flex flex-col gap-[32px]">
           <.objectives objectives={@result.objectives} />
           <.files files={@result.files} preview_file={@preview_file} />
+          <div class="mx-auto">
+            <.download_all_button document={@result} />
+          </div>
         </div>
       </div>
     </div>
@@ -84,8 +88,8 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   def objectives(assigns) do
     ~H"""
     <div>
-      <div class="text-xl mb-[24px]">{gettext("Objectives")}</div>
-      <ul :if={@objectives != []} class="list bg-base-200 rounded-box shadow-md">
+      <ul :if={@objectives != []} class="list bg-base-100 rounded-box shadow-md">
+        <li class="text-lg opacity-60 p-4 pb-2">{gettext("Objectives")}</li>
         <li
           :for={objective <- @objectives}
           class="list-row"
@@ -97,7 +101,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     """
   end
 
-  attr :files, :list, default: []
+  attr :files, :list, default: nil
   attr :preview_file, :integer, default: nil
 
   def files(assigns) do
@@ -126,12 +130,9 @@ defmodule TeacherCoopWeb.SearchLive.Search do
       <div class="card-actions justify-around">
         <button
           type="button"
-          phx-click={
-            JS.dispatch("modal:open")
-            |> JS.push("user-preview-file")
-          }
+          id={"preview-button-#{@file.id}"}
+          phx-click={JS.push("user-preview-file")}
           phx-value-id={@file.id}
-          data={"modal-file-#{@file.id}"}
         >
           <div class="tooltip" data-tip={gettext("Preview")}>
             <.icon
@@ -165,6 +166,8 @@ defmodule TeacherCoopWeb.SearchLive.Search do
         </form>
         <div
           :if={@preview_file == @file.id}
+          phx-mounted={JS.dispatch("modal:open")}
+          data={"modal-file-#{@file.id}"}
           class="flex flex-col gap-4"
         >
           <div class="text-center">{@file.filename}</div>
