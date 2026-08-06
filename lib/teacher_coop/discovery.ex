@@ -11,6 +11,7 @@ defmodule TeacherCoop.Discovery do
   alias TeacherCoop.SearchRepo.SearchDocuments
 
   alias TeacherCoop.Discovery.Search
+  alias TeacherCoop.Library
   alias TeacherCoop.Accounts.Scope
 
   @doc """
@@ -61,6 +62,8 @@ defmodule TeacherCoop.Discovery do
     # |> Search.changeset(attrs, scope)
     # |> Repo.insert()
     make_search(search_terms)
+    |> get_db_results()
+    |> reorder_db_results()
   end
 
   def create_search(nil, %{search_terms: search_terms} = _) do
@@ -68,10 +71,28 @@ defmodule TeacherCoop.Discovery do
     # |> Search.changeset(attrs, scope)
     # |> Repo.insert()
     make_search(search_terms)
+    |> get_db_results()
+    |> reorder_db_results()
   end
 
   defp make_search(search_terms) do
     SearchDocuments.search_document(search_terms)
+  end
+
+  defp get_db_results({:ok, results}) do
+    db_results =
+      results.hits
+      |> Enum.map(& &1["id"])
+      |> Library.list_documents_by_ids()
+
+    {results.hits, db_results}
+  end
+
+  defp reorder_db_results({results, db_results}) do
+    results
+    |> Enum.map(fn result ->
+      Enum.find(db_results, &(&1.id == result["id"]))
+    end)
   end
 
   @doc """

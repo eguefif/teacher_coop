@@ -78,7 +78,8 @@ defmodule TeacherCoopWeb.Router do
       live "/users/log-in/:token", UserLive.Confirmation, :new
     end
 
-    get "/files/:id", FileController, :get
+    get "/files/:id", FileController, :show
+    get "/documents/download/:id", DocumentController, :show
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end
