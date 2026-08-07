@@ -8,9 +8,10 @@ defmodule TeacherCoop.Discovery do
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
+  alias TeacherCoop.SearchRepo
   alias TeacherCoop.SearchRepo.SearchDocuments
 
-  alias TeacherCoop.Discovery.Search
+  alias TeacherCoop.Discovery.{Search, SearchSession}
   alias TeacherCoop.Library
   alias TeacherCoop.Accounts.Scope
 
@@ -46,37 +47,79 @@ defmodule TeacherCoop.Discovery do
   end
 
   @doc """
-  Creates a search.
+  Create a search session with initial values.
+  A search session allows the app to track a user's search
+  through different searches in the same time window.
+  """
+  def create_search_session(scope) do
+    SearchSession.new(scope, SearchRepo.get_document_index_test_a_b())
+  end
+
+  def save_successful_search(
+        %SearchSession{created_at: %DateTime{} = created_at} = search_session,
+        click_position
+      ) do
+    attrs = %{
+      success_click_position: click_position,
+      dwell_time: DateTime.diff(created_at, DateTime.utc_now(), :millisecond),
+      success: true
+    }
+
+    search_session.search_record
+    |> Search.changeset(attrs, search_session.scope)
+    |> Repo.update()
+  end
+
+  @doc """
+  Creates a search using a SearchSession.
 
   ## Examples
 
-      iex> create_search(scope, %{field: value})
-      {:ok, %Search{}}
-
-      iex> create_search(scope, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+      iex> create_search(search_session)
+      %SearchSession{}}
 
   """
-  def create_search(%Scope{} = _scope, %{search_terms: search_terms} = _) do
-    # %Search{}
-    # |> Search.changeset(attrs, scope)
-    # |> Repo.insert()
-    make_search(search_terms)
-    |> get_db_results()
-    |> reorder_db_results()
+  def handle_search(%SearchSession{} = search_session, search_terms) do
+    search_session
+    |> update_current_search()
+    |> make_search(search_terms)
+    |> create_search_record()
   end
 
-  def create_search(nil, %{search_terms: search_terms} = _) do
-    # %Search{}
-    # |> Search.changeset(attrs, scope)
-    # |> Repo.insert()
-    make_search(search_terms)
-    |> get_db_results()
-    |> reorder_db_results()
+  # If search_record nil, we create a new one
+  def update_current_search(%SearchSession{} = search_session)
+      when is_nil(search_session.search_record), do: search_session
+
+  # If not it means the user is makeing a new search, we mark
+  # the current one as failed and update the search record
+  def update_current_search(
+        %SearchSession{
+          created_at: %DateTime{} = created_at,
+          scope: scope,
+          search_record: %Search{} = search_record
+        } = search_session
+      ) do
+    attrs = %{
+      sucess: false,
+      dwell_time: DateTime.diff(created_at, DateTime.utc_now(), :millisecond)
+    }
+
+    search_record
+    |> Search.changeset(attrs, scope)
+    |> Repo.update()
+
+    %SearchSession{search_session | search_record: nil}
   end
 
-  defp make_search(search_terms) do
-    SearchDocuments.search_document(search_terms)
+  defp make_search(%SearchSession{} = search_session, search_terms) do
+    search_session = SearchSession.add_search_terms(search_session, search_terms)
+
+    {results, db_results} =
+      SearchDocuments.search_document(search_terms)
+      |> get_db_results()
+      |> reorder_db_results()
+
+    SearchSession.add_search_results(search_session, results, db_results)
   end
 
   defp get_db_results({:ok, results}) do
@@ -85,14 +128,32 @@ defmodule TeacherCoop.Discovery do
       |> Enum.map(& &1["id"])
       |> Library.list_documents_by_ids()
 
-    {results.hits, db_results}
+    {results, db_results}
   end
 
   defp reorder_db_results({results, db_results}) do
-    results
-    |> Enum.map(fn result ->
-      Enum.find(db_results, &(&1.id == result["id"]))
-    end)
+    db_results =
+      results.hits
+      |> Enum.map(fn result ->
+        Enum.find(db_results, &(&1.id == result["id"]))
+      end)
+
+    {results, db_results}
+  end
+
+  defp create_search_record(%SearchSession{} = search_session) do
+    attrs = %{
+      hits_count: length(search_session.results.hits),
+      session_id: search_session.session_id,
+      document_index: search_session.document_index
+    }
+
+    search_record =
+      %Search{}
+      |> Search.changeset(attrs, search_session.scope)
+      |> Repo.insert()
+
+    SearchSession.add_search_record(search_session, search_record)
   end
 
   @doc """

@@ -6,6 +6,16 @@ defmodule TeacherCoop.SearchRepo do
   @indexes ["documents", "documents_test", "objectives", "objectives_test"]
 
   @doc """
+  Function used for search test A/B. At the moments, it returns only one index.
+  In the future, this function will returns either documents_a or documents_b.
+  To make test A/B, we set up two index with different configuration.
+  To not make a test, we copy the settings from a to b.
+  """
+  def get_document_index_test_a_b() do
+    "documents"
+  end
+
+  @doc """
    Convenient function that initialize finch client if necessary and returns
    a Meilisearch client.
   """
