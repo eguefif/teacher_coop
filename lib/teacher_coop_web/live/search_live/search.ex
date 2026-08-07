@@ -4,9 +4,6 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   import TeacherCoop.DocumentLive.Component
   alias TeacherCoop.Discovery
 
-  # TODO:
-  # - [ ] solve bug with preview button and collapse
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -29,15 +26,14 @@ defmodule TeacherCoopWeb.SearchLive.Search do
             <.button
               name="trigger-search"
               class="btn btn-primary btn-soft btn-lg rounded-xl"
-              phx-click="trigger-search"
             >
               {gettext("Search")}
             </.button>
           </div>
         </form>
         <div :if={@results != nil} class="max-w-200 flex flex-col gap-[64px]">
-          <div :for={result <- @results} class="w-200">
-            <.result result={result} preview_file={@preview_file} />
+          <div :for={{result, position} <- Enum.with_index(@results)} class="w-200">
+            <.result result={result} preview_file={@preview_file} position={position} />
           </div>
         </div>
       </div>
@@ -46,6 +42,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     """
   end
 
+  attr :position, :integer
   attr :result, :map
   attr :preview_file, :integer, default: nil
 
@@ -75,7 +72,11 @@ defmodule TeacherCoopWeb.SearchLive.Search do
           <.objectives objectives={@result.objectives} />
           <.files files={@result.files} preview_file={@preview_file} />
           <div class="mx-auto">
-            <.download_all_button document={@result} />
+            <.download_all_button
+              phx-click="user-click-download-all"
+              phx-value-position={@position}
+              document={@result}
+            />
           </div>
         </div>
       </div>
@@ -193,29 +194,26 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     scope =
       if Map.has_key?(socket.assigns, :current_scope), do: socket.assigns.current_scope, else: nil
 
-    results =
-      Discovery.create_search(scope, %{
-        search_terms: "fraction"
-      })
+    search_session = Discovery.create_search_session(scope)
 
     {:ok,
      socket
      |> assign_new(:current_scope, fn -> scope end)
-     |> assign(:search_terms, "fraction")
-     |> assign(:results, results)
-     |> assign(:preview_file, nil)}
+     |> assign(:search_terms, "")
+     |> assign(:preview_file, nil)
+     |> assign(results: [])
+     |> assign(:search_session, search_session)}
   end
 
   @impl true
   def handle_event("trigger-search", %{}, socket) do
-    results =
-      Discovery.create_search(socket.assigns.current_scope, %{
-        search_terms: socket.assigns.search_terms
-      })
+    search_session =
+      Discovery.handle_search(socket.assigns.search_session, socket.assigns.search_terms)
 
     {:noreply,
      socket
-     |> assign(:results, results)
+     |> assign(:results, search_session.db_results)
+     |> assign(:search_session, search_session)
      |> assign(:search_terms, socket.assigns.search_terms)}
   end
 
@@ -228,5 +226,11 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   @impl true
   def handle_event("user-preview-file", %{"id" => id}, socket) do
     {:noreply, socket |> assign(:preview_file, String.to_integer(id))}
+  end
+
+  @impl true
+  def handle_event("user-click-download-all", %{"position" => click_position}, socket) do
+    Discovery.save_successful_search(socket.assigns.search_session, click_position)
+    {:noreply, socket}
   end
 end
