@@ -121,17 +121,18 @@ defmodule TeacherCoop.SearchRepo do
 
     result = wait_for_tasks(tasks)
 
-    update_index_settings()
+    update_index_settings("documents")
+    update_index_settings("documents_test")
 
     if result == :ok,
       do: IO.puts("All index created"),
       else: IO.puts("Error while creating indexes")
   end
 
-  defp update_index_settings() do
+  defp update_index_settings(index) do
     client = get_client()
 
-    Meilisearch.Settings.FilterableAttributes.update(client, "documents_test", [
+    Meilisearch.Settings.FilterableAttributes.update(client, index, [
       "user_id",
       "institution_type",
       "grade"
@@ -186,7 +187,7 @@ defmodule TeacherCoop.SearchRepo do
       |> Tesla.patch("/indexes/documents/settings/embedders", embedder_config)
       |> Meilisearch.Client.handle_response()
 
-    :succeeded = wait_for_task(task["taskUid"])
+    :succeeded = wait_for_task_loop(task["taskUid"])
   end
 
   defp get_template() do

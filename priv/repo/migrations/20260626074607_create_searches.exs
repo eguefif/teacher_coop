@@ -5,7 +5,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateSearches do
     create table(:searches) do
       add :search_terms, :string
       add :user_id, references(:users, on_delete: :delete_all)
-      add :session_id, Ecto.UUID
+      add :session_id, :string
       add :hits_count, :integer
       add :success, :boolean
       # What position was the success result in the ranking

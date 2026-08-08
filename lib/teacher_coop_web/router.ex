@@ -65,9 +65,11 @@ defmodule TeacherCoopWeb.Router do
     pipe_through [:browser, :require_admin]
 
     live_session :require_admin, on_mount: [{TeacherCoopWeb.UserAuth, :require_admin}] do
-      # TO FINISh
       live "/", AdminLive.ConfigurationLive.Index, :index
       live "/configuration", AdminLive.ConfigurationLive.Index, :index
+      live "/configuration/new", AdminLive.ConfigurationLive.Form, :new
+      live "/configuration/:id", AdminLive.ConfigurationLive.Show, :show
+      live "/configuration/:id/edit", AdminLive.ConfigurationLive.Form, :edit
     end
   end
 
