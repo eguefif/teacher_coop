@@ -16,6 +16,21 @@ defmodule TeacherCoop.SearchRepo do
   end
 
   @doc """
+  Configure an index with the settings.
+  Settings should be a map
+  """
+  def set_index(index_name, %{} = settings) do
+    {result, task} =
+      get_client()
+      |> Meilisearch.Settings.update(index_name, settings)
+
+    case result do
+      :ok -> wait_for_task(task)
+      :error -> :error
+    end
+  end
+
+  @doc """
    Convenient function that initialize finch client if necessary and returns
    a Meilisearch client.
   """
@@ -123,27 +138,27 @@ defmodule TeacherCoop.SearchRepo do
     ])
   end
 
-  def wait_for_tasks(tasks) when tasks == [] do
-    :ok
-  end
-
-  def wait_for_tasks(tasks) do
+  def wait_for_tasks(tasks) when is_list(tasks) do
     result =
       tasks
-      |> Enum.map(&wait_for_task(&1.taskUid))
+      |> Enum.map(&wait_for_task_loop(&1.taskUid))
       |> Enum.all?(fn status -> status in [:succeeded] end)
 
     if result == true, do: :ok, else: :error
   end
 
-  defp wait_for_task(task_uid) do
+  def wait_for_task(task) do
+    wait_for_task_loop(task.taskUid)
+  end
+
+  defp wait_for_task_loop(task_uid) do
     {:ok, task_details} = Meilisearch.Task.get(get_client(), task_uid)
     status = Map.get(task_details, :status)
     wait_time = if is_env_test(), do: 1, else: 250
 
     if status in [:enqueued, :processing] do
       Process.sleep(wait_time)
-      wait_for_task(task_uid)
+      wait_for_task_loop(task_uid)
     else
       status
     end

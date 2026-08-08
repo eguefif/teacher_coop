@@ -71,12 +71,12 @@ defmodule TeacherCoopWeb.SearchLive.Search do
         <div class="collapse-content flex flex-col gap-[32px]">
           <.objectives objectives={@result.objectives} />
           <.files files={@result.files} preview_file={@preview_file} />
-          <div class="mx-auto">
-            <.download_all_button
-              phx-click="user-click-download-all"
-              phx-value-position={@position}
-              document={@result}
-            />
+          <div
+            phx-click="user-click-download-all"
+            phx-value-position={@position}
+            class="mx-auto"
+          >
+            <.download_all_button document={@result} />
           </div>
         </div>
       </div>

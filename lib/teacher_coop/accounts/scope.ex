@@ -30,4 +30,12 @@ defmodule TeacherCoop.Accounts.Scope do
   end
 
   def for_user(nil), do: nil
+
+  def is_admin(%__MODULE__{} = scope) do
+    if scope.user.email == "robert_do@lost.com" do
+      true
+    else
+      false
+    end
+  end
 end
