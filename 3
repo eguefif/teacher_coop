@@ -1,0 +1,39 @@
+defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
+  use TeacherCoopWeb, :live_view
+
+  alias TeacherCoop.Discovery.Configuration
+  alias TeacherCoop.Discovery.Configuration.EngineConfiguration
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} current_scope={@current_scope}>
+      <.header>
+        {gettext("New Index")}
+      </.header>
+
+      <.form for={@form} id="index-form" phx-change="validate" phx-submit="save"></.form>
+    </Layouts.app>
+    """
+  end
+
+  @impl true
+  def mount(params, _session, socket) do
+    {:ok,
+     socket
+     |> apply_action(socket.assigns.live_action, params)}
+  end
+
+  def apply_action(socket, :new, _params) do
+    configuration = %EngineConfiguration{
+      user_id: socket.assigns.current_scope.user.id,
+      engine: "meilisearch"
+    }
+
+    socket
+    |> assign(
+      :form,
+      to_form(Discovery.Configuration.change_configuration(socket.assigns.current_scope, configuration))
+    )
+  end
+end

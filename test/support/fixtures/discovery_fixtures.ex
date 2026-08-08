@@ -7,13 +7,10 @@ defmodule TeacherCoop.DiscoveryFixtures do
   @doc """
   Generate a search.
   """
-  def search_fixture(scope, attrs \\ %{}) do
-    attrs =
-      Enum.into(attrs, %{
-        search_terms: "some search_terms"
-      })
+  def search_fixture(scope, search_terms \\ "some serach_terms") do
+    search_session = TeacherCoop.create_search_session(scope)
 
-    {:ok, search} = TeacherCoop.Discovery.create_search(scope, attrs)
+    {:ok, search} = TeacherCoop.Discovery.handle_search(search_session, search_terms)
     search
   end
 end
