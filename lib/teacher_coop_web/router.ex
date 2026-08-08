@@ -61,6 +61,16 @@ defmodule TeacherCoopWeb.Router do
     post "/users/update-password", UserSessionController, :update_password
   end
 
+  scope "/admin", TeacherCoopWeb do
+    pipe_through [:browser, :require_admin]
+
+    live_session :require_admin, on_mount: [{TeacherCoopWeb.UserAuth, :require_admin}] do
+      # TO FINISh
+      live "/", AdminLive.ConfigurationLive.Index, :index
+      live "/configuration", AdminLive.ConfigurationLive.Index, :index
+    end
+  end
+
   ## No authentication routes
 
   scope "/", TeacherCoopWeb do
