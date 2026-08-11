@@ -24,6 +24,8 @@ defmodule TeacherCoop.Discovery.Configuration do
   def create_configuration(%Scope{} = scope, attrs) do
     true = Scope.is_admin(scope)
 
+    IO.inspect(attrs)
+
     with {:ok, configuration} <-
            %EngineConfiguration{}
            |> EngineConfiguration.changeset(attrs, scope)
