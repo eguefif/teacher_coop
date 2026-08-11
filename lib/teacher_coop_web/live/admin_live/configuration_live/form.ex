@@ -3,6 +3,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   alias TeacherCoop.Discovery.Configuration
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
+  alias TeacherCoop.Discovery.Configuration.EngineConfiguration.{Config, Config.Embedder}
 
   @impl true
   def render(assigns) do
@@ -25,13 +26,17 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
           label={gettext("Engine Name")}
           phx-debounce="blur"
         />
-        <.input
-          field={@form[:filterable_attributes]}
-          type="text"
-          label={gettext("Filterables Attributes (comma separated list)")}
-          placeholder={gettext("user_id, grade")}
-          phx-debounce="blur"
-        />
+        <div class="divider w-[25%] mx-auto"></div>
+        <.inputs_for :let={config_form} field={@form[:config]}>
+          <.input
+            type="text"
+            field={config_form[:filterable_attributes]}
+            label={gettext("Filterable Attributes")}
+            placeholder={gettext("user_id, grade")}
+            phx-debounce="blur"
+          />
+          <.embedders_input field={config_form[:embedders]} />
+        </.inputs_for>
         <footer>
           <.button phx-disable-with={gettext("Saving...")} variant="primary">{gettext("Save")} {gettext(
             "Document"
@@ -42,6 +47,72 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         </footer>
       </.form>
     </Layouts.app>
+    """
+  end
+
+  attr :field, Phoenix.HTML.FormField, required: true
+
+  defp embedders_input(assigns) do
+    ~H"""
+    <fieldset class="fieldset mt-2">
+      <legend class="fieldset-legend text-base">{gettext("Embedders")}</legend>
+
+      <div class="flex flex-col gap-4">
+        <.inputs_for :let={embedders_form} field={@field}>
+          <div class="card card-border bg-base-100 border-base-300">
+            <div class="card-body gap-3 p-4">
+              <input type="hidden" name="embedders[embedders_sort][]" value={embedders_form.index} />
+              <div class="flex items-start justify-between gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 flex-1">
+                  <.input
+                    type="text"
+                    field={embedders_form[:name]}
+                    label={gettext("Name")}
+                    placeholder={gettext("default")}
+                    phx-debounce="blur"
+                  />
+                  <.input
+                    type="text"
+                    field={embedders_form[:model]}
+                    label={gettext("Model")}
+                    placeholder="text-embedding-3-small"
+                    phx-debounce="blur"
+                  />
+                </div>
+                <button
+                  type="button"
+                  name="embedders[embedders_drop][]"
+                  value={embedders_form.index}
+                  class="btn btn-ghost btn-square btn-sm mt-6"
+                  aria-label={gettext("Remove embedder")}
+                  phx-click={JS.dispatch("change")}
+                >
+                  <.icon name="hero-x-mark" class="w-5 h-5" />
+                </button>
+              </div>
+              <.input
+                type="text"
+                field={embedders_form[:template]}
+                label={gettext("Template")}
+                placeholder={gettext("{{document.title}} for {{document.grade}} students")}
+                phx-debounce="blur"
+              />
+            </div>
+          </div>
+        </.inputs_for>
+
+        <input type="hidden" name="embedders[embedders_drop][]" />
+        <button
+          type="button"
+          name="embedders[embedders_sort][]"
+          class="btn btn-outline btn-primary btn-sm self-start"
+          value="new"
+          phx-click={JS.dispatch("change")}
+        >
+          <.icon name="hero-plus" class="w-4 h-4" /> {gettext("Add more embedders")}
+        </button>
+      </div>
+    </fieldset>
     """
   end
 
@@ -74,7 +145,12 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   def apply_action(socket, :new, _params) do
     configuration = %EngineConfiguration{
       user_id: socket.assigns.current_scope.user.id,
-      engine: "meilisearch"
+      engine: "meilisearch",
+      config: %Config{
+        embedders: [
+          %Config.Embedder{name: "default", source: "huggingFace", model: "", template: ""}
+        ]
+      }
     }
 
     socket
@@ -93,7 +169,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   @impl true
   def handle_event("validate", %{"engine_configuration" => configuration_params}, socket) do
-    IO.inspect(configuration_params)
     configuration_params = create_config(configuration_params)
 
     changeset =
@@ -110,6 +185,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   @impl true
   def handle_event("save", %{"engine_configuration" => configuration_params}, socket) do
+    configuration_params = create_config(configuration_params)
     save_document(socket, socket.assigns.live_action, configuration_params)
   end
 
@@ -132,24 +208,39 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   end
 
   defp create_config(configuration_params) do
-    {%{}, configuration_params}
+    configuration_params
     |> add_filterable_attributes()
-    |> put_config()
+
+    # |> add_embedders()
   end
 
-  defp put_config({config, configuration_params}) do
-    Map.put(configuration_params, "config", config)
+  defp add_filterable_attributes(configuration_params) do
+    Kernel.get_and_update_in(
+      configuration_params,
+      ["config", "filterable_attributes"],
+      fn attrs ->
+        {attrs,
+         attrs
+         |> String.split(",")
+         |> Enum.map(&String.trim(&1))}
+      end
+    )
+    |> elem(1)
   end
 
-  defp add_filterable_attributes({config, configuration_params}) do
-    attributes =
-      configuration_params["filterable_attributes"]
-      |> String.split(",")
-      |> Enum.map(&String.trim(&1))
+  defp add_embedders({config, configuration_params}) do
+    model = configuration_params["embedders_model"]
+    template = configuration_params["embedders_template"]
 
-    configuration_params = Map.delete(configuration_params, :filterable_attributes)
+    configuration_params =
+      Map.delete(configuration_params, "embedders_model")
+      |> Map.delete("embedders_template")
 
-    {config |> Map.put(:filterable_attributes, attributes), configuration_params}
+    embedders = [
+      %{"name" => "default", "source" => "huggingFace", "model" => model, "template" => template}
+    ]
+
+    {config |> Map.put("embedders", embedders), configuration_params}
   end
 
   defp return_path(_scope, "index", _document), do: ~p"/admin/configuration"
