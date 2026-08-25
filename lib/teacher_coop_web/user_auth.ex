@@ -233,7 +233,7 @@ defmodule TeacherCoopWeb.UserAuth do
   def on_mount(:require_admin, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
-    if socket.assigns.current_scope && Scope.is_admin(socket.assigns.current_scope) do
+    if socket.assigns.current_scope && Scope.is_admin?(socket.assigns.current_scope) do
       {:cont, socket}
     else
       socket =
@@ -304,7 +304,7 @@ defmodule TeacherCoopWeb.UserAuth do
   Plug for routes that require the uesr to be an admin
   """
   def require_admin(conn, _opts) do
-    if conn.assigns.current_scope && Scope.is_admin(conn.assigns.current_scope) do
+    if conn.assigns.current_scope && Scope.is_admin?(conn.assigns.current_scope) do
       conn
     else
       conn

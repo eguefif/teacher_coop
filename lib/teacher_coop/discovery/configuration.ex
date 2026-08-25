@@ -22,16 +22,14 @@ defmodule TeacherCoop.Discovery.Configuration do
   Insert a configuration in the Repo.
   """
   def create_configuration(%Scope{} = scope, attrs) do
-    true = Scope.is_admin(scope)
-
-    IO.inspect(attrs)
+    true = Scope.is_admin?(scope)
 
     with {:ok, configuration} <-
            %EngineConfiguration{}
            |> EngineConfiguration.changeset(attrs, scope)
            |> Repo.insert() do
       if not is_nil(configuration.index_name) do
-        # TODO: put that in a background job
+        # TODO: put the following in a background job
         SearchRepo.set_index(configuration.index_name, configuration.config)
       end
 
