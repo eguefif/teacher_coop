@@ -50,7 +50,7 @@
           <li>
             {@current_scope.user.email}
           </li>
-          <%= if TeacherCoop.Accounts.Scope.is_admin(@current_scope) do %>
+          <%= if TeacherCoop.Accounts.Scope.is_admin?(@current_scope) do %>
             <li>
               <.link href={~p"/admin"}>{gettext("Admin")}</.link>
             </li>

@@ -178,6 +178,8 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         configuration_params
       )
 
+    IO.inspect(configuration_params)
+
     {:noreply,
      socket
      |> assign(form: to_form(changeset, action: :validate))}
@@ -190,6 +192,8 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   end
 
   def save_document(socket, :new, configuration_params) do
+    IO.inspect(configuration_params)
+
     result =
       Configuration.create_configuration(socket.assigns.current_scope, configuration_params)
 
@@ -203,6 +207,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
          )}
 
       {:error, changeset} ->
+        IO.inspect(changeset)
         {:noreply, socket |> assign(:form, to_form(changeset))}
     end
   end
@@ -210,8 +215,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   defp create_config(configuration_params) do
     configuration_params
     |> add_filterable_attributes()
-
-    # |> add_embedders()
+    |> add_embedders()
   end
 
   defp add_filterable_attributes(configuration_params) do
@@ -221,26 +225,27 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
       fn attrs ->
         {attrs,
          attrs
-         |> String.split(",")
+         |> String.split(",", trim: true)
          |> Enum.map(&String.trim(&1))}
       end
     )
     |> elem(1)
   end
 
-  defp add_embedders({config, configuration_params}) do
-    model = configuration_params["embedders_model"]
-    template = configuration_params["embedders_template"]
-
-    configuration_params =
-      Map.delete(configuration_params, "embedders_model")
-      |> Map.delete("embedders_template")
-
-    embedders = [
-      %{"name" => "default", "source" => "huggingFace", "model" => model, "template" => template}
-    ]
-
-    {config |> Map.put("embedders", embedders), configuration_params}
+  defp add_embedders(configuration_params) do
+    get_and_update_in(
+      configuration_params,
+      ["config", "embedders"],
+      fn attrs ->
+        {attrs,
+         attrs
+         |> Enum.map(fn {key, embedders_config} ->
+           {key, Map.put(embedders_config, "source", "huggingFace")}
+         end)
+         |> Map.new()}
+      end
+    )
+    |> elem(1)
   end
 
   defp return_path(_scope, "index", _document), do: ~p"/admin/configuration"
