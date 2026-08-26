@@ -18,6 +18,10 @@ defmodule TeacherCoop.Discovery.Configuration do
     Repo.all(EngineConfiguration)
   end
 
+  def list_index_names() do
+    SearchRepo.list_index_names()
+  end
+
   @doc """
   Insert a configuration in the Repo.
   """
