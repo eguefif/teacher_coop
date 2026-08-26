@@ -16,6 +16,20 @@ defmodule TeacherCoop.SearchRepo do
   end
 
   @doc """
+  Get all indexes. This function will call Meilisearch directly.
+  """
+  def list_index_names() do
+    {status, result} =
+      get_client()
+      |> Meilisearch.Index.list()
+
+    case status do
+      :ok -> result |> Map.get(:results) |> Enum.map(& &1.uid)
+      :error -> :error
+    end
+  end
+
+  @doc """
   Configure an index with the settings.
   Settings should be a map
   """

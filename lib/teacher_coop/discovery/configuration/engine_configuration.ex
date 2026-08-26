@@ -4,7 +4,7 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
 
   schema "engine_configurations" do
     field :engine, :string
-    field :index_name, :string
+    field :index_name, {:array, :string}
     field :user_id, :id
 
     timestamps(type: :utc_datetime)

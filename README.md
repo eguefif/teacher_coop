@@ -54,12 +54,12 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 - [ ] Working on configuration
-    - [ ] Add validations for config as a map. Problem, we get a string from the input
-    - [ ] Index configuration should show a list of configurations
-    - [ ] Add a second step where we apply the config to an indexes
+    - [ ] Work on error message when index is empty.
+    - [ ] Make sure indexname is registered when a user select the index
+    - [ ] Execute configuration to Meilisearch in a background job
+    - [ ] Index page configuration shows a list of configurations
     - [ ] Edit configuration should allow to update a configuration
     - [ ] Update the local seed to create configuration for our indexes from Meilisearch
-    - [ ] Add a button copy configuration => open a form with a copy of the configuration that we can edit
 
 - [ ] Add a SearchSession table
     - [ ] Add an admin liveview to show statistics related to search
