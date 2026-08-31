@@ -15,7 +15,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
       <.form for={@form} id="configuration-form" phx-change="validate" phx-submit="save">
         <.index_name_input
-          form={@form[:index_name]}
+          index_name_field={@form[:index_name]}
           options={@index_names}
           errors={@form.source.errors}
         />
@@ -49,15 +49,17 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
     """
   end
 
-  attr :form, :map
+  attr :index_name_field, :map
   attr :options, :list
   attr :errors, :list, default: []
 
   def index_name_input(assigns) do
+    is_used? = if Phoenix.Component.used_input?(assigns.index_name_field), do: true, else: false
+
     ~H"""
     <div>
       <.input
-        field={@form}
+        field={@index_name_field}
         type="select"
         label={gettext("Index Name")}
         options={@options}
@@ -66,6 +68,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
       />
       <p
         :for={msg <- translate_errors(@errors, :index_name)}
+        :if={is_used?}
         class="mt-1.5 flex gap-2 items-center text-sm text-error"
       >
         <.icon name="hero-exclamation-circle" class="size-5" />
@@ -179,16 +182,19 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
       }
     }
 
+    configuration_changeset =
+      Configuration.change_configuration(
+        socket.assigns.current_scope,
+        configuration
+      )
+
+    IO.inspect(configuration_changeset)
+
     socket
     |> assign(:page_title, gettext("Edit") <> " " <> gettext("Configuration"))
     |> assign(
       :form,
-      to_form(
-        Configuration.change_configuration(
-          socket.assigns.current_scope,
-          configuration
-        )
-      )
+      to_form(configuration_changeset)
     )
     |> assign(:configuration, configuration)
   end
@@ -203,8 +209,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         socket.assigns.configuration,
         configuration_params
       )
-
-    IO.inspect(configuration_params)
 
     {:noreply,
      socket
@@ -240,6 +244,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   defp create_config(configuration_params) do
     configuration_params
+    |> Map.put_new("index_name", nil)
     |> add_filterable_attributes()
     |> add_embedders()
   end
