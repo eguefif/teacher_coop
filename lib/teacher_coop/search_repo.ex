@@ -31,9 +31,16 @@ defmodule TeacherCoop.SearchRepo do
 
   @doc """
   Configure an index with the settings.
-  Settings should be a map
+  Settings should be a map. The function will camelCase all the keys.
   """
   def set_index(index_name, %{} = settings) do
+    settings =
+      camelize_keys(settings)
+      |> handle_embedders()
+
+    require Logger
+    Logger.info("oban: ", settings)
+
     {result, task} =
       get_client()
       |> Meilisearch.Settings.update(index_name, settings)
@@ -43,6 +50,38 @@ defmodule TeacherCoop.SearchRepo do
       :error -> :error
     end
   end
+
+  defp handle_embedders(config) do
+    get_and_update_in(config, ["embedders"], fn embedders_list ->
+      {embedders_list,
+       embedders_list
+       |> Enum.map(fn %{} = embedder ->
+         {embedder["name"], Map.reject(embedder, fn {key, _value} -> key == "name" end)}
+       end)
+       |> Map.new()}
+    end)
+    |> elem(1)
+  end
+
+  @doc "Recursively convert map keys from snake_case to camelCase."
+  def camelize_keys(map) when is_map(map) and not is_struct(map) do
+    Map.new(map, fn {k, v} -> {camelize_key(k), camelize_keys(v)} end)
+  end
+
+  def camelize_keys(list) when is_list(list), do: Enum.map(list, &camelize_keys/1)
+  def camelize_keys(value), do: value
+
+  defp camelize_key(key) when is_atom(key), do: key |> Atom.to_string() |> camelize_key()
+
+  defp camelize_key(key) when is_binary(key) do
+    case String.split(key, "_", trim: true) do
+      [] -> key
+      [first | rest] -> first <> Enum.map_join(rest, "", &upcase_first/1)
+    end
+  end
+
+  defp upcase_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest
+  defp upcase_first(""), do: ""
 
   @doc """
    Convenient function that initialize finch client if necessary and returns

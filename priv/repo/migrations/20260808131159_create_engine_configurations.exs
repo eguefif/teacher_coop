@@ -5,7 +5,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateEngineConfigurations do
     create table(:engine_configurations) do
       add :engine, :string
       add :config, :map
-      add :index_name, :string
+      add :index_names, {:array, :string}
       add :user_id, references(:users, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)

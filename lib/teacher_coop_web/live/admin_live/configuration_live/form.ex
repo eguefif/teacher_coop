@@ -14,10 +14,13 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
       </.header>
 
       <.form for={@form} id="configuration-form" phx-change="validate" phx-submit="save">
-        <.index_name_input
-          index_name_field={@form[:index_name]}
-          options={@index_names}
-          errors={@form.source.errors}
+        <.input
+          field={@form[:index_names]}
+          type="select"
+          label={gettext("Index Name")}
+          options={@index_names_options}
+          multiple={true}
+          phx-debounce="blur"
         />
         <.input
           field={@form[:engine]}
@@ -46,35 +49,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         </footer>
       </.form>
     </Layouts.app>
-    """
-  end
-
-  attr :index_name_field, :map
-  attr :options, :list
-  attr :errors, :list, default: []
-
-  def index_name_input(assigns) do
-    is_used? = if Phoenix.Component.used_input?(assigns.index_name_field), do: true, else: false
-
-    ~H"""
-    <div>
-      <.input
-        field={@index_name_field}
-        type="select"
-        label={gettext("Index Name")}
-        options={@options}
-        multiple={true}
-        phx-debounce="blur"
-      />
-      <p
-        :for={msg <- translate_errors(@errors, :index_name)}
-        :if={is_used?}
-        class="mt-1.5 flex gap-2 items-center text-sm text-error"
-      >
-        <.icon name="hero-exclamation-circle" class="size-5" />
-        {msg}
-      </p>
-    </div>
     """
   end
 
@@ -120,7 +94,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
               </div>
               <.input
                 type="text"
-                field={embedders_form[:template]}
+                field={embedders_form[:document_template]}
                 label={gettext("Template")}
                 placeholder={gettext("{{document.title}} for {{document.grade}} students")}
                 phx-debounce="blur"
@@ -149,7 +123,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(:index_names, Configuration.list_index_names())
+     |> assign(:index_names_options, Configuration.list_index_names())
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -177,7 +151,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
       engine: "meilisearch",
       config: %Config{
         embedders: [
-          %Embedder{name: "default", source: "huggingFace", model: "", template: ""}
+          %Embedder{name: "default", source: "huggingFace", model: "", document_template: ""}
         ]
       }
     }
@@ -222,8 +196,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   end
 
   def save_document(socket, :new, configuration_params) do
-    IO.inspect(configuration_params)
-
     result =
       Configuration.create_configuration(socket.assigns.current_scope, configuration_params)
 
@@ -244,7 +216,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   defp create_config(configuration_params) do
     configuration_params
-    |> Map.put_new("index_name", nil)
+    |> Map.put_new("index_names", nil)
     |> add_filterable_attributes()
     |> add_embedders()
   end

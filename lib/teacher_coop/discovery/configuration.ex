@@ -1,6 +1,6 @@
 defmodule TeacherCoop.Discovery.Configuration do
   alias TeacherCoop.Repo
-  alias TeacherCoop.Discovery.Configuration.EngineConfiguration
+  alias TeacherCoop.Discovery.Configuration.{EngineConfiguration, Workers}
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.SearchRepo
 
@@ -27,14 +27,18 @@ defmodule TeacherCoop.Discovery.Configuration do
   """
   def create_configuration(%Scope{} = scope, attrs) do
     true = Scope.is_admin?(scope)
+    IO.inspect(attrs)
 
     with {:ok, configuration} <-
            %EngineConfiguration{}
            |> EngineConfiguration.changeset(attrs, scope)
            |> Repo.insert() do
-      if not is_nil(configuration.index_name) do
-        # TODO: put the following in a background job
-        SearchRepo.set_index(configuration.index_name, configuration.config)
+      if not is_nil(configuration.index_names) do
+        Enum.each(configuration.index_names, fn indexname ->
+          %{"indexname" => indexname, "config_id" => configuration.id}
+          |> Workers.UpdateConfig.new()
+          |> Oban.insert()
+        end)
       end
 
       {:ok, configuration}

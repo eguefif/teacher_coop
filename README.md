@@ -54,12 +54,17 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 - [ ] Working on configuration
-    - [ ] Work on error message when index is empty.
-    - [ ] Make sure indexname is registered when a user select the index
-    - [ ] Execute configuration to Meilisearch in a background job
+    - [x] Work on error message when index is empty.
+    - [x] Make sure indexname is registered when a user select the index
+    - [x] Execute configuration to Meilisearch in a background job
+    - [ ] Test if tasks runs to update config
     - [ ] Index page configuration shows a list of configurations
     - [ ] Edit configuration should allow to update a configuration
     - [ ] Update the local seed to create configuration for our indexes from Meilisearch
+    - [ ] We set Meilisearch asynchronously, this is not possible to know if there is an error
+        Maybe we should create config in one place and handle indexes in another. When applying
+        a config to an index, we can check if it works.
+- [ ] Refactor SearchRepo: 
 
 - [ ] Add a SearchSession table
     - [ ] Add an admin liveview to show statistics related to search
