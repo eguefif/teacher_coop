@@ -4,7 +4,7 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
 
   schema "engine_configurations" do
     field :engine, :string
-    field :index_name, {:array, :string}
+    field :index_names, {:array, :string}
     field :user_id, :id
 
     timestamps(type: :utc_datetime)
@@ -16,10 +16,10 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
         field :name, :string
         field :source, :string
         field :model, :string
-        field :template, :string
+        field :document_template, :string
 
         def changeset(embedder, attrs) do
-          permitted = [:name, :source, :model, :template]
+          permitted = [:name, :source, :model, :document_template]
           required = permitted
 
           embedder
@@ -41,9 +41,9 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
   @doc false
   def changeset(engine_configuration, attrs, user_scope) do
     engine_configuration
-    |> cast(attrs, [:engine, :index_name])
+    |> cast(attrs, [:engine, :index_names])
     |> cast_embed(:config, required: true)
-    |> validate_required([:engine, :index_name])
+    |> validate_required([:engine])
     |> put_change(:user_id, user_scope.user.id)
   end
 end
