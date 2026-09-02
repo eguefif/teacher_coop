@@ -70,6 +70,7 @@ defmodule TeacherCoopWeb.Router do
       live "/configurations/new", AdminLive.ConfigurationLive.Form, :new
       live "/configurations/:id", AdminLive.ConfigurationLive.Show, :show
       live "/configurations/:id/edit", AdminLive.ConfigurationLive.Form, :edit
+      live "/indexes", AdminLive.IndexLive.Index, :index
     end
   end
 

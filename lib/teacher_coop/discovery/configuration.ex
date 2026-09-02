@@ -1,6 +1,6 @@
 defmodule TeacherCoop.Discovery.Configuration do
   alias TeacherCoop.Repo
-  alias TeacherCoop.Discovery.Configuration.{EngineConfiguration, Workers}
+  alias TeacherCoop.Discovery.Configuration.{EngineConfiguration, Workers, Index}
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.SearchRepo
 
@@ -27,7 +27,7 @@ defmodule TeacherCoop.Discovery.Configuration do
   end
 
   def list_index_names() do
-    SearchRepo.list_index_names()
+    Repo.all(Index) |> Repo.preload(:engine_configuration)
   end
 
   def list_index_fields() do
