@@ -4,6 +4,7 @@ defmodule TeacherCoop.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :type, :string
     field :fullname, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
@@ -60,7 +61,7 @@ defmodule TeacherCoop.Accounts.User do
   end
 
   def update_changeset(user, attrs, _opts \\ []) do
-    permitted = [:fullname]
+    permitted = [:fullname, :type]
 
     user
     |> cast(attrs, permitted)

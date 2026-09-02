@@ -9,6 +9,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateUsersAuthTables do
       add :fullname, :string, null: true
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime
+      add :type, :string, null: true
 
       timestamps(type: :utc_datetime)
     end

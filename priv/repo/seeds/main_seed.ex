@@ -19,7 +19,8 @@ defmodule TeacherCoop.Repo.Seeds.MainSeed do
 
     user =
       case Accounts.update_user(TeacherCoop.Accounts.Scope.for_user(user), %{
-             :fullname => fullname
+             :fullname => fullname,
+             :type => "admin"
            }) do
         {:ok, user} -> user
         {:error, _} -> Accounts.get_user_by_email(user_email)
