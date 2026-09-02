@@ -2,11 +2,15 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias TeacherCoop.Discovery.Configuration.Index
+
   schema "engine_configurations" do
     field :name, :string
     field :engine, :string
     field :index_names, {:array, :string}
     field :user_id, :id
+
+    has_many :index, Index, on_delete: :nilify_all
 
     timestamps(type: :utc_datetime)
 

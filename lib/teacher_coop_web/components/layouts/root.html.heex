@@ -52,7 +52,17 @@
           </li>
           <%= if TeacherCoop.Accounts.Scope.is_admin?(@current_scope) do %>
             <li>
-              <.link href={~p"/admin"}>{gettext("Admin")}</.link>
+              <details>
+                <summary>Admin</summary>
+                <ul>
+                  <li>
+                    <.link href={~p"/admin/configurations"}>{gettext("Engine Configurations")}</.link>
+                  </li>
+                  <li>
+                    <.link href={~p"/admin/indexes"}>{gettext("Indexes")}</.link>
+                  </li>
+                </ul>
+              </details>
             </li>
           <% end %>
           <li>

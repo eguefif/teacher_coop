@@ -53,18 +53,16 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Add a column user_type for admin
 - [ ] Working on configuration
-    - [x] Work on error message when index is empty.
-    - [x] Make sure indexname is registered when a user select the index
-    - [x] Execute configuration to Meilisearch in a background job
-    - [ ] Test if tasks runs to update config
-    - [ ] Index page configuration shows a list of configurations
-    - [ ] Edit configuration should allow to update a configuration
-    - [ ] Update the local seed to create configuration for our indexes from Meilisearch
-    - [ ] We set Meilisearch asynchronously, this is not possible to know if there is an error
-        Maybe we should create config in one place and handle indexes in another. When applying
-        a config to an index, we can check if it works.
+    - [ ] Refactor reset to be sure it creates Indexes entry in the database based on meilisearch
+    - [ ] Add a new function that will allow to add an index based on existing indexes
+    - [ ] Add a type field in Index: original / copy
+    - [ ] In the form, we should be able to change the configuration
+    - [ ] Add in Index a state that will be updated via a pub/sub
+
+In general, when a user edit/new an index, and apply a config, the background job that apply the config will check the task state and update the pub/sub.
+The task will also update the index row state when configuration is applied
+
 - [ ] Refactor SearchRepo: 
 
 - [ ] Add a SearchSession table
