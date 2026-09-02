@@ -11,7 +11,7 @@ services:
       - postgres_data:/var/lib/postgresql
 
   meilisearch:
-    image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:v1.53.1
     environment:
       MEILI_MASTER_KEY: masterkey
       MEILI_ENV: development

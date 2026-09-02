@@ -3,6 +3,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateEngineConfigurations do
 
   def change do
     create table(:engine_configurations) do
+      add :name, :string
       add :engine, :string
       add :config, :map
       add :index_names, {:array, :string}

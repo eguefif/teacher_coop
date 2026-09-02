@@ -5,6 +5,13 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration.{Config, Config.Embedder}
 
+  # <.input
+  #   type="text"
+  #   field={config_form[:filterable_attributes]}
+  #   label={gettext("Filterable Attributes")}
+  #   placeholder={gettext("user_id, grade")}
+  #   phx-debounce="blur"
+  # />
   @impl true
   def render(assigns) do
     ~H"""
@@ -14,6 +21,12 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
       </.header>
 
       <.form for={@form} id="configuration-form" phx-change="validate" phx-submit="save">
+        <.input
+          field={@form[:name]}
+          type="text"
+          label={gettext("Configuration Name")}
+          phx-debounce="blur"
+        />
         <.input
           field={@form[:index_names]}
           type="select"
@@ -31,7 +44,9 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         <div class="divider w-[25%] mx-auto"></div>
         <.inputs_for :let={config_form} field={@form[:config]}>
           <.input
-            type="text"
+            type="select"
+            multiple
+            options={@field_options}
             field={config_form[:filterable_attributes]}
             label={gettext("Filterable Attributes")}
             placeholder={gettext("user_id, grade")}
@@ -81,16 +96,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
                     phx-debounce="blur"
                   />
                 </div>
-                <button
-                  type="button"
-                  name="embedders[embedders_drop][]"
-                  value={embedders_form.index}
-                  class="btn btn-ghost btn-square btn-sm mt-6"
-                  aria-label={gettext("Remove embedder")}
-                  phx-click={JS.dispatch("change")}
-                >
-                  <.icon name="hero-x-mark" class="w-5 h-5" />
-                </button>
               </div>
               <.input
                 type="text"
@@ -102,17 +107,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
             </div>
           </div>
         </.inputs_for>
-
-        <input type="hidden" name="embedders[embedders_drop][]" />
-        <button
-          type="button"
-          name="embedders[embedders_sort][]"
-          class="btn btn-outline btn-primary btn-sm self-start"
-          value="new"
-          phx-click={JS.dispatch("change")}
-        >
-          <.icon name="hero-plus" class="w-4 h-4" /> {gettext("Add more embedders")}
-        </button>
       </div>
     </fieldset>
     """
@@ -124,6 +118,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
      socket
      |> assign(:return_to, return_to(params["return_to"]))
      |> assign(:index_names_options, Configuration.list_index_names())
+     |> assign(:field_options, Configuration.list_index_fields())
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -217,22 +212,8 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   defp create_config(configuration_params) do
     configuration_params
     |> Map.put_new("index_names", nil)
-    |> add_filterable_attributes()
+    |> Map.put_new("filterable_attributes", nil)
     |> add_embedders()
-  end
-
-  defp add_filterable_attributes(configuration_params) do
-    Kernel.get_and_update_in(
-      configuration_params,
-      ["config", "filterable_attributes"],
-      fn attrs ->
-        {attrs,
-         attrs
-         |> String.split(",", trim: true)
-         |> Enum.map(&String.trim(&1))}
-      end
-    )
-    |> elem(1)
   end
 
   defp add_embedders(configuration_params) do
