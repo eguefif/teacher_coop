@@ -26,7 +26,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
           {configuration.name}
         </:col>
         <:col :let={{_id, configuration}} label={gettext("Indexes")}>
-          {configuration.index_names}
+          {configuration.index_names |> Enum.join(", ")}
         </:col>
         <:action :let={{_id, configuration}}>
           <div class="sr-only">
