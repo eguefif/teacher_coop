@@ -12,6 +12,14 @@ defmodule TeacherCoop.Discovery.Configuration do
   end
 
   @doc """
+  Delete one configuration by id.
+  """
+  def delete_configuration(user_scope, %EngineConfiguration{} = configuration) do
+    true = Scope.is_admin?(user_scope)
+    Repo.delete(configuration)
+  end
+
+  @doc """
   Returns all the configurations from the table
   """
   def list_configurations() do
@@ -27,7 +35,6 @@ defmodule TeacherCoop.Discovery.Configuration do
   """
   def create_configuration(%Scope{} = scope, attrs) do
     true = Scope.is_admin?(scope)
-    IO.inspect(attrs)
 
     with {:ok, configuration} <-
            %EngineConfiguration{}

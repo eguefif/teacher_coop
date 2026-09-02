@@ -1,5 +1,6 @@
 defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
   use TeacherCoopWeb, :live_view
+  alias TeacherCoop.Discovery.Configuration
 
   @impl true
   def render(assigns) do
@@ -8,17 +9,58 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
       <.header>
         {gettext("Index Configurations")}
         <:actions>
-          <.button variant="primary" navigate={~p"/admin/configuration/new"}>
+          <.button variant="primary" navigate={~p"/admin/configurations/new"}>
             <.icon name="hero-plus" /> {gettext("New")} {gettext("Index")}
           </.button>
         </:actions>
       </.header>
+
+      <.table
+        id="configurations"
+        rows={@streams.configurations}
+        row_click={
+          fn {_id, configuration} -> JS.navigate(~p"/admin/configurations/#{configuration}") end
+        }
+      >
+        <:col :let={{_id, configuration}} label={gettext("Id")}>{configuration.id}</:col>
+        <:col :let={{_id, configuration}} label={gettext("Indexes")}>
+          {configuration.index_names}
+        </:col>
+        <:action :let={{_id, configuration}}>
+          <div class="sr-only">
+            <.link navigate={~p"/admin/configurations/#{configuration}"}>{gettext("Show")}</.link>
+          </div>
+          <.link navigate={~p"/admin/configurations/#{configuration}/edit"}>{gettext("Edit")}</.link>
+        </:action>
+        <:action :let={{id, configuration}}>
+          <.link
+            phx-click={JS.push("delete", value: %{id: configuration.id}) |> hide("##{id}")}
+            data-confirm={gettext("Are you sure?")}
+          >
+            {gettext("Delete")}
+          </.link>
+        </:action>
+      </.table>
     </Layouts.app>
     """
   end
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    configurations = Configuration.list_configurations()
+
+    {:ok,
+     socket
+     |> stream(:configurations, configurations)}
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    configuration = Configuration.get_configuration!(id)
+
+    {:ok, _} =
+      Configuration.delete_configuration(socket.assigns.current_scope, configuration)
+
+    {:noreply, stream_delete(socket, :configurations, configuration)}
   end
 end
