@@ -157,8 +157,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         configuration
       )
 
-    IO.inspect(configuration_changeset)
-
     socket
     |> assign(:page_title, gettext("Edit") <> " " <> gettext("Configuration"))
     |> assign(
@@ -204,7 +202,28 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
          )}
 
       {:error, changeset} ->
-        IO.inspect(changeset)
+        {:noreply, socket |> assign(:form, to_form(changeset))}
+    end
+  end
+
+  def save_document(socket, :edit, configuration_params) do
+    result =
+      Configuration.update_configuration(
+        socket.assigns.current_scope,
+        socket.assigns.configuration,
+        configuration_params
+      )
+
+    case result do
+      {:ok, configuration} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, gettext("Configuration updated successfully"))
+         |> push_navigate(
+           to: return_path(socket.assigns.current_scope, socket.assigns.return_to, configuration)
+         )}
+
+      {:error, changeset} ->
         {:noreply, socket |> assign(:form, to_form(changeset))}
     end
   end

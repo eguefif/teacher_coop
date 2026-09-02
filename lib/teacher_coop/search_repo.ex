@@ -26,12 +26,9 @@ defmodule TeacherCoop.SearchRepo do
 
     case Meilisearch.Client.handle_response(response) do
       {:ok, fields_map} ->
-        IO.inspect(fields_map)
         Enum.map(fields_map["results"], & &1["name"])
 
-      {:error, error, status} ->
-        IO.inspect(error)
-        IO.inspect(status)
+      _ ->
         :error
     end
   end
