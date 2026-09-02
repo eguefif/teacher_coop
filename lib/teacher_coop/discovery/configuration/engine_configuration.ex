@@ -3,6 +3,7 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
   import Ecto.Changeset
 
   schema "engine_configurations" do
+    field :name, :string
     field :engine, :string
     field :index_names, {:array, :string}
     field :user_id, :id
@@ -41,9 +42,9 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
   @doc false
   def changeset(engine_configuration, attrs, user_scope) do
     engine_configuration
-    |> cast(attrs, [:engine, :index_names])
+    |> cast(attrs, [:engine, :index_names, :name])
     |> cast_embed(:config, required: true)
-    |> validate_required([:engine])
+    |> validate_required([:engine, :name])
     |> put_change(:user_id, user_scope.user.id)
   end
 end

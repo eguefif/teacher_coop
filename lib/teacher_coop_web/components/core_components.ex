@@ -196,11 +196,6 @@ defmodule TeacherCoopWeb.CoreComponents do
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
 
-    # if field.field == :index_name do
-    #  IO.inspect(field)
-    #  IO.inspect(errors)
-    # end
-
     assigns
     |> assign(field: nil, id: assigns.id || field.id)
     |> assign(:errors, Enum.map(errors, &translate_error(&1)))

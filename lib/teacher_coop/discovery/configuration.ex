@@ -30,6 +30,10 @@ defmodule TeacherCoop.Discovery.Configuration do
     SearchRepo.list_index_names()
   end
 
+  def list_index_fields() do
+    SearchRepo.list_fields_for("documents")
+  end
+
   @doc """
   Insert a configuration in the Repo.
   """
