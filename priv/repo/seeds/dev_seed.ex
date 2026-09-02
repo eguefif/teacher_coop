@@ -1,4 +1,4 @@
-defmodule TeacherCoop.Repo.Seeds.MainSeed do
+defmodule TeacherCoop.Repo.Seeds.DevSeed do
   import Ecto.Query, warn: false
 
   alias TeacherCoop.Library
@@ -6,6 +6,7 @@ defmodule TeacherCoop.Repo.Seeds.MainSeed do
   alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Accounts
   alias TeacherCoop.Repo
+  alias TeacherCoop.Repo.Seeds.IndexSeed
 
   def seed() do
     user_email = "robert_do@lost.com"
@@ -89,6 +90,8 @@ defmodule TeacherCoop.Repo.Seeds.MainSeed do
       end)
       |> Enum.map(&elem(&1, 0))
       |> Enum.all?(&(&1 == :ok))
+
+    IndexSeed.seed()
 
     seed_searches(user)
   end

@@ -4,6 +4,8 @@ defmodule TeacherCoop.Repo.Migrations.CreateIndexes do
   def change do
     create table(:indexes) do
       add :name, :string
+      add :primary_key, :string
+      add :type, :string
       add :state, :string
       add :task_uid, :string
       add :engine_configuration_id, references(:engine_configurations, on_delete: :nothing)
@@ -14,6 +16,6 @@ defmodule TeacherCoop.Repo.Migrations.CreateIndexes do
 
     create index(:indexes, [:user_id])
 
-    create index(:indexes, [:engine_configuration])
+    create index(:indexes, [:engine_configuration_id])
   end
 end

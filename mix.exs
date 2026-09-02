@@ -90,7 +90,14 @@ defmodule TeacherCoop.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build", "meilisearch.setup"],
+      setup: [
+        "deps.get",
+        "ecto.setup",
+        "assets.setup",
+        "assets.build",
+        "seed",
+        "meilisearch.setup"
+      ],
       reset: ["meilisearch.setup", "ecto.reset", "populate_curriculum", "seed"],
       seed: ["run priv/repo/seeds.exs"],
       "ecto.setup": ["ecto.create", "ecto.migrate"],
