@@ -22,7 +22,9 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
           fn {_id, configuration} -> JS.navigate(~p"/admin/configurations/#{configuration}") end
         }
       >
-        <:col :let={{_id, configuration}} label={gettext("Id")}>{configuration.id}</:col>
+        <:col :let={{_id, configuration}} label={gettext("Configuration Name")}>
+          {configuration.name}
+        </:col>
         <:col :let={{_id, configuration}} label={gettext("Indexes")}>
           {configuration.index_names}
         </:col>

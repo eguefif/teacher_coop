@@ -57,6 +57,28 @@ defmodule TeacherCoop.Discovery.Configuration do
   end
 
   @doc """
+  Update a configuration in the Repo.
+  """
+  def update_configuration(%Scope{} = scope, %EngineConfiguration{} = params, attrs) do
+    true = Scope.is_admin?(scope)
+
+    with {:ok, configuration} <-
+           params
+           |> EngineConfiguration.changeset(attrs, scope)
+           |> Repo.update() do
+      if not is_nil(configuration.index_names) do
+        Enum.each(configuration.index_names, fn indexname ->
+          %{"indexname" => indexname, "config_id" => configuration.id}
+          |> Workers.UpdateConfig.new()
+          |> Oban.insert()
+        end)
+      end
+
+      {:ok, configuration}
+    end
+  end
+
+  @doc """
   Returns a EngineConfiguration changeset.
   """
   def change_configuration(
