@@ -3,7 +3,7 @@ defmodule TeacherCoop.SearchRepo do
   SearchRepo is a layer between the Search Engine and the application
   This module in particular is used to setup Meilisearch.
   """
-  @indexes ["documents", "documents_test", "objectives", "objectives_test"]
+  alias TeacherCoop.Discovery.Configuration.Index
 
   @doc """
   Function used for search test A/B. At the moments, it returns only one index.
@@ -124,11 +124,13 @@ defmodule TeacherCoop.SearchRepo do
   Initliazes all the indexes after dropping them.
   """
   def init_indexes() do
+    definitions = Index.definitions()
+
     IO.puts("Starting meilisearch operations for reset")
     IO.puts(" 1. Dropped all index")
-    drop_all(@indexes)
+    drop_all(Enum.map(definitions, & &1.uid))
     IO.puts(" 2. Recreated index")
-    create_indexes(@indexes)
+    create_indexes(definitions)
     IO.puts(" 3. Define embedders")
     configure_embedder()
     IO.puts("Meilisearch end of operations")
@@ -155,12 +157,12 @@ defmodule TeacherCoop.SearchRepo do
   Reset specifically the tests indexes
   """
   def reset_tests() do
-    indexes =
-      @indexes
-      |> Enum.filter(&String.contains?(&1, "test"))
+    definitions =
+      Index.definitions()
+      |> Enum.filter(&String.contains?(&1.uid, "test"))
 
-    drop_all(indexes)
-    create_indexes(indexes)
+    drop_all(Enum.map(definitions, & &1.uid))
+    create_indexes(definitions)
   end
 
   @doc """
@@ -179,12 +181,12 @@ defmodule TeacherCoop.SearchRepo do
     String.contains?(database, "test")
   end
 
-  defp create_indexes(indexes) do
+  defp create_indexes(definitions) do
     client = get_client()
 
     tasks =
-      indexes
-      |> Enum.map(&Meilisearch.Index.create(client, %{uid: &1, primaryKey: "id"}))
+      definitions
+      |> Enum.map(&Meilisearch.Index.create(client, %{uid: &1.uid, primaryKey: &1.primary_key}))
       |> Enum.map(&elem(&1, 1))
 
     result = wait_for_tasks(tasks)

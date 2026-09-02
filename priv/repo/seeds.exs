@@ -10,8 +10,12 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias TeacherCoop.Repo.Seeds.MainSeed
+alias TeacherCoop.Repo.Seeds.{DevSeed, ProdSeed}
 
 if Mix.env() == :dev do
-  MainSeed.seed()
+  DevSeed.seed()
+end
+
+if Mix.env() == :prod do
+  ProdSeed.seed()
 end

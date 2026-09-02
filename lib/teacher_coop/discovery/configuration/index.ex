@@ -5,12 +5,29 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
   alias TeacherCoop.Accounts.User
 
+  @definitions [
+    %{uid: "documents", primary_key: "id", type: "original"},
+    %{uid: "documents_test", primary_key: "id", type: "original"},
+    %{uid: "objectives", primary_key: "id", type: "original"},
+    %{uid: "objectives_test", primary_key: "id", type: "original"}
+  ]
+
+  @doc """
+  Canonical list of index definitions that should exist in the search engine.
+
+  Used both to seed the `indexes` table and to (re)create the indexes in
+  Meilisearch, so the two stay in sync.
+  """
+  def definitions, do: @definitions
+
   schema "indexes" do
     field :name, :string
+    field :primary_key, :string
+    field :type, :string
     field :state, :string
     field :task_uid, :string
-    belongs_to :engine_configuration_id, EngineConfiguration
-    belongs_to :user_id, User
+    belongs_to :engine_configuration, EngineConfiguration
+    belongs_to :user, User
 
     timestamps(type: :utc_datetime)
   end
