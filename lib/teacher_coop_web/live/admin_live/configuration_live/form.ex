@@ -5,13 +5,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration.{Config, Config.Embedder}
 
-  # <.input
-  #   type="text"
-  #   field={config_form[:filterable_attributes]}
-  #   label={gettext("Filterable Attributes")}
-  #   placeholder={gettext("user_id, grade")}
-  #   phx-debounce="blur"
-  # />
   @impl true
   def render(assigns) do
     ~H"""

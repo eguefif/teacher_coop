@@ -53,6 +53,7 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
+- [ ] Add a column user_type for admin
 - [ ] Working on configuration
     - [x] Work on error message when index is empty.
     - [x] Make sure indexname is registered when a user select the index
