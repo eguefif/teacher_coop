@@ -10,7 +10,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Show do
       <.header>
         {@configuration.index_name}
         <:actions>
-          <.button variant="primary" navigate={~p"/admin/configuration/#{@configuration.id}/edit"}>
+          <.button variant="primary" navigate={~p"/admin/configurations/#{@configuration.id}/edit"}>
             <.icon name="hero-plus" /> {gettext("Edit")} {gettext("Index")}
           </.button>
         </:actions>

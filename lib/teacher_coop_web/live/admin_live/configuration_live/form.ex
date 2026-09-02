@@ -251,6 +251,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
     |> elem(1)
   end
 
-  defp return_path(_scope, "index", _document), do: ~p"/admin/configuration"
-  defp return_path(_scope, "show", document), do: ~p"/admin/configuration/#{document}"
+  defp return_path(_scope, "index", _document), do: ~p"/admin/configurations"
+  defp return_path(_scope, "show", document), do: ~p"/admin/configurations/#{document}"
 end
