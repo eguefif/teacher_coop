@@ -37,12 +37,32 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         <div class="divider w-[25%] mx-auto"></div>
         <.inputs_for :let={config_form} field={@form[:config]}>
           <.input
+            type="checkbox"
+            field={config_form[:facet_search]}
+            label={gettext("Facet Search")}
+            phx-debounce="blur"
+          />
+          <.input
+            type="select"
+            options={[gettext("None") | @field_options]}
+            field={config_form[:distinct_attribute]}
+            label={gettext("Distinct Attributes")}
+            phx-debounce="blur"
+          />
+          <.input
             type="select"
             multiple
             options={@field_options}
             field={config_form[:filterable_attributes]}
             label={gettext("Filterable Attributes")}
-            placeholder={gettext("user_id, grade")}
+            class="flex flex-row flex-wrap gap-2 w-full select"
+            phx-debounce="blur"
+          />
+          <.input
+            type="select"
+            options={EngineConfiguration.get_proximity_precision_values()}
+            field={config_form[:proximity_precision]}
+            label={gettext("Proximity_precision")}
             phx-debounce="blur"
           />
           <.input
@@ -50,8 +70,8 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
             multiple
             options={@field_options}
             field={config_form[:searchable_attributes]}
+            class="flex flex-row flex-wrap gap-2 w-full select"
             label={gettext("Searchable Attributes")}
-            placeholder={gettext("user_id, grade")}
             phx-debounce="blur"
           />
           <.input
@@ -59,11 +79,51 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
             multiple
             options={@field_options}
             field={config_form[:sortable_attributes]}
+            class="flex flex-row flex-wrap gap-2 w-full select"
             label={gettext("Sortable Attributes")}
-            placeholder={gettext("user_id, grade")}
             phx-debounce="blur"
           />
-          <.embedders_input field={config_form[:embedders]} />
+          <.input
+            type="text"
+            field={config_form[:stop_words]}
+            value={words_to_str(config_form[:stop_words].value)}
+            placeholder={gettext("la le li")}
+            label={gettext("Stop Words")}
+            phx-debounce="blur"
+          />
+          <.input
+            type="text"
+            field={config_form[:separator_tokens]}
+            value={words_to_str(config_form[:separator_tokens].value)}
+            placeholder={gettext("|")}
+            label={gettext("Separator Tokens")}
+            phx-debounce="blur"
+          />
+          <.input
+            type="text"
+            field={config_form[:non_separator_tokens]}
+            value={words_to_str(config_form[:non_separtor_tokens].value)}
+            placeholder={gettext("@ ")}
+            label={gettext("Non Separator Tokens")}
+            phx-debounce="blur"
+          />
+          <.input
+            type="text"
+            field={config_form[:ranking_rules]}
+            value={words_to_str(config_form[:ranking_rules].value)}
+            label={gettext("Ranking Rules") <>  " (#{words_to_str(EngineConfiguration.get_ranking_rules())})"}
+            phx-debounce="blur"
+          />
+          <.input
+            type="text"
+            field={config_form[:dictionnary]}
+            value={words_to_str(config_form[:dictionnary].value)}
+            placeholder={gettext("J.R.R")}
+            label={gettext("Dictionnary")}
+            phx-debounce="blur"
+          />
+          <.embedder_input field={config_form[:embedder]} />
+          <.typo_tolerance_input field={config_form[:typo_tolerance]} />
         </.inputs_for>
         <footer>
           <.button phx-disable-with={gettext("Saving...")} variant="primary">{gettext("Save")} {gettext(
@@ -78,30 +138,33 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
     """
   end
 
+  def words_to_str(str) when is_binary(str), do: str
+  def words_to_str(list) when is_list(list), do: Enum.join(list, " ")
+  def words_to_str(_), do: ""
+
   attr :field, Phoenix.HTML.FormField, required: true
 
-  defp embedders_input(assigns) do
+  defp embedder_input(assigns) do
     ~H"""
     <fieldset class="fieldset mt-2">
-      <legend class="fieldset-legend text-base">{gettext("Embedders")}</legend>
+      <legend class="fieldset-legend text-base">{gettext("Embedder")}</legend>
 
       <div class="flex flex-col gap-4">
-        <.inputs_for :let={embedders_form} field={@field}>
+        <.inputs_for :let={embedder_form} field={@field}>
           <div class="card card-border bg-base-100 border-base-300">
             <div class="card-body gap-3 p-4">
-              <input type="hidden" name="embedders[embedders_sort][]" value={embedders_form.index} />
               <div class="flex items-start justify-between gap-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 flex-1">
                   <.input
                     type="text"
-                    field={embedders_form[:name]}
+                    field={embedder_form[:name]}
                     label={gettext("Name")}
                     placeholder={gettext("default")}
                     phx-debounce="blur"
                   />
                   <.input
                     type="text"
-                    field={embedders_form[:model]}
+                    field={embedder_form[:model]}
                     label={gettext("Model")}
                     placeholder="text-embedding-3-small"
                     phx-debounce="blur"
@@ -110,12 +173,58 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
               </div>
               <.input
                 type="text"
-                field={embedders_form[:document_template]}
+                field={embedder_form[:document_template]}
                 label={gettext("Template")}
                 placeholder={gettext("{{document.title}} for {{document.grade}} students")}
                 phx-debounce="blur"
               />
             </div>
+          </div>
+        </.inputs_for>
+      </div>
+    </fieldset>
+    """
+  end
+
+  attr :field, Phoenix.HTML.FormField, required: true
+
+  def typo_tolerance_input(assigns) do
+    ~H"""
+    <fieldset class="fieldset mt-2">
+      <legend class="fieldset-legend text-base">{gettext("Typo Tolerance")}</legend>
+
+      <div class="flex flex-col gap-4">
+        <.inputs_for :let={typo_tolerance} field={@field}>
+          <div class="card card-body gap-3 p-4 card-border bg-base-100 border-base-300">
+            <.input
+              type="checkbox"
+              field={typo_tolerance[:enabled]}
+              label={gettext("Enabled")}
+              phx-debounce="blur"
+            />
+            <.input
+              type="text"
+              field={typo_tolerance[:disable_on_words]}
+              value={words_to_str(typo_tolerance[:disable_on_words])}
+              label={gettext("Disable on words")}
+              phx-debounce="blur"
+            />
+            <.inputs_for :let={min_word} field={typo_tolerance[:min_word_size_for_typos]}>
+              <div class="flex flex-row gap-4">
+                <.input
+                  type="number"
+                  field={min_word[:one_typo]}
+                  label={gettext("Min word length to accept one typo")}
+                  phx-debounce="blur"
+                />
+                <.input
+                  type="number"
+                  field={min_word[:two_typos]}
+                  label={gettext("Min word length to accept two typos")}
+                  phx-debounce="blur"
+                />
+              </div>
+            </.inputs_for>
           </div>
         </.inputs_for>
       </div>
@@ -158,9 +267,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
       user_id: socket.assigns.current_scope.user.id,
       engine: "meilisearch",
       config: %Config{
-        embedders: [
-          %Embedder{name: "default", source: "huggingFace", model: "", document_template: ""}
-        ]
+        embedder: %Embedder{}
       }
     }
 
@@ -245,20 +352,67 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
     configuration_params
     |> Map.put_new("index_names", nil)
     |> Map.put_new("filterable_attributes", nil)
-    |> add_embedders()
+    |> Map.put_new("sortable_attributes", nil)
+    |> Map.put_new("searchable_attributes", nil)
+    |> handle_distinct_attribute()
+    |> handle_multiwords_config(["config", "stop_words"])
+    |> handle_multiwords_config(["config", "non_separator_tokens"])
+    |> handle_multiwords_config(["config", "separator_tokens"])
+    |> handle_multiwords_config(["config", "dictionnary"])
+    |> handle_multiwords_config(["config", "ranking_rules"])
+    |> handle_typo_tolerance()
+    |> handle_embedder()
   end
 
-  defp add_embedders(configuration_params) do
+  def handle_typo_tolerance(configuration_params) do
     get_and_update_in(
       configuration_params,
-      ["config", "embedders"],
+      ["config", "typo_tolerance"],
+      fn attr ->
+        {attr, handle_multiwords_config(attr, ["disable_on_words"])}
+      end
+    )
+    |> elem(1)
+  end
+
+  def handle_distinct_attribute(configuration_params) do
+    get_and_update_in(
+      configuration_params,
+      ["config", "distinct_attribute"],
+      fn attr ->
+        {attr,
+         case attr do
+           "None" -> nil
+           value -> value
+         end}
+      end
+    )
+    |> elem(1)
+  end
+
+  def handle_multiwords_config(configuration_params, keys) do
+    get_and_update_in(
+      configuration_params,
+      keys,
       fn attrs ->
-        {attrs,
-         attrs
-         |> Enum.map(fn {key, embedders_config} ->
-           {key, Map.put(embedders_config, "source", "huggingFace")}
-         end)
-         |> Map.new()}
+        if is_binary(attrs) do
+          {attrs, attrs |> String.split(" ", trim: true)}
+        else
+          {attrs, attrs}
+        end
+      end
+    )
+    |> elem(1)
+  end
+
+  defp handle_embedder(configuration_params) do
+    get_and_update_in(
+      configuration_params,
+      ["config", "embedder"],
+      fn attr ->
+        {attr,
+         attr
+         |> Map.put("source", "huggingFace")}
       end
     )
     |> elem(1)

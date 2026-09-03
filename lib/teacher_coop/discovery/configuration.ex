@@ -43,6 +43,7 @@ defmodule TeacherCoop.Discovery.Configuration do
     with {:ok, configuration} <-
            %EngineConfiguration{}
            |> EngineConfiguration.changeset(attrs, scope)
+           |> IO.inspect()
            |> Repo.insert() do
       if not is_nil(configuration.index_names) do
         Enum.each(configuration.index_names, fn indexname ->
