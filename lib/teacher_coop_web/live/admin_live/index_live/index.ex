@@ -18,7 +18,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Index do
           {index.name}
         </:col>
         <:col :let={{_id, index}} label={gettext("Config")}>
-          {index.config || gettext("No config")}
+          {index.engine_configuration || gettext("No config")}
         </:col>
         <:action :let={{_id, _index}}>
           {gettext("Apply config")}

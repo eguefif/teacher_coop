@@ -45,6 +45,24 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
             placeholder={gettext("user_id, grade")}
             phx-debounce="blur"
           />
+          <.input
+            type="select"
+            multiple
+            options={@field_options}
+            field={config_form[:searchable_attributes]}
+            label={gettext("Searchable Attributes")}
+            placeholder={gettext("user_id, grade")}
+            phx-debounce="blur"
+          />
+          <.input
+            type="select"
+            multiple
+            options={@field_options}
+            field={config_form[:sortable_attributes]}
+            label={gettext("Sortable Attributes")}
+            placeholder={gettext("user_id, grade")}
+            phx-debounce="blur"
+          />
           <.embedders_input field={config_form[:embedders]} />
         </.inputs_for>
         <footer>
@@ -107,10 +125,12 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
+    index_names = Configuration.list_index_names() |> Enum.map(& &1.name)
+
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(:index_names_options, Configuration.list_index_names())
+     |> assign(:index_names_options, index_names)
      |> assign(:field_options, Configuration.list_index_fields())
      |> apply_action(socket.assigns.live_action, params)}
   end

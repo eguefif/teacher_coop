@@ -55,6 +55,7 @@ To do that, we might want to test different configuration on different instance.
 ### Next
 - [ ] Working on configuration
     - [ ] Refactor reset to be sure it creates Indexes entry in the database based on meilisearch
+    - [ ] Finish Meilisearch configuration form
     - [ ] Add a new function that will allow to add an index based on existing indexes
     - [ ] Add a type field in Index: original / copy
     - [ ] In the form, we should be able to change the configuration
