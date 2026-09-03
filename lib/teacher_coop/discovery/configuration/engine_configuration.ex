@@ -38,7 +38,7 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
       field :stop_words, {:array, :string}, default: []
       field :non_separator_tokens, {:array, :string}, default: []
       field :separator_tokens, {:array, :string}, default: []
-      field :dictionnary, {:array, :string}, default: []
+      field :dictionary, {:array, :string}, default: []
 
       field :ranking_rules, {:array, :string},
         default: [
@@ -51,21 +51,28 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
           "exactness"
         ]
 
-      embeds_one :embedder, Embedder, primary_key: false, on_replace: :update do
-        field :name, :string, default: "default"
-        field :source, :string, default: "huggingFace"
-        field :model, :string, default: "sentence-transformers/all-MiniLM-L6-v2"
+      embeds_one :embedders, Embedders, primary_key: false, on_replace: :update do
+        embeds_one :default, Default, primary_key: false, on_replace: :update do
+          field :source, :string, default: "huggingFace"
+          field :model, :string, default: "sentence-transformers/all-MiniLM-L6-v2"
 
-        field :document_template, :string,
-          default: "A document named '{{title}}' described as '{{description}}'"
+          field :document_template, :string,
+            default: "A document named {{doc.title}} described as {{doc.description}}"
 
-        def changeset(embedder, attrs) do
-          permitted = [:name, :source, :model, :document_template]
-          required = permitted
+          def changeset(embedder, attrs) do
+            permitted = [:source, :model, :document_template]
+            required = permitted
 
-          embedder
-          |> cast(attrs, permitted)
-          |> validate_required(required)
+            embedder
+            |> cast(attrs, permitted)
+            |> validate_required(required)
+          end
+        end
+
+        def changeset(embedders, attrs) do
+          embedders
+          |> cast(attrs, [])
+          |> cast_embed(:default)
         end
       end
 
@@ -109,14 +116,14 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
           :stop_words,
           :non_separator_tokens,
           :separator_tokens,
-          :dictionnary,
+          :dictionary,
           :ranking_rules,
           :facet_search
         ]
 
         config
         |> cast(attrs, permitted)
-        |> cast_embed(:embedder)
+        |> cast_embed(:embedders)
         |> cast_embed(:typo_tolerance)
         |> validate_ranking_rules()
         |> validate_proximity_precision()

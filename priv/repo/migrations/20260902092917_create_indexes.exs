@@ -14,6 +14,8 @@ defmodule TeacherCoop.Repo.Migrations.CreateIndexes do
       timestamps(type: :utc_datetime)
     end
 
+    create unique_index(:indexes, [:name])
+
     create index(:indexes, [:user_id])
 
     create index(:indexes, [:engine_configuration_id])

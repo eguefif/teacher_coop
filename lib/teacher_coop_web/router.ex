@@ -1,5 +1,6 @@
 defmodule TeacherCoopWeb.Router do
   use TeacherCoopWeb, :router
+  import Oban.Web.Router
 
   import TeacherCoopWeb.UserAuth
 
@@ -63,6 +64,7 @@ defmodule TeacherCoopWeb.Router do
 
   scope "/admin", TeacherCoopWeb do
     pipe_through [:browser, :require_admin]
+    oban_dashboard("/oban")
 
     live_session :require_admin, on_mount: [{TeacherCoopWeb.UserAuth, :require_admin}] do
       live "/", AdminLive.ConfigurationLive.Index, :index
@@ -71,6 +73,9 @@ defmodule TeacherCoopWeb.Router do
       live "/configurations/:id", AdminLive.ConfigurationLive.Show, :show
       live "/configurations/:id/edit", AdminLive.ConfigurationLive.Form, :edit
       live "/indexes", AdminLive.IndexLive.Index, :index
+      live "/indexes/:id", AdminLive.IndexLive.Show, :show
+      live "/indexes/new", AdminLive.IndexLive.Form, :new
+      live "/indexes/:id/edit", AdminLive.IndexLive.Form, :edit
     end
   end
 

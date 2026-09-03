@@ -54,15 +54,8 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 - [ ] Working on configuration
-    - [ ] Check configuration form default value to be sure we don't screw settings
-    - [ ] In index form, allow to change the configuraiton: use a stream system to change the state. State will be changed by Oban task
     - [ ] Add a new function that will allow to add an index based on existing indexes
     - [ ] Add a type field in Index: original / copy
-    - [ ] In the form, we should be able to change the configuration
-    - [ ] Add in Index a state that will be updated via a pub/sub
-
-In general, when a user edit/new an index, and apply a config, the background job that apply the config will check the task state and update the pub/sub.
-The task will also update the index row state when configuration is applied
 
 - [ ] Refactor SearchRepo: 
 

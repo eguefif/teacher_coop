@@ -54,7 +54,6 @@ defmodule TeacherCoop.SearchRepo do
   def set_index(index_name, %{} = settings) do
     settings =
       camelize_keys(settings)
-      |> handle_embedders()
 
     {result, task} =
       get_client()
@@ -64,18 +63,6 @@ defmodule TeacherCoop.SearchRepo do
       :ok -> wait_for_task(task)
       :error -> :error
     end
-  end
-
-  defp handle_embedders(config) do
-    get_and_update_in(config, ["embedders"], fn embedders_list ->
-      {embedders_list,
-       embedders_list
-       |> Enum.map(fn %{} = embedder ->
-         {embedder["name"], Map.reject(embedder, fn {key, _value} -> key == "name" end)}
-       end)
-       |> Map.new()}
-    end)
-    |> elem(1)
   end
 
   @doc "Recursively convert map keys from snake_case to camelCase."
@@ -209,6 +196,11 @@ defmodule TeacherCoop.SearchRepo do
     ])
   end
 
+  @doc """
+  Wait for Meilisearch set of Tasks to be done
+  Takes an array of `%Task{}`.
+  Returns `:ok` or `:error`.
+  """
   def wait_for_tasks(tasks) when is_list(tasks) do
     result =
       tasks
@@ -218,6 +210,11 @@ defmodule TeacherCoop.SearchRepo do
     if result == true, do: :ok, else: :error
   end
 
+  @doc """
+  Wait for a Meilisearch Task to be done
+  Takes a `%Task{}`
+  Returns `:ok` or `:error`.
+  """
   def wait_for_task(task) do
     wait_for_task_loop(task.taskUid)
   end
@@ -225,13 +222,25 @@ defmodule TeacherCoop.SearchRepo do
   defp wait_for_task_loop(task_uid) do
     {:ok, task_details} = Meilisearch.Task.get(get_client(), task_uid)
     status = Map.get(task_details, :status)
-    wait_time = if is_env_test(), do: 1, else: 250
+    wait_time = if is_env_test(), do: 1, else: 500
 
     if status in [:enqueued, :processing] do
       Process.sleep(wait_time)
       wait_for_task_loop(task_uid)
     else
       status
+    end
+
+    case status do
+      value when value in [:enqueued, :processing] ->
+        Process.sleep(wait_time)
+        wait_for_task_loop(task_uid)
+
+      :succeeded ->
+        :ok
+
+      _ ->
+        :error
     end
   end
 
