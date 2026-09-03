@@ -21,7 +21,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Show do
       <div class="flex flex-col gap-2">
         <div>
           <span class="font-bold">{gettext("Applied to indexes ")}</span>
-          {@configuration.index_names |> Enum.join(", ")}
+          {inline_index_names_or_none(@configuration.index_names)}
         </div>
 
         <div>
@@ -32,10 +32,13 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Show do
     """
   end
 
+  def inline_index_names_or_none(index_names) when is_nil(index_names), do: gettext("None")
+  def inline_index_names_or_none(index_names), do: index_names |> Enum.join(", ")
+
   @impl true
   def mount(params, _session, socket) do
     id = String.to_integer(params["id"])
-    configuration = Configuration.get_configuration!(id)
+    configuration = Configuration.get_configuration!(socket.assigns.current_scope, id)
 
     {:ok,
      socket

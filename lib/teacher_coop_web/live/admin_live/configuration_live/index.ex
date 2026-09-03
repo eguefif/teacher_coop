@@ -26,7 +26,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
           {configuration.name}
         </:col>
         <:col :let={{_id, configuration}} label={gettext("Indexes")}>
-          {configuration.index_names |> Enum.join(", ")}
+          {inline_index_names_or_none(configuration.index_names)}
         </:col>
         <:action :let={{_id, configuration}}>
           <div class="sr-only">
@@ -47,9 +47,12 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
     """
   end
 
+  def inline_index_names_or_none(index_names) when is_nil(index_names), do: gettext("None")
+  def inline_index_names_or_none(index_names), do: index_names |> Enum.join(", ")
+
   @impl true
   def mount(_params, _session, socket) do
-    configurations = Configuration.list_configurations()
+    configurations = Configuration.list_configurations(socket.assigns.current_scope)
 
     {:ok,
      socket
@@ -58,7 +61,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    configuration = Configuration.get_configuration!(id)
+    configuration = Configuration.get_configuration!(socket.assigns.current_scope, id)
 
     {:ok, _} =
       Configuration.delete_configuration(socket.assigns.current_scope, configuration)

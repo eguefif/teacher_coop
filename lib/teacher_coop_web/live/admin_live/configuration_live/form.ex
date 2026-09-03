@@ -3,7 +3,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   alias TeacherCoop.Discovery.Configuration
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
-  alias TeacherCoop.Discovery.Configuration.EngineConfiguration.{Config, Config.Embedder}
 
   @impl true
   def render(assigns) do
@@ -116,13 +115,13 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
           />
           <.input
             type="text"
-            field={config_form[:dictionnary]}
-            value={words_to_str(config_form[:dictionnary].value)}
+            field={config_form[:dictionary]}
+            value={words_to_str(config_form[:dictionary].value)}
             placeholder={gettext("J.R.R")}
-            label={gettext("Dictionnary")}
+            label={gettext("Dictionary")}
             phx-debounce="blur"
           />
-          <.embedder_input field={config_form[:embedder]} />
+          <.embedder_input field={config_form[:embedders]} />
           <.typo_tolerance_input field={config_form[:typo_tolerance]} />
         </.inputs_for>
         <footer>
@@ -151,35 +150,37 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
       <div class="flex flex-col gap-4">
         <.inputs_for :let={embedder_form} field={@field}>
-          <div class="card card-border bg-base-100 border-base-300">
-            <div class="card-body gap-3 p-4">
-              <div class="flex items-start justify-between gap-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 flex-1">
-                  <.input
-                    type="text"
-                    field={embedder_form[:name]}
-                    label={gettext("Name")}
-                    placeholder={gettext("default")}
-                    phx-debounce="blur"
-                  />
-                  <.input
-                    type="text"
-                    field={embedder_form[:model]}
-                    label={gettext("Model")}
-                    placeholder="text-embedding-3-small"
-                    phx-debounce="blur"
-                  />
+          <.inputs_for :let={default_embedder} field={embedder_form[:default]}>
+            <div class="card card-border bg-base-100 border-base-300">
+              <div class="card-body gap-3 p-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 flex-1">
+                    <.input
+                      type="text"
+                      field={default_embedder[:name]}
+                      label={gettext("Name")}
+                      placeholder={gettext("default")}
+                      phx-debounce="blur"
+                    />
+                    <.input
+                      type="text"
+                      field={default_embedder[:model]}
+                      label={gettext("Model")}
+                      placeholder="text-embedding-3-small"
+                      phx-debounce="blur"
+                    />
+                  </div>
                 </div>
+                <.input
+                  type="text"
+                  field={default_embedder[:document_template]}
+                  label={gettext("Template")}
+                  placeholder={gettext("{{document.title}} for {{document.grade}} students")}
+                  phx-debounce="blur"
+                />
               </div>
-              <.input
-                type="text"
-                field={embedder_form[:document_template]}
-                label={gettext("Template")}
-                placeholder={gettext("{{document.title}} for {{document.grade}} students")}
-                phx-debounce="blur"
-              />
             </div>
-          </div>
+          </.inputs_for>
         </.inputs_for>
       </div>
     </fieldset>
@@ -234,13 +235,14 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
-    index_names = Configuration.list_index_names() |> Enum.map(& &1.name)
+    scope = socket.assigns.current_scope
+    index_names = Configuration.list_index(scope) |> Enum.map(& &1.name)
 
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
      |> assign(:index_names_options, index_names)
-     |> assign(:field_options, Configuration.list_index_fields())
+     |> assign(:field_options, Configuration.list_index_fields(scope))
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -248,7 +250,8 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   defp return_to(_), do: "index"
 
   def apply_action(socket, :edit, %{"id" => id}) do
-    configuration = Configuration.get_configuration!(String.to_integer(id))
+    configuration =
+      Configuration.get_configuration!(socket.assigns.current_scope, String.to_integer(id))
 
     changeset =
       Configuration.change_configuration(
@@ -265,10 +268,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   def apply_action(socket, :new, _params) do
     configuration = %EngineConfiguration{
       user_id: socket.assigns.current_scope.user.id,
-      engine: "meilisearch",
-      config: %Config{
-        embedder: %Embedder{}
-      }
+      engine: "meilisearch"
     }
 
     configuration_changeset =
@@ -358,10 +358,11 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
     |> handle_multiwords_config(["config", "stop_words"])
     |> handle_multiwords_config(["config", "non_separator_tokens"])
     |> handle_multiwords_config(["config", "separator_tokens"])
-    |> handle_multiwords_config(["config", "dictionnary"])
+    |> handle_multiwords_config(["config", "dictionary"])
     |> handle_multiwords_config(["config", "ranking_rules"])
     |> handle_typo_tolerance()
-    |> handle_embedder()
+
+    # |> handle_embedder()
   end
 
   def handle_typo_tolerance(configuration_params) do
@@ -400,19 +401,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
         else
           {attrs, attrs}
         end
-      end
-    )
-    |> elem(1)
-  end
-
-  defp handle_embedder(configuration_params) do
-    get_and_update_in(
-      configuration_params,
-      ["config", "embedder"],
-      fn attr ->
-        {attr,
-         attr
-         |> Map.put("source", "huggingFace")}
       end
     )
     |> elem(1)
