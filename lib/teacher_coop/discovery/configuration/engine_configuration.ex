@@ -16,6 +16,8 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
 
     embeds_one :config, Config, primary_key: false, on_replace: :update do
       field :filterable_attributes, {:array, :string}
+      field :searchable_attributes, {:array, :string}
+      field :sortable_attributes, {:array, :string}
 
       embeds_many :embedders, Embedder, primary_key: false, on_replace: :delete do
         field :name, :string
