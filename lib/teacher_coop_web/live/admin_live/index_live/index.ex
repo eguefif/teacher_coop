@@ -33,16 +33,8 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Index do
     indexes =
       Configuration.list_index_names()
 
-    IO.inspect(indexes)
-
     {:ok,
      socket
      |> stream(:indexes, indexes)}
-  end
-
-  defp get_config(indexname, configurations) do
-    configurations
-    |> Enum.find(%{}, &(indexname in &1.index_names))
-    |> Map.get(:name)
   end
 end

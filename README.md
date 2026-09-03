@@ -54,8 +54,8 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 - [ ] Working on configuration
-    - [ ] Refactor reset to be sure it creates Indexes entry in the database based on meilisearch
-    - [ ] Finish Meilisearch configuration form
+    - [ ] Check configuration form default value to be sure we don't screw settings
+    - [ ] In index form, allow to change the configuraiton: use a stream system to change the state. State will be changed by Oban task
     - [ ] Add a new function that will allow to add an index based on existing indexes
     - [ ] Add a type field in Index: original / copy
     - [ ] In the form, we should be able to change the configuration
