@@ -35,6 +35,10 @@ defmodule TeacherCoop.Discovery.Configuration do
     Repo.get_by!(Index, name: name) |> Repo.preload(:engine_configuration)
   end
 
+  @doc """
+  Set the given index to state indexing.
+  Broadcast the new index if successful
+  """
   def set_index_to_indexing(index) do
     with {:ok, index} <-
            Index.changeset_state(index, %{state: "indexing"})
@@ -44,6 +48,10 @@ defmodule TeacherCoop.Discovery.Configuration do
     end
   end
 
+  @doc """
+  Set the given index to state error_indexing.
+  Broadcast the new index if successful
+  """
   def set_index_to_error_indexing(index) do
     with {:ok, index} <-
            Index.changeset_state(index, %{state: "error_indexing"})
@@ -53,6 +61,10 @@ defmodule TeacherCoop.Discovery.Configuration do
     end
   end
 
+  @doc """
+  Set the given index to state indexed.
+  Broadcast the new index if successful
+  """
   def set_index_to_indexed(index) do
     with {:ok, index} <-
            Index.changeset_state(index, %{state: "indexed"})
@@ -65,7 +77,7 @@ defmodule TeacherCoop.Discovery.Configuration do
   @doc """
   Get index changeset.
   """
-  def change_index(%Index{} = index, %Scope{} = current_scope, attrs \\ %{}) do
+  def change_index(%Scope{} = current_scope, %Index{} = index, attrs \\ %{}) do
     Index.changeset(index, attrs, current_scope)
   end
 
@@ -115,7 +127,6 @@ defmodule TeacherCoop.Discovery.Configuration do
       if not is_nil(index.engine_configuration_id) do
         %{"indexname" => index.name, "config_id" => index.engine_configuration_id}
         |> Workers.UpdateConfig.new()
-        |> IO.inspect()
         |> Oban.insert()
       end
 

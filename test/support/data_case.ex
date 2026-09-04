@@ -18,6 +18,7 @@ defmodule TeacherCoop.DataCase do
 
   using do
     quote do
+      use Oban.Testing, repo: TeacherCoop.Repo
       alias TeacherCoop.Repo
 
       import Ecto

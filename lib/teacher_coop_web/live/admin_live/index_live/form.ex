@@ -49,7 +49,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
     socket
     |> assign(:page_title, gettext("Edit") <> " " <> gettext("Index"))
     |> assign(:index, index)
-    |> assign(:form, to_form(Configuration.change_index(index, current_scope)))
+    |> assign(:form, to_form(Configuration.change_index(current_scope, index)))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -59,13 +59,13 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
     socket
     |> assign(:page_title, gettext("New") <> " " <> gettext("Index"))
     |> assign(:index, index)
-    |> assign(:form, to_form(Configuration.change_index(index, current_scope)))
+    |> assign(:form, to_form(Configuration.change_index(current_scope, index)))
   end
 
   @impl true
   def handle_event("validate", %{"index" => index_params}, socket) do
     changeset =
-      Configuration.change_index(socket.assigns.index, socket.assigns.current_scope, index_params)
+      Configuration.change_index(socket.assigns.current_scope, socket.assigns.index, index_params)
 
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
