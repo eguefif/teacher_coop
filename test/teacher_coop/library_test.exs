@@ -161,4 +161,60 @@ defmodule TeacherCoop.LibraryTest do
       assert List.keymember?(changeset.errors, :grade, 0)
     end
   end
+
+  describe "list_documents_by_ids/1" do
+    import TeacherCoop.AccountsFixtures, only: [user_scope_fixture: 0]
+    import TeacherCoop.LibraryFixtures
+
+    test "returns the documents matching the given ids" do
+      scope = user_scope_fixture()
+      doc1 = document_fixture(scope)
+      doc2 = document_fixture(scope)
+      _doc3 = document_fixture(scope)
+
+      ids =
+        Library.list_documents_by_ids([doc1.id, doc2.id])
+        |> Enum.map(& &1.id)
+        |> Enum.sort()
+
+      assert ids == Enum.sort([doc1.id, doc2.id])
+    end
+
+    test "preloads files and objectives" do
+      scope = user_scope_fixture()
+      document = document_fixture(scope)
+
+      assert [loaded] = Library.list_documents_by_ids([document.id])
+      assert Ecto.assoc_loaded?(loaded.files)
+      assert Ecto.assoc_loaded?(loaded.objectives)
+    end
+
+    test "returns an empty list when the id list is empty" do
+      assert Library.list_documents_by_ids([]) == []
+    end
+  end
+
+  describe "files" do
+    import TeacherCoop.LibraryFixtures
+
+    test "get_file!/1 returns the file with the given id" do
+      file = file_fixture()
+
+      assert Library.get_file!(file.id) == file
+    end
+
+    test "get_file!/1 returns nil when no file matches" do
+      assert Library.get_file!(-1) == nil
+    end
+
+    test "delete_file_by_id/1 deletes the file and schedules index cleanup" do
+      file = file_fixture()
+
+      assert {:ok, %Oban.Job{}} = Library.delete_file_by_id(file.id)
+      assert Library.get_file!(file.id) == nil
+
+      assert_enqueued worker: TeacherCoop.Library.Workers.DeleteDocument,
+                      args: %{"document_id" => file.id}
+    end
+  end
 end

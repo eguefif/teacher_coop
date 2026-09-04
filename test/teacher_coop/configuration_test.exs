@@ -153,9 +153,34 @@ defmodule TeacherCoop.ConfigurationTest do
     end
   end
 
+  describe "Index.definitions/0" do
+    test "returns the canonical list of index definitions" do
+      assert Index.definitions() == [
+               %{uid: "documents", primary_key: "id", type: "original", state: "indexed"},
+               %{uid: "documents_test", primary_key: "id", type: "original", state: "indexed"},
+               %{uid: "objectives", primary_key: "id", type: "original", state: "indexed"},
+               %{uid: "objectives_test", primary_key: "id", type: "original", state: "indexed"}
+             ]
+    end
+
+    test "every definition has the expected keys" do
+      for definition <- Index.definitions() do
+        assert Map.keys(definition) |> Enum.sort() == [:primary_key, :state, :type, :uid]
+      end
+    end
+
+    test "uids are unique" do
+      uids = Index.definitions() |> Enum.map(& &1.uid)
+
+      assert uids == Enum.uniq(uids)
+    end
+  end
+
   describe "engine_configuration" do
     import TeacherCoop.AccountsFixtures, only: [user_scope_fixture: 1]
     import TeacherCoop.ConfigurationFixtures
+
+    alias TeacherCoop.Discovery.Configuration.EngineConfiguration.Config
 
     test "get_configuration!/2 returns one configuration" do
       scope = user_scope_fixture(:admin)
@@ -341,6 +366,37 @@ defmodule TeacherCoop.ConfigurationTest do
       assert config.typo_tolerance.disable_on_words == ["ecto"]
       assert config.typo_tolerance.min_word_size_for_typos.one_typo == 4
       assert config.typo_tolerance.min_word_size_for_typos.two_typos == 8
+    end
+
+    test "Config.changeset/2 rejects an unknown proximity_precision" do
+      changeset = Config.changeset(%Config{}, %{proximity_precision: "byNothing"})
+
+      refute changeset.valid?
+      assert %{proximity_precision: ["Must be one of " <> _]} = errors_on(changeset)
+    end
+
+    test "Config.changeset/2 rejects ranking_rules with an unknown rule" do
+      rules = [
+        "words",
+        "typo",
+        "proximity",
+        "attributeRank",
+        "sort",
+        "wordPosition",
+        "banana"
+      ]
+
+      changeset = Config.changeset(%Config{}, %{ranking_rules: rules})
+
+      refute changeset.valid?
+      assert %{ranking_rules: [_ | _]} = errors_on(changeset)
+    end
+
+    test "Config.changeset/2 rejects ranking_rules that do not have 7 values" do
+      changeset = Config.changeset(%Config{}, %{ranking_rules: ["words", "typo"]})
+
+      refute changeset.valid?
+      assert %{ranking_rules: [_ | _]} = errors_on(changeset)
     end
   end
 end

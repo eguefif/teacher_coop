@@ -16,6 +16,22 @@ defmodule TeacherCoop.MixProject do
       source_url: "https://github.com/eguefif/teacher_coop",
       docs: [
         extras: ["README.md"]
+      ],
+      test_coverage: [
+        ignore_modules: [
+          TeacherCoopWeb.ErrorHTML,
+          TeacherCoopWeb.Layouts,
+          TeacherCoopWeb.PageHTML,
+          TeacherCoopWeb.PageController,
+          TeacherCoopWeb.Router,
+          TeacherCoopWeb,
+          TeacherCoopWeb.Telemetry,
+          TeacherCoop.Application,
+          TeacherCoopWeb.Date,
+          TeacherCoopWeb.CoreComponents,
+          TeacherCoopWeb.FileController,
+          TeacherCoopWeb.DocumentController
+        ]
       ]
     ]
   end

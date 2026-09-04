@@ -19,4 +19,23 @@ defmodule TeacherCoop.LibraryFixtures do
     {:ok, document} = TeacherCoop.Library.create_document(scope, attrs)
     document
   end
+
+  @doc """
+  Generate a persisted file.
+  """
+  def file_fixture(attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
+        filename: "lesson.pdf",
+        filepath: "uploads/lesson.pdf",
+        format: "pdf"
+      })
+
+    {:ok, file} =
+      %TeacherCoop.Library.File{}
+      |> TeacherCoop.Library.File.changeset(attrs)
+      |> TeacherCoop.Repo.insert()
+
+    file
+  end
 end

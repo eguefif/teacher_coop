@@ -53,11 +53,37 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
+- [ ] Add tests and clean files
+    - [ ] New Liveview
+        - [ ] SearchLive
+            - [ ] Search
+            - [ ] DocumentLive.Component
+        - [ ] ConfigurationLive
+            - [ ] Index
+            - [ ] Show
+            - [ ] Form
+        - [ ] IndexLive
+            - [ ] Index
+            - [ ] Show
+            - [ ] Form
+    - [ ] DocumentLive.Show
+    - [ ] DocumentLive.Form
+    - [ ] Workers
+        - [ ] Update config
+        - [ ] Index document
+        - [ ] Delete documents
+        - [ ] Delete files
+
+- [ ] Refactor SearchRepo: 
+    - [ ] Add tests:
+        - [ ] SearchRepo
+        - [ ] SearchRepo.SearchDocuments
+        - [ ] SearchRepo.SearchObjectives
+
 - [ ] Working on configuration
     - [ ] Add a new function that will allow to add an index based on existing indexes
     - [ ] Add a type field in Index: original / copy
 
-- [ ] Refactor SearchRepo: 
 
 - [ ] Add a SearchSession table
     - [ ] Add an admin liveview to show statistics related to search
