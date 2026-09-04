@@ -3,6 +3,7 @@ defmodule TeacherCoop.AccountsTest do
 
   alias TeacherCoop.SearchRepo.SearchDocuments
   alias TeacherCoop.Accounts
+  alias TeacherCoop.Accounts.Scope
 
   import TeacherCoop.AccountsFixtures
   import TeacherCoop.LibraryFixtures
@@ -431,6 +432,22 @@ defmodule TeacherCoop.AccountsTest do
   describe "inspect/2 for the User module" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
+    end
+  end
+
+  describe "is_admin/1 for the Scope module" do
+    test "returns true if user is admin" do
+      scope = user_scope_fixture(:admin)
+      assert Scope.is_admin?(scope) == true
+    end
+
+    test "returns false if user is not admin" do
+      scope = user_scope_fixture()
+      assert Scope.is_admin?(scope) == false
+    end
+
+    test "returns false if called with nil" do
+      assert Scope.is_admin?(nil) == false
     end
   end
 end

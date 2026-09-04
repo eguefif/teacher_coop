@@ -22,7 +22,6 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
 
   schema "indexes" do
     field :name, :string
-    field :primary_key, :string
     field :type, :string, default: "copy"
     field :state, :string, default: "indexed"
     field :task_uid, :string

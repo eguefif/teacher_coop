@@ -47,6 +47,12 @@ defmodule TeacherCoop.AccountsFixtures do
     user_scope_fixture(user)
   end
 
+  def user_scope_fixture(:admin) do
+    user = user_fixture()
+    user = Map.put(user, :type, "admin")
+    user_scope_fixture(user)
+  end
+
   def user_scope_fixture(user) do
     Scope.for_user(user)
   end

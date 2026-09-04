@@ -205,7 +205,7 @@ defmodule TeacherCoop.SearchRepo do
     result =
       tasks
       |> Enum.map(&wait_for_task_loop(&1.taskUid))
-      |> Enum.all?(fn status -> status in [:succeeded] end)
+      |> Enum.all?(fn status -> status in [:ok] end)
 
     if result == true, do: :ok, else: :error
   end
@@ -215,8 +215,12 @@ defmodule TeacherCoop.SearchRepo do
   Takes a `%Task{}`
   Returns `:ok` or `:error`.
   """
-  def wait_for_task(task) do
-    wait_for_task_loop(task.taskUid)
+  def wait_for_task(%{"taskUid" => uid} = _) do
+    wait_for_task_loop(uid)
+  end
+
+  def wait_for_task(%{taskUid: uid} = _) do
+    wait_for_task_loop(uid)
   end
 
   defp wait_for_task_loop(task_uid) do
@@ -266,7 +270,7 @@ defmodule TeacherCoop.SearchRepo do
       |> Tesla.patch("/indexes/documents/settings/embedders", embedder_config)
       |> Meilisearch.Client.handle_response()
 
-    :succeeded = wait_for_task_loop(task["taskUid"])
+    :ok = wait_for_task(task)
   end
 
   defp get_template() do
