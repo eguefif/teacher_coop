@@ -56,7 +56,7 @@ To do that, we might want to test different configuration on different instance.
 - [ ] Starts to add a dashboard for admin/
     - [ ] Number of user
     - [ ] Number of documents
-    - [ ] Number of updated_documents past 7 days
+    - [ ] Number of uploaded_documents past 7 days
     - [ ] Think of search indicator to show.
 
 - [ ] Think of a way to create A/B testing
