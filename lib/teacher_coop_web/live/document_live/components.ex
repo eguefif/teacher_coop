@@ -1,4 +1,4 @@
-defmodule TeacherCoop.DocumentLive.Component do
+defmodule TeacherCoop.DocumentLive.Components do
   use Gettext, backend: TeacherCoopWeb.Gettext
   use TeacherCoopWeb, :live_view
 

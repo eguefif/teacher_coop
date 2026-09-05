@@ -12,7 +12,7 @@ defmodule TeacherCoop.ConfigurationFixtures do
   def index_fixture(scope, attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{
-        uid: "some description",
+        uid: "some_description",
         type: "original",
         state: "indexed"
       })

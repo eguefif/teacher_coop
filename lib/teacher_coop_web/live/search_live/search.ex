@@ -1,7 +1,7 @@
 defmodule TeacherCoopWeb.SearchLive.Search do
   use TeacherCoopWeb, :live_view
 
-  import TeacherCoop.DocumentLive.Component
+  import TeacherCoop.DocumentLive.Components
   alias TeacherCoop.Discovery
 
   @impl true

@@ -3,6 +3,7 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
 
   import Phoenix.LiveViewTest
   import TeacherCoop.LibraryFixtures
+  import TeacherCoop.AccountsFixtures
 
   @create_attrs %{description: "some description", title: "some title"}
   @update_attrs %{description: "some updated description", title: "some updated title"}
@@ -11,6 +12,14 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
   setup :register_and_log_in_user
 
   defp create_document(%{scope: scope}) do
+    document = document_fixture(scope)
+
+    %{document: document}
+  end
+
+  defp create_document_no_scope(%{}) do
+    user = add_random_user()
+    scope = TeacherCoop.Accounts.Scope.for_user(user)
     document = document_fixture(scope)
 
     %{document: document}
@@ -41,15 +50,18 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
              |> form("#document-form", document: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
-      assert {:ok, index_live, _html} =
-               form_live
-               |> form("#document-form", document: @create_attrs)
-               |> render_submit()
-               |> follow_redirect(conn, ~p"/documents")
+      assert {:ok, index_live, _html} = fill_new_form(form_live, conn)
 
       html = render(index_live)
       assert html =~ "Document created successfully"
       assert html =~ "some title"
+    end
+
+    defp fill_new_form(form_live, conn) do
+      form_live
+      |> form("#document-form", document: @create_attrs)
+      |> render_submit()
+      |> follow_redirect(conn, ~p"/documents")
     end
 
     test "updates document in listing", %{conn: conn, document: document} do
@@ -96,6 +108,19 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
       assert html =~ document.title
     end
 
+    test "displays document that returns to search", %{conn: conn, document: document} do
+      {:ok, show_live, html} = live(conn, ~p"/documents/#{document}?return_to=search")
+
+      assert html =~ "Show Document"
+      assert html =~ document.title
+
+      assert {:ok, _, _} =
+               show_live
+               |> element("#return-to")
+               |> render_click()
+               |> follow_redirect(conn, ~p"/search")
+    end
+
     test "updates document and returns to show", %{conn: conn, document: document} do
       {:ok, show_live, _html} = live(conn, ~p"/documents/#{document}")
 
@@ -120,6 +145,18 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
       html = render(show_live)
       assert html =~ "Document updated successfully"
       assert html =~ "some updated title"
+    end
+  end
+
+  describe "Show when user is not the owner" do
+    setup [:create_document_no_scope]
+
+    test "displays document", %{conn: conn, document: document} do
+      {:ok, _show_live, html} = live(conn, ~p"/documents/#{document}")
+
+      assert html =~ "Show Document"
+      assert html =~ document.title
+      assert html =~ document.user.fullname
     end
   end
 end

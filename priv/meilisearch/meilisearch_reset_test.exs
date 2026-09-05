@@ -1,1 +1,1 @@
-TeacherCoop.SearchRepo.reset_tests()
+TeacherCoop.SearchRepo.Init.reset_tests()

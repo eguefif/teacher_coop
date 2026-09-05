@@ -19,6 +19,9 @@ defmodule TeacherCoop.MixProject do
       ],
       test_coverage: [
         ignore_modules: [
+          TeacherCoop.SearchRepo.Init,
+          TeacherCoop.AccountsFixture,
+          TeacherCoop.DocumentLive.Components,
           TeacherCoopWeb.ErrorHTML,
           TeacherCoopWeb.Layouts,
           TeacherCoopWeb.PageHTML,
@@ -30,7 +33,10 @@ defmodule TeacherCoop.MixProject do
           TeacherCoopWeb.Date,
           TeacherCoopWeb.CoreComponents,
           TeacherCoopWeb.FileController,
-          TeacherCoopWeb.DocumentController
+          TeacherCoopWeb.DocumentController,
+          TeacherCoopWeb.DocumentLive.Form,
+          TeacherCoopWeb.SearchLive.Search,
+          TeacherCoop.SearchRepo.SearchObjectives
         ]
       ]
     ]

@@ -5,18 +5,18 @@ defmodule TeacherCoop.ConfigurationTest do
   alias TeacherCoop.Discovery.Configuration.Workers.UpdateConfig
 
   describe "configuration" do
-    import TeacherCoop.AccountsFixtures, only: [user_scope_fixture: 1]
     import TeacherCoop.ConfigurationFixtures
+    import TeacherCoop.AccountsFixtures, only: [admin_scope_fixture: 0]
 
     test "get_index/2 return one index" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       index = index_fixture(scope) |> Map.update(:engine_configuration, nil, fn _ -> nil end)
 
       assert Configuration.get_index!(index.id, scope) == index
     end
 
     test "get_index/2 return one index using :bypass_auth" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       index =
         index_fixture(scope) |> Map.update(:engine_configuration, nil, fn _ -> nil end)
@@ -25,7 +25,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "get_index_by_name/2 return one index" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       index =
         index_fixture(scope) |> Map.update(:engine_configuration, nil, fn _ -> nil end)
@@ -34,7 +34,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "set_index_to_error_indexing/1" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       index =
         index_fixture(scope)
@@ -45,7 +45,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "set_index_to_indexing/1" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       index =
         index_fixture(scope)
@@ -56,7 +56,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "set_index_to_indexed/1" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       index =
         index_fixture(scope)
@@ -67,13 +67,13 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "change_index/1 returns a document changeset" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       index = index_fixture(scope)
       assert %Ecto.Changeset{} = Configuration.change_index(scope, index)
     end
 
     test "change_index/1 returns error with missing name" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       attrs = %{
         state: "indexing"
@@ -85,14 +85,14 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "list_index/1" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       index = index_fixture(scope) |> Map.update(:engine_configuration, nil, fn _ -> nil end)
 
       assert Configuration.list_index(scope) == [index]
     end
 
     test "delete_index/2 deletes the index when it is not an original" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       index = index_fixture(scope, %{type: "copy"})
 
       assert {:ok, _} = Configuration.delete_index(index, scope)
@@ -100,7 +100,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "delete_index/2 returns an error when the index is an original" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       index = index_fixture(scope, %{type: "original"})
 
       assert {:error, _} = Configuration.delete_index(index, scope)
@@ -108,7 +108,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "create_index/2 with engine_configuration_id to schedule oban" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       attrs = %{
@@ -126,7 +126,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "update_index/2 update uid" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       attrs = %{
@@ -141,7 +141,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "update_index/2 with engine_configuration_id to schedule oban" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       attrs = %{
@@ -162,6 +162,8 @@ defmodule TeacherCoop.ConfigurationTest do
   end
 
   describe "Index.definitions/0" do
+    import TeacherCoop.AccountsFixtures, only: [admin_scope_fixture: 0]
+
     test "returns the canonical list of index definitions" do
       assert Index.definitions() == [
                %{uid: "documents", primary_key: "id", type: "original", state: "indexed"},
@@ -185,34 +187,34 @@ defmodule TeacherCoop.ConfigurationTest do
   end
 
   describe "engine_configuration" do
-    import TeacherCoop.AccountsFixtures, only: [user_scope_fixture: 1]
+    import TeacherCoop.AccountsFixtures, only: [admin_scope_fixture: 0]
     import TeacherCoop.ConfigurationFixtures
 
     alias TeacherCoop.Discovery.Configuration.EngineConfiguration.Config
 
     test "get_configuration!/2 returns one configuration" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       assert Configuration.get_configuration!(scope, config.id) == config
     end
 
     test "get_configuration!/2 returns one configuration using :bypass_auth" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       assert Configuration.get_configuration!(:bypass_auth, config.id) == config
     end
 
     test "list_configurations/1 returns all configurations" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       assert Configuration.list_configurations(scope) == [config]
     end
 
     test "delete_configuration/2 deletes the configuration" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       assert {:ok, _} = Configuration.delete_configuration(scope, config)
@@ -220,7 +222,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "create_configuration/2 inserts a configuration" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       attrs = %{
         name: "A configuration",
@@ -235,7 +237,7 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "update_configuration/3 updates the name" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       assert {:ok, config} =
@@ -245,14 +247,14 @@ defmodule TeacherCoop.ConfigurationTest do
     end
 
     test "change_configuration/3 returns a configuration changeset" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       config = configuration_fixture(scope)
 
       assert %Ecto.Changeset{} = Configuration.change_configuration(scope, config)
     end
 
     test "EngineConfiguration.changeset/3 casts the full range of config values" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
 
       config_attrs = %{
         facet_search: false,

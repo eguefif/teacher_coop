@@ -29,13 +29,34 @@ defmodule TeacherCoop.Accounts.User do
   """
   def email_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email])
+    |> cast(attrs, [:email, :fullname])
     |> validate_email(opts)
+  end
+
+  def changeset(user, attrs, opts \\ []) do
+    permitted = [:email, :type, :fullname]
+
+    user
+    |> cast(attrs, permitted)
+    |> validate_email(opts)
+    |> validate_type()
+  end
+
+  def validate_type(changeset) do
+    type = get_field(changeset, :type)
+
+    if type in ["admin", "", nil] do
+      changeset
+    else
+      add_error(changeset, :type, "User type should be one of '%{value}'.",
+        value: "Admin or nothing"
+      )
+    end
   end
 
   def admin_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :type])
+    |> cast(attrs, [:email, :type, :fullname])
     |> validate_email(opts)
   end
 

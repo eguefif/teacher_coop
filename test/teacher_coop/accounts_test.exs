@@ -437,7 +437,7 @@ defmodule TeacherCoop.AccountsTest do
 
   describe "is_admin/1 for the Scope module" do
     test "returns true if user is admin" do
-      scope = user_scope_fixture(:admin)
+      scope = admin_scope_fixture()
       assert Scope.is_admin?(scope) == true
     end
 

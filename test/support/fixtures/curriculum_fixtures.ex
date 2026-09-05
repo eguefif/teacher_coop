@@ -10,9 +10,10 @@ defmodule TeacherCoop.CurriculumFixtures do
   def objective_fixture(attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{
-        goal: "some goal",
-        grade: "some grade",
-        subject: "some subject",
+        goal: "Compter plein de nombres",
+        grade: "cm2",
+        strand: "compter",
+        subject: "mathématiques",
         year: 42
       })
 

@@ -4,20 +4,27 @@ defmodule TeacherCoop.LibraryFixtures do
   entities via the `TeacherCoop.Library` context.
   """
 
+  alias TeacherCoop.CurriculumFixtures
+
   @doc """
   Generate a document.
   """
   def document_fixture(scope, attrs \\ %{}) do
+    objective = CurriculumFixtures.objective_fixture()
+
     attrs =
       Enum.into(attrs, %{
         description: "some description",
         title: "some title",
         institution_type: "Tout le monde",
-        grade: "CM2"
+        grade: "CM2",
+        files: [%{filename: "lesson.pdf", filepath: "uploads/lesson.pdf", format: "pdf"}]
       })
 
-    {:ok, document} = TeacherCoop.Library.create_document(scope, attrs)
-    document
+    {:ok, document} =
+      TeacherCoop.Library.create_document(scope, attrs, [objective.id])
+
+    document |> TeacherCoop.Repo.preload(:user) |> TeacherCoop.Repo.preload(:objectives)
   end
 
   @doc """

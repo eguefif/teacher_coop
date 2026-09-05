@@ -81,6 +81,12 @@ defmodule TeacherCoop.Accounts do
     |> Repo.insert()
   end
 
+  def add_user(attrs) do
+    %User{}
+    |> User.changeset(attrs)
+    |> Repo.insert()
+  end
+
   ## Admin registration
 
   @doc """

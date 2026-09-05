@@ -3,8 +3,6 @@ defmodule TeacherCoop.SearchRepo do
   SearchRepo is a layer between the Search Engine and the application
   This module in particular is used to setup Meilisearch.
   """
-  alias TeacherCoop.Discovery.Configuration.Index
-
   @doc """
   Function used for search test A/B. At the moments, it returns only one index.
   In the future, this function will returns either documents_a or documents_b.
@@ -30,20 +28,6 @@ defmodule TeacherCoop.SearchRepo do
 
       _ ->
         :error
-    end
-  end
-
-  @doc """
-  Get all indexes. This function will call Meilisearch directly.
-  """
-  def list_index_uids() do
-    {status, result} =
-      get_client()
-      |> Meilisearch.Index.list()
-
-    case status do
-      :ok -> result |> Map.get(:results) |> Enum.map(& &1.uid)
-      :error -> :error
     end
   end
 
@@ -108,51 +92,6 @@ defmodule TeacherCoop.SearchRepo do
   end
 
   @doc """
-  Initliazes all the indexes after dropping them.
-  """
-  def init_indexes() do
-    definitions = Index.definitions()
-
-    IO.puts("Starting meilisearch operations for reset")
-    IO.puts(" 1. Dropped all index")
-    drop_all(Enum.map(definitions, & &1.uid))
-    IO.puts(" 2. Recreated index")
-    create_indexes(definitions)
-    IO.puts(" 3. Define embedders")
-    configure_embedder()
-    IO.puts("Meilisearch end of operations")
-  end
-
-  @doc """
-  Removes all index from Meilisearch
-  """
-  def drop_all(indexes) do
-    client = get_client()
-
-    tasks =
-      indexes
-      |> Enum.map(&{&1, Meilisearch.Index.get(client, &1)})
-      |> Enum.reject(&(elem(elem(&1, 1), 0) == :error))
-      |> Enum.map(&elem(&1, 0))
-      |> Enum.map(&Meilisearch.Index.delete(client, &1))
-      |> Enum.map(&elem(&1, 1))
-
-    :ok = wait_for_tasks(tasks)
-  end
-
-  @doc """
-  Reset specifically the tests indexes
-  """
-  def reset_tests() do
-    definitions =
-      Index.definitions()
-      |> Enum.filter(&String.contains?(&1.uid, "test"))
-
-    drop_all(Enum.map(definitions, & &1.uid))
-    create_indexes(definitions)
-  end
-
-  @doc """
   This function returns the correct index_name depending on the environment
   """
   def index_name(index) do
@@ -166,24 +105,6 @@ defmodule TeacherCoop.SearchRepo do
       Application.get_env(app, TeacherCoop.Repo) |> List.keyfind(:database, 0)
 
     String.contains?(database, "test")
-  end
-
-  defp create_indexes(definitions) do
-    client = get_client()
-
-    tasks =
-      definitions
-      |> Enum.map(&Meilisearch.Index.create(client, %{uid: &1.uid, primaryKey: &1.primary_key}))
-      |> Enum.map(&elem(&1, 1))
-
-    result = wait_for_tasks(tasks)
-
-    update_index_settings("documents")
-    update_index_settings("documents_test")
-
-    if result == :ok,
-      do: IO.puts("All index created"),
-      else: IO.puts("Error while creating indexes")
   end
 
   defp update_index_settings(index) do
@@ -252,28 +173,5 @@ defmodule TeacherCoop.SearchRepo do
     if Process.get(:finch_meilisearch) == nil do
       Finch.start_link(name: :finch_meilisearch)
     end
-  end
-
-  defp configure_embedder() do
-    embedder = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-
-    embedder_config = %{
-      "default" => %{
-        "source" => "huggingFace",
-        "model" => embedder,
-        "documentTemplate" => get_template()
-      }
-    }
-
-    {:ok, task} =
-      get_client()
-      |> Tesla.patch("/indexes/documents/settings/embedders", embedder_config)
-      |> Meilisearch.Client.handle_response()
-
-    :ok = wait_for_task(task)
-  end
-
-  defp get_template() do
-    "Un document nommé {{doc.title}} avec pour description {{doc.description}} et dont les objectifs sont: {{doc.objectives}}."
   end
 end

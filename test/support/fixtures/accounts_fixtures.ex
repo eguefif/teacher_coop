@@ -84,9 +84,8 @@ defmodule TeacherCoop.AccountsFixtures do
     user_scope_fixture(user)
   end
 
-  def user_scope_fixture(:admin) do
-    user = user_fixture()
-    user = Map.put(user, :type, "admin")
+  def admin_scope_fixture() do
+    user = admin_fixture()
     user_scope_fixture(user)
   end
 
@@ -129,5 +128,22 @@ defmodule TeacherCoop.AccountsFixtures do
       from(ut in Accounts.UserToken, where: ut.token == ^token),
       set: [inserted_at: dt, authenticated_at: dt]
     )
+  end
+
+  @doc """
+  Add a user with a complete/partial changeset
+  """
+  def add_random_user(attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
+        email: unique_user_email(),
+        fullname: unique_user_fullname()
+      })
+
+    {:ok, user} =
+      attrs
+      |> Accounts.add_user()
+
+    user
   end
 end

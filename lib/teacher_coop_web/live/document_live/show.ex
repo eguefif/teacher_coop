@@ -16,10 +16,13 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
         <.header>
           {@document.title}
           <span :if={@current_scope.user.id != @document.user_id}>
-            {@document.user.id}
+            {@document.user.fullname}
           </span>
           <:actions>
-            <.button navigate={@return_to}>
+            <.button
+              id="return-to"
+              navigate={@return_to}
+            >
               <.icon name="hero-arrow-left" />
             </.button>
             <.button

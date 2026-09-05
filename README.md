@@ -54,25 +54,9 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 - [ ] Add tests and clean files
-    - [ ] New Liveview
-            - [ ] IndexLive <------------------------ Current job
-            - [ ] Index
-            - [ ] Show
-            - [ ] Form
-        - [ ] SearchLive
-            - [ ] Search
-            - [ ] DocumentLive.Component
-        - [ ] ConfigurationLive
-            - [ ] Index
-            - [ ] Show
-            - [ ] Form
-    - [ ] DocumentLive.Show
-    - [ ] DocumentLive.Form
-    - [ ] Workers
-        - [ ] Update config
-        - [ ] Index document
-        - [ ] Delete documents
-        - [ ] Delete files
+    - [ ] TeacherCoop.SearchRepo.SearchObjectives 
+    - [ ] TeacherCoop.SearchRepo
+    - [ ] TeacherCoop.SearchRepo.SearchDocuments
 
 - [ ] Refactor SearchRepo: 
     - [ ] Add tests:

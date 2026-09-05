@@ -14,7 +14,9 @@ defmodule TeacherCoop.LibraryTest do
     test "list_documents/1 returns all scoped documents" do
       scope = user_scope_fixture()
       other_scope = user_scope_fixture()
+
       document = document_fixture(scope)
+
       other_document = document_fixture(other_scope)
       assert Library.list_documents(scope) == [document]
       assert Library.list_documents(other_scope) == [other_document]

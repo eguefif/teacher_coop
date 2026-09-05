@@ -60,6 +60,7 @@ defmodule TeacherCoop.Library do
     Repo.all_by(Document, user_id: scope.user.id)
     |> Repo.preload(:objectives)
     |> Repo.preload(:files)
+    |> Repo.preload(:user)
   end
 
   def list_documents_by_ids(ids) when ids != [] do
