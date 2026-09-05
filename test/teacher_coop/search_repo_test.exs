@@ -3,5 +3,10 @@ defmodule TeacherCoop.SearchRepoTest do
 
   describe "SearchRepo" do
     alias TeacherCoop.SearchRepo
+
+    test "camelize_keys" do
+      value = ""
+      assert "" == SearchRepo.camelize_keys(value)
+    end
   end
 end

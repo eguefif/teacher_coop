@@ -1,5 +1,28 @@
 defmodule TeacherCoopWeb.DateTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case,
+    async: true,
+    parameterize:
+      for(
+        month <-
+          Enum.zip([
+            ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
+            [
+              "january",
+              "february",
+              "march",
+              "april",
+              "may",
+              "june",
+              "july",
+              "august",
+              "september",
+              "october",
+              "november",
+              "december"
+            ]
+          ]),
+        do: %{month: month}
+      )
 
   alias TeacherCoopWeb.Date
 
@@ -15,8 +38,10 @@ defmodule TeacherCoopWeb.DateTest do
       :ok
     end
 
-    test "formats as \"year month day\"" do
-      assert Date.format_time("2024-01-15T10:30:00Z") == "2024 january 15"
+    test "formats as \"year month day\"", %{month: month} do
+      num_month = elem(month, 0)
+      str_month = elem(month, 1)
+      assert Date.format_time("2024-#{num_month}-15T10:30:00Z") == "2024 #{str_month} 15"
     end
 
     test "uses the english month name" do

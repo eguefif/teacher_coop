@@ -53,29 +53,18 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Add tests and clean files
-    - [ ] TeacherCoop.SearchRepo.SearchObjectives 
-    - [ ] TeacherCoop.SearchRepo
-    - [ ] TeacherCoop.SearchRepo.SearchDocuments
+- [ ] Starts to add a dashboard for admin/
+    - [ ] Number of user
+    - [ ] Number of documents
+    - [ ] Number of updated_documents past 7 days
+    - [ ] Think of search indicator to show.
 
-- [ ] Refactor SearchRepo: 
-    - [ ] Add tests:
-        - [ ] SearchRepo
-        - [ ] SearchRepo.SearchDocuments
-        - [ ] SearchRepo.SearchObjectives
-
-- [ ] Working on configuration
-    - [ ] Add a new function that will allow to add an index based on existing indexes
-    - [ ] Add a type field in Index: original / copy
-
-
-- [ ] Add a SearchSession table
-    - [ ] Add an admin liveview to show statistics related to search
-    - [ ] Add stat for a test A/B => Create a table search_stats ? With regular daily aggregated stats
-            and test A/B stats? Or have two tables, one for test, one for daily aggregates?
-
-- [ ] Add dashboard to configure Meilisearch index
-    - [ ] Start with the features that we want to configure easily
+- [ ] Think of a way to create A/B testing
+    - [ ] We might want to have two other documents indexes for each test.
+    - [ ] AB testing could a a new table
+    - [ ] User the ERT with a boolean: test_ab_running, if true, we use a random function to return either document index a or b.
+    - [ ] The new test AB should allow the user to define configuration to use for test a an test b.
+    - [ ] Test should have a default duration of 7 days.
 
 
 - [ ]Improve search result with accordeon

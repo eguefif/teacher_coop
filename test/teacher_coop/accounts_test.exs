@@ -188,7 +188,7 @@ defmodule TeacherCoop.AccountsTest do
       Accounts.update_user_email(user, token)
 
       {:ok, documents} = SearchDocuments.get_user_documents(user)
-      documents = documents.results |> Enum.map(& &1["email"])
+      documents = documents.hits |> Enum.map(& &1["email"])
       assert documents == [email]
     end
   end
@@ -214,7 +214,7 @@ defmodule TeacherCoop.AccountsTest do
 
       Accounts.update_user(scope, attrs)
       {:ok, documents} = SearchDocuments.get_user_documents(user)
-      documents = documents.results |> Enum.map(& &1["fullname"])
+      documents = documents.hits |> Enum.map(& &1["fullname"])
       assert documents == ["robert"]
       assert Map.has_key?(document, "fullname") == false
     end

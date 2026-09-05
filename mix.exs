@@ -19,24 +19,27 @@ defmodule TeacherCoop.MixProject do
       ],
       test_coverage: [
         ignore_modules: [
+          # These are used for seeding
+          TeacherCoop.SearchRepo.SearchObjectives,
           TeacherCoop.SearchRepo.Init,
-          TeacherCoop.AccountsFixture,
-          TeacherCoop.DocumentLive.Components,
-          TeacherCoopWeb.ErrorHTML,
-          TeacherCoopWeb.Layouts,
-          TeacherCoopWeb.PageHTML,
-          TeacherCoopWeb.PageController,
-          TeacherCoopWeb.Router,
-          TeacherCoopWeb,
-          TeacherCoopWeb.Telemetry,
           TeacherCoop.Application,
-          TeacherCoopWeb.Date,
-          TeacherCoopWeb.CoreComponents,
+          # Complex UI liveview that might change, better to test manually
+          TeacherCoop.DocumentLive.Components,
           TeacherCoopWeb.FileController,
           TeacherCoopWeb.DocumentController,
           TeacherCoopWeb.DocumentLive.Form,
           TeacherCoopWeb.SearchLive.Search,
-          TeacherCoop.SearchRepo.SearchObjectives
+          # Test fixtures
+          TeacherCoop.AccountsFixtures,
+          # Skip the following Phoenix Modules
+          TeacherCoopWeb.CoreComponents,
+          TeacherCoopWeb.ErrorHTML,
+          TeacherCoopWeb.Telemetry,
+          TeacherCoopWeb.Layouts,
+          TeacherCoopWeb.PageHTML,
+          TeacherCoopWeb.PageController,
+          TeacherCoopWeb.Router,
+          TeacherCoopWeb
         ]
       ]
     ]

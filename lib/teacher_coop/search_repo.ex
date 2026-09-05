@@ -3,6 +3,7 @@ defmodule TeacherCoop.SearchRepo do
   SearchRepo is a layer between the Search Engine and the application
   This module in particular is used to setup Meilisearch.
   """
+
   @doc """
   Function used for search test A/B. At the moments, it returns only one index.
   In the future, this function will returns either documents_a or documents_b.
@@ -35,7 +36,7 @@ defmodule TeacherCoop.SearchRepo do
   Configure an index with the settings.
   Settings should be a map. The function will camelCase all the keys.
   """
-  def set_index(index_name, %{} = settings) do
+  def update_index_settings(index_name, %{} = settings) do
     settings =
       camelize_keys(settings)
 
@@ -67,29 +68,6 @@ defmodule TeacherCoop.SearchRepo do
   end
 
   defp upcase_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest
-  defp upcase_first(""), do: ""
-
-  @doc """
-   Convenient function that initialize finch client if necessary and returns
-   a Meilisearch client.
-  """
-  def get_client() do
-    init_finch()
-    meilisearch_config = Application.fetch_env!(:teacher_coop, TeacherCoop.SearchRepo)
-    masterkey = meilisearch_config |> List.keyfind(:masterkey, 0) |> elem(1)
-    host = meilisearch_config |> List.keyfind(:hostname, 0) |> elem(1)
-    port = meilisearch_config |> List.keyfind(:port, 0) |> elem(1)
-    hostname = "#{host}:#{port}"
-    # Create a Meilisearch client whenever and wherever you need it.
-    case Process.get(:meilisearch) do
-      nil ->
-        [endpoint: hostname, key: masterkey, finch: :finch_meilisearch]
-        |> Meilisearch.Client.new()
-
-      _ ->
-        Meilisearch.client(:meilisearch)
-    end
-  end
 
   @doc """
   This function returns the correct index_name depending on the environment
@@ -105,16 +83,6 @@ defmodule TeacherCoop.SearchRepo do
       Application.get_env(app, TeacherCoop.Repo) |> List.keyfind(:database, 0)
 
     String.contains?(database, "test")
-  end
-
-  defp update_index_settings(index) do
-    client = get_client()
-
-    Meilisearch.Settings.FilterableAttributes.update(client, index, [
-      "user_id",
-      "institution_type",
-      "grade"
-    ])
   end
 
   @doc """
@@ -166,6 +134,30 @@ defmodule TeacherCoop.SearchRepo do
 
       _ ->
         :error
+    end
+  end
+
+  @doc """
+  Convenient function to retrieve meilisearch client.
+  This return the application based client in a prod/dev environnement.
+  Returns a on the fly created client for test.
+  """
+  def get_client() do
+    meilisearch_config = Application.fetch_env!(:teacher_coop, TeacherCoop.SearchRepo)
+    masterkey = meilisearch_config |> List.keyfind(:masterkey, 0) |> elem(1)
+    host = meilisearch_config |> List.keyfind(:hostname, 0) |> elem(1)
+    port = meilisearch_config |> List.keyfind(:port, 0) |> elem(1)
+    hostname = "#{host}:#{port}"
+    # Create a Meilisearch client whenever and wherever you need it.
+    case Process.get(:meilisearch) do
+      nil ->
+        init_finch()
+
+        [endpoint: hostname, key: masterkey, finch: :finch_meilisearch]
+        |> Meilisearch.Client.new()
+
+      _ ->
+        Meilisearch.client(:meilisearch)
     end
   end
 

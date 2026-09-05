@@ -1,6 +1,6 @@
 defmodule TeacherCoop.SearchRepo.Init do
-  import TeacherCoop.SearchRepo
   alias TeacherCoop.Discovery.Configuration.Index
+  import TeacherCoop.SearchRepo
 
   @doc """
   Reset specifically the tests indexes

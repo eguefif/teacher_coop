@@ -116,6 +116,10 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
   def get_user_documents(user) do
     client = get_client()
 
-    Meilisearch.Document.list(client, index_name("documents"), filter: "user_id=#{user.id}")
+    Meilisearch.Search.search(client, index_name("documents"),
+      q: "",
+      filter: "user_id = #{user.id}",
+      limit: 1000
+    )
   end
 end

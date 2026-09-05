@@ -15,7 +15,10 @@ defmodule TeacherCoop.Discovery.Configuration.Workers.UpdateConfig do
       Configuration.get_index_by_uid(args["indexuid"], :bypass_auth)
       |> Configuration.set_index_to_indexing()
 
-    case SearchRepo.set_index(args["indexuid"], Ecto.embedded_dump(configuration, :json)) do
+    case SearchRepo.update_index_settings(
+           args["indexuid"],
+           Ecto.embedded_dump(configuration, :json)
+         ) do
       :ok ->
         Configuration.set_index_to_indexed(index)
         :ok
