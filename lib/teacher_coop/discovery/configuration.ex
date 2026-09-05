@@ -177,20 +177,9 @@ defmodule TeacherCoop.Discovery.Configuration do
   def create_configuration(%Scope{} = scope, attrs) do
     true = Scope.is_admin?(scope)
 
-    with {:ok, configuration} <-
-           %EngineConfiguration{}
-           |> EngineConfiguration.changeset(attrs, scope)
-           |> Repo.insert() do
-      if not is_nil(configuration.index_names) do
-        Enum.each(configuration.index_names, fn indexuid ->
-          %{"indexuid" => indexuid, "config_id" => configuration.id}
-          |> Workers.UpdateConfig.new()
-          |> Oban.insert()
-        end)
-      end
-
-      {:ok, configuration}
-    end
+    %EngineConfiguration{}
+    |> EngineConfiguration.changeset(attrs, scope)
+    |> Repo.insert()
   end
 
   @doc """
@@ -199,20 +188,9 @@ defmodule TeacherCoop.Discovery.Configuration do
   def update_configuration(%Scope{} = scope, %EngineConfiguration{} = params, attrs) do
     true = Scope.is_admin?(scope)
 
-    with {:ok, configuration} <-
-           params
-           |> EngineConfiguration.changeset(attrs, scope)
-           |> Repo.update() do
-      if not is_nil(configuration.index_names) do
-        Enum.each(configuration.index_names, fn indexuid ->
-          %{"indexuid" => indexuid, "config_id" => configuration.id}
-          |> Workers.UpdateConfig.new()
-          |> Oban.insert()
-        end)
-      end
-
-      {:ok, configuration}
-    end
+    params
+    |> EngineConfiguration.changeset(attrs, scope)
+    |> Repo.update()
   end
 
   @doc """

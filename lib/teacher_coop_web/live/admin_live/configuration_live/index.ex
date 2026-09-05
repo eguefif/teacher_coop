@@ -25,9 +25,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
         <:col :let={{_id, configuration}} label={gettext("Configuration Name")}>
           {configuration.name}
         </:col>
-        <:col :let={{_id, configuration}} label={gettext("Indexes")}>
-          {inline_index_names_or_none(configuration.index_names)}
-        </:col>
         <:action :let={{_id, configuration}}>
           <div class="sr-only">
             <.link navigate={~p"/admin/configurations/#{configuration}"}>{gettext("Show")}</.link>
@@ -46,9 +43,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
     </Layouts.app>
     """
   end
-
-  def inline_index_names_or_none(index_names) when is_nil(index_names), do: gettext("None")
-  def inline_index_names_or_none(index_names), do: index_names |> Enum.join(", ")
 
   @impl true
   def mount(_params, _session, socket) do

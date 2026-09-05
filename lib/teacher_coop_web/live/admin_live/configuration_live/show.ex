@@ -20,20 +20,12 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Show do
       </.header>
       <div class="flex flex-col gap-2">
         <div>
-          <span class="font-bold">{gettext("Applied to indexes ")}</span>
-          {inline_index_names_or_none(@configuration.index_names)}
-        </div>
-
-        <div>
           <pre class="bg-base-200 p-4 rounded overflow-x-auto text-sm">{Jason.encode!(@configuration.config |> Ecto.embedded_dump(:json), pretty: true)}</pre>
         </div>
       </div>
     </Layouts.app>
     """
   end
-
-  def inline_index_names_or_none(index_names) when is_nil(index_names), do: gettext("None")
-  def inline_index_names_or_none(index_names), do: index_names |> Enum.join(", ")
 
   @impl true
   def mount(params, _session, socket) do

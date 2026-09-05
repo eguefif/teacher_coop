@@ -20,14 +20,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
           phx-debounce="blur"
         />
         <.input
-          field={@form[:index_names]}
-          type="select"
-          label={gettext("Index Name")}
-          options={@index_names_options}
-          multiple={true}
-          phx-debounce="blur"
-        />
-        <.input
           field={@form[:engine]}
           type="text"
           label={gettext("Engine Name")}
@@ -236,12 +228,10 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
   @impl true
   def mount(params, _session, socket) do
     scope = socket.assigns.current_scope
-    index_names = Configuration.list_index(scope) |> Enum.map(& &1.name)
 
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(:index_names_options, index_names)
      |> assign(:field_options, Configuration.list_index_fields(scope))
      |> apply_action(socket.assigns.live_action, params)}
   end
@@ -350,7 +340,6 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Form do
 
   defp create_config(configuration_params) do
     configuration_params
-    |> Map.put_new("index_names", nil)
     |> Map.put_new("filterable_attributes", nil)
     |> Map.put_new("sortable_attributes", nil)
     |> Map.put_new("searchable_attributes", nil)

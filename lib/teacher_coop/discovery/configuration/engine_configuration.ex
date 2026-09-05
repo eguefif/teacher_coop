@@ -19,7 +19,6 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
   schema "engine_configurations" do
     field :name, :string
     field :engine, :string
-    field :index_names, {:array, :string}
     field :user_id, :id
 
     has_many :index, Index, on_delete: :nilify_all
@@ -172,7 +171,7 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
   @doc false
   def changeset(engine_configuration, attrs, user_scope) do
     engine_configuration
-    |> cast(attrs, [:engine, :index_names, :name])
+    |> cast(attrs, [:engine, :name])
     |> cast_embed(:config, required: true)
     |> validate_required([:engine, :name])
     |> put_change(:user_id, user_scope.user.id)

@@ -234,25 +234,6 @@ defmodule TeacherCoop.ConfigurationTest do
       assert config.user_id == scope.user.id
     end
 
-    test "create_configuration/2 with index_names schedules oban" do
-      scope = user_scope_fixture(:admin)
-
-      attrs = %{
-        name: "A configuration",
-        engine: "meilisearch",
-        index_names: ["an_index"],
-        config: Map.from_struct(%TeacherCoop.Discovery.Configuration.EngineConfiguration.Config{})
-      }
-
-      {:ok, config} = Configuration.create_configuration(scope, attrs)
-
-      assert_enqueued worker: UpdateConfig,
-                      args: %{
-                        "indexuid" => "an_index",
-                        "config_id" => config.id
-                      }
-    end
-
     test "update_configuration/3 updates the name" do
       scope = user_scope_fixture(:admin)
       config = configuration_fixture(scope)
@@ -261,20 +242,6 @@ defmodule TeacherCoop.ConfigurationTest do
                Configuration.update_configuration(scope, config, %{name: "New name"})
 
       assert config.name == "New name"
-    end
-
-    test "update_configuration/3 with index_names schedules oban" do
-      scope = user_scope_fixture(:admin)
-      config = configuration_fixture(scope)
-
-      {:ok, config} =
-        Configuration.update_configuration(scope, config, %{index_names: ["an_index"]})
-
-      assert_enqueued worker: UpdateConfig,
-                      args: %{
-                        "indexuid" => "an_index",
-                        "config_id" => config.id
-                      }
     end
 
     test "change_configuration/3 returns a configuration changeset" do
@@ -324,7 +291,6 @@ defmodule TeacherCoop.ConfigurationTest do
       attrs = %{
         name: "Full configuration",
         engine: "meilisearch",
-        index_names: ["documents", "documents_test"],
         config: config_attrs
       }
 
@@ -341,7 +307,6 @@ defmodule TeacherCoop.ConfigurationTest do
 
       assert applied.name == "Full configuration"
       assert applied.engine == "meilisearch"
-      assert applied.index_names == ["documents", "documents_test"]
       assert applied.user_id == scope.user.id
 
       config = applied.config
