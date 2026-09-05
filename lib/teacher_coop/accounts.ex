@@ -81,6 +81,26 @@ defmodule TeacherCoop.Accounts do
     |> Repo.insert()
   end
 
+  ## Admin registration
+
+  @doc """
+  Registers an admin user.
+
+  ## Examples
+
+      iex> register_admin(%{field: value})
+      {:ok, %User{}}
+
+      iex> register_admin(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def register_admin(attrs) do
+    %User{type: "admin"}
+    |> User.admin_changeset(attrs)
+    |> Repo.insert()
+  end
+
   ## Settings
 
   @doc """

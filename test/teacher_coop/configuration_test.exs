@@ -30,7 +30,7 @@ defmodule TeacherCoop.ConfigurationTest do
       index =
         index_fixture(scope) |> Map.update(:engine_configuration, nil, fn _ -> nil end)
 
-      assert Configuration.get_index_by_name!(index.name, :bypass_auth) == index
+      assert Configuration.get_index_by_uid(index.uid, :bypass_auth) == index
     end
 
     test "set_index_to_error_indexing/1" do
@@ -81,7 +81,7 @@ defmodule TeacherCoop.ConfigurationTest do
 
       changeset = Index.changeset(%Index{}, attrs, scope)
       assert changeset.valid? == false
-      assert List.keymember?(changeset.errors, :name, 0)
+      assert List.keymember?(changeset.errors, :uid, 0)
     end
 
     test "list_index/1" do
@@ -91,12 +91,20 @@ defmodule TeacherCoop.ConfigurationTest do
       assert Configuration.list_index(scope) == [index]
     end
 
-    test "delete_index/2" do
+    test "delete_index/2 deletes the index when it is not an original" do
       scope = user_scope_fixture(:admin)
-      index = index_fixture(scope) |> Map.update(:engine_configuration, nil, fn _ -> nil end)
+      index = index_fixture(scope, %{type: "copy"})
 
-      Configuration.delete_index(index, scope)
+      assert {:ok, _} = Configuration.delete_index(index, scope)
       assert Configuration.list_index(scope) == []
+    end
+
+    test "delete_index/2 returns an error when the index is an original" do
+      scope = user_scope_fixture(:admin)
+      index = index_fixture(scope, %{type: "original"})
+
+      assert {:error, _} = Configuration.delete_index(index, scope)
+      assert Configuration.list_index(scope) != []
     end
 
     test "create_index/2 with engine_configuration_id to schedule oban" do
@@ -104,7 +112,7 @@ defmodule TeacherCoop.ConfigurationTest do
       config = configuration_fixture(scope)
 
       attrs = %{
-        name: "An index",
+        uid: "An index",
         engine_configuration_id: config.id
       }
 
@@ -112,24 +120,24 @@ defmodule TeacherCoop.ConfigurationTest do
 
       assert_enqueued worker: UpdateConfig,
                       args: %{
-                        "indexname" => index.name,
+                        "indexuid" => index.uid,
                         "config_id" => config.id
                       }
     end
 
-    test "update_index/2 update name" do
+    test "update_index/2 update uid" do
       scope = user_scope_fixture(:admin)
       config = configuration_fixture(scope)
 
       attrs = %{
-        name: "An index",
+        uid: "An index",
         engine_configuration_id: config.id
       }
 
       {:ok, index} = Configuration.create_index(attrs, scope)
 
-      {:ok, index} = Configuration.update_index(index, %{name: "New name"}, scope)
-      assert index.name == "New name"
+      {:ok, index} = Configuration.update_index(index, %{uid: "New uid"}, scope)
+      assert index.uid == "New uid"
     end
 
     test "update_index/2 with engine_configuration_id to schedule oban" do
@@ -137,17 +145,17 @@ defmodule TeacherCoop.ConfigurationTest do
       config = configuration_fixture(scope)
 
       attrs = %{
-        name: "An index",
+        uid: "An index",
         engine_configuration_id: config.id
       }
 
       {:ok, index} = Configuration.create_index(attrs, scope)
 
-      {:ok, index} = Configuration.update_index(index, %{name: "New name"}, scope)
+      {:ok, index} = Configuration.update_index(index, %{uid: "New uid"}, scope)
 
       assert_enqueued worker: UpdateConfig,
                       args: %{
-                        "indexname" => index.name,
+                        "indexuid" => index.uid,
                         "config_id" => config.id
                       }
     end
@@ -240,7 +248,7 @@ defmodule TeacherCoop.ConfigurationTest do
 
       assert_enqueued worker: UpdateConfig,
                       args: %{
-                        "indexname" => "an_index",
+                        "indexuid" => "an_index",
                         "config_id" => config.id
                       }
     end
@@ -264,7 +272,7 @@ defmodule TeacherCoop.ConfigurationTest do
 
       assert_enqueued worker: UpdateConfig,
                       args: %{
-                        "indexname" => "an_index",
+                        "indexuid" => "an_index",
                         "config_id" => config.id
                       }
     end

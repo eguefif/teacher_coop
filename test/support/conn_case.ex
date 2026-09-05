@@ -57,6 +57,28 @@ defmodule TeacherCoopWeb.ConnCase do
   end
 
   @doc """
+  Setup helper that registers and logs in users.
+
+      setup :register_and_log_in_admin_user
+
+  It stores an updated connection and a registered admin user in the
+  test context.
+  """
+  def register_and_log_in_admin_user(%{conn: conn} = context) do
+    user = TeacherCoop.AccountsFixtures.admin_fixture()
+    user = Map.update(user, :type, "", fn _ -> "admin" end)
+
+    scope = TeacherCoop.Accounts.Scope.for_user(user)
+
+    opts =
+      context
+      |> Map.take([:token_authenticated_at])
+      |> Enum.into([])
+
+    %{conn: log_in_user(conn, user, opts), user: user, scope: scope}
+  end
+
+  @doc """
   Logs the given `user` into the `conn`.
 
   It returns an updated `conn`.

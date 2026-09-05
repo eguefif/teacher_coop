@@ -42,6 +42,43 @@ defmodule TeacherCoop.AccountsFixtures do
     user
   end
 
+  def unconfirmed_admin_fixture(attrs \\ %{}) do
+    {:ok, user} =
+      attrs
+      |> valid_user_attributes()
+      |> Accounts.register_admin()
+
+    user
+  end
+
+  def admin_fixture(attrs \\ %{}) do
+    user = unconfirmed_admin_fixture(attrs)
+
+    token =
+      extract_user_token(fn url ->
+        Accounts.deliver_login_instructions(user, url)
+      end)
+
+    {:ok, {user, _expired_tokens}} =
+      Accounts.login_user_by_magic_link(token)
+
+    user
+  end
+
+  def _fixture(attrs \\ %{}) do
+    user = unconfirmed_user_fixture(attrs)
+
+    token =
+      extract_user_token(fn url ->
+        Accounts.deliver_login_instructions(user, url)
+      end)
+
+    {:ok, {user, _expired_tokens}} =
+      Accounts.login_user_by_magic_link(token)
+
+    user
+  end
+
   def user_scope_fixture do
     user = user_fixture()
     user_scope_fixture(user)

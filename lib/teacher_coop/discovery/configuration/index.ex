@@ -5,6 +5,7 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
   alias TeacherCoop.Accounts.User
 
+  # TODO: indexname should be uid
   @definitions [
     %{uid: "documents", primary_key: "id", type: "original", state: "indexed"},
     %{uid: "documents_test", primary_key: "id", type: "original", state: "indexed"},
@@ -21,7 +22,8 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   def definitions, do: @definitions
 
   schema "indexes" do
-    field :name, :string
+    field :uid, :string
+    field :primary_key, :string, default: "id"
     field :type, :string, default: "copy"
     field :state, :string, default: "indexed"
     field :task_uid, :string
@@ -34,8 +36,8 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   @doc false
   def changeset(index, attrs, user_scope) do
     index
-    |> cast(attrs, [:name, :state, :task_uid, :type, :engine_configuration_id])
-    |> validate_required([:name])
+    |> cast(attrs, [:uid, :state, :task_uid, :type, :engine_configuration_id])
+    |> validate_required([:uid])
     |> put_change(:user_id, user_scope.user.id)
     |> foreign_key_constraint(:engine_configuration_id)
   end

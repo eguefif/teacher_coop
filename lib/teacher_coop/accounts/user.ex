@@ -33,6 +33,12 @@ defmodule TeacherCoop.Accounts.User do
     |> validate_email(opts)
   end
 
+  def admin_changeset(user, attrs, opts \\ []) do
+    user
+    |> cast(attrs, [:email, :type])
+    |> validate_email(opts)
+  end
+
   defp validate_email(changeset, opts) do
     changeset =
       changeset

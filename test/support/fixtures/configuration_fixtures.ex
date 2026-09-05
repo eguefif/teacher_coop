@@ -12,13 +12,13 @@ defmodule TeacherCoop.ConfigurationFixtures do
   def index_fixture(scope, attrs \\ %{}) do
     attrs =
       Enum.into(attrs, %{
-        name: "some description",
+        uid: "some description",
         type: "original",
         state: "indexed"
       })
 
-    {:ok, document} = TeacherCoop.Discovery.Configuration.create_index(attrs, scope)
-    document
+    {:ok, index} = TeacherCoop.Discovery.Configuration.create_index(attrs, scope)
+    index
   end
 
   def configuration_fixture(scope, attrs \\ %{}) do
@@ -29,7 +29,7 @@ defmodule TeacherCoop.ConfigurationFixtures do
         config: Map.from_struct(%Config{})
       })
 
-    {:ok, document} = TeacherCoop.Discovery.Configuration.create_configuration(scope, attrs)
-    document
+    {:ok, configuration} = TeacherCoop.Discovery.Configuration.create_configuration(scope, attrs)
+    configuration
   end
 end

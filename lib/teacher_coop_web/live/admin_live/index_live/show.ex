@@ -8,19 +8,19 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        {gettext("Index")} {@index.name}
+        {gettext("Index")} {@index.uid}
         <:actions>
           <.button navigate={~p"/admin/indexes"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/admin/indexes/#{@index.id}/edit"}>
+          <.button variant="primary" navigate={~p"/admin/indexes/#{@index.id}/edit?return_to=show"}>
             <.icon name="hero-pencil-square" /> {gettext("Edit")}
           </.button>
         </:actions>
       </.header>
 
       <.list>
-        <:item title={gettext("Name")}>{@index.name}</:item>
+        <:item title={gettext("Name")}>{@index.uid}</:item>
         <:item title={gettext("Primary key")}>{@index.primary_key}</:item>
         <:item title={gettext("Type")}>{@index.type}</:item>
         <:item title={gettext("State")}>{@index.state || gettext("Unknown")}</:item>

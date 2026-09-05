@@ -55,14 +55,14 @@ To do that, we might want to test different configuration on different instance.
 ### Next
 - [ ] Add tests and clean files
     - [ ] New Liveview
+            - [ ] IndexLive <------------------------ Current job
+            - [ ] Index
+            - [ ] Show
+            - [ ] Form
         - [ ] SearchLive
             - [ ] Search
             - [ ] DocumentLive.Component
         - [ ] ConfigurationLive
-            - [ ] Index
-            - [ ] Show
-            - [ ] Form
-        - [ ] IndexLive
             - [ ] Index
             - [ ] Show
             - [ ] Form

@@ -97,7 +97,10 @@ defmodule TeacherCoop.Discovery.Configuration do
   def delete_index(%Index{} = index, %Scope{} = current_scope) do
     true = Scope.is_admin?(current_scope)
 
-    Repo.delete(index)
+    case index.type != "original" do
+      true -> Repo.delete(index)
+      false -> {:error, "Index is an original index"}
+    end
   end
 
   def create_index(attrs, %Scope{} = current_scope) do
@@ -108,7 +111,7 @@ defmodule TeacherCoop.Discovery.Configuration do
            |> Index.changeset(attrs, current_scope)
            |> Repo.insert() do
       if not is_nil(index.engine_configuration_id) do
-        %{"indexname" => index.name, "config_id" => index.engine_configuration_id}
+        %{"indexname" => index.uid, "config_id" => index.engine_configuration_id}
         |> Workers.UpdateConfig.new()
         |> Oban.insert()
       end
@@ -125,7 +128,7 @@ defmodule TeacherCoop.Discovery.Configuration do
            |> Index.changeset(attrs, scope)
            |> Repo.update() do
       if not is_nil(index.engine_configuration_id) do
-        %{"indexname" => index.name, "config_id" => index.engine_configuration_id}
+        %{"indexname" => index.uid, "config_id" => index.engine_configuration_id}
         |> Workers.UpdateConfig.new()
         |> Oban.insert()
       end

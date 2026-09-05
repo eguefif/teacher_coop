@@ -13,9 +13,9 @@ defmodule TeacherCoop.Repo.Seeds.IndexSeed do
   end
 
   defp upsert_index(%{uid: uid} = attrs) do
-    case Repo.get_by(Index, name: uid) do
+    case Repo.get_by(Index, uid: uid) do
       nil ->
-        Repo.insert!(%Index{name: uid, primary_key: attrs.primary_key, type: attrs.type})
+        Repo.insert!(%Index{uid: uid, primary_key: attrs.primary_key, type: attrs.type})
 
       %Index{} = index ->
         index

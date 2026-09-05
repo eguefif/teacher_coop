@@ -3,7 +3,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateIndexes do
 
   def change do
     create table(:indexes) do
-      add :name, :string
+      add :uid, :string
       add :primary_key, :string
       add :type, :string
       add :state, :string
@@ -14,7 +14,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateIndexes do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:indexes, [:name])
+    create unique_index(:indexes, [:uid])
 
     create index(:indexes, [:user_id])
 

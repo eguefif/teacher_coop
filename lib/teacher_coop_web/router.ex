@@ -73,8 +73,8 @@ defmodule TeacherCoopWeb.Router do
       live "/configurations/:id", AdminLive.ConfigurationLive.Show, :show
       live "/configurations/:id/edit", AdminLive.ConfigurationLive.Form, :edit
       live "/indexes", AdminLive.IndexLive.Index, :index
-      live "/indexes/:id", AdminLive.IndexLive.Show, :show
       live "/indexes/new", AdminLive.IndexLive.Form, :new
+      live "/indexes/:id", AdminLive.IndexLive.Show, :show
       live "/indexes/:id/edit", AdminLive.IndexLive.Form, :edit
     end
   end

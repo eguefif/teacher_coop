@@ -12,7 +12,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
         {@page_title}
       </.header>
       <.form for={@form} id="index-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:name]} type="text" label="Title" />
+        <.input field={@form[:uid]} type="text" label="Title" />
         <.input
           type="select"
           field={@form[:engine_configuration_id]}
@@ -44,6 +44,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     current_scope = socket.assigns.current_scope
+
     index = Configuration.get_index!(id, current_scope)
 
     socket
@@ -83,7 +84,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
       {:ok, index} ->
         {:noreply,
          socket
-         |> put_flash(:info, "index updated successfully")
+         |> put_flash(:info, gettext("Index updated successfully"))
          |> push_navigate(to: return_path(socket.assigns.return_to, index))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -96,7 +97,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
       {:ok, index} ->
         {:noreply,
          socket
-         |> put_flash(:info, "index created successfully")
+         |> put_flash(:info, gettext("Index created successfully"))
          |> push_navigate(to: return_path(socket.assigns.return_to, index))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -106,4 +107,5 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
 
   defp return_path("index", _index), do: ~p"/admin/indexes"
   defp return_path("show", index), do: ~p"/admin/indexes/#{index}"
+  defp return_path(_, index), do: ~p"/admin/indexes/#{index}"
 end
