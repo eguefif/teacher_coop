@@ -18,11 +18,11 @@ defmodule TeacherCoop.SearchRepo do
   @doc """
   Get all fields from an index: returns an array
   """
-  def list_fields_for(indexname) do
+  def list_fields_for(indexuid) do
     client = get_client()
 
     response =
-      Tesla.post(client, "/indexes/#{indexname}/fields", "{\"offset\": 0, \"limit\": 50}")
+      Tesla.post(client, "/indexes/#{indexuid}/fields", "{\"offset\": 0, \"limit\": 50}")
 
     case Meilisearch.Client.handle_response(response) do
       {:ok, fields_map} ->
@@ -36,7 +36,7 @@ defmodule TeacherCoop.SearchRepo do
   @doc """
   Get all indexes. This function will call Meilisearch directly.
   """
-  def list_index_names() do
+  def list_index_uids() do
     {status, result} =
       get_client()
       |> Meilisearch.Index.list()

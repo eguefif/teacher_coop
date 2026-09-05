@@ -12,10 +12,10 @@ defmodule TeacherCoop.Discovery.Configuration.Workers.UpdateConfig do
     configuration = Configuration.get_configuration!(:bypass_auth, args["config_id"]).config
 
     index =
-      Configuration.get_index_by_name!(args["indexname"], :bypass_auth)
+      Configuration.get_index_by_uid(args["indexuid"], :bypass_auth)
       |> Configuration.set_index_to_indexing()
 
-    case SearchRepo.set_index(args["indexname"], Ecto.embedded_dump(configuration, :json)) do
+    case SearchRepo.set_index(args["indexuid"], Ecto.embedded_dump(configuration, :json)) do
       :ok ->
         Configuration.set_index_to_indexed(index)
         :ok

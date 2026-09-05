@@ -31,8 +31,8 @@ defmodule TeacherCoop.Discovery.Configuration do
   @doc """
   Get an index by names.
   """
-  def get_index_by_name!(name, :bypass_auth) do
-    Repo.get_by!(Index, name: name) |> Repo.preload(:engine_configuration)
+  def get_index_by_uid(uid, :bypass_auth) do
+    Repo.get_by!(Index, uid: uid) |> Repo.preload(:engine_configuration)
   end
 
   @doc """
@@ -111,7 +111,7 @@ defmodule TeacherCoop.Discovery.Configuration do
            |> Index.changeset(attrs, current_scope)
            |> Repo.insert() do
       if not is_nil(index.engine_configuration_id) do
-        %{"indexname" => index.uid, "config_id" => index.engine_configuration_id}
+        %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
         |> Workers.UpdateConfig.new()
         |> Oban.insert()
       end
@@ -128,7 +128,7 @@ defmodule TeacherCoop.Discovery.Configuration do
            |> Index.changeset(attrs, scope)
            |> Repo.update() do
       if not is_nil(index.engine_configuration_id) do
-        %{"indexname" => index.uid, "config_id" => index.engine_configuration_id}
+        %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
         |> Workers.UpdateConfig.new()
         |> Oban.insert()
       end
@@ -182,8 +182,8 @@ defmodule TeacherCoop.Discovery.Configuration do
            |> EngineConfiguration.changeset(attrs, scope)
            |> Repo.insert() do
       if not is_nil(configuration.index_names) do
-        Enum.each(configuration.index_names, fn indexname ->
-          %{"indexname" => indexname, "config_id" => configuration.id}
+        Enum.each(configuration.index_names, fn indexuid ->
+          %{"indexuid" => indexuid, "config_id" => configuration.id}
           |> Workers.UpdateConfig.new()
           |> Oban.insert()
         end)
@@ -204,8 +204,8 @@ defmodule TeacherCoop.Discovery.Configuration do
            |> EngineConfiguration.changeset(attrs, scope)
            |> Repo.update() do
       if not is_nil(configuration.index_names) do
-        Enum.each(configuration.index_names, fn indexname ->
-          %{"indexname" => indexname, "config_id" => configuration.id}
+        Enum.each(configuration.index_names, fn indexuid ->
+          %{"indexuid" => indexuid, "config_id" => configuration.id}
           |> Workers.UpdateConfig.new()
           |> Oban.insert()
         end)

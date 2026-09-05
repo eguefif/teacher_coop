@@ -5,7 +5,6 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
   alias TeacherCoop.Accounts.User
 
-  # TODO: indexname should be uid
   @definitions [
     %{uid: "documents", primary_key: "id", type: "original", state: "indexed"},
     %{uid: "documents_test", primary_key: "id", type: "original", state: "indexed"},
@@ -45,7 +44,7 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   @doc false
   def changeset_state(index, attrs) do
     index
-    |> cast(attrs, [:name, :state, :task_uid, :type, :engine_configuration_id])
+    |> cast(attrs, [:uid, :state, :task_uid, :type, :engine_configuration_id])
     |> validate_required([:state])
   end
 end
