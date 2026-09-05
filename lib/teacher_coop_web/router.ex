@@ -67,7 +67,7 @@ defmodule TeacherCoopWeb.Router do
     oban_dashboard("/oban")
 
     live_session :require_admin, on_mount: [{TeacherCoopWeb.UserAuth, :require_admin}] do
-      live "/", AdminLive.ConfigurationLive.Index, :index
+      live "/", AdminLive.DashboardLive, :index
       live "/configurations", AdminLive.ConfigurationLive.Index, :index
       live "/configurations/new", AdminLive.ConfigurationLive.Form, :new
       live "/configurations/:id", AdminLive.ConfigurationLive.Show, :show

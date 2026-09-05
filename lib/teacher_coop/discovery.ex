@@ -6,7 +6,6 @@ defmodule TeacherCoop.Discovery do
   We want to be able to improve our serach engine.
   """
 
-  import Ecto.Query, warn: false
   alias TeacherCoop.Repo
   alias TeacherCoop.SearchRepo
   alias TeacherCoop.SearchRepo.SearchDocuments
