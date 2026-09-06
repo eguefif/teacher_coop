@@ -54,6 +54,10 @@ defmodule TeacherCoop.Discovery do
     SearchSession.new(scope, SearchRepo.get_document_index_test_a_b())
   end
 
+  @doc """
+  When a user click download, this is a success. We mark the search record
+  as successfull and save it.
+  """
   def save_successful_search(
         %SearchSession{created_at: %DateTime{} = created_at} = search_session,
         click_position
@@ -69,29 +73,17 @@ defmodule TeacherCoop.Discovery do
     |> Repo.update()
   end
 
-  @doc """
-  Creates a search using a SearchSession.
-
-  ## Examples
-
-      iex> create_search(search_session)
-      %SearchSession{}}
-
-  """
   def handle_search(%SearchSession{} = search_session, search_terms) do
     search_session
-    |> update_current_search()
-    |> make_search(search_terms)
+    |> maybe_mark_last_search_failed()
+    |> do_search(search_terms)
     |> create_search_record()
   end
 
-  # If search_record nil, we create a new one
-  def update_current_search(%SearchSession{} = search_session)
+  def maybe_mark_last_search_failed(%SearchSession{} = search_session)
       when is_nil(search_session.search_record), do: search_session
 
-  # If not it means the user is makeing a new search, we mark
-  # the current one as failed and update the search record
-  def update_current_search(
+  def maybe_mark_last_search_failed(
         %SearchSession{
           created_at: %DateTime{} = created_at,
           scope: scope,
@@ -110,18 +102,18 @@ defmodule TeacherCoop.Discovery do
     %SearchSession{search_session | search_record: nil}
   end
 
-  defp make_search(%SearchSession{} = search_session, search_terms) do
+  defp do_search(%SearchSession{} = search_session, search_terms) do
     search_session = SearchSession.add_search_terms(search_session, search_terms)
 
     {results, db_results} =
       SearchDocuments.search_document(search_terms)
-      |> get_db_results()
+      |> get_db_documents_from_search_ids()
       |> reorder_db_results()
 
     SearchSession.add_search_results(search_session, results, db_results)
   end
 
-  defp get_db_results({:ok, results}) do
+  defp get_db_documents_from_search_ids({:ok, results}) do
     db_results =
       results.hits
       |> Enum.map(& &1["id"])

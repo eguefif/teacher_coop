@@ -1,4 +1,7 @@
 defmodule TeacherCoop.Discovery.Search do
+  @moduledoc """
+  Database representation of a user search.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,6 +13,7 @@ defmodule TeacherCoop.Discovery.Search do
     field :success, :boolean
     # What position was the success result in the ranking
     field :success_click_position, :integer
+    # How long the user spend before clicking
     field :dwell_time, :integer
     field :document_index, :string
 

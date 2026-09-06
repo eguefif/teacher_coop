@@ -1,4 +1,8 @@
 defmodule TeacherCoop.Discovery.SearchSession do
+  @moduledoc """
+  This data structure is used to keep an in-memory state of a user search session.
+  search_record is the current search record in database.
+  """
   defstruct [
     :session_id,
     :created_at,

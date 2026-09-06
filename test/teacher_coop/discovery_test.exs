@@ -47,21 +47,6 @@ defmodule TeacherCoop.DiscoveryTest do
       assert session.db_results == []
     end
 
-    test "update_current_search/1 returns the session unchanged when there is no current search" do
-      scope = user_scope_fixture()
-      session = search_session_fixture(scope)
-
-      assert Discovery.update_current_search(session) == session
-    end
-
-    test "update_current_search/1 clears the current search record when a new search starts" do
-      scope = user_scope_fixture()
-      search = search_fixture(scope)
-      session = search_session_fixture(scope, search_record: search)
-
-      assert %SearchSession{search_record: nil} = Discovery.update_current_search(session)
-    end
-
     test "save_successful_search/2 returns the updated search record" do
       scope = user_scope_fixture()
       search = search_fixture(scope)

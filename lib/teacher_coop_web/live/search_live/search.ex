@@ -219,8 +219,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
 
   @impl true
   def handle_event("update-search", %{"search" => search_terms}, socket) do
-    {:noreply,
-     socket |> assign(:search_terms, search_terms) |> assign(:results, socket.assigns.results)}
+    {:noreply, socket |> assign(:search_terms, search_terms)}
   end
 
   @impl true
@@ -231,6 +230,12 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   @impl true
   def handle_event("user-click-download-all", %{"position" => click_position}, socket) do
     Discovery.save_successful_search(socket.assigns.search_session, click_position)
-    {:noreply, socket}
+
+    search_session =
+      Discovery.handle_search(socket.assigns.search_session, socket.assigns.search_terms)
+
+    {:noreply,
+     socket
+     |> assign(:search_session, search_session)}
   end
 end

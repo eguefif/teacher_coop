@@ -53,13 +53,30 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Starts to add a dashboard for admin/
-    - [ ] Number of user
-    - [ ] Number of documents
-    - [ ] Number of uploaded_documents past 7 days
-    - [ ] Think of search indicator to show.
+- [ ] Dashboard
+    - [ ] 
+
+- [ ] Refactor search
+    - [ ] Add two tables: SearchSession, Search (see Obsidian)
+    - [ ] Create search session when initialization
+    - [ ] Have a task to timeout search when user not active
+
+- [ ] Improve data gathering for search
+    - [ ] Check user flow, what does it do.
+    - [ ] Add test to be sure that we have the behavior we want.
+    - [ ] Design a better architecture to be sure we get all we need
+    - [ ] Add a cron task that mark search as timeout at some point when there is no
+        activity
+
+- [ ] Liveview search
+    - [ ] Debounce update search
+    - [ ] Add a suggestion search ? This would need a new index and store queries by popularity
+    - [ ] When clicking on a document: return to search, result should still be here: keep alive
+    - [ ] WHen clicking on a document: should be able to click download all and mark search as success
 
 - [ ] Think of a way to create A/B testing
+    - [ ] At the moment, index uid is hardcoded, take the result of get_index_test_a_b
+        When no test, test the regular one, other else, random between regular and document_b
     - [ ] We might want to have two other documents indexes for each test.
     - [ ] AB testing could a a new table
     - [ ] User the ERT with a boolean: test_ab_running, if true, we use a random function to return either document index a or b.
