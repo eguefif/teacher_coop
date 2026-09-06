@@ -9,32 +9,43 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="flex flex-col items-center gap-[64px]">
-        <form
-          phx-change="update-search"
+        <.form
+          id="search-form"
+          for={@form}
           phx-submit="trigger-search"
           class="flex flex-row gap-[48px] items-baseline"
         >
           <.input
-            id="search"
-            name="search"
+            id="search_terms"
+            name="search_terms"
             type="text"
-            value={@search_terms}
+            field={@form[:search_terms]}
             placeholder="Un petit prince..."
             class="input w-150 h-14 rounded-4xl"
           />
-          <div>
+          <footer>
             <.button
-              name="trigger-search"
+              phx-disable-with={gettext("Searching...")}
+              name="trigger-search-button"
               class="btn btn-primary btn-soft btn-lg rounded-xl"
             >
               {gettext("Search")}
             </.button>
-          </div>
-        </form>
-        <div :if={@results != nil} class="max-w-200 flex flex-col gap-[64px]">
+          </footer>
+        </.form>
+        <div
+          :if={@results != nil && @form[:search_terms].value != ""}
+          class="max-w-200 flex flex-col gap-[64px]"
+        >
           <div :for={{result, position} <- Enum.with_index(@results)} class="w-200">
             <.result result={result} preview_file={@preview_file} position={position} />
           </div>
+        </div>
+        <div
+          :if={@results == [] && @form[:search_terms].value != ""}
+          class="max-w-200 flex flex-col gap-[64px]"
+        >
+          {gettext("Oops no result for that search....")}
         </div>
       </div>
       <pre><%= inspect @results, pretty: true %></pre>
@@ -199,27 +210,25 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     {:ok,
      socket
      |> assign_new(:current_scope, fn -> scope end)
-     |> assign(:search_terms, "")
+     |> assign(:form, to_form(%{"search_terms" => ""}))
      |> assign(:preview_file, nil)
      |> assign(results: [])
      |> assign(:search_session, search_session)}
   end
 
   @impl true
-  def handle_event("trigger-search", %{}, socket) do
+  def handle_event("trigger-search", %{"search_terms" => search_terms}, socket) do
     search_session =
-      Discovery.handle_search(socket.assigns.search_session, socket.assigns.search_terms)
+      Discovery.handle_search(socket.assigns.search_session, search_terms)
 
+    # TODO: when we run a search with nothing, it fails because search_record has a failed
+    # changeset set. This should be different. Handle here the case of a failed changeset
+    # Maybe validate before doing the search.
     {:noreply,
      socket
      |> assign(:results, search_session.db_results)
      |> assign(:search_session, search_session)
-     |> assign(:search_terms, socket.assigns.search_terms)}
-  end
-
-  @impl true
-  def handle_event("update-search", %{"search" => search_terms}, socket) do
-    {:noreply, socket |> assign(:search_terms, search_terms)}
+     |> assign(:form, to_form(%{"search_terms" => search_terms}))}
   end
 
   @impl true
@@ -231,11 +240,8 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   def handle_event("user-click-download-all", %{"position" => click_position}, socket) do
     Discovery.save_successful_search(socket.assigns.search_session, click_position)
 
-    search_session =
-      Discovery.handle_search(socket.assigns.search_session, socket.assigns.search_terms)
-
     {:noreply,
      socket
-     |> assign(:search_session, search_session)}
+     |> assign(:search_session, socket.assigns.search_session)}
   end
 end
