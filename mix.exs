@@ -28,7 +28,6 @@ defmodule TeacherCoop.MixProject do
           TeacherCoopWeb.FileController,
           TeacherCoopWeb.DocumentController,
           TeacherCoopWeb.DocumentLive.Form,
-          TeacherCoopWeb.SearchLive.Search,
           # Test fixtures
           TeacherCoop.AccountsFixtures,
           # Skip the following Phoenix Modules

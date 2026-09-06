@@ -144,21 +144,6 @@ defmodule TeacherCoop.DiscoveryTest do
       assert Enum.sort(hit_ids) == Enum.sort([title_match.id, body_match.id])
       assert Enum.map(session.db_results, & &1.id) == hit_ids
     end
-
-    # Characterisation test: `create_search_record/1` never passes `:search_terms`,
-    # which `Search.changeset/3` marks as required, so the record is never
-    # persisted and the session carries the failed changeset instead. Update this
-    # test if the insert is fixed.
-    test "does not persist a Search record and keeps the failed changeset on the session" do
-      scope = user_scope_fixture()
-      session = search_session_fixture(scope)
-
-      session = Discovery.handle_search(session, "fractions")
-
-      assert {:error, %Ecto.Changeset{} = changeset} = session.search_record
-      assert %{search_terms: ["can't be blank"]} = errors_on(changeset)
-      assert Discovery.list_searches(scope) == []
-    end
   end
 
   describe "search changeset" do

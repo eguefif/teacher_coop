@@ -77,7 +77,7 @@ defmodule TeacherCoop.Discovery do
     search_session
     |> maybe_mark_last_search_failed()
     |> do_search(search_terms)
-    |> create_search_record()
+    |> create_search_record(search_terms)
   end
 
   def maybe_mark_last_search_failed(%SearchSession{} = search_session)
@@ -132,14 +132,15 @@ defmodule TeacherCoop.Discovery do
     {results, db_results}
   end
 
-  defp create_search_record(%SearchSession{} = search_session) do
+  defp create_search_record(%SearchSession{} = search_session, search_terms) do
     attrs = %{
       hits_count: length(search_session.results.hits),
       session_id: search_session.session_id,
-      document_index: search_session.document_index
+      document_index: search_session.document_index,
+      search_terms: search_terms
     }
 
-    search_record =
+    {:ok, search_record} =
       %Search{}
       |> Search.changeset(attrs, search_session.scope)
       |> Repo.insert()
