@@ -91,7 +91,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
   @doc """
   Specialized function to look into documents
   """
-  def search_document(search_terms) when is_bitstring(search_terms) do
+  def search_documents(search_terms) when is_bitstring(search_terms) do
     client = get_client()
 
     case Meilisearch.Search.search(client, index_name("documents"), q: search_terms) do

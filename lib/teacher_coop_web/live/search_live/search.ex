@@ -222,7 +222,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
       ) do
     scope = socket.assigns.current_scope
 
-    {search_session, search, hits} =
+    {search_session, search, hits, _} =
       Discovery.handle_search(search_terms, scope, search_session)
 
     {:noreply,
@@ -237,7 +237,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   def handle_event("trigger-search", %{"search_terms" => search_terms}, socket) do
     scope = socket.assigns.current_scope
 
-    {search_session, search, hits} =
+    {search_session, search, hits, _} =
       Discovery.handle_search(search_terms, scope)
 
     {:noreply,
