@@ -12,6 +12,8 @@ defmodule TeacherCoop.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
 
     has_many :document_id, TeacherCoop.Library.Document, on_delete: :delete_all
+    has_many :search_id, TeacherCoop.Discovery.Search, on_delete: :delete_all
+    has_many :search_session_id, TeacherCoop.Discovery.SearchSession, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

@@ -1,44 +1,43 @@
 defmodule TeacherCoop.Discovery.SearchSession do
   @moduledoc """
-  This data structure is used to keep an in-memory state of a user search session.
-  search_record is the current search record in database.
+  Database representation of a user search session.
   """
-  defstruct [
-    :session_id,
-    :created_at,
-    :results,
-    :db_results,
-    :scope,
-    :search_record,
-    :search_terms,
-    :document_index
-  ]
+  use Ecto.Schema
+  import Ecto.Changeset
 
-  def new(scope, document_index) do
-    %__MODULE__{
-      scope: scope,
-      session_id: Ecto.UUID.generate(version: 7),
-      created_at: DateTime.utc_now(),
-      results: nil,
-      db_results: [],
-      document_index: document_index,
-      search_record: nil
-    }
+  alias TeacherCoop.Discovery.Search
+
+  schema "search_sessions" do
+    field :state, :string
+    field :timeout_at, :utc_datetime
+    field :success, :boolean
+    field :document_index, :string
+
+    belongs_to(:user, User)
+    has_many(:searches, Search)
+
+    timestamps(type: :utc_datetime)
   end
 
-  def get_hits(%__MODULE__{} = search_session) do
-    search_session.results.hits
+  @doc false
+  def changeset(search, attrs, user_scope) when is_nil(user_scope) do
+    permitted = [
+      :state,
+      :timeout_at,
+      :success,
+      :document_index
+    ]
+
+    search
+    |> cast(attrs, permitted)
+    |> validate_required([])
   end
 
-  def add_search_terms(%__MODULE__{} = search_session, search_terms) do
-    %__MODULE__{search_session | search_terms: search_terms}
-  end
-
-  def add_search_results(%__MODULE__{} = search_session, results, db_results) do
-    %__MODULE__{search_session | results: results, db_results: db_results}
-  end
-
-  def add_search_record(%__MODULE__{} = search_session, search_record) do
-    %__MODULE__{search_session | search_record: search_record}
+  @doc false
+  def changeset(search, attrs, user_scope) do
+    search
+    |> cast(attrs, [:search_terms])
+    |> validate_required([:search_terms])
+    |> put_change(:user_id, user_scope.user.id)
   end
 end
