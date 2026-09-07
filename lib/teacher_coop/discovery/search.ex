@@ -1,6 +1,6 @@
 defmodule TeacherCoop.Discovery.Search do
   @moduledoc """
-  Database representation of a user search.
+  A search is one query typed by the user on the search page.
   """
   use Ecto.Schema
   import Ecto.Changeset
@@ -23,26 +23,23 @@ defmodule TeacherCoop.Discovery.Search do
   end
 
   @doc false
-  def changeset(search, attrs, user_scope) when is_nil(user_scope) do
+  def changeset(search, attrs, search_session, user_scope) do
     permitted = [
       :search_terms,
       :hits_count,
-      :success,
+      :state,
       :success_click_position,
       :dwell_time,
       :document_index
     ]
 
+    user_id = if user_scope, do: user_scope.user.id, else: nil
+    search_session_id = if search_session, do: search_session.id, else: nil
+
     search
     |> cast(attrs, permitted)
     |> validate_required([:search_terms])
-  end
-
-  @doc false
-  def changeset(search, attrs, user_scope) do
-    search
-    |> cast(attrs, [:search_terms])
-    |> validate_required([:search_terms])
-    |> put_change(:user_id, user_scope.user.id)
+    |> put_change(:search_session_id, search_session_id)
+    |> put_change(:user_id, user_id)
   end
 end

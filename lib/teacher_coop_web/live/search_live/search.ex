@@ -3,6 +3,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
 
   import TeacherCoop.DocumentLive.Components
   alias TeacherCoop.Discovery
+  alias TeacherCoop.Discovery.{Search}
 
   @impl true
   def render(assigns) do
@@ -205,27 +206,46 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     scope =
       if Map.has_key?(socket.assigns, :current_scope), do: socket.assigns.current_scope, else: nil
 
-    search_session = Discovery.create_search_session(scope)
-
     {:ok,
      socket
      |> assign_new(:current_scope, fn -> scope end)
-     |> assign(:form, to_form(%{"search_terms" => ""}))
+     |> assign(:form, to_form(Discovery.change_search(nil, %{search_terms: ""}, scope)))
      |> assign(:preview_file, nil)
-     |> assign(results: [])
-     |> assign(:search_session, search_session)}
+     |> assign(results: [])}
+  end
+
+  @impl true
+  def handle_event(
+        "trigger-search",
+        %{"search_terms" => search_terms},
+        %{assigns: %{search_session: search_session}} = socket
+      ) do
+    scope = socket.assigns.current_scope
+
+    {search_session, search, hits} =
+      Discovery.handle_search(search_terms, scope, search_session)
+
+    {:noreply,
+     socket
+     |> assign(:results, hits)
+     |> assign(:search_session, search_session)
+     |> assign(:search, search)
+     |> assign(:form, to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope)))}
   end
 
   @impl true
   def handle_event("trigger-search", %{"search_terms" => search_terms}, socket) do
-    search_session =
-      Discovery.handle_search(socket.assigns.search_session, search_terms)
+    scope = socket.assigns.current_scope
+
+    {search_session, search, hits} =
+      Discovery.handle_search(search_terms, scope)
 
     {:noreply,
      socket
-     |> assign(:results, search_session.db_results)
+     |> assign(:results, hits)
      |> assign(:search_session, search_session)
-     |> assign(:form, to_form(%{"search_terms" => search_terms}))}
+     |> assign(:search, search)
+     |> assign(:form, to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope)))}
   end
 
   @impl true
@@ -235,8 +255,6 @@ defmodule TeacherCoopWeb.SearchLive.Search do
 
   @impl true
   def handle_event("user-click-download-all", %{"position" => click_position}, socket) do
-    Discovery.save_successful_search(socket.assigns.search_session, click_position)
-
     {:noreply,
      socket
      |> assign(:search_session, socket.assigns.search_session)}

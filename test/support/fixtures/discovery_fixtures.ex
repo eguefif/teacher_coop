@@ -24,12 +24,13 @@ defmodule TeacherCoop.DiscoveryFixtures do
 
   @doc """
   Generate a search session for the given scope.
-  Pass `attrs` (a map or keyword list) to override struct fields,
-  e.g. `search_session_fixture(scope, search_record: search_fixture(scope))`.
+  e.g. `search_session_fixture(scope)`.
   """
-  def search_session_fixture(scope, attrs \\ %{}) do
-    scope
-    |> Discovery.create_search_session()
-    |> struct(attrs)
+  def search_session_fixture(scope) do
+    {:ok, session} =
+      scope
+      |> Discovery.create_search_session()
+
+    session
   end
 end
