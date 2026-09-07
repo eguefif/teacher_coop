@@ -1,7 +1,6 @@
 defmodule TeacherCoopWeb.SearchLive.Search do
   use TeacherCoopWeb, :live_view
 
-  import TeacherCoop.DocumentLive.Components
   alias TeacherCoop.Discovery
 
   @impl true
@@ -81,13 +80,15 @@ defmodule TeacherCoopWeb.SearchLive.Search do
         </div>
         <div class="collapse-content flex flex-col gap-[32px]">
           <.objectives objectives={@result.objectives} />
-          <.files files={@result.files} preview_file={@preview_file} />
-          <div
-            phx-click="user-click-download-all"
-            phx-value-position={@position}
-            class="mx-auto"
-          >
-            <.download_all_button document={@result} />
+          <div :if={@result.files != []} class="w-full">
+            <.files position={@position} files={@result.files} preview_file={@preview_file} />
+            <.link
+              id={"download-all-button-#{@result.id}"}
+              phx-click="search-success"
+              phx-value-position={@position}
+              phx-value-download-link={~p"/documents/download/#{@result}"}
+              class="btn btn-primary"
+            >{gettext("Download all")}</.link>
           </div>
         </div>
       </div>
@@ -115,6 +116,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
 
   attr :files, :list, default: nil
   attr :preview_file, :integer, default: nil
+  attr :position, :integer, required: true
 
   def files(assigns) do
     ~H"""
@@ -125,7 +127,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
           :for={file <- @files}
           class="card bg-base-200 w-[192px] shadow-sm"
         >
-          <.file_card file={file} />
+          <.file_card file={file} position={@position} />
           <.preview_modal file={file} preview_file={@preview_file} />
         </div>
       </div>
@@ -134,6 +136,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   end
 
   attr :file, :map, default: nil
+  attr :position, :integer, required: true
 
   def file_card(assigns) do
     ~H"""
@@ -154,7 +157,12 @@ defmodule TeacherCoopWeb.SearchLive.Search do
           </div>
         </button>
         <div class="tooltip" data-tip={gettext("Download")}>
-          <.link href={~p"/files/#{@file}"}>
+          <.link
+            phx-click="search-success"
+            phx-value-position={@position}
+            id={"download-button-#{@file.id}"}
+            phx-value-download-link={~p"/files/#{@file}"}
+          >
             <.icon
               name="hero-arrow-down-tray"
               class="size-[32px] scale-100 hover:scale-120 transform-transition duration-100 ease-in-out cursor-pointer"
@@ -221,30 +229,52 @@ defmodule TeacherCoopWeb.SearchLive.Search do
       ) do
     scope = socket.assigns.current_scope
 
-    {search_session, search, hits, _} =
-      Discovery.handle_search(search_terms, scope, search_session)
+    case Discovery.handle_search(search_terms, scope, search_session) do
+      {:error, search_session, changeset, hits, _db_hits} ->
+        {:noreply,
+         socket
+         |> assign(:results, hits)
+         |> assign(:search_session, search_session)
+         |> assign(:search, nil)
+         |> assign(:form, to_form(changeset))}
 
-    {:noreply,
-     socket
-     |> assign(:results, hits)
-     |> assign(:search_session, search_session)
-     |> assign(:search, search)
-     |> assign(:form, to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope)))}
+      {:ok, search_session, search, hits, _} ->
+        {:noreply,
+         socket
+         |> assign(:results, hits)
+         |> assign(:search_session, search_session)
+         |> assign(:search, search)
+         |> assign(
+           :form,
+           to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope))
+         )}
+    end
   end
 
   @impl true
   def handle_event("trigger-search", %{"search_terms" => search_terms}, socket) do
     scope = socket.assigns.current_scope
 
-    {search_session, search, hits, _} =
-      Discovery.handle_search(search_terms, scope)
+    case Discovery.handle_search(search_terms, scope) do
+      {:error, search_session, changeset, hits, _db_hits} ->
+        {:noreply,
+         socket
+         |> assign(:results, hits)
+         |> assign(:search_session, search_session)
+         |> assign(:search, nil)
+         |> assign(:form, to_form(changeset))}
 
-    {:noreply,
-     socket
-     |> assign(:results, hits)
-     |> assign(:search_session, search_session)
-     |> assign(:search, search)
-     |> assign(:form, to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope)))}
+      {:ok, search_session, search, hits, _} ->
+        {:noreply,
+         socket
+         |> assign(:results, hits)
+         |> assign(:search_session, search_session)
+         |> assign(:search, search)
+         |> assign(
+           :form,
+           to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope))
+         )}
+    end
   end
 
   @impl true
@@ -253,7 +283,11 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   end
 
   @impl true
-  def handle_event("user-click-download-all", %{"position" => click_position}, socket) do
+  def handle_event(
+        "search-success",
+        %{"position" => click_position, "download-link" => redirect_link},
+        socket
+      ) do
     {:ok, search} =
       Discovery.mark_search_as_succes(
         socket.assigns.search,
@@ -265,6 +299,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     {:noreply,
      socket
      |> assign(:search_session, socket.assigns.search_session)
-     |> assign(:search, search)}
+     |> assign(:search, search)
+     |> redirect(to: redirect_link)}
   end
 end

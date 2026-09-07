@@ -11,12 +11,12 @@ defmodule TeacherCoop.DiscoveryFixtures do
   @doc """
   Generate a persisted search record owned by the given scope's user.
   """
-  def search_fixture(scope, attrs \\ %{}) do
+  def search_fixture(search_session \\ nil, scope, attrs \\ %{}) do
     attrs = Enum.into(attrs, %{search_terms: "some search terms"})
 
     {:ok, search} =
       %Search{}
-      |> Search.changeset(attrs, scope)
+      |> Search.changeset(attrs, scope, search_session)
       |> Repo.insert()
 
     search

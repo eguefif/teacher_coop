@@ -8,6 +8,7 @@ defmodule TeacherCoop.DocumentLive.Components do
     ~H"""
     <div :if={@document != nil}>
       <.link
+        id={"download-all-link-#{@document.id}"}
         class="btn btn-primary"
         href={~p"/documents/download/#{@document}"}
       >{gettext("Download all")}</.link>

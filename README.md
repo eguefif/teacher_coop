@@ -55,13 +55,9 @@ To do that, we might want to test different configuration on different instance.
 ### Next
 - [ ] Dashboard
     - [ ] 
-- [ ] Add search test
-    - [ ] Mark as success
-    - [ ] No result
-    - [ ] Empty search when trigger search
 
 - [ ] Refactor search
-    - [ ] Add two tables: SearchSession, Search (see Obsidian)
+    - [x] Add two tables: SearchSession, Search (see Obsidian)
     - [ ] Create search session when initialization
     - [ ] Have a task to timeout search when user not active
 
