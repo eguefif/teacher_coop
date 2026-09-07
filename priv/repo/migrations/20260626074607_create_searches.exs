@@ -5,7 +5,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateSearches do
     create table(:searches) do
       add :search_terms, :string
       add :user_id, references(:users, on_delete: :nothing)
-      add :session_id, references(:search_sessions, on_delete: :nothing)
+      add :search_session_id, references(:search_sessions, on_delete: :nothing)
       add :hits_count, :integer
       add :success_click_position, :integer
       add :dwell_time, :integer
@@ -16,6 +16,6 @@ defmodule TeacherCoop.Repo.Migrations.CreateSearches do
     end
 
     create index(:searches, [:user_id])
-    create index(:searches, [:session_id])
+    create index(:searches, [:search_session_id])
   end
 end

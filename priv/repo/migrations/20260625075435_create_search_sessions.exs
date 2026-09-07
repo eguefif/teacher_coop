@@ -4,7 +4,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateSearchSessions do
   def change do
     create table(:search_sessions) do
       add :state, :string
-      add :index, :string
+      add :document_index, :string
       add :timeout_at, :utc_datetime
       add :user_id, references(:users, on_delete: :nothing)
 
