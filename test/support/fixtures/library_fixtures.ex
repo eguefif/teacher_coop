@@ -18,13 +18,22 @@ defmodule TeacherCoop.LibraryFixtures do
         title: "some title",
         institution_type: "Tout le monde",
         grade: "CM2",
-        files: [%{filename: "lesson.pdf", filepath: "uploads/lesson.pdf", format: "pdf"}]
+        files: [
+          %{
+            filename: "lesson.pdf",
+            filepath: "files/test-file",
+            format: "pdf"
+          }
+        ]
       })
 
     {:ok, document} =
       TeacherCoop.Library.create_document(scope, attrs, [objective.id])
 
-    document |> TeacherCoop.Repo.preload(:user) |> TeacherCoop.Repo.preload(:objectives)
+    document
+    |> TeacherCoop.Repo.preload(:user)
+    |> TeacherCoop.Repo.preload(:objectives)
+    |> TeacherCoop.Repo.preload(:files)
   end
 
   @doc """

@@ -17,9 +17,14 @@ defmodule TeacherCoop.Discovery do
   A Session is used to track a user over multiple search queries.
   """
   def create_search_session(scope) do
-    %SearchSession{}
-    |> SearchSession.changeset(%{state: "searching"}, scope)
-    |> Repo.insert()
+    with {:ok, session} <-
+           %SearchSession{}
+           |> SearchSession.changeset(%{state: "searching"}, scope)
+           |> Repo.insert() do
+      {:ok,
+       session
+       |> Repo.preload(:user)}
+    end
   end
 
   @doc """
@@ -44,6 +49,14 @@ defmodule TeacherCoop.Discovery do
   def get_search!(id) do
     Repo.get!(Search, id)
     |> Repo.preload(:user)
+  end
+
+  @doc """
+  Get a search by it search terms.
+  Params: `search_terms: string`
+  """
+  def get_search_by_search_terms!(search_terms) do
+    Repo.get_by!(Search, search_terms: search_terms)
   end
 
   @doc """
@@ -78,6 +91,11 @@ defmodule TeacherCoop.Discovery do
   """
   def handle_search(search_terms \\ "", scope, search_session \\ nil)
 
+  def handle_search(search_terms, scope, search_session) when search_terms == "" do
+    {:error, search_session, change_search(search_session, %{search_terms: search_terms}, scope),
+     [], []}
+  end
+
   def handle_search(
         search_terms,
         scope,
@@ -86,7 +104,8 @@ defmodule TeacherCoop.Discovery do
       when is_binary(search_terms) and is_nil(search_session) do
     {:ok, search_session} = create_search_session(scope)
     {search, db_hits, engine_hits} = do_search(search_session, search_terms, scope)
-    {search_session, search, db_hits, engine_hits}
+
+    {:ok, search_session, search, db_hits, engine_hits}
   end
 
   def handle_search(
@@ -97,24 +116,25 @@ defmodule TeacherCoop.Discovery do
       when is_binary(search_terms) do
     {search, db_hits, engine_hits} = do_search(search_session, search_terms, scope)
 
-    {search_session, search, db_hits, engine_hits}
+    {:ok, search_session, search, db_hits, engine_hits}
   end
 
   defp do_search(search_session, search_terms, scope) do
-    {db_hits, engine_hits} =
-      with {:ok, engine_hits} <- SearchDocuments.search_documents(search_terms),
-           {:ok, {db_hits, engine_hits}} <-
-             get_db_document_from_engine_hits(engine_hits) do
-        {db_hits, engine_hits}
-      end
+    with {:ok, engine_hits} <- SearchDocuments.search_documents(search_terms),
+         {:ok, {db_hits, engine_hits}} <-
+           get_db_document_from_engine_hits(engine_hits),
+         {:ok, search} <- do_create_search(search_terms, length(db_hits), search_session, scope) do
+      {search, db_hits, engine_hits}
+    end
+  end
 
+  defp do_create_search(search_terms, db_hits_count, search_session, scope) do
     search_attrs = %{
       search_terms: search_terms,
-      hits_count: length(db_hits)
+      hits_count: db_hits_count
     }
 
-    {:ok, search} = create_search(search_session, search_attrs, scope)
-    {search, db_hits, engine_hits}
+    create_search(search_session, search_attrs, scope)
   end
 
   defp get_db_document_from_engine_hits(engine_hits) do
