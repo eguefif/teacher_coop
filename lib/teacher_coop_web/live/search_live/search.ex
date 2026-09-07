@@ -3,7 +3,6 @@ defmodule TeacherCoopWeb.SearchLive.Search do
 
   import TeacherCoop.DocumentLive.Components
   alias TeacherCoop.Discovery
-  alias TeacherCoop.Discovery.{Search}
 
   @impl true
   def render(assigns) do
@@ -255,8 +254,17 @@ defmodule TeacherCoopWeb.SearchLive.Search do
 
   @impl true
   def handle_event("user-click-download-all", %{"position" => click_position}, socket) do
+    {:ok, search} =
+      Discovery.mark_search_as_succes(
+        socket.assigns.search,
+        String.to_integer(click_position),
+        socket.assigns.current_scope,
+        socket.assigns.search_session
+      )
+
     {:noreply,
      socket
-     |> assign(:search_session, socket.assigns.search_session)}
+     |> assign(:search_session, socket.assigns.search_session)
+     |> assign(:search, search)}
   end
 end
