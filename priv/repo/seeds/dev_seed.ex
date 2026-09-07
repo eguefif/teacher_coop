@@ -101,7 +101,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "fraction ce2",
         hits_count: 5,
-        success: true,
+        state: "success",
         success_click_position: 1,
         dwell_time: 8_500,
         document_index: "documents"
@@ -109,7 +109,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "addition fractions",
         hits_count: 4,
-        success: true,
+        state: "success",
         success_click_position: 2,
         dwell_time: 12_300,
         document_index: "documents"
@@ -117,7 +117,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "nombres décimaux cm1",
         hits_count: 3,
-        success: true,
+        state: "success",
         success_click_position: 1,
         dwell_time: 6_100,
         document_index: "documents"
@@ -125,7 +125,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "verbes pronominaux",
         hits_count: 6,
-        success: true,
+        state: "success",
         success_click_position: 3,
         dwell_time: 15_400,
         document_index: "documents"
@@ -133,7 +133,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "système métrique",
         hits_count: 2,
-        success: true,
+        state: "success",
         success_click_position: 1,
         dwell_time: 4_200,
         document_index: "documents"
@@ -141,7 +141,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "mesures et conversions",
         hits_count: 4,
-        success: true,
+        state: "failed",
         success_click_position: 4,
         dwell_time: 18_700,
         document_index: "documents"
@@ -149,7 +149,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "problèmes de fractions",
         hits_count: 8,
-        success: false,
+        state: "failed",
         success_click_position: nil,
         dwell_time: 22_000,
         document_index: "documents"
@@ -157,7 +157,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "géométrie cm2",
         hits_count: 0,
-        success: false,
+        state: "failed",
         success_click_position: nil,
         dwell_time: 3_000,
         document_index: "documents"
@@ -165,7 +165,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "conjugaison présent",
         hits_count: 5,
-        success: false,
+        state: "failed",
         success_click_position: nil,
         dwell_time: 9_800,
         document_index: "documents"
@@ -173,7 +173,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
       %{
         search_terms: "dictée cm1",
         hits_count: 0,
-        success: false,
+        state: "failed",
         success_click_position: nil,
         dwell_time: 2_500,
         document_index: "documents"

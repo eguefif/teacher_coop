@@ -221,9 +221,6 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     search_session =
       Discovery.handle_search(socket.assigns.search_session, search_terms)
 
-    # TODO: when we run a search with nothing, it fails because search_record has a failed
-    # changeset set. This should be different. Handle here the case of a failed changeset
-    # Maybe validate before doing the search.
     {:noreply,
      socket
      |> assign(:results, search_session.db_results)

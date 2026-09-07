@@ -4,18 +4,18 @@ defmodule TeacherCoop.Repo.Migrations.CreateSearches do
   def change do
     create table(:searches) do
       add :search_terms, :string
-      add :user_id, references(:users, on_delete: :delete_all)
-      add :session_id, :string
+      add :user_id, references(:users, on_delete: :nothing)
+      add :session_id, references(:search_sessions, on_delete: :nothing)
       add :hits_count, :integer
-      add :success, :boolean
-      # What position was the success result in the ranking
       add :success_click_position, :integer
       add :dwell_time, :integer
       add :document_index, :string
+      add :state, :string
 
       timestamps(type: :utc_datetime)
     end
 
     create index(:searches, [:user_id])
+    create index(:searches, [:session_id])
   end
 end

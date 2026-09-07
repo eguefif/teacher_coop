@@ -5,17 +5,19 @@ defmodule TeacherCoop.Discovery.Search do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias TeacherCoop.Discovery.SearchSession
+  alias TeacherCoop.Accounts.User
+
   schema "searches" do
     field :search_terms, :string
-    field :user_id, :id
-    field :session_id, :integer
     field :hits_count, :integer
-    field :success, :boolean
-    # What position was the success result in the ranking
+    field :state, :string
     field :success_click_position, :integer
-    # How long the user spend before clicking
     field :dwell_time, :integer
     field :document_index, :string
+
+    belongs_to(:user, User)
+    belongs_to(:search_session, SearchSession)
 
     timestamps(type: :utc_datetime)
   end
