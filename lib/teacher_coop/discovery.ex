@@ -7,12 +7,10 @@ defmodule TeacherCoop.Discovery do
   """
 
   alias TeacherCoop.Repo
-  # alias TeacherCoop.SearchRepo
   alias TeacherCoop.SearchRepo.SearchDocuments
 
   alias TeacherCoop.Discovery.{Search, SearchSession}
   alias TeacherCoop.Library
-  alias TeacherCoop.Accounts.Scope
 
   @doc """
   Create one search session in `searching` state.
@@ -56,6 +54,15 @@ defmodule TeacherCoop.Discovery do
     %Search{}
     |> Search.changeset(attrs, search_session, scope)
     |> Repo.insert()
+  end
+
+  @doc """
+  Update a search
+  """
+  def update_search(%Search{} = search, attrs \\ %{}, scope, search_session) do
+    search
+    |> Search.changeset(attrs, search_session, scope)
+    |> Repo.update()
   end
 
   @doc """
@@ -123,5 +130,17 @@ defmodule TeacherCoop.Discovery do
   defp reorder_db_hits(db_hits, engine_hits) do
     engine_hits
     |> Enum.map(&Enum.find(db_hits, fn result -> result.id == &1["id"] end))
+  end
+
+  @doc """
+  Mark a search as successfull.
+  """
+  def mark_search_as_succes(%Search{} = search, click_position, scope, search_session) do
+    search
+    |> update_search(
+      %{success_click_position: click_position, state: "success"},
+      scope,
+      search_session
+    )
   end
 end
