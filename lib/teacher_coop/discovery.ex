@@ -8,10 +8,10 @@ defmodule TeacherCoop.Discovery do
 
   alias TeacherCoop.Repo
   # alias TeacherCoop.SearchRepo
-  # alias TeacherCoop.SearchRepo.SearchDocuments
+  alias TeacherCoop.SearchRepo.SearchDocuments
 
   alias TeacherCoop.Discovery.{Search, SearchSession}
-  # alias TeacherCoop.Library
+  alias TeacherCoop.Library
   alias TeacherCoop.Accounts.Scope
 
   @doc """
@@ -52,7 +52,7 @@ defmodule TeacherCoop.Discovery do
   Create a search.
   A search is one query typed by the user on the search engine page.
   """
-  def create_search(%SearchSession{} = search_session, attrs \\ %{}, %Scope{} = scope) do
+  def create_search(%SearchSession{} = search_session, attrs \\ %{}, scope) do
     %Search{}
     |> Search.changeset(attrs, search_session, scope)
     |> Repo.insert()
@@ -61,7 +61,7 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Returns a %Search{}` `Changeset`.
   """
-  def change_search(search_session, attrs \\ %{}, %Scope{} = scope) do
+  def change_search(search_session, attrs \\ %{}, scope) do
     %Search{}
     |> Search.changeset(attrs, search_session, scope)
   end
@@ -78,8 +78,8 @@ defmodule TeacherCoop.Discovery do
       )
       when is_binary(search_terms) and is_nil(search_session) do
     {:ok, search_session} = create_search_session(scope)
-    {search, hits} = do_search(search_session, search_terms, scope)
-    {search_session, search, hits}
+    {search, db_hits, engine_hits} = do_search(search_session, search_terms, scope)
+    {search_session, search, db_hits, engine_hits}
   end
 
   def handle_search(
@@ -88,20 +88,40 @@ defmodule TeacherCoop.Discovery do
         search_session
       )
       when is_binary(search_terms) do
-    {search, hits} = do_search(search_session, search_terms, scope)
+    {search, db_hits, engine_hits} = do_search(search_session, search_terms, scope)
 
-    {search_session, search, hits}
+    {search_session, search, db_hits, engine_hits}
   end
 
   defp do_search(search_session, search_terms, scope) do
-    results = []
+    {db_hits, engine_hits} =
+      with {:ok, engine_hits} <- SearchDocuments.search_documents(search_terms),
+           {:ok, {db_hits, engine_hits}} <-
+             get_db_document_from_engine_hits(engine_hits) do
+        {db_hits, engine_hits}
+      end
 
     search_attrs = %{
       search_terms: search_terms,
-      hits_count: length(results)
+      hits_count: length(db_hits)
     }
 
     {:ok, search} = create_search(search_session, search_attrs, scope)
-    {search, results}
+    {search, db_hits, engine_hits}
+  end
+
+  defp get_db_document_from_engine_hits(engine_hits) do
+    db_hits =
+      engine_hits.hits
+      |> Enum.map(& &1["id"])
+      |> then(&Library.list_documents_by_ids(&1))
+      |> reorder_db_hits(engine_hits.hits)
+
+    {:ok, {db_hits, engine_hits}}
+  end
+
+  defp reorder_db_hits(db_hits, engine_hits) do
+    engine_hits
+    |> Enum.map(&Enum.find(db_hits, fn result -> result.id == &1["id"] end))
   end
 end
