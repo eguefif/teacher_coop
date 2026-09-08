@@ -3,10 +3,10 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
 
   alias TeacherCoop.Library
   alias TeacherCoop.Curriculum.Objective
-  alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Accounts
   alias TeacherCoop.Repo
   alias TeacherCoop.Repo.Seeds.IndexSeed
+  alias TeacherCoop.Repo.Seeds.SearchSeed
 
   def seed() do
     user_email = "robert_do@lost.com"
@@ -93,100 +93,7 @@ defmodule TeacherCoop.Repo.Seeds.DevSeed do
 
     IndexSeed.seed()
 
-    seed_searches(user)
-  end
-
-  defp seed_searches(user) do
-    attrs = [
-      %{
-        search_terms: "fraction ce2",
-        hits_count: 5,
-        state: "success",
-        success_click_position: 1,
-        dwell_time: 8_500,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "addition fractions",
-        hits_count: 4,
-        state: "success",
-        success_click_position: 2,
-        dwell_time: 12_300,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "nombres décimaux cm1",
-        hits_count: 3,
-        state: "success",
-        success_click_position: 1,
-        dwell_time: 6_100,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "verbes pronominaux",
-        hits_count: 6,
-        state: "success",
-        success_click_position: 3,
-        dwell_time: 15_400,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "système métrique",
-        hits_count: 2,
-        state: "success",
-        success_click_position: 1,
-        dwell_time: 4_200,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "mesures et conversions",
-        hits_count: 4,
-        state: "failed",
-        success_click_position: 4,
-        dwell_time: 18_700,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "problèmes de fractions",
-        hits_count: 8,
-        state: "failed",
-        success_click_position: nil,
-        dwell_time: 22_000,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "géométrie cm2",
-        hits_count: 0,
-        state: "failed",
-        success_click_position: nil,
-        dwell_time: 3_000,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "conjugaison présent",
-        hits_count: 5,
-        state: "failed",
-        success_click_position: nil,
-        dwell_time: 9_800,
-        document_index: "documents"
-      },
-      %{
-        search_terms: "dictée cm1",
-        hits_count: 0,
-        state: "failed",
-        success_click_position: nil,
-        dwell_time: 2_500,
-        document_index: "documents"
-      }
-    ]
-
-    attrs
-    |> Enum.each(fn search_attrs ->
-      %Search{}
-      |> Ecto.Changeset.change(search_attrs)
-      |> Ecto.Changeset.put_change(:user_id, user.id)
-      |> Repo.insert!()
-    end)
+    SearchSeed.seed(user)
   end
 
   defp sample_objective_ids(grade, subject, count \\ 3) do

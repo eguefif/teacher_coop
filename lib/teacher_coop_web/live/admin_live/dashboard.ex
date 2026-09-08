@@ -7,11 +7,15 @@ defmodule TeacherCoopWeb.AdminLive.DashboardLive do
       <.header>
         {gettext("Dashboard")}
       </.header>
-      <div>
+      <div class="flex flex-col gap-8">
         <.live_component
           module={TeacherCoopWeb.AdminLive.DocumentsCountLive}
           id={@documents_count_component_id}
           current_scope={@current_scope}
+        />
+        <.live_component
+          module={TeacherCoopWeb.AdminLive.SearchGraphsLive}
+          id={@search_graphs_id}
         />
       </div>
     </Layouts.app>
@@ -19,6 +23,9 @@ defmodule TeacherCoopWeb.AdminLive.DashboardLive do
   end
 
   def mount(_params, _session, socket) do
-    {:ok, socket |> assign(:documents_count_component_id, "documents-count")}
+    {:ok,
+     socket
+     |> assign(:documents_count_component_id, "documents-count")
+     |> assign(:search_graphs_id, "search-graphs")}
   end
 end

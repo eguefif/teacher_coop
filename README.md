@@ -54,7 +54,7 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 - [ ] Dashboard
-    - [ ] 
+    - [ ] Add a graph with evolution of zero result count
 
 - [ ] Refactor search
     - [x] Add two tables: SearchSession, Search (see Obsidian)

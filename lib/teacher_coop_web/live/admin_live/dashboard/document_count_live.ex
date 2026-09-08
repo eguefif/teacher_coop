@@ -5,7 +5,7 @@ defmodule TeacherCoopWeb.AdminLive.DocumentsCountLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <section class="ml-8 flex flex-row flex-wrap gap-2">
+    <section class="flex flex-row flex-wrap gap-2">
       <.documents_counts stat={@documents_count} />
       <.users_counts stat={@users_count} />
     </section>
