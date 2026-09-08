@@ -6,33 +6,17 @@ defmodule TeacherCoopWeb.AdminLive.DocumentsCountLive do
   def render(assigns) do
     ~H"""
     <section class="ml-8 flex flex-row flex-wrap gap-2">
-      <.stat_card
-        title={gettext("Documents")}
-        what={gettext("user")}
-        stat={@documents_count}
-        icon="hero-document"
-        sub_title={gettext("past 7 days")}
-      />
-      <.stat_card
-        title={gettext("User Count")}
-        what={gettext("user")}
-        stat={@users_count}
-        sub_title="past 7 days"
-        icon="hero-users"
-      />
+      <.documents_counts stat={@documents_count} />
+      <.users_counts stat={@users_count} />
     </section>
     """
   end
 
-  attr :title, :string, required: true
-  attr :sub_title, :string, required: true
   attr :stat, Phoenix.LiveView.AsyncResult, required: true
-  attr :icon, :string
-  attr :what, :string
 
-  def stat_card(assigns) do
+  def documents_counts(assigns) do
     ~H"""
-    <div class="flex-1">
+    <div id="documents-counts" class="flex-1">
       <.async_result :let={stat} assign={@stat}>
         <:loading>
           <span class="skeleton w-[384px] h-[128px]"></span>
@@ -40,14 +24,41 @@ defmodule TeacherCoopWeb.AdminLive.DocumentsCountLive do
         <:failed :let={_error}>error</:failed>
         <div class="flex flex-row justify-between card bg-base-200 shadow-md p-[16px] h-[128px] items-center">
           <div class="flex flex-col flex-4 gap-[8px]">
-            <div class="text-md">{@title}</div>
+            <div class="text-md">{gettext("Document")}</div>
             <div class="text-4xl">{stat.total}</div>
             <div if={stat.sub > 0}>
-              <span class="text-md">{stat.sub} {@what} {@sub_title}</span>
+              <span class="text-md">{stat.sub} {gettext(" new documents in the past 7 days")}</span>
             </div>
           </div>
           <div class="flex-1">
-            <.icon name={@icon} class="size-8" />
+            <.icon name="hero-document" class="size-8" />
+          </div>
+        </div>
+      </.async_result>
+    </div>
+    """
+  end
+
+  attr :stat, Phoenix.LiveView.AsyncResult, required: true
+
+  def users_counts(assigns) do
+    ~H"""
+    <div id="users-counts" class="flex-1">
+      <.async_result :let={stat} assign={@stat}>
+        <:loading>
+          <span class="skeleton w-[384px] h-[128px]"></span>
+        </:loading>
+        <:failed :let={_error}>error</:failed>
+        <div class="flex flex-row justify-between card bg-base-200 shadow-md p-[16px] h-[128px] items-center">
+          <div class="flex flex-col flex-4 gap-[8px]">
+            <div class="text-md">{gettext("Users")}</div>
+            <div class="text-4xl">{stat.total}</div>
+            <div if={stat.sub > 0}>
+              <span class="text-md">{stat.sub} {gettext("new users in the past 7 days.")}</span>
+            </div>
+          </div>
+          <div class="flex-1">
+            <.icon name="hero-users" class="size-8" />
           </div>
         </div>
       </.async_result>
