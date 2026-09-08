@@ -4,6 +4,8 @@ defmodule TeacherCoop.Dashboard do
   alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Accounts.User
 
+  alias TeacherCoop.Discovery.Search.Query
+
   def documents_count(scope) do
     true = Scope.is_admin?(scope)
     Repo.aggregate(Document, :count)
@@ -28,5 +30,17 @@ defmodule TeacherCoop.Dashboard do
     Document.Query.base()
     |> Document.Query.last_n_days(number_days)
     |> Repo.aggregate(:count)
+  end
+
+  def zero_results(n_days \\ 7) do
+    Query.group_by_last_n_days(n_days)
+    |> Query.where_zero_results()
+    |> Repo.all()
+  end
+
+  def failed_results(n_days \\ 7) do
+    Query.group_by_last_n_days(n_days)
+    |> Query.where_failed_state()
+    |> Repo.all()
   end
 end

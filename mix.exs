@@ -103,7 +103,8 @@ defmodule TeacherCoop.MixProject do
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:oban, "~> 2.23"},
       {:oban_web, "~> 2.11"},
-      {:igniter, "~> 0.5", only: [:dev]}
+      {:igniter, "~> 0.5", only: [:dev]},
+      {:vega_lite, "~> 0.1.11"}
     ]
   end
 
