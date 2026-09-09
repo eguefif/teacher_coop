@@ -22,7 +22,7 @@ defmodule TeacherCoopWeb.AdminLive.DocumentsCountLive do
           <span class="skeleton w-[384px] h-[128px]"></span>
         </:loading>
         <:failed :let={_error}>error</:failed>
-        <div class="flex flex-row justify-between card bg-base-200 shadow-md p-[16px] h-[128px] items-center">
+        <div class="flex flex-row justify-between rounded-xl bg-base-200 shadow-md p-[16px] h-[128px] items-center">
           <div class="flex flex-col flex-4 gap-[8px]">
             <div class="text-md">{gettext("Document")}</div>
             <div class="text-4xl">{stat.total}</div>
