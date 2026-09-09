@@ -34,7 +34,19 @@ defmodule TeacherCoop.Discovery.Search.Query do
     })
   end
 
-  def group_by_date(query) do
+  def group_by_date(query \\ base()) do
     group_by(query, [s], [fragment("date")])
+  end
+
+  def group_by_position(query \\ base()) do
+    select(query, [s], %{
+      position: s.success_click_position,
+      count: fragment("count(?) as count", s.success_click_position)
+    })
+    |> group_by([s], s.success_click_position)
+  end
+
+  def where_download_true(query \\ base()) do
+    where(query, [s], s.state == "success")
   end
 end

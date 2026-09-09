@@ -8,6 +8,7 @@ defmodule TeacherCoop.Repo.Migrations.CreateSearches do
       add :search_session_id, references(:search_sessions, on_delete: :nothing)
       add :hits_count, :integer
       add :success_click_position, :integer
+      add :success_nature, :string
       add :dwell_time, :integer
       add :document_index, :string
       add :state, :string

@@ -155,10 +155,10 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Mark a search as successfull.
   """
-  def mark_search_as_succes(%Search{} = search, click_position, scope, search_session) do
+  def mark_search_as_succes(%Search{} = search, click_position, scope, search_session, reason) do
     search
     |> update_search(
-      %{success_click_position: click_position, state: "success"},
+      %{success_click_position: click_position, state: "success", reason: reason},
       scope,
       search_session
     )

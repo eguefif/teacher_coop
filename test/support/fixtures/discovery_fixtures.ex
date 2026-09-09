@@ -16,7 +16,7 @@ defmodule TeacherCoop.DiscoveryFixtures do
 
     {:ok, search} =
       %Search{}
-      |> Search.changeset(attrs, scope, search_session)
+      |> Search.changeset(attrs, search_session, scope)
       |> Repo.insert()
 
     search

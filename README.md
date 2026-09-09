@@ -53,8 +53,10 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
+- [ ] Remove search session
+- [x] Refactor search to have an indicator to tell what success. Add a success type
 - [ ] Dashboard
-    - [ ] ADd an indicator on search retries
+    - [ ] Add an indicator on search retries
     - [x] Add a graph with evolution of zero result count
     - [ ] Add a graph for successful searches
     - [ ] Add a graph on how many searches

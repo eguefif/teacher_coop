@@ -18,6 +18,16 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
             id={@searches_count_id}
           />
         </.async_result>
+        <.async_result :let={click_position_data} assign={@click_position_data}>
+          <:loading><div class="skeleton" /></:loading>
+          <:failed>{gettext("Failed to retrieve data")}</:failed>
+          <.live_component
+            module={TeacherCoopWeb.AdminLive.BarGraph}
+            title={gettext("Click position")}
+            data={click_position_data}
+            id={@click_position_id}
+          />
+        </.async_result>
       </div>
       <div class="flex flex-row gap-4 justify-around">
         <.async_result :let={zero_results_data} assign={@zero_results_data}>
@@ -52,6 +62,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
      |> assign(:graph_zero_result_id, "graph-zero-result")
      |> assign(:graph_failed_result_id, "graph-failed-result")
      |> assign(:searches_count_id, "graph-search-count")
+     |> assign(:click_position_id, "graph-click-position")
      |> assign_async(:zero_results_data, fn ->
        {:ok,
         %{
@@ -79,6 +90,17 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
             Dashboard.searches_count(7)
             |> Enum.map(fn elem ->
               %{x: elem.date, y: elem.count}
+            end)
+        }}
+     end)
+     |> assign_async(:click_position_data, fn ->
+       {:ok,
+        %{
+          click_position_data:
+            Dashboard.click_position(7)
+            |> Enum.sort(&(&1 >= &2))
+            |> Enum.map(fn elem ->
+              %{x: elem.position, y: elem.count}
             end)
         }}
      end)}

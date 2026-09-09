@@ -48,4 +48,12 @@ defmodule TeacherCoop.Dashboard do
     Query.group_by_last_n_days(n_days)
     |> Repo.all()
   end
+
+  def click_position(n_days \\ 7) do
+    Query.base()
+    |> Query.last_n_days(n_days)
+    |> Query.where_download_true()
+    |> Query.group_by_position()
+    |> Repo.all()
+  end
 end
