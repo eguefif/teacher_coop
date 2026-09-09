@@ -54,12 +54,16 @@ To do that, we might want to test different configuration on different instance.
 ## TODO
 ### Next
 - [ ] Dashboard
-    - [ ] Add a graph with evolution of zero result count
+    - [ ] ADd an indicator on search retries
+    - [x] Add a graph with evolution of zero result count
+    - [ ] Add a graph for successful searches
+    - [ ] Add a graph on how many searches
+    - [ ] Add an indicator on search terms
+    - [ ] Add an idicator on search terms that returns zero results
 
 - [ ] Refactor search
     - [x] Add two tables: SearchSession, Search (see Obsidian)
-    - [ ] Create search session when initialization
-    - [ ] Have a task to timeout search when user not active
+    - [ ] Remove seearhsession table, just create a search_session id to manage to keep all searches in one session ( Before check search retries)
 
 - [ ] Improve data gathering for search
     - [ ] Check user flow, what does it do.

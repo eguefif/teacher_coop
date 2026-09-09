@@ -43,4 +43,9 @@ defmodule TeacherCoop.Dashboard do
     |> Query.where_failed_state()
     |> Repo.all()
   end
+
+  def searches_count(n_days \\ 7) do
+    Query.group_by_last_n_days(n_days)
+    |> Repo.all()
+  end
 end
