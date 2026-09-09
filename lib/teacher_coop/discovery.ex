@@ -9,39 +9,8 @@ defmodule TeacherCoop.Discovery do
   alias TeacherCoop.Repo
   alias TeacherCoop.SearchRepo.SearchDocuments
 
-  alias TeacherCoop.Discovery.{Search, SearchSession}
+  alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Library
-
-  @doc """
-  Create one search session in `searching` state.
-  A Session is used to track a user over multiple search queries.
-  """
-  def create_search_session(scope) do
-    with {:ok, session} <-
-           %SearchSession{}
-           |> SearchSession.changeset(%{state: "searching"}, scope)
-           |> Repo.insert() do
-      {:ok,
-       session
-       |> Repo.preload(:user)}
-    end
-  end
-
-  @doc """
-  Get one search session or raise an exception.
-  """
-  def get_search_session!(id) do
-    Repo.get!(SearchSession, id)
-    |> Repo.preload(:user)
-  end
-
-  @doc """
-  Returns a %SearchSession{}` `Changeset`.
-  """
-  def change_search_session(attrs \\ %{}, scope) do
-    %SearchSession{}
-    |> SearchSession.changeset(attrs, scope)
-  end
 
   @doc """
   Get one search or raise an exception.
@@ -63,27 +32,27 @@ defmodule TeacherCoop.Discovery do
   Create a search.
   A search is one query typed by the user on the search engine page.
   """
-  def create_search(%SearchSession{} = search_session, attrs \\ %{}, scope) do
+  def create_search(attrs \\ %{}, scope) do
     %Search{}
-    |> Search.changeset(attrs, search_session, scope)
+    |> Search.changeset(attrs, scope)
     |> Repo.insert()
   end
 
   @doc """
   Update a search
   """
-  def update_search(%Search{} = search, attrs \\ %{}, scope, search_session) do
+  def update_search(%Search{} = search, attrs \\ %{}, scope) do
     search
-    |> Search.changeset(attrs, search_session, scope)
+    |> Search.changeset(attrs, scope)
     |> Repo.update()
   end
 
   @doc """
   Returns a %Search{}` `Changeset`.
   """
-  def change_search(search_session, attrs \\ %{}, scope) do
+  def change_search(attrs \\ %{}, scope) do
     %Search{}
-    |> Search.changeset(attrs, search_session, scope)
+    |> Search.changeset(attrs, scope)
   end
 
   @doc """
@@ -92,20 +61,9 @@ defmodule TeacherCoop.Discovery do
   def handle_search(search_terms \\ "", scope, search_session \\ nil)
 
   def handle_search(search_terms, scope, search_session) when search_terms == "" do
-    {:error, search_session, change_search(search_session, %{search_terms: search_terms}, scope),
-     [], []}
-  end
-
-  def handle_search(
-        search_terms,
-        scope,
-        search_session
-      )
-      when is_binary(search_terms) and is_nil(search_session) do
-    {:ok, search_session} = create_search_session(scope)
-    {search, db_hits, engine_hits} = do_search(search_session, search_terms, scope)
-
-    {:ok, search_session, search, db_hits, engine_hits}
+    {:error,
+     change_search(%{search_terms: search_terms, search_session_id: search_session}, scope), [],
+     []}
   end
 
   def handle_search(
@@ -116,7 +74,7 @@ defmodule TeacherCoop.Discovery do
       when is_binary(search_terms) do
     {search, db_hits, engine_hits} = do_search(search_session, search_terms, scope)
 
-    {:ok, search_session, search, db_hits, engine_hits}
+    {:ok, search, db_hits, engine_hits}
   end
 
   defp do_search(search_session, search_terms, scope) do
@@ -131,10 +89,11 @@ defmodule TeacherCoop.Discovery do
   defp do_create_search(search_terms, db_hits_count, search_session, scope) do
     search_attrs = %{
       search_terms: search_terms,
-      hits_count: db_hits_count
+      hits_count: db_hits_count,
+      search_session_id: search_session
     }
 
-    create_search(search_session, search_attrs, scope)
+    create_search(search_attrs, scope)
   end
 
   defp get_db_document_from_engine_hits(engine_hits) do
@@ -158,9 +117,13 @@ defmodule TeacherCoop.Discovery do
   def mark_search_as_succes(%Search{} = search, click_position, scope, search_session, reason) do
     search
     |> update_search(
-      %{success_click_position: click_position, state: "success", reason: reason},
-      scope,
-      search_session
+      %{
+        success_click_position: click_position,
+        state: "success",
+        reason: reason,
+        search_session_id: search_session
+      },
+      scope
     )
   end
 end

@@ -216,7 +216,8 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     {:ok,
      socket
      |> assign_new(:current_scope, fn -> scope end)
-     |> assign(:form, to_form(Discovery.change_search(nil, %{search_terms: ""}, scope)))
+     |> assign(:search_session_id, Ecto.UUID.generate(version: 7))
+     |> assign(:form, to_form(Discovery.change_search(%{search_terms: ""}, scope)))
      |> assign(:preview_file, nil)
      |> assign(results: [])}
   end
@@ -225,54 +226,26 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   def handle_event(
         "trigger-search",
         %{"search_terms" => search_terms},
-        %{assigns: %{search_session: search_session}} = socket
+        %{assigns: %{search_session_id: search_session_id}} = socket
       ) do
     scope = socket.assigns.current_scope
 
-    case Discovery.handle_search(search_terms, scope, search_session) do
-      {:error, search_session, changeset, hits, _db_hits} ->
+    case Discovery.handle_search(search_terms, scope, search_session_id) do
+      {:error, changeset, hits, _db_hits} ->
         {:noreply,
          socket
          |> assign(:results, hits)
-         |> assign(:search_session, search_session)
          |> assign(:search, nil)
          |> assign(:form, to_form(changeset))}
 
-      {:ok, search_session, search, hits, _} ->
+      {:ok, search, hits, _} ->
         {:noreply,
          socket
          |> assign(:results, hits)
-         |> assign(:search_session, search_session)
          |> assign(:search, search)
          |> assign(
            :form,
-           to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope))
-         )}
-    end
-  end
-
-  @impl true
-  def handle_event("trigger-search", %{"search_terms" => search_terms}, socket) do
-    scope = socket.assigns.current_scope
-
-    case Discovery.handle_search(search_terms, scope) do
-      {:error, search_session, changeset, hits, _db_hits} ->
-        {:noreply,
-         socket
-         |> assign(:results, hits)
-         |> assign(:search_session, search_session)
-         |> assign(:search, nil)
-         |> assign(:form, to_form(changeset))}
-
-      {:ok, search_session, search, hits, _} ->
-        {:noreply,
-         socket
-         |> assign(:results, hits)
-         |> assign(:search_session, search_session)
-         |> assign(:search, search)
-         |> assign(
-           :form,
-           to_form(Discovery.change_search(nil, %{search_terms: search_terms}, scope))
+           to_form(Discovery.change_search(%{search_terms: search_terms}, scope))
          )}
     end
   end
@@ -293,13 +266,12 @@ defmodule TeacherCoopWeb.SearchLive.Search do
         socket.assigns.search,
         String.to_integer(click_position),
         socket.assigns.current_scope,
-        socket.assigns.search_session,
+        socket.assigns.search_session_id,
         "download"
       )
 
     {:noreply,
      socket
-     |> assign(:search_session, socket.assigns.search_session)
      |> assign(:search, search)
      |> redirect(to: redirect_link)}
   end
