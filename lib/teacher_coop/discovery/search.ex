@@ -13,6 +13,7 @@ defmodule TeacherCoop.Discovery.Search do
     field :hits_count, :integer
     field :state, :string
     field :success_click_position, :integer
+    field :success_nature, :string
     field :dwell_time, :integer
     field :document_index, :string
 
@@ -30,7 +31,8 @@ defmodule TeacherCoop.Discovery.Search do
       :state,
       :success_click_position,
       :dwell_time,
-      :document_index
+      :document_index,
+      :success_nature
     ]
 
     user_id = if user_scope, do: user_scope.user.id, else: nil

@@ -293,7 +293,8 @@ defmodule TeacherCoopWeb.SearchLive.Search do
         socket.assigns.search,
         String.to_integer(click_position),
         socket.assigns.current_scope,
-        socket.assigns.search_session
+        socket.assigns.search_session,
+        "download"
       )
 
     {:noreply,
