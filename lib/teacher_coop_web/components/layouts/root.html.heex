@@ -12,12 +12,16 @@
       (() => {
         const systemTheme = () => matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
+        const getTheme = (preference) => preference == "dark" ? "sunset" : "nord";
+
         const setTheme = (theme) => {
           if (theme === "system") {
+            const theme = getTheme(systemTheme());
             localStorage.removeItem("phx:theme");
-            document.documentElement.setAttribute("data-theme", systemTheme());
+            document.documentElement.setAttribute("data-theme", theme);
             document.documentElement.setAttribute("data-theme-source", "system");
           } else {
+            const theme = getTheme(theme);
             localStorage.setItem("phx:theme", theme);
             document.documentElement.setAttribute("data-theme", theme);
             document.documentElement.setAttribute("data-theme-source", "user");
