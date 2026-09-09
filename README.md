@@ -53,15 +53,21 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Remove search session
-- [x] Refactor search to have an indicator to tell what success. Add a success type
+- [ ] Setup db to work on snapshot for dashboard
+    - [ ] One materialized view for 7 days snapshot
+    - [ ] One materialized for the current window: refresh twice a day
+    - [ ] See if we need two for each: stats + words
+
 - [ ] Dashboard
     - [ ] Add an indicator on search retries
     - [x] Add a graph with evolution of zero result count
-    - [ ] Add a graph for successful searches
-    - [ ] Add a graph on how many searches
+    - [x] Add a graph for successful searches
+    - [x] Add a graph on how many searches
     - [ ] Add an indicator on search terms
     - [ ] Add an idicator on search terms that returns zero results
+    - [ ] Add stat on average time before success, 10/90 decils
+    - [ ] Show previous windows result close to the graph
+    - [ ] Should be able to parameters how long is the comparison window
 
 - [ ] Refactor search
     - [x] Add two tables: SearchSession, Search (see Obsidian)

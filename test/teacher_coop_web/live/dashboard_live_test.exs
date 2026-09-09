@@ -34,7 +34,7 @@ defmodule TeacherCoopWeb.DashboardTest do
         search_terms: "le petit prince"
       }
     ]
-    |> Enum.each(&DiscoveryFixtures.search_fixture(nil, nil, &1))
+    |> Enum.each(&DiscoveryFixtures.search_fixture(nil, &1))
   end
 
   defp create_users() do
