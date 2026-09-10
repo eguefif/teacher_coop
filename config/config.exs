@@ -10,8 +10,13 @@ import Config
 config :teacher_coop, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [default: 10, document_ingestion: 20],
+  queues: [default: 10, document_ingestion: 20, stats: 20],
   repo: TeacherCoop.Repo,
+  cron: [
+    crontab: [
+      {"0 0 * * *", TeacherCoop.Dashboard.Workers.PopulateWordsTableWorker}
+    ]
+  ],
   plugins: [
     # 7 days job retention
     {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 7},

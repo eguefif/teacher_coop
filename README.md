@@ -57,6 +57,10 @@ To do that, we might want to test different configuration on different instance.
     - [ ] One materialized view for 7 days snapshot
     - [ ] One materialized for the current window: refresh twice a day
     - [ ] See if we need two for each: stats + words
+    - [ ] Add stop words to the french configuration: it keep word like le la
+    - [ ] Add a test for the job
+    - [ ] Add indicators for the words
+    - [ ] Add zero results equivalent for words
 
 - [ ] Dashboard
     - [x] Add a graph with evolution of zero result count
