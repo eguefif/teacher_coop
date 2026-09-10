@@ -10,7 +10,7 @@ import Config
 config :teacher_coop, Oban,
   engine: Oban.Engines.Basic,
   notifier: Oban.Notifiers.Postgres,
-  queues: [default: 10, document_ingestion: 20],
+  queues: [default: 10, document_ingestion: 20, stats: 20],
   repo: TeacherCoop.Repo,
   plugins: [
     # 7 days job retention

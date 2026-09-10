@@ -9,8 +9,17 @@ defmodule TeacherCoop.DiscoveryFixtures do
 
   @doc """
   Generate a persisted search record owned by the given scope's user.
+
+  Pass `:inserted_at` (a `DateTime`) in `attrs` to backdate the record; the
+  auto-managed timestamps would otherwise force it to `now`. This is handy for
+  building a history of searches spread over several days.
   """
   def search_fixture(scope, attrs \\ %{}) do
+    {inserted_at, attrs} =
+      attrs
+      |> Map.new()
+      |> Map.pop(:inserted_at)
+
     attrs =
       Enum.into(attrs, %{
         search_terms: "some search terms",
@@ -22,6 +31,14 @@ defmodule TeacherCoop.DiscoveryFixtures do
       |> Search.changeset(attrs, scope)
       |> Repo.insert()
 
-    search
+    case inserted_at do
+      nil ->
+        search
+
+      %DateTime{} = inserted_at ->
+        search
+        |> Ecto.Changeset.change(inserted_at: DateTime.truncate(inserted_at, :second))
+        |> Repo.update!()
+    end
   end
 end

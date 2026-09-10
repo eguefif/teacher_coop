@@ -12,6 +12,12 @@ defmodule TeacherCoop.Discovery do
   alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Library
 
+  def get_search_by_date!(%Date{} = date) do
+    Search.Query.base()
+    |> Search.Query.where_date(date)
+    |> Repo.all()
+  end
+
   @doc """
   Get a search by it search terms.
   Params: `search_terms: string`
