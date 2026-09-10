@@ -75,10 +75,10 @@ defmodule TeacherCoopWeb.AdminLive.BarGraph do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:spec, make_graph(assigns.data, assigns.title) |> Jason.encode!())}
+     |> assign(:spec, make_graph(assigns.data, assigns.title, assigns.orient) |> Jason.encode!())}
   end
 
-  defp make_graph(data, title) do
+  defp make_graph(data, title, orient) do
     Vl.new(
       height: 100,
       background: "transparent",
@@ -93,7 +93,7 @@ defmodule TeacherCoopWeb.AdminLive.BarGraph do
     )
     |> Vl.config(axis: [grid: false], view: [stroke: nil])
     |> Vl.data_from_values(data)
-    |> Vl.mark(:bar, filled: true, width: [band: 0.8])
+    |> define_mark(orient)
     |> Vl.encode_field(:x, "x",
       type: :ordinal,
       axis: [title: nil, label_overlap: true],
@@ -101,5 +101,15 @@ defmodule TeacherCoopWeb.AdminLive.BarGraph do
     )
     |> Vl.encode_field(:y, "y", type: :quantitative, axis: [title: nil])
     |> Vl.to_spec()
+  end
+
+  defp define_mark(context, :vertical) do
+    context
+    |> Vl.mark(:bar, filled: true, width: [band: 0.8], orient: :vertical)
+  end
+
+  defp define_mark(context, :horizontal) do
+    context
+    |> Vl.mark(:bar, filled: true, height: [band: 0.8], orient: :horizontal)
   end
 end
