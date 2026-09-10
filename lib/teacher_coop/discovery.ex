@@ -13,14 +13,6 @@ defmodule TeacherCoop.Discovery do
   alias TeacherCoop.Library
 
   @doc """
-  Get one search or raise an exception.
-  """
-  def get_search!(id) do
-    Repo.get!(Search, id)
-    |> Repo.preload(:user)
-  end
-
-  @doc """
   Get a search by it search terms.
   Params: `search_terms: string`
   """
@@ -32,7 +24,7 @@ defmodule TeacherCoop.Discovery do
   Create a search.
   A search is one query typed by the user on the search engine page.
   """
-  def create_search(attrs \\ %{}, scope) do
+  def create_search(%{} = attrs, scope) do
     %Search{}
     |> Search.changeset(attrs, scope)
     |> Repo.insert()

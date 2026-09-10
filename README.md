@@ -59,12 +59,13 @@ To do that, we might want to test different configuration on different instance.
     - [ ] See if we need two for each: stats + words
 
 - [ ] Dashboard
-    - [ ] Add an indicator on search retries
     - [x] Add a graph with evolution of zero result count
     - [x] Add a graph for successful searches
     - [x] Add a graph on how many searches
+    - [ ] Add an indicator on search terms by click position average
     - [ ] Add an indicator on search terms
-    - [ ] Add an idicator on search terms that returns zero results
+    - [ ] Add an indicator on search terms that returns zero results
+    - [ ] Add an indicator on search retries
     - [ ] Add stat on average time before success, 10/90 decils
     - [ ] Show previous windows result close to the graph
     - [ ] Should be able to parameters how long is the comparison window
