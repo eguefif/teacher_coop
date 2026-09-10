@@ -35,6 +35,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchTermsStatsLive do
           click_position_data:
             Dashboard.zero_results_by_search_terms(7)
             |> Enum.sort(&(&1 >= &2))
+            |> IO.inspect()
             |> Enum.map(fn elem ->
               %{x: elem.position, y: elem.count}
             end)

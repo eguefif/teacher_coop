@@ -17,6 +17,7 @@ defmodule TeacherCoop.Repo.Seeds.SearchSeed do
   import Ecto.Query, warn: false
 
   alias TeacherCoop.Discovery.Search
+  alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Repo
 
   # How far back the zero-result searches go (today included), and how many we
@@ -35,6 +36,7 @@ defmodule TeacherCoop.Repo.Seeds.SearchSeed do
   def seed(user) do
     seed_sample_searches(user)
     seed_zero_result_searches(user)
+    seed_word_count()
   end
 
   @doc """
@@ -321,5 +323,30 @@ defmodule TeacherCoop.Repo.Seeds.SearchSeed do
       "problèmes à étapes cm1",
       "sens de la division cm1"
     ]
+  end
+
+  def seed_word_count() do
+    {start_day, last_day} = get_first_and_last_inserted_at_from_searches()
+    TeacherCoop.Dashboard.WordStats.populate_words_count("french", start_day, last_day)
+  end
+
+  def get_first_and_last_inserted_at_from_searches() do
+    first_date =
+      from(s in Search,
+        select: s.inserted_at,
+        order_by: [asc: s.inserted_at],
+        limit: 1
+      )
+      |> Repo.one()
+
+    last_date =
+      from(s in Search,
+        select: s.inserted_at,
+        order_by: [desc: s.inserted_at],
+        limit: 1
+      )
+      |> Repo.one()
+
+    {first_date, last_date}
   end
 end
