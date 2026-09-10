@@ -13,9 +13,15 @@ defmodule TeacherCoopWeb.AdminLive.DashboardLive do
           id={@documents_count_component_id}
           current_scope={@current_scope}
         />
+        <div class="divider"></div>
         <.live_component
           module={TeacherCoopWeb.AdminLive.SearchGraphsLive}
           id={@search_graphs_id}
+        />
+        <div class="divider"></div>
+        <.live_component
+          module={TeacherCoopWeb.AdminLive.SearchTermsStatsLive}
+          id={@search_terms_stats_id}
         />
       </div>
     </Layouts.app>
@@ -26,6 +32,7 @@ defmodule TeacherCoopWeb.AdminLive.DashboardLive do
     {:ok,
      socket
      |> assign(:documents_count_component_id, "documents-count")
+     |> assign(:search_terms_stats_id, "search-terms-stats-id")
      |> assign(:search_graphs_id, "search-graphs")}
   end
 end

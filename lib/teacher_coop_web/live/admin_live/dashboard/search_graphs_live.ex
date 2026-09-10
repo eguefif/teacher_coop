@@ -25,6 +25,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
             module={TeacherCoopWeb.AdminLive.BarGraph}
             title={gettext("Click position")}
             data={click_position_data}
+            orient={:vertical}
             id={@click_position_id}
           />
         </.async_result>
