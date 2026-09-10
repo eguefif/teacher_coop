@@ -32,24 +32,27 @@ defmodule TeacherCoop.Dashboard do
     |> Repo.aggregate(:count)
   end
 
-  def zero_results(n_days \\ 7) do
-    Query.group_by_last_n_days(n_days)
+  def zero_results(n_days) do
+    Query.base()
+    |> Query.group_by_last_n_days(n_days)
     |> Query.where_zero_results()
     |> Repo.all()
   end
 
-  def failed_results(n_days \\ 7) do
-    Query.group_by_last_n_days(n_days)
+  def failed_results(n_days) do
+    Query.base()
+    |> Query.group_by_last_n_days(n_days)
     |> Query.where_failed_state()
     |> Repo.all()
   end
 
-  def searches_count(n_days \\ 7) do
-    Query.group_by_last_n_days(n_days)
+  def searches_count(n_days) do
+    Query.base()
+    |> Query.group_by_last_n_days(n_days)
     |> Repo.all()
   end
 
-  def click_position(n_days \\ 7) do
+  def click_position(n_days) do
     Query.base()
     |> Query.last_n_days(n_days)
     |> Query.where_download_true()
