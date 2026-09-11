@@ -11,6 +11,10 @@ defmodule TeacherCoop.Curriculum do
 
   alias TeacherCoop.Curriculum.Objective
 
+  def list_objectives!() do
+    Repo.all(Objective)
+  end
+
   def search_objectives(input) when is_bitstring(input) do
     TeacherCoop.SearchRepo.SearchObjectives.search(input)
   end
