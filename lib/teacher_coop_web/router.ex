@@ -22,10 +22,12 @@ defmodule TeacherCoopWeb.Router do
     pipe_through :browser
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", TeacherCoopWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", TeacherCoopWeb do
+    pipe_through :api
+
+    resources "/curriculum", CurriculumController, only: [:index]
+    resources "/year", YearController, only: [:index]
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:teacher_coop, :dev_routes) do
