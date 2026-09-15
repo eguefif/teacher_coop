@@ -43,4 +43,17 @@ defmodule TeacherCoop.Dashboard.WordCount.Query do
   def select_sum_count(query) do
     select(query, [w], sum(w.count))
   end
+
+  @spec top_search_words(Ecto.Query.t(), integer()) :: Ecto.Query.t()
+  def top_search_words(query, l \\ 15) do
+    query
+    |> order_by([w], desc: w.frequency)
+    |> limit(^l)
+  end
+
+  @spec where_no_results(Ecto.Query.t()) :: Ecto.Query.t()
+  def where_no_results(query) do
+    query
+    |> where([w], w.zero_result_count == 0)
+  end
 end

@@ -59,8 +59,4 @@ defmodule TeacherCoop.Dashboard do
     |> Query.group_by_position()
     |> Repo.all()
   end
-
-  def count_by_search_terms(n_days) do
-    click_position(n_days)
-  end
 end
