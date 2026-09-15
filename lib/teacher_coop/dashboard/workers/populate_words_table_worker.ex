@@ -19,5 +19,6 @@ defmodule TeacherCoop.Dashboard.Workers.PopulateWordsTableWorker do
     start_day = DateTime.new!(day, ~T[00:00:00], "Etc/UTC")
     end_day = DateTime.new!(Date.add(day, 1), ~T[00:00:00], "Etc/UTC")
     WordStats.populate_words_count("french", start_day, end_day)
+    # WordStats.populate_zero_result_words_count("french", start_day, end_day)
   end
 end

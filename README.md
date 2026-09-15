@@ -53,10 +53,10 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Refactor to rule out vega-lite, the bundle is too big. Try with contex quickly and see how big is the bundle
 - [ ] Words stat 
+    - [ ] Add zero results equivalent for words.
+    - [ ] Add a graph for zero results word.
     - [ ] Add indicator to detect when a popular words results count droped
-    - [ ] Add zero results equivalent for words
     - [ ] Add a test for the job
 - [ ] Setup db to work on snapshot for dashboard
     - [ ] One materialized view for 7 days snapshot

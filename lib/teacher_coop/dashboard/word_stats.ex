@@ -9,7 +9,8 @@ defmodule TeacherCoop.Dashboard.WordStats do
   alias TeacherCoop.Discovery.Search
 
   @doc """
-  Populate the word_counts table.
+  Populate the word_counts table with search terms and their count.
+  Count is how many occurences of the word we have in searches.
   """
   @spec populate_words_count(String.t(), DateTime.t(), DateTime.t()) :: :error | :ok
   def populate_words_count(language, %DateTime{} = start, %DateTime{} = end_date) do
@@ -17,6 +18,23 @@ defmodule TeacherCoop.Dashboard.WordStats do
       Search.Query.base_with_tsvector(language)
       |> Search.Query.where_inserted_between(start, end_date)
       |> Search.Query.group_by_lexeme_and_inserted_at_date()
+
+    {result, _} =
+      Repo.insert_all(WordCount, search_query,
+        conflict_target: [:word, :date],
+        on_conflict: WordCount.Query.on_conflict()
+      )
+
+    if is_nil(result), do: :error, else: :ok
+  end
+
+  @spec populate_zero_result_words_count(String.t(), DateTime.t(), DateTime.t()) :: :error | :ok
+  def populate_zero_result_words_count(language, %DateTime{} = start, %DateTime{} = end_date) do
+    search_query =
+      Search.Query.base_with_tsvector(language)
+      |> Search.Query.where_inserted_between(start, end_date)
+      |> Search.Query.group_by_lexeme_and_inserted_at_date()
+      |> Search.Query.where_zero_results()
 
     {result, _} =
       Repo.insert_all(WordCount, search_query,
