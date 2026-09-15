@@ -104,7 +104,7 @@ defmodule TeacherCoop.MixProject do
       {:oban, "~> 2.24.1"},
       {:oban_web, "~> 2.11"},
       {:igniter, "~> 0.5", only: [:dev]},
-      {:vega_lite, "~> 0.1.11"}
+      {:contex, "~> 0.5.0"}
     ]
   end
 
