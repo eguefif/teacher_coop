@@ -12,7 +12,12 @@ defmodule TeacherCoop.Dashboard.WordCount.Query do
 
   def on_conflict() do
     from(w in WordCount,
-      update: [set: [count: fragment("? + EXCLUDED.count", w.count)]]
+      update: [
+        set: [
+          frequency: fragment("? + EXCLUDED.frequency", w.frequency),
+          zero_result_count: fragment("? + EXCLUDED.zero_result_count", w.zero_result_count)
+        ]
+      ]
     )
   end
 
