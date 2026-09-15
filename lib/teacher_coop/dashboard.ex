@@ -60,7 +60,7 @@ defmodule TeacherCoop.Dashboard do
     |> Repo.all()
   end
 
-  def zero_results_by_search_terms(n_days) do
-    click_position(n_days)
+  def count_by_search_terms(n_days) do
+    WordStats.counts_by_word()
   end
 end

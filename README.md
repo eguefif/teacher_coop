@@ -53,14 +53,16 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
+- [ ] Refactor to rule out vega-lite, the bundle is too big. Try with contex quickly and see how big is the bundle
+- [ ] Words stat 
+    - [ ] Add indicator to detect when a popular words results count droped
+    - [ ] Add zero results equivalent for words
+    - [ ] Add a test for the job
 - [ ] Setup db to work on snapshot for dashboard
     - [ ] One materialized view for 7 days snapshot
     - [ ] One materialized for the current window: refresh twice a day
     - [ ] See if we need two for each: stats + words
     - [ ] Add stop words to the french configuration: it keep word like le la
-    - [ ] Add a test for the job
-    - [ ] Add indicators for the words
-    - [ ] Add zero results equivalent for words
 
 - [ ] Dashboard
     - [x] Add a graph with evolution of zero result count
