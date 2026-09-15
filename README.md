@@ -53,11 +53,24 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
+- [x] Reorganize todo: needs to move them in subsection and keep next for what I want to do
+- [x] Finish typespec and documentation: use Github to check all files
+- [ ] Make every module tests above 90% coverage
+
+### CI/CD
+- [ ] Github actions are not working, make it work
+- [ ] Have a complete CI/CD up and working with a DNS
+    - [ ] Configure DB
+    - [ ] Configure Meilisearch
+    - [ ] Create a GH that trigger something on the server and pull new repo
+
+
+### Search monitoring
 - [ ] Words stat 
-    - [ ] Add zero results equivalent for words.
-    - [ ] Add a graph for zero results word.
-    - [ ] Add indicator to detect when a popular words results count droped
-    - [ ] Add a test for the job
+    - [x] Add zero results equivalent for words.
+    - [x] Add a table for popular search terms
+    - [ ] Add a new row in table for popular search terms: compared with the last month average
+    - [ ] Add tests (check with --cover)
 - [ ] Setup db to work on snapshot for dashboard
     - [ ] One materialized view for 7 days snapshot
     - [ ] One materialized for the current window: refresh twice a day
@@ -87,12 +100,6 @@ To do that, we might want to test different configuration on different instance.
     - [ ] Add a cron task that mark search as timeout at some point when there is no
         activity
 
-- [ ] Liveview search
-    - [ ] Debounce update search
-    - [ ] Add a suggestion search ? This would need a new index and store queries by popularity
-    - [ ] When clicking on a document: return to search, result should still be here: keep alive
-    - [ ] WHen clicking on a document: should be able to click download all and mark search as success
-
 - [ ] Think of a way to create A/B testing
     - [ ] At the moment, index uid is hardcoded, take the result of get_index_test_a_b
         When no test, test the regular one, other else, random between regular and document_b
@@ -102,6 +109,12 @@ To do that, we might want to test different configuration on different instance.
     - [ ] The new test AB should allow the user to define configuration to use for test a an test b.
     - [ ] Test should have a default duration of 7 days.
 
+### Search 
+- [ ] Liveview search
+    - [ ] Debounce update search
+    - [ ] Add a suggestion search ? This would need a new index and store queries by popularity
+    - [ ] When clicking on a document: return to search, result should still be here: keep alive
+    - [ ] WHen clicking on a document: should be able to click download all and mark search as success
 
 - [ ]Improve search result with accordeon
     - [x] Add filepaths in Meilisearch
@@ -115,6 +128,11 @@ To do that, we might want to test different configuration on different instance.
 	- [ ] Add a pedagogy style: standard, Montessori, Institutionnel, Freinet, alternative
 	- [ ] Add a public target: country, city, REP/REP+, Autiste, (find more categories) there can be several of them
 
+
+### SearchRepo behavior
+
+ - [ ] We need to define a behavior for our SearchRepo
+ - [ ] Mock that SearchRepo for test
 
 ### List
 - [ ] Document creation: generate a document file in pdf that will be shiped with download all
@@ -148,3 +166,14 @@ To do that, we might want to test different configuration on different instance.
 - [ ] We add a Meilisearch client in application that we don't use in SearchRepo: make it consistent.
 
 - [ ] Add a field admin in user.
+
+### Schola API
+
+This API is consumed by the Schola app which is a local first program for teacher. This api needs
+a way to get the school calendar each year with holidays and periode start and end day. It also needs
+to get the curriculum.
+
+- [ ] Add tests for new endpoint: year / curriculum
+- [ ] Add a table school calendar that I can edit from the admin to replace hardcoded value.
+- [ ] Think on how to handle curriculum update.
+- [ ] Maybe add an endpoint that list all the curriculum years, if there is a new one, Schola will pull the new year. It can compares with its own database.

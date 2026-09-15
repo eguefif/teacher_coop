@@ -2,6 +2,15 @@ defmodule TeacherCoop.Library.File do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t :: %__MODULE__{
+          id: integer() | nil,
+          filename: String.t(),
+          filepath: String.t(),
+          format: String.t(),
+          document_id: integer() | nil,
+          document: TeacherCoop.Library.Document.t() | Ecto.Association.NotLoaded.t() | nil
+        }
+
   schema "files" do
     field :filename, :string
     field :filepath, :string

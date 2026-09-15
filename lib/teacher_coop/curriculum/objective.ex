@@ -4,6 +4,18 @@ defmodule TeacherCoop.Curriculum.Objective do
 
   alias TeacherCoop.Library
 
+  @type t() :: %__MODULE__{
+          id: integer() | nil,
+          year: integer(),
+          subject: String.t(),
+          grade: String.t(),
+          strand: String.t() | nil,
+          goal: String.t(),
+          document_objectives: [Library.DocumentObjective.t()] | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
   schema "objectives" do
     field :year, :integer
     field :subject, :string

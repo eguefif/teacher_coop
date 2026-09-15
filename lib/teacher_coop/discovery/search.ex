@@ -7,6 +7,22 @@ defmodule TeacherCoop.Discovery.Search do
 
   alias TeacherCoop.Accounts.User
 
+  @type t() :: %__MODULE__{
+          id: integer() | nil,
+          search_terms: String.t(),
+          hits_count: integer() | nil,
+          state: String.t() | nil,
+          success_click_position: integer() | nil,
+          success_nature: String.t() | nil,
+          dwell_time: integer() | nil,
+          document_index: String.t() | nil,
+          search_session_id: String.t() | nil,
+          user_id: integer() | nil,
+          user: TeacherCoop.Accounts.User.t() | Ecto.Association.NotLoaded.t() | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
   schema "searches" do
     field :search_terms, :string
     field :hits_count, :integer

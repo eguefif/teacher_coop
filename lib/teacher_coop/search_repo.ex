@@ -10,6 +10,7 @@ defmodule TeacherCoop.SearchRepo do
   To make test A/B, we set up two index with different configuration.
   To not make a test, we copy the settings from a to b.
   """
+  @spec get_document_index_test_a_b() :: String.t()
   def get_document_index_test_a_b() do
     "documents"
   end
@@ -17,6 +18,7 @@ defmodule TeacherCoop.SearchRepo do
   @doc """
   Get all fields from an index: returns an array
   """
+  @spec list_fields_for(String.t()) :: {:ok, [String.t()]} | :error
   def list_fields_for(indexuid) do
     client = get_client()
 
@@ -36,7 +38,8 @@ defmodule TeacherCoop.SearchRepo do
   Configure an index with the settings.
   Settings should be a map. The function will camelCase all the keys.
   """
-  def update_index_settings(index_name, %{} = settings) do
+  @spec update_index_settings(String.t(), map()) :: :ok | :error
+  def(update_index_settings(index_name, %{} = settings)) do
     settings =
       camelize_keys(settings)
 
@@ -51,6 +54,8 @@ defmodule TeacherCoop.SearchRepo do
   end
 
   @doc "Recursively convert map keys from snake_case to camelCase."
+  @spec camelize_keys(map() | list() | atom() | String.t()) ::
+          map() | list() | atom() | String.t()
   def camelize_keys(map) when is_map(map) and not is_struct(map) do
     Map.new(map, fn {k, v} -> {camelize_key(k), camelize_keys(v)} end)
   end
@@ -72,6 +77,7 @@ defmodule TeacherCoop.SearchRepo do
   @doc """
   This function returns the correct index_name depending on the environment
   """
+  @spec index_name(String.t()) :: String.t()
   def index_name(index) do
     if is_env_test(), do: index <> "_test", else: index
   end
@@ -90,6 +96,7 @@ defmodule TeacherCoop.SearchRepo do
   Takes an array of `%Task{}`.
   Returns `:ok` or `:error`.
   """
+  @spec wait_for_tasks([Meilisearch.Task.t()]) :: :ok | :error
   def wait_for_tasks(tasks) when is_list(tasks) do
     result =
       tasks
@@ -104,10 +111,12 @@ defmodule TeacherCoop.SearchRepo do
   Takes a `%Task{}`
   Returns `:ok` or `:error`.
   """
+  @spec wait_for_tasks(map()) :: :ok | :error
   def wait_for_task(%{"taskUid" => uid} = _) do
     wait_for_task_loop(uid)
   end
 
+  @spec wait_for_tasks(map()) :: :ok | :error
   def wait_for_task(%{taskUid: uid} = _) do
     wait_for_task_loop(uid)
   end
@@ -142,6 +151,7 @@ defmodule TeacherCoop.SearchRepo do
   This return the application based client in a prod/dev environnement.
   Returns a on the fly created client for test.
   """
+  @spec get_client() :: Meilisearch.Client.t()
   def get_client() do
     meilisearch_config = Application.fetch_env!(:teacher_coop, TeacherCoop.SearchRepo)
     masterkey = meilisearch_config |> List.keyfind(:masterkey, 0) |> elem(1)

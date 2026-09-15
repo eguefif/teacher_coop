@@ -26,10 +26,12 @@ defmodule TeacherCoop.MixProject do
           # Complex UI liveview that might change, better to test manually
           TeacherCoop.DocumentLive.Components,
           TeacherCoopWeb.FileController,
-          TeacherCoopWeb.DocumentController,
           TeacherCoopWeb.DocumentLive.Form,
+          TeacherCoopWeb.DocumentController,
           # Test fixtures
           TeacherCoop.AccountsFixtures,
+          TeacherCoop.DashboardFixtures,
+          TeacherCoop.DiscoveryFixtures,
           # Skip the following Phoenix Modules
           TeacherCoopWeb.CoreComponents,
           TeacherCoopWeb.ErrorHTML,
@@ -38,7 +40,8 @@ defmodule TeacherCoop.MixProject do
           TeacherCoopWeb.PageHTML,
           TeacherCoopWeb.PageController,
           TeacherCoopWeb.Router,
-          TeacherCoopWeb
+          TeacherCoopWeb,
+          TeacherCoop.Release
         ]
       ]
     ]
@@ -104,7 +107,8 @@ defmodule TeacherCoop.MixProject do
       {:oban, "~> 2.24.1"},
       {:oban_web, "~> 2.11"},
       {:igniter, "~> 0.5", only: [:dev]},
-      {:contex, "~> 0.5.0"}
+      {:contex, "~> 0.5.0"},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 

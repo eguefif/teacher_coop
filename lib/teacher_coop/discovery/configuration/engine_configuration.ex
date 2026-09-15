@@ -16,9 +16,21 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
 
   @proximity_precision_values ["byWord", "byAttribute"]
 
+  @type t() :: %__MODULE__{
+          id: integer() | nil,
+          engine: String.t() | nil,
+          user_id: integer() | nil,
+          # user: TeacherCoop.Accounts.User.t() | Ecto.Association.NotLoaded.t() | nil,
+          index: [Index.t()] | Ecto.Association.NotLoaded.t() | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t(),
+          config: __MODULE__.Config.t() | nil
+        }
+
   schema "engine_configurations" do
     field :name, :string
     field :engine, :string
+    # TODO: Should User be an association?
     field :user_id, :id
 
     has_many :index, Index, on_delete: :nilify_all
@@ -26,6 +38,22 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
     timestamps(type: :utc_datetime)
 
     embeds_one :config, Config, primary_key: false, on_replace: :update do
+      @type t() :: %__MODULE__{
+              facet_search: boolean(),
+              distinct_attribute: String.t() | nil,
+              proximity_precision: String.t(),
+              filterable_attributes: [String.t()],
+              searchable_attributes: [String.t()],
+              sortable_attributes: [String.t()],
+              stop_words: [String.t()],
+              non_separator_tokens: [String.t()],
+              separator_tokens: [String.t()],
+              dictionary: [String.t()],
+              ranking_rules: [String.t()],
+              embedders: __MODULE__.Embedders.t() | nil,
+              typo_tolerance: __MODULE__.TypoTolerance.t() | nil
+            }
+
       field :facet_search, :boolean, default: true
       field :distinct_attribute, :string, default: nil
       field :proximity_precision, :string, default: "byWord"
@@ -51,7 +79,17 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
         ]
 
       embeds_one :embedders, Embedders, primary_key: false, on_replace: :update do
+        @type t() :: %__MODULE__{
+                default: __MODULE__.Default.t() | nil
+              }
+
         embeds_one :default, Default, primary_key: false, on_replace: :update do
+          @type t() :: %__MODULE__{
+                  source: String.t(),
+                  model: String.t(),
+                  document_template: String.t()
+                }
+
           field :source, :string, default: "huggingFace"
           field :model, :string, default: "sentence-transformers/all-MiniLM-L6-v2"
 
@@ -76,12 +114,23 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
       end
 
       embeds_one :typo_tolerance, TypoTolerance, primary_key: false, on_replace: :update do
+        @type t() :: %__MODULE__{
+                enabled: boolean(),
+                disable_on_words: [String.t()],
+                min_word_size_for_typos: __MODULE__.MinWordSizeForTypos.t() | nil
+              }
+
         field :enabled, :boolean, default: true
         field :disable_on_words, {:array, :string}, default: []
 
         embeds_one :min_word_size_for_typos, MinWordSizeForTypos,
           primary_key: false,
           on_replace: :delete do
+          @type t() :: %__MODULE__{
+                  one_typo: integer(),
+                  two_typos: integer()
+                }
+
           field :one_typo, :integer, default: 5
           field :two_typos, :integer, default: 9
 

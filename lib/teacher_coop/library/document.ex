@@ -21,6 +21,22 @@ defmodule TeacherCoop.Library.Document do
     "Cycle 3"
   ]
 
+  @type t :: %__MODULE__{
+          id: integer() | nil,
+          title: String.t(),
+          description: String.t(),
+          institution_type: String.t(),
+          grade: String.t(),
+          user_id: integer() | nil,
+          user: TeacherCoop.Accounts.User.t() | Ecto.Association.NotLoaded.t() | nil,
+          document_objectives:
+            [TeacherCoop.Library.DocumentObjective.t()] | Ecto.Association.NotLoaded.t(),
+          objectives: [TeacherCoop.Curriculum.Objective.t()] | Ecto.Association.NotLoaded.t(),
+          files: [TeacherCoop.Library.File.t()] | Ecto.Association.NotLoaded.t(),
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
   schema "documents" do
     field :title, :string
     field :description, :string

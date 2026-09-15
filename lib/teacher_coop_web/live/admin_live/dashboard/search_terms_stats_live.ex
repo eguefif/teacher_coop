@@ -8,17 +8,55 @@ defmodule TeacherCoopWeb.AdminLive.SearchTermsStatsLive do
     ~H"""
     <div class="flex flex-col gap-4">
       <div class="flex flex-row gap-4 justify-around">
-        <.async_result :let={click_position_data} assign={@click_position_data}>
+        <.async_result
+          :let={top_search_terms_with_no_result}
+          assign={@top_search_terms_with_no_result}
+        >
           <:loading><div class="skeleton" /></:loading>
           <:failed>{gettext("Failed to retrieve data")}</:failed>
-          <.live_component
-            module={TeacherCoopWeb.AdminLive.BarGraph}
-            title={gettext("Zero results by Search terms")}
-            data={click_position_data}
-            orient={:horizontal}
-            id={@click_position_id}
+          <.stat_grid
+            title={gettext("Popular words with no result")}
+            data={top_search_terms_with_no_result}
           />
         </.async_result>
+        <.async_result
+          :let={popular_search_terms}
+          assign={@popular_search_terms}
+        >
+          <:loading><div class="skeleton" /></:loading>
+          <:failed>{gettext("Failed to retrieve data")}</:failed>
+          <.stat_grid
+            title={gettext("Popular search terms")}
+            data={popular_search_terms}
+          />
+        </.async_result>
+      </div>
+    </div>
+    """
+  end
+
+  attr :data, :map
+  attr :title, :string
+
+  def stat_grid(assigns) do
+    ~H"""
+    <div class="flex flex-col gap-[32px]">
+      <div class="text-2xl">{@title}</div>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{gettext("Popular words")}</th>
+              <th>{gettext("Frequency")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr :for={row <- @data}>
+              <th>{row.word}</th>
+              <th>{row.frequency}</th>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     """
@@ -29,16 +67,16 @@ defmodule TeacherCoopWeb.AdminLive.SearchTermsStatsLive do
     {:ok,
      socket
      |> assign(:click_position_id, "graph-click-position")
-     |> assign_async(:click_position_data, fn ->
+     |> assign_async(:top_search_terms_with_no_result, fn ->
        {:ok,
         %{
-          click_position_data:
-            Dashboard.zero_results_by_search_terms(7)
-            |> Enum.sort(&(&1 >= &2))
-            |> IO.inspect()
-            |> Enum.map(fn elem ->
-              %{x: elem.position, y: elem.count}
-            end)
+          top_search_terms_with_no_result: Dashboard.WordStats.top_search_terms_with_no_result()
+        }}
+     end)
+     |> assign_async(:popular_search_terms, fn ->
+       {:ok,
+        %{
+          popular_search_terms: Dashboard.WordStats.top_search_terms()
         }}
      end)}
   end

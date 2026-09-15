@@ -22,35 +22,51 @@ defmodule TeacherCoop.Dashboard.WordStats do
     {result, _} =
       Repo.insert_all(WordCount, search_query,
         conflict_target: [:word, :date],
-        on_conflict: WordCount.Query.on_conflict()
+        on_conflict:
+          from(w in WordCount,
+            update: [
+              set: [
+                frequency: fragment("? + EXCLUDED.frequency", w.frequency),
+                zero_result_count: fragment("? + EXCLUDED.zero_result_count", w.zero_result_count)
+              ]
+            ]
+          )
       )
 
     if is_nil(result), do: :error, else: :ok
   end
 
-  @spec populate_zero_result_words_count(String.t(), DateTime.t(), DateTime.t()) :: :error | :ok
-  def populate_zero_result_words_count(language, %DateTime{} = start, %DateTime{} = end_date) do
-    search_query =
-      Search.Query.base_with_tsvector(language)
-      |> Search.Query.where_inserted_between(start, end_date)
-      |> Search.Query.group_by_lexeme_and_inserted_at_date()
-      |> Search.Query.where_zero_results()
-
-    {result, _} =
-      Repo.insert_all(WordCount, search_query,
-        conflict_target: [:word, :date],
-        on_conflict: WordCount.Query.on_conflict()
-      )
-
-    if is_nil(result), do: :error, else: :ok
+  @doc """
+  Returns a list of the most popular words.
+  """
+  @spec top_search_terms(integer()) :: [Ecto.Schema.t() | term()]
+  def top_search_terms(limit \\ 15) do
+    WordCount.Query.base()
+    |> WordCount.Query.top_search_words(limit)
+    |> Repo.all()
   end
 
+  @doc """
+  Returns a list of the most popular words that get no results from the search.
+  """
+  @spec top_search_terms_with_no_result(integer()) :: [Ecto.Schema.t() | term()]
+  def top_search_terms_with_no_result(limit \\ 15) do
+    WordCount.Query.base()
+    |> WordCount.Query.top_search_words(limit)
+    |> WordCount.Query.where_no_results()
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns all the WordCount rows.
+  """
+  @spec list_all() :: [Ecto.Schema.t() | term()]
   def list_all() do
     Repo.all(WordCount)
   end
 
   @doc """
-  Returns total counts for each word
+  Returns total counts for each word.
   """
   @spec counts_by_word() :: map()
   def counts_by_word do
@@ -73,12 +89,14 @@ defmodule TeacherCoop.Dashboard.WordStats do
     if result, do: result, else: 0
   end
 
+  @doc """
+  Return the last inserted row based on the table ordered by date.
+  """
   @spec last_entry_date() :: Date.t() | nil
   def last_entry_date() do
-    Search.Query.base()
+    WordCount.Query.base()
     |> select([w], w.date)
-    |> order_by(desc: :inserted_at)
-    |> limit(1)
+    |> order_by(desc: :date)
     |> Repo.one()
   end
 end
