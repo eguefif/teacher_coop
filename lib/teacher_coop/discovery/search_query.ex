@@ -5,6 +5,9 @@ defmodule TeacherCoop.Discovery.Search.Query do
 
   def base(), do: from(s in Search)
 
+  @doc """
+  Returns a query that selects 
+  """
   @spec base_with_tsvector(String.t()) :: Ecto.Query.t()
   def base_with_tsvector(language) when language in ~w(french english) do
     from(s in Search,
@@ -13,7 +16,9 @@ defmodule TeacherCoop.Discovery.Search.Query do
       select: %{
         word: w.lexeme,
         date: fragment("date_trunc('day', ?)", s.inserted_at),
-        count: count()
+        frequency: count(),
+        zero_result_count:
+          fragment("SUM(CASE WHEN hits_count = 0 THEN 1 ELSE 0 END) as zero_result_count")
       }
     )
   end
@@ -28,7 +33,10 @@ defmodule TeacherCoop.Discovery.Search.Query do
 
   @spec group_by_lexeme_and_inserted_at_date(Ecto.Query.t()) :: Ecto.Query.t()
   def group_by_lexeme_and_inserted_at_date(query) do
-    group_by(query, [s, w], [w.lexeme, fragment("date_trunc('day',?)", s.inserted_at)])
+    group_by(query, [s, w], [
+      w.lexeme,
+      fragment("date_trunc('day',?)", s.inserted_at)
+    ])
   end
 
   # TODO: check if that works, there is no field date on Search
@@ -36,6 +44,10 @@ defmodule TeacherCoop.Discovery.Search.Query do
     where(query, [s], s.date == ^date)
   end
 
+  @doc """
+  Returns `Search` that have zero hits count.
+  """
+  @spec where_zero_results(Ecto.Query.t()) :: Ecto.Query.t()
   def where_zero_results(query) do
     where(query, [s], s.hits_count == 0)
   end

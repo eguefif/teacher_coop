@@ -4,7 +4,8 @@ defmodule TeacherCoop.Repo.Migrations.CreateWordCounts do
   def change do
     create table(:word_counts) do
       add :word, :string
-      add :count, :integer
+      add :frequency, :integer
+      add :zero_result_count, :integer
       add :date, :date
     end
 

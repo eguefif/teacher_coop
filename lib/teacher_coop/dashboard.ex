@@ -61,6 +61,6 @@ defmodule TeacherCoop.Dashboard do
   end
 
   def count_by_search_terms(n_days) do
-    WordStats.counts_by_word()
+    click_position(n_days)
   end
 end
