@@ -2,6 +2,19 @@ defmodule TeacherCoop.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t() :: %__MODULE__{
+          id: integer() | nil,
+          email: String.t(),
+          type: String.t() | nil,
+          fullname: String.t(),
+          password: String.t() | nil,
+          hashed_password: String.t() | nil,
+          document_id: [TeacherCoop.Library.Document.t()] | Ecto.Association.NotLoaded.t(),
+          search_id: [TeacherCoop.Discovery.Search.t()] | Ecto.Association.NotLoaded.t(),
+          confirmed_at: DateTime.t(),
+          authenticated_at: DateTime.t()
+        }
+
   schema "users" do
     field :email, :string
     field :type, :string

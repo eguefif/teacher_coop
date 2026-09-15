@@ -11,17 +11,14 @@ defmodule TeacherCoop.Discovery do
 
   alias TeacherCoop.Discovery.Search
   alias TeacherCoop.Library
-
-  def get_search_by_date!(%Date{} = date) do
-    Search.Query.base()
-    |> Search.Query.where_date(date)
-    |> Repo.all()
-  end
+  alias TeacherCoop.Library.Document
+  alias TeacherCoop.Accounts.Scope
 
   @doc """
   Get a search by it search terms.
   Params: `search_terms: string`
   """
+  @spec get_search_by_search_terms!(String.t()) :: Search.t()
   def get_search_by_search_terms!(search_terms) do
     Repo.get_by!(Search, search_terms: search_terms)
   end
@@ -30,7 +27,8 @@ defmodule TeacherCoop.Discovery do
   Create a search.
   A search is one query typed by the user on the search engine page.
   """
-  def create_search(%{} = attrs, scope) do
+  @spec create_search(map(), Scope.t()) :: {:ok, Search.t()} | {:error, Ecto.Changeset.t()}
+  def(create_search(%{} = attrs, scope)) do
     %Search{}
     |> Search.changeset(attrs, scope)
     |> Repo.insert()
@@ -39,6 +37,8 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Update a search
   """
+  @spec update_search(Search.t(), map(), Scope.t()) ::
+          {:ok, Search.t()} | {:error, Ecto.Changeset.t()}
   def update_search(%Search{} = search, attrs \\ %{}, scope) do
     search
     |> Search.changeset(attrs, scope)
@@ -48,6 +48,7 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Returns a %Search{}` `Changeset`.
   """
+  @spec change_search(map(), Scope.t()) :: Ecto.Changeset.t()
   def change_search(attrs \\ %{}, scope) do
     %Search{}
     |> Search.changeset(attrs, scope)
@@ -56,6 +57,9 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Handle a search for the user.
   """
+  @spec handle_search(String.t(), Scope.t(), String.t() | nil) ::
+          {:error, Ecto.Changeset.t(), list(), list()}
+          | {:ok, Search.t(), [Document.t()], [TeacherCoop.Discovery.SearchResult.t()]}
   def handle_search(search_terms \\ "", scope, search_session \\ nil)
 
   def handle_search(search_terms, scope, search_session) when search_terms == "" do
@@ -112,6 +116,8 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Mark a search as successfull.
   """
+  @spec mark_search_as_succes(Search.t(), integer(), Scope.t(), String.t(), String.t()) ::
+          {:ok, Search.t()} | {:error, Ecto.Changeset.t()}
   def mark_search_as_succes(%Search{} = search, click_position, scope, search_session, reason) do
     search
     |> update_search(

@@ -10,9 +10,6 @@ defmodule TeacherCoop.Library.Workers.IndexDocument do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
-    case SearchDocuments.index_document(args["attrs"]) do
-      :ok -> :ok
-      _ -> :error
-    end
+    SearchDocuments.index_document(args["attrs"])
   end
 end

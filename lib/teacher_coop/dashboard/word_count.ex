@@ -15,6 +15,13 @@ defmodule TeacherCoop.Dashboard.WordCount do
     field :date, :date
   end
 
+  @type t :: %__MODULE__{
+          word: String.t(),
+          frequency: integer(),
+          zero_result_count: integer(),
+          date: Date.t()
+        }
+
   @doc false
   def changeset(word_count, attrs) do
     permitted = [:word, :frequency, :zero_result_count, :date]

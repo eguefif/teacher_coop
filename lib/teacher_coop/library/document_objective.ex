@@ -2,6 +2,16 @@ defmodule TeacherCoop.Library.DocumentObjective do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t() :: %__MODULE__{
+          id: integer() | nil,
+          document_id: integer() | nil,
+          document: TeacherCoop.Library.Document.t() | Ecto.Association.NotLoaded.t() | nil,
+          objective_id: integer() | nil,
+          objective: TeacherCoop.Curriculum.Objective.t() | Ecto.Association.NotLoaded.t() | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
   schema "document_objectives" do
     belongs_to :document, TeacherCoop.Library.Document, on_replace: :delete
     belongs_to :objective, TeacherCoop.Curriculum.Objective, on_replace: :delete

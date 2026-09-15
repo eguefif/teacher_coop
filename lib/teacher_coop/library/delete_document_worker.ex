@@ -10,9 +10,6 @@ defmodule TeacherCoop.Library.Workers.DeleteDocument do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
-    case SearchDocuments.delete_document(args["document_id"]) do
-      :ok -> :ok
-      _ -> :error
-    end
+    SearchDocuments.delete_document(args["document_id"])
   end
 end

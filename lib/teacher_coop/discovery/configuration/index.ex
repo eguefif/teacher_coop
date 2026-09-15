@@ -12,6 +12,21 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
     %{uid: "objectives_test", primary_key: "id", type: "original", state: "indexed"}
   ]
 
+  @type t() :: %__MODULE__{
+          id: integer() | nil,
+          uid: String.t(),
+          primary_key: String.t() | nil,
+          type: String.t() | nil,
+          state: String.t() | nil,
+          task_uid: String.t() | nil,
+          engine_configuration_id: integer() | nil,
+          engine_configuration: EngineConfiguration.t() | nil,
+          user_id: integer() | nil,
+          user: User.t() | nil,
+          inserted_at: DateTime.t(),
+          updated_at: DateTime.t()
+        }
+
   @doc """
   Canonical list of index definitions that should exist in the search engine.
 

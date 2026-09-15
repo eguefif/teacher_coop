@@ -91,6 +91,7 @@ defmodule TeacherCoop.SearchRepo.SearchDocuments do
   @doc """
   Specialized function to look into documents
   """
+  @spec search_documents(String.t()) :: {:ok, SearchResult.t()} | :error
   def search_documents(search_terms) when is_bitstring(search_terms) do
     client = get_client()
 

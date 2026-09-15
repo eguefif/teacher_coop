@@ -12,6 +12,16 @@ defmodule TeacherCoop.Accounts.UserToken do
   @change_email_validity_in_days 7
   @session_validity_in_days 14
 
+  @type t() :: %__MODULE__{
+          token: binary() | nil,
+          context: String.t() | nil,
+          sent_to: String.t() | nil,
+          authenticated_at: DateTime.t(),
+          user_id: integer() | nil,
+          user: TeacherCoop.Accounts.User.t() | nil,
+          inserted_at: DateTime.t()
+        }
+
   schema "users_tokens" do
     field :token, :binary
     field :context, :string

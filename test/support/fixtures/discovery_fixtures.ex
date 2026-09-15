@@ -14,7 +14,7 @@ defmodule TeacherCoop.DiscoveryFixtures do
   auto-managed timestamps would otherwise force it to `now`. This is handy for
   building a history of searches spread over several days.
   """
-  def search_fixture(scope, attrs \\ %{}) do
+  def search_fixture(scope \\ nil, attrs \\ %{}) do
     {inserted_at, attrs} =
       attrs
       |> Map.new()
@@ -23,7 +23,7 @@ defmodule TeacherCoop.DiscoveryFixtures do
     attrs =
       Enum.into(attrs, %{
         search_terms: "some search terms",
-        search_session: Ecto.UUID.generate(version: 7)
+        search_session_id: Ecto.UUID.generate(version: 7)
       })
 
     {:ok, search} =
