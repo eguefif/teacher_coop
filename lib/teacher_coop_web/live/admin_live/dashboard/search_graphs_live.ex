@@ -70,7 +70,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
           zero_results_data:
             Dashboard.zero_results(7)
             |> Enum.map(fn elem ->
-              %{x: elem.date, y: elem.count}
+              {elem.date, elem.count}
             end)
         }}
      end)
@@ -80,7 +80,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
           failed_results_data:
             Dashboard.failed_results(7)
             |> Enum.map(fn elem ->
-              %{x: elem.date, y: elem.count}
+              {elem.date, elem.count}
             end)
         }}
      end)
@@ -90,7 +90,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
           searches_count_data:
             Dashboard.searches_count(7)
             |> Enum.map(fn elem ->
-              %{x: elem.date, y: elem.count}
+              {elem.date, elem.count}
             end)
         }}
      end)
@@ -101,7 +101,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
             Dashboard.click_position(7)
             |> Enum.sort(&(&1 >= &2))
             |> Enum.map(fn elem ->
-              %{x: elem.position, y: elem.count}
+              {elem.position, elem.count}
             end)
         }}
      end)}
