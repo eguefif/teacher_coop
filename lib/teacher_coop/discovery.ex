@@ -37,9 +37,9 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Update a search
   """
-  @spec update_search(Search.t(), map(), Scope.t()) ::
+  @spec update_search(Search.t(), map(), Scope.t() | nil) ::
           {:ok, Search.t()} | {:error, Ecto.Changeset.t()}
-  def update_search(%Search{} = search, attrs \\ %{}, scope) do
+  def update_search(%Search{} = search, attrs \\ %{}, scope \\ nil) do
     search
     |> Search.changeset(attrs, scope)
     |> Repo.update()
@@ -48,8 +48,8 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Returns a %Search{}` `Changeset`.
   """
-  @spec change_search(map(), Scope.t()) :: Ecto.Changeset.t()
-  def change_search(attrs \\ %{}, scope) do
+  @spec change_search(map(), Scope.t() | nil) :: Ecto.Changeset.t()
+  def change_search(attrs \\ %{}, scope \\ nil) do
     %Search{}
     |> Search.changeset(attrs, scope)
   end
@@ -57,10 +57,10 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Handle a search for the user.
   """
-  @spec handle_search(String.t(), Scope.t(), String.t() | nil) ::
+  @spec handle_search(String.t(), Scope.t() | nil, String.t() | nil) ::
           {:error, Ecto.Changeset.t(), list(), list()}
           | {:ok, Search.t(), [Document.t()], [TeacherCoop.Discovery.SearchResult.t()]}
-  def handle_search(search_terms \\ "", scope, search_session \\ nil)
+  def handle_search(search_terms \\ "", scope \\ nil, search_session \\ nil)
 
   def handle_search(search_terms, scope, search_session) when search_terms == "" do
     {:error,

@@ -8,11 +8,15 @@ defmodule TeacherCoop.Dashboard.WordStats do
   alias TeacherCoop.Dashboard.WordCount
   alias TeacherCoop.Discovery.Search
 
+  @type pg_dictionnary_language() :: String.t()
+
   @doc """
   Populate the word_counts table with search terms and their count.
   Count is how many occurences of the word we have in searches.
+  language: 'french', 'english' to use in Postgres
   """
-  @spec populate_words_count(String.t(), DateTime.t(), DateTime.t()) :: :error | :ok
+  @spec populate_words_count(pg_dictionnary_language(), DateTime.t(), DateTime.t()) ::
+          :error | :ok
   def populate_words_count(language, %DateTime{} = start, %DateTime{} = end_date) do
     search_query =
       Search.Query.base_with_tsvector(language)
