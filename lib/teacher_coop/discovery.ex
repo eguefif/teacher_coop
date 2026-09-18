@@ -59,7 +59,8 @@ defmodule TeacherCoop.Discovery do
   """
   @spec handle_search(String.t(), Scope.t() | nil, String.t() | nil) ::
           {:error, Ecto.Changeset.t(), list(), list()}
-          | {:ok, Search.t(), [Document.t()], [TeacherCoop.Discovery.SearchResult.t()]}
+          | {:error, String.t()}
+          | {:ok, Search.t(), [Document.t() | nil], TeacherCoop.Discovery.SearchResult.t()}
   def handle_search(search_terms \\ "", scope \\ nil, search_session \\ nil)
 
   def handle_search(search_terms, scope, search_session) when search_terms == "" do
@@ -74,9 +75,7 @@ defmodule TeacherCoop.Discovery do
         search_session
       )
       when is_binary(search_terms) do
-    {search, db_hits, engine_hits} = do_search(search_session, search_terms, scope)
-
-    {:ok, search, db_hits, engine_hits}
+    do_search(search_session, search_terms, scope)
   end
 
   defp do_search(search_session, search_terms, scope) do
@@ -84,7 +83,13 @@ defmodule TeacherCoop.Discovery do
          {:ok, {db_hits, engine_hits}} <-
            get_db_document_from_engine_hits(engine_hits),
          {:ok, search} <- do_create_search(search_terms, length(db_hits), search_session, scope) do
-      {search, db_hits, engine_hits}
+      {:ok, search, db_hits, engine_hits}
+    else
+      :error ->
+        {:error, "Failed to query Meilisearch"}
+
+      {:error, %Ecto.Changeset{}} ->
+        {:error, "Failed to record search"}
     end
   end
 

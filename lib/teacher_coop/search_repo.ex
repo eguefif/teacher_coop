@@ -151,7 +151,7 @@ defmodule TeacherCoop.SearchRepo do
   This return the application based client in a prod/dev environnement.
   Returns a on the fly created client for test.
   """
-  @spec get_client() :: Meilisearch.Client.t()
+  @spec get_client() :: Tesla.Client.t()
   def get_client() do
     meilisearch_config = Application.fetch_env!(:teacher_coop, TeacherCoop.SearchRepo)
     masterkey = meilisearch_config |> List.keyfind(:masterkey, 0) |> elem(1)

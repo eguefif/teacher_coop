@@ -238,6 +238,10 @@ defmodule TeacherCoopWeb.SearchLive.Search do
          |> assign(:search, nil)
          |> assign(:form, to_form(changeset))}
 
+      {:error, error_reason} ->
+        IO.puts("Error: " <> error_reason)
+        {:noreply, socket}
+
       {:ok, search, hits, _} ->
         {:noreply,
          socket

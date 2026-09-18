@@ -9,7 +9,8 @@ defmodule TeacherCoop.Library.DocumentObjectiveTest do
 
   describe "changeset/2" do
     test "is valid with document_id and objective_id" do
-      changeset = DocumentObjective.changeset(%DocumentObjective{}, %{document_id: 1, objective_id: 2})
+      changeset =
+        DocumentObjective.changeset(%DocumentObjective{}, %{document_id: 1, objective_id: 2})
 
       assert changeset.valid?
       assert get_change(changeset, :document_id) == 1

@@ -53,20 +53,20 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [x] Reorganize todo: needs to move them in subsection and keep next for what I want to do
-- [x] Finish typespec and documentation: use Github to check all files
+- [ ] Github actions are not working, make it work
+- [ ] Have a complete CI/CD up and working with a DNS
+    - [ ] Configure DB: user and password
+    - [ ] Configure Meilisearch
+    - [ ] Define secret
+    - [ ] Create a GH that trigger something on the server and pull new repo
+    - [ ] Create a domain name
+    - [ ] Configure let's encrypt
+    - [ ] Have an NGinx on the instance
 
 ### Testing
 
 - [ ] Add test for SearchRepo: define behavior and use Mock
 - [ ] Add test for render_async pages in Dashboard: define behavior and use Mock
-
-### CI/CD
-- [ ] Github actions are not working, make it work
-- [ ] Have a complete CI/CD up and working with a DNS
-    - [ ] Configure DB
-    - [ ] Configure Meilisearch
-    - [ ] Create a GH that trigger something on the server and pull new repo
 
 
 ### Search monitoring
