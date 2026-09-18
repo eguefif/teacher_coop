@@ -62,6 +62,7 @@ To do that, we might want to test different configuration on different instance.
     - [ ] Create a domain name
     - [ ] Configure let's encrypt
     - [ ] Have an NGinx on the instance
+    - [ ] Use a docker compose for now
 
 ### Testing
 
