@@ -108,7 +108,8 @@ defmodule TeacherCoop.MixProject do
       {:oban_web, "~> 2.11"},
       {:igniter, "~> 0.5", only: [:dev]},
       {:contex, "~> 0.5.0"},
-      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:mox, "~> 1.3.2", only: [:test]}
     ]
   end
 

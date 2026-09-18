@@ -55,7 +55,11 @@ To do that, we might want to test different configuration on different instance.
 ### Next
 - [x] Reorganize todo: needs to move them in subsection and keep next for what I want to do
 - [x] Finish typespec and documentation: use Github to check all files
-- [ ] Make every module tests above 90% coverage
+
+### Testing
+
+- [ ] Add test for SearchRepo: define behavior and use Mock
+- [ ] Add test for render_async pages in Dashboard: define behavior and use Mock
 
 ### CI/CD
 - [ ] Github actions are not working, make it work

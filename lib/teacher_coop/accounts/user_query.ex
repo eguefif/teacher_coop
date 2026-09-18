@@ -5,10 +5,6 @@ defmodule TeacherCoop.Accounts.User.Query do
 
   def base(), do: from(u in User)
 
-  def by_ids(query, ids) do
-    where(query, [u], u.id in ^ids)
-  end
-
   def last_n_days(query, n) do
     now = DateTime.utc_now()
     epoch = DateTime.to_unix(now)

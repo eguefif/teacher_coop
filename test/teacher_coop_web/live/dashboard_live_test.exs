@@ -10,6 +10,13 @@ defmodule TeacherCoopWeb.DashboardTest do
 
   defp create_fixtures(%{}) do
     create_searches()
+
+    TeacherCoop.Dashboard.WordStats.populate_words_count(
+      "french",
+      DateTime.add(DateTime.utc_now(), -10, :minute),
+      DateTime.utc_now()
+    )
+
     users = create_users()
     documents = create_documents(users)
     %{documents: documents, users: users}

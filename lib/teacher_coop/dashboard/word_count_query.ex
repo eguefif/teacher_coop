@@ -46,7 +46,7 @@ defmodule TeacherCoop.Dashboard.WordCount.Query do
   end
 
   @spec top_search_words(Ecto.Query.t(), integer()) :: Ecto.Query.t()
-  def top_search_words(query, l \\ 15) do
+  def top_search_words(query, l) do
     query
     |> order_by([w], desc: w.frequency)
     |> limit(^l)
@@ -59,14 +59,5 @@ defmodule TeacherCoop.Dashboard.WordCount.Query do
   def where_no_results(query) do
     query
     |> where([w], w.zero_result_count == 0)
-  end
-
-  @doc """
-  Apply a where for a date range.
-  """
-  @spec from_date_to(Ecto.Query.t(), Date.t(), Date.t()) :: Ecto.Query.t()
-  def from_date_to(query, start, end_date) do
-    query
-    |> where([w], w.date >= ^start and w.date <= ^end_date)
   end
 end
