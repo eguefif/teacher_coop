@@ -23,6 +23,7 @@ defmodule TeacherCoop.Library.WorkersTest do
     test "perform_job/1 deletes the given files from disc" do
       base_path = File.cwd!() <> "/priv/static/"
       relative_path = "files/delete_files_worker_test.txt"
+      File.mkdir_p!(Path.dirname(base_path <> relative_path))
       File.write!(base_path <> relative_path, "some content")
 
       assert :ok = perform_job(DeleteFiles, %{files: [relative_path]})

@@ -17,6 +17,10 @@ defmodule TeacherCoop.MixProject do
       docs: [
         extras: ["README.md"]
       ],
+      dialyzer: [
+        plt_local_path: "priv/plts",
+        plt_core_path: "priv/plts"
+      ],
       test_coverage: [
         ignore_modules: [
           # These are used for seeding

@@ -69,7 +69,7 @@ defmodule TeacherCoop.CurriculumTest do
   end
 
   describe "search_objectives/1" do
-    import TeacherCoop.SearchRepo, only: [get_client: 0]
+    import TeacherCoop.SearchRepo, only: [get_client: 0, index_name: 1]
 
     alias TeacherCoop.SearchRepo.SearchObjectives
 
@@ -87,7 +87,11 @@ defmodule TeacherCoop.CurriculumTest do
         })
 
       assert :ok = SearchObjectives.index_objective(attrs, true)
-      on_exit(fn -> Meilisearch.Document.delete_one(get_client(), "objectives", attrs.id) end)
+
+      on_exit(fn ->
+        Meilisearch.Document.delete_one(get_client(), index_name("objectives"), attrs.id)
+      end)
+
       attrs
     end
 

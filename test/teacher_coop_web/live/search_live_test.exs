@@ -14,11 +14,14 @@ defmodule TeacherCoopWeb.SearchLiveTest do
   setup :register_and_log_in_user
 
   defp create_documents(%{scope: scope}) do
+    relative_path = "files/test-file-#{System.unique_integer([:positive])}"
+
     documents =
       [
         %{
           title: "Sequence sur les fractions",
-          description: "Ensemble d'exercices pratiques sur les fractions pour ce2"
+          description: "Ensemble d'exercices pratiques sur les fractions pour ce2",
+          files: [%{filename: "lesson.pdf", filepath: relative_path, format: "pdf"}]
         },
         %{
           title: "Fractions en ligne",
@@ -34,8 +37,13 @@ defmodule TeacherCoopWeb.SearchLiveTest do
 
     Oban.drain_queue(queue: :document_ingestion)
 
+    file_path = Path.join(Application.app_dir(:teacher_coop, "priv/static"), relative_path)
+    File.mkdir_p!(Path.dirname(file_path))
+    File.write!(file_path, "test file content")
+
     on_exit(fn ->
       Enum.each(documents, &SearchDocuments.delete_document(&1.id))
+      File.rm(file_path)
     end)
 
     %{documents: documents}
@@ -105,14 +113,14 @@ defmodule TeacherCoopWeb.SearchLiveTest do
       assert html =~ "search"
 
       document_title = Enum.at(documents, 0) |> Map.get(:title)
-      document_id = Enum.at(documents, 0) |> Map.get(:id)
+      file_id = Enum.at(documents, 0) |> Map.get(:files) |> Enum.at(0) |> Map.get(:id)
 
       assert search_live
              |> form("#search-form", %{"search_terms" => document_title})
              |> render_submit() =~ document_title
 
       assert search_live
-             |> element("#preview-button-#{document_id}")
+             |> element("#preview-button-#{file_id}")
              |> render_click()
 
       assert search_live |> element("object") |> render() =~ "pdf"
@@ -125,7 +133,6 @@ defmodule TeacherCoopWeb.SearchLiveTest do
 
       document = Enum.at(documents, 0)
       document_title = document |> Map.get(:title)
-      document_id = document |> Map.get(:id)
       file = document |> Map.get(:files) |> Enum.at(0)
 
       assert search_live
@@ -134,7 +141,7 @@ defmodule TeacherCoopWeb.SearchLiveTest do
 
       assert {:ok, result} =
                search_live
-               |> element("#download-button-#{document_id}")
+               |> element("#download-button-#{file.id}")
                |> render_click()
                |> follow_redirect(conn, ~p"/files/#{file}")
 
