@@ -1,92 +1,33 @@
 name: Build
 
 on:
-  workflow_run:
-    workflows: ["Test", "Lint", "Dialyzer", "Coverage"]
-    types: [completed]
+  push:
     branches: [main]
 
 permissions:
-  actions: read
   contents: read
 
 concurrency:
-  group: build-${{ github.event.workflow_run.head_sha }}
+  group: build-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
   build:
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check that all required workflows succeeded
-        id: gate
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          set -e
-          REQUIRED=("Test" "Lint" "Dialyzer" "Coverage")
-          proceed=true
-
-          for name in "${REQUIRED[@]}"; do
-            conclusion=$(gh api "repos/${{ github.repository }}/actions/runs?head_sha=$SHA&per_page=50" \
-              --jq "[.workflow_runs[] | select(.name==\"$name\")] | sort_by(.run_started_at) | last | .conclusion")
-
-            echo "Workflow '$name' conclusion: '$conclusion'"
-
-            if [ "$conclusion" != "success" ]; then
-              proceed=false
-            fi
-          done
-
-          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
-
-          if [ "$proceed" != "true" ]; then
-            echo "::error::Not all required workflows have succeeded yet for $SHA; nothing built."
-            exit 1
-          fi
-
-      - name: Skip if this commit was already built
-        id: dedupe
-        if: steps.gate.outputs.proceed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          set -e
-          prior=$(gh api "repos/${{ github.repository }}/actions/workflows/build.yml/runs?status=success&per_page=50" \
-            --jq "[.workflow_runs[] | select(.head_sha==\"$SHA\") | .id] | .[0] // empty")
-
-          if [ -n "$prior" ]; then
-            echo "Build already succeeded for $SHA in run $prior, skipping."
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - uses: actions/checkout@v4
-        if: steps.gate.outputs.proceed == 'true' && steps.dedupe.outputs.run == 'true'
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
 
       - uses: erlef/setup-beam@v1
-        if: steps.gate.outputs.proceed == 'true' && steps.dedupe.outputs.run == 'true'
         with:
           version-type: strict
           version-file: .tool-versions
 
       - name: Log in to Docker Hub
-        if: steps.gate.outputs.proceed == 'true' && steps.dedupe.outputs.run == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Run build
-        if: steps.gate.outputs.proceed == 'true' && steps.dedupe.outputs.run == 'true'
         run: ./build.sh

@@ -72,6 +72,8 @@ COPY config/runtime.exs config/
 COPY rel rel
 RUN mix release
 
+RUN mix reset
+
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE} AS final

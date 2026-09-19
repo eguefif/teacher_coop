@@ -53,7 +53,8 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Github actions are not working, make it work
+- [ ] Need to configure deployement. At this time of the project, I want to use a command that wiped the db and start over: mix phx.reset.
+- [ ] Need an email adapter to make it works.
 - [ ] Have a complete CI/CD up and working with a DNS
     - [ ] Configure DB: user and password
     - [ ] Configure Meilisearch
