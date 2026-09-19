@@ -46,6 +46,11 @@ jobs:
 
           echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
 
+          if [ "$proceed" != "true" ]; then
+            echo "::error::Not all required workflows have succeeded yet for $SHA; nothing built."
+            exit 1
+          fi
+
       - name: Skip if this commit was already built
         id: dedupe
         if: steps.gate.outputs.proceed == 'true'
