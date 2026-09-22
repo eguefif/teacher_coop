@@ -53,17 +53,16 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Need to configure deployement. At this time of the project, I want to use a command that wiped the db and start over: mix phx.reset.
-- [ ] Need an email adapter to make it works.
 - [ ] Have a complete CI/CD up and working with a DNS
-    - [ ] Configure DB: user and password
-    - [ ] Configure Meilisearch
-    - [ ] Define secret
-    - [ ] Create a GH that trigger something on the server and pull new repo
-    - [ ] Create a domain name
+    - [x] Configure DB: user and password
+    - [x] Configure Meilisearch
+    - [x] Define secret
+    - [ ] Make traefik redirect to the app
+    - [ ] Check if email with teachercoop.org works => configure let's encrypt
+    - [ ] Need an email adapter to make it works: see mailgun.
+    - [x] Create a domain name
     - [ ] Configure let's encrypt
-    - [ ] Have an NGinx on the instance
-    - [ ] Use a docker compose for now
+    - [ ] Create a GH that trigger something on the server and pull new repo
 
 ### Testing
 
