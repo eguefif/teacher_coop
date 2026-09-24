@@ -100,7 +100,7 @@ defmodule TeacherCoop.SearchRepo do
   def wait_for_tasks(tasks) when is_list(tasks) do
     result =
       tasks
-      |> Enum.map(&wait_for_task_loop(&1.taskUid))
+      |> Enum.map(fn task -> wait_for_task_loop(task.taskUid) end)
       |> Enum.all?(fn status -> status in [:ok] end)
 
     if result == true, do: :ok, else: :error

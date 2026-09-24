@@ -82,7 +82,7 @@ defmodule TeacherCoop.Dashboard do
   end
 
   @doc """
-  Returns an array of `Search` group by clock_position in the past `n` days.
+  Returns an array of `Search` group by click_position in the past `n` days.
   """
   @spec click_position(integer()) :: [Search.t()]
   def click_position(n_days) do
