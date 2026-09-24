@@ -22,6 +22,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
           <:loading><div class="skeleton" /></:loading>
           <:failed>{gettext("Failed to retrieve data")}</:failed>
           <.live_component
+            if={length(click_position_data) != 0}
             module={TeacherCoopWeb.AdminLive.BarGraph}
             title={gettext("Click position")}
             data={click_position_data}
@@ -100,6 +101,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
           click_position_data:
             Dashboard.click_position(7)
             |> Enum.sort(&(&1 >= &2))
+            |> IO.inspect()
             |> Enum.map(fn elem ->
               {elem.position, elem.count}
             end)

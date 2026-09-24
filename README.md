@@ -1,5 +1,14 @@
 # TeacherCoop
 
+https://www.teachercoop.org
+
+This project is an Elixir learning project. It's also a project that I might one day put in production.
+
+
+This repository is linked to the [infra repo](https://github.com/eguefif/infra_teacher_coop). The CI/CD is automated.
+Any pull request goes through GitHub Actions to check: tests, test coverage and Dialyzer.
+Any merge on main trigger the `build.yml` GitHub Actions that build, push image to Docker Hub and trigger deploy on Portainer.
+
 ## Table of content
 
 - [Setup](#setup)
@@ -13,12 +22,14 @@
 ```bash
 $ mix setup
 $ docker compose up
+$ mix deps.get
 $ mix phx.server
 ```
 
-The website is available on `teachercoop:4000`
+The website is available on `localhost:4000`.
 
-If you want to reset developement database and search engine: `mix reset`
+If you want to reset developement database and search engine: `mix reset`.
+Sometimes, you will need to reset the test database: `MIX_ENV=test mix reset`.
 
 
 ## Contexts
@@ -38,6 +49,19 @@ This context is responsible fo handling search.
 This will handle two aspects of the search:
 * Operations made by the user to find a document
 * Tracking of search performance. We want the user to find what they need. Therefore, we want to evaluate the search and improve it.
+
+### Curriculum
+
+This context handles the French curriculum via the schema `objectives`.
+
+### Dashboard
+
+This context is designed to calculate documents and user stats, monitor Searches and create test A/B.
+
+It contains a sub-context:
+- WordStats: that provides stats for search results per search lexemes.
+
+There is one schema: `word_count`. This table is populated by a background job and uses the `searches` table to build data.
 
 ## Repos
 
