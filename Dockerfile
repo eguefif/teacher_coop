@@ -29,7 +29,6 @@ FROM ${BUILDER_IMAGE} AS builder
 # install build dependencies
 RUN apt-get update \
   && apt-get install -y --no-install-recommends build-essential git \
-  && apt-get install -y curl
   && rm -rf /var/lib/apt/lists/*
 
 # prepare build dir
@@ -78,7 +77,7 @@ RUN mix release
 FROM ${RUNNER_IMAGE} AS final
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends libstdc++6 openssl libncurses6 locales ca-certificates \
+  && apt-get install -y --no-install-recommends libstdc++6 openssl libncurses6 locales ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 
 # Set the locale
