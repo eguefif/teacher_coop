@@ -26,14 +26,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push image with latest tag
+      - name: Build and push image
         run: |
-          docker build -t "eguefif/teacher_coop:latest" .
+          docker build -t "eguefif/teacher_coop:latest" -t "eguefif/teacher_coop:${TAG}" .
           docker push "eguefif/teacher_coop:latest"
-
-      - name: Build and push image with commit tag
-        run: |
-          docker build -t "eguefif/teacher_coop:${TAG}" .
           docker push "eguefif/teacher_coop:${TAG}"
 
       - name: Deploy to Portainer using Webhook
