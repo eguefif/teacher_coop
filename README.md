@@ -57,18 +57,18 @@ To do that, we might want to test different configuration on different instance.
     - [x] Configure DB: user and password
     - [x] Configure Meilisearch
     - [x] Define secret
-    - [ ] Make traefik redirect to the app
-    - [ ] Check if email with teachercoop.org works => configure let's encrypt
-    - [ ] Need an email adapter to make it works: see mailgun.
+    - [x] Make traefik redirect to the app
     - [x] Create a domain name
-    - [ ] Configure let's encrypt
+    - [x] Configure let's encrypt
+    - [ ] Need an email adapter to make it works: see mailgun.
     - [ ] Create a GH that trigger something on the server and pull new repo
+        - [ ] It first should run a migration service wait for it
+        - [ ] Then update current teacher_coop containers
 
 ### Testing
 
 - [ ] Add test for SearchRepo: define behavior and use Mock
 - [ ] Add test for render_async pages in Dashboard: define behavior and use Mock
-
 
 ### Search monitoring
 - [ ] Words stat 

@@ -20,6 +20,8 @@ defmodule TeacherCoopWeb.Router do
 
   scope "/", TeacherCoopWeb do
     pipe_through :browser
+
+    get "/healthcheck", HealthController, :show
   end
 
   scope "/api", TeacherCoopWeb do
