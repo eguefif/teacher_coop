@@ -37,9 +37,9 @@ defmodule TeacherCoopWeb.UserLive.Registration do
               "Your email address is used to create and secure your account (confirmation, login, password reset). See our "
             )}
             <.link navigate={~p"/privacy-policy/"} class="font-semibold text-brand hover:underline">{gettext(
-              "privacy policy "
+              "privacy policy"
             )}</.link>
-            {gettext("for details and your rights.")}
+            {gettext(" for details and your rights.")}
           </div>
 
           <.button phx-disable-with={gettext("Creating account...")} class="btn btn-primary w-full">
