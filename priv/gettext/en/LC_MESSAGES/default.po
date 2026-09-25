@@ -1030,7 +1030,6 @@ msgstr ""
 msgid "Legal Mentions"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts/root.html.heex
 #: lib/teacher_coop_web/live/user_live/registration.ex
 #, elixir-autogen, elixir-format
 msgid "privacy policy"
@@ -1039,4 +1038,9 @@ msgstr ""
 #: lib/teacher_coop_web/components/layouts/root.html.heex
 #, elixir-autogen, elixir-format
 msgid "Terms of Service"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Privacy Policy"
 msgstr ""
