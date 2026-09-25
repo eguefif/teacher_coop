@@ -9,7 +9,7 @@ defmodule TeacherCoop.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"TeacherCoop", "contact@example.com"})
+      |> from({"TeacherCoop", "admin@teachercoop.org"})
       |> subject(subject)
       |> text_body(body)
 
