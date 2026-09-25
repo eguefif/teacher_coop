@@ -28,9 +28,10 @@ defmodule TeacherCoopWeb.UserLive.Login do
         <div :if={local_mail_adapter?()} class="alert alert-info">
           <.icon name="hero-information-circle" class="size-6 shrink-0" />
           <div>
-            <p>You are running the local mail adapter.</p>
+            <p>{gettext("You are running the local mail adapter.")}</p>
             <p>
-              To see sent emails, visit <.link href="/dev/mailbox" class="underline">the mailbox page</.link>.
+              {gettext("To see sent emails, visit")}
+              <.link href="/dev/mailbox" class="underline">{gettext("the mailbox page")}</.link>.
             </p>
           </div>
         </div>
@@ -46,7 +47,7 @@ defmodule TeacherCoopWeb.UserLive.Login do
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
-            label="Email"
+            label={gettext("Email")}
             autocomplete="username"
             spellcheck="false"
             required
@@ -57,7 +58,7 @@ defmodule TeacherCoopWeb.UserLive.Login do
           </.button>
         </.form>
 
-        <div class="divider">or</div>
+        <div class="divider">{gettext("or")}</div>
 
         <.form
           :let={f}
@@ -71,7 +72,7 @@ defmodule TeacherCoopWeb.UserLive.Login do
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
-            label="Email"
+            label={gettext("Email")}
             autocomplete="username"
             spellcheck="false"
             required
@@ -79,7 +80,7 @@ defmodule TeacherCoopWeb.UserLive.Login do
           <.input
             field={@form[:password]}
             type="password"
-            label="Password"
+            label={gettext("Password")}
             autocomplete="current-password"
             spellcheck="false"
           />
@@ -120,7 +121,9 @@ defmodule TeacherCoopWeb.UserLive.Login do
     end
 
     info =
-      "If your email is in our system, you will receive instructions for logging in shortly."
+      gettext(
+        "If your email is in our system, you will receive instructions for logging in shortly."
+      )
 
     {:noreply,
      socket

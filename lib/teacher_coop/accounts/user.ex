@@ -1,6 +1,7 @@
 defmodule TeacherCoop.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  use Gettext, backend: TeacherCoopWeb.Gettext
 
   @type t() :: %__MODULE__{
           id: integer() | nil,
@@ -79,7 +80,7 @@ defmodule TeacherCoop.Accounts.User do
       changeset
       |> validate_required([:email])
       |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/,
-        message: "must have the @ sign and no spaces"
+        message: dgettext_noop("errors", "must have the @ sign and no spaces")
       )
       |> validate_length(:email, max: 160)
 
@@ -95,7 +96,7 @@ defmodule TeacherCoop.Accounts.User do
 
   defp validate_email_changed(changeset) do
     if get_field(changeset, :email) && get_change(changeset, :email) == nil do
-      add_error(changeset, :email, "did not change")
+      add_error(changeset, :email, dgettext_noop("errors", "did not change"))
     else
       changeset
     end
@@ -127,7 +128,9 @@ defmodule TeacherCoop.Accounts.User do
   def password_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:password])
-    |> validate_confirmation(:password, message: "does not match password")
+    |> validate_confirmation(:password,
+      message: dgettext_noop("errors", "does not match password")
+    )
     |> validate_password(opts)
   end
 

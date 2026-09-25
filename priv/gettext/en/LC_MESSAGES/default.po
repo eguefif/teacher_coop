@@ -11,297 +11,1027 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: lib/teacher_coop_web/components/core_components.ex:375
+#: lib/teacher_coop_web/components/core_components.ex
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/index.ex:42
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "Are you sure?"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts.ex:75
-#: lib/teacher_coop_web/components/layouts.ex:90
+#: lib/teacher_coop_web/components/layouts.ex
 #, elixir-autogen, elixir-format
 msgid "Attempting to reconnect"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/index.ex:44
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "Delete"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts.ex:82
+#: lib/teacher_coop_web/components/layouts.ex
 #, elixir-autogen, elixir-format
 msgid "Something went wrong!"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts.ex:67
+#: lib/teacher_coop_web/components/layouts.ex
 #, elixir-autogen, elixir-format
 msgid "We can't find the internet"
 msgstr ""
 
-#: lib/teacher_coop_web/components/core_components.ex:81
+#: lib/teacher_coop_web/components/core_components.ex
+#: lib/teacher_coop_web/live/search_live/search.ex
 #, elixir-autogen, elixir-format
 msgid "close"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:29
+#: lib/teacher_coop_web/live/search_live/search.ex
 #, elixir-autogen, elixir-format
 msgid "Search"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/settings.ex:14
+#: lib/teacher_coop_web/live/user_live/settings.ex
 #, elixir-autogen, elixir-format
 msgid "Account Settings"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/registration.ex:16
+#: lib/teacher_coop_web/live/user_live/registration.ex
 #, elixir-autogen, elixir-format
 msgid "Already registered?"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:34
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#: lib/teacher_coop_web/live/document_live/form.ex
 #, elixir-autogen, elixir-format
 msgid "Cancel"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/settings.ex:28
+#: lib/teacher_coop_web/live/user_live/settings.ex
 #, elixir-autogen, elixir-format
 msgid "Change Email"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/confirmation.ex:34
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
 #, elixir-autogen, elixir-format
 msgid "Confirm and log in only this time"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/confirmation.ex:31
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
 #, elixir-autogen, elixir-format
 msgid "Confirm and stay logged in"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/registration.ex:37
+#: lib/teacher_coop_web/live/user_live/registration.ex
 #, elixir-autogen, elixir-format
 msgid "Create an account"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:31
-#: lib/teacher_coop_web/live/document_live/index.ex:14
-#: lib/teacher_coop_web/live/document_live/show.ex:11
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/dashboard/document_count_live.ex
+#: lib/teacher_coop_web/live/document_live/form.ex
+#: lib/teacher_coop_web/live/document_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "Document"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/login.ex:18
+#: lib/teacher_coop_web/live/user_live/login.ex
 #, elixir-autogen, elixir-format
 msgid "Don't have an account?"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/show.ex:21
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/configuration_live/show.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#: lib/teacher_coop_web/live/document_live/index.ex
+#: lib/teacher_coop_web/live/document_live/show.ex
 #, elixir-autogen, elixir-format
 msgid "Edit"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/confirmation.ex:59
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
 #, elixir-autogen, elixir-format
 msgid "Keep me logged in on this device"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts/root.html.heex:67
-#: lib/teacher_coop_web/live/user_live/confirmation.ex:50
-#: lib/teacher_coop_web/live/user_live/login.ex:13
-#: lib/teacher_coop_web/live/user_live/registration.ex:18
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
+#: lib/teacher_coop_web/live/user_live/login.ex
+#: lib/teacher_coop_web/live/user_live/registration.ex
 #, elixir-autogen, elixir-format
 msgid "Log in"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/login.ex:87
+#: lib/teacher_coop_web/live/user_live/login.ex
 #, elixir-autogen, elixir-format
 msgid "Log in and stay logged in"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/login.ex:90
+#: lib/teacher_coop_web/live/user_live/login.ex
 #, elixir-autogen, elixir-format
 msgid "Log in only this time"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/login.ex:56
+#: lib/teacher_coop_web/live/user_live/login.ex
 #, elixir-autogen, elixir-format
 msgid "Log in with email"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/confirmation.ex:62
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
 #, elixir-autogen, elixir-format
 msgid "Log me in only this time"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/settings.ex:15
+#: lib/teacher_coop_web/live/user_live/settings.ex
 #, elixir-autogen, elixir-format
 msgid "Manage your account email address and password settings"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/index.ex:11
+#: lib/teacher_coop_web/live/document_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "My Documents"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/index.ex:14
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#: lib/teacher_coop_web/live/document_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "New"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/registration.ex:14
+#: lib/teacher_coop_web/live/user_live/registration.ex
 #, elixir-autogen, elixir-format
 msgid "Register for an account"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:31
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/document_live/form.ex
 #, elixir-autogen, elixir-format
 msgid "Save"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/settings.ex:65
+#: lib/teacher_coop_web/live/user_live/settings.ex
 #, elixir-autogen, elixir-format
 msgid "Save Password"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/login.ex:22
+#: lib/teacher_coop_web/live/user_live/login.ex
 #, elixir-autogen, elixir-format
 msgid "Sign up"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/confirmation.ex:68
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
 #, elixir-autogen, elixir-format
 msgid "Tip: If you prefer passwords, you can enable them in the user settings."
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/confirmation.ex:12
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
 #, elixir-autogen, elixir-format
 msgid "Welcome"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/login.ex:16
+#: lib/teacher_coop_web/live/user_live/login.ex
 #, elixir-autogen, elixir-format
 msgid "You need to reauthenticate to perform sensitive actions on your account."
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:20
-#: lib/teacher_coop_web/live/document_live/index.ex:27
-#: lib/teacher_coop_web/live/document_live/show.ex:28
+#: lib/teacher_coop_web/live/document_live/form.ex
 #, elixir-autogen, elixir-format
 msgid "description"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/show.ex:21
+#: lib/teacher_coop_web/live/document_live/show.ex
 #, elixir-autogen, elixir-format
 msgid "document"
 msgstr ""
 
-#: lib/teacher_coop_web/live/user_live/login.ex:22
+#: lib/teacher_coop_web/live/user_live/login.ex
 #, elixir-autogen, elixir-format
 msgid "for an account now."
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/show.ex:27
-#, elixir-autogen, elixir-format
-msgid "title"
-msgstr ""
-
-#: lib/teacher_coop_web/live/user_live/registration.ex:20
+#: lib/teacher_coop_web/live/user_live/registration.ex
 #, elixir-autogen, elixir-format
 msgid "to your account now."
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:25
-#: lib/teacher_coop_web/live/document_live/index.ex:30
+#: lib/teacher_coop_web/live/document_live/form.ex
 #, elixir-autogen, elixir-format
 msgid "institution type"
 msgstr ""
 
-#: lib/teacher_coop_web/live/document_live/form.ex:16
-#: lib/teacher_coop_web/live/document_live/index.ex:24
-#, elixir-autogen, elixir-format, fuzzy
-msgid "titre"
-msgstr ""
-
-#: lib/teacher_coop_web/live/search_live/search.ex:109
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "april"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:113
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "august"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:117
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "december"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:107
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "february"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:106
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "january"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:112
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "july"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:111
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "june"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:108
-#, elixir-autogen, elixir-format, fuzzy
+#: lib/teacher_coop_web/date.ex
+#, elixir-autogen, elixir-format
 msgid "march"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:110
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "may"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:116
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "november"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:115
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "october"
 msgstr ""
 
-#: lib/teacher_coop_web/live/search_live/search.ex:114
+#: lib/teacher_coop_web/date.ex
 #, elixir-autogen, elixir-format
 msgid "september"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts/root.html.heex:54
-#, elixir-autogen, elixir-format, fuzzy
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
 msgid "Documents"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts/root.html.heex:60
+#: lib/teacher_coop_web/components/layouts/root.html.heex
 #, elixir-autogen, elixir-format
 msgid "Log out"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts/root.html.heex:64
+#: lib/teacher_coop_web/components/layouts/root.html.heex
 #, elixir-autogen, elixir-format
 msgid "Register"
 msgstr ""
 
-#: lib/teacher_coop_web/components/layouts/root.html.heex:57
+#: lib/teacher_coop_web/components/layouts/root.html.heex
 #, elixir-autogen, elixir-format
 msgid "Settings"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "@ "
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "A link to confirm your email change has been sent to the new address."
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Admin"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Changing..."
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_graphs_live.ex
+#, elixir-autogen, elixir-format
+msgid "Click position"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Config"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Configuration"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Configuration Name"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Configuration created successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Configuration updated successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Confirm new password"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard.ex
+#, elixir-autogen, elixir-format
+msgid "Dashboard"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Delete file"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Delete objective"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Description"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Dictionary"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Disable on words"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Distinct Attributes"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Document created successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Document updated successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Download"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/components.ex
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Download all"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/login.ex
+#: lib/teacher_coop_web/live/user_live/registration.ex
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Email"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Email change link is invalid or it has expired."
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Email changed successfully."
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Embedder"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Enabled"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Engine Configuration"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Engine Configurations"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Engine Name"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Facet Search"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_graphs_live.ex
+#, elixir-autogen, elixir-format
+msgid "Failed results"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_graphs_live.ex
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
+#, elixir-autogen, elixir-format
+msgid "Failed to retrieve data"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "File too large"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Files"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Filterable Attributes"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
+#, elixir-autogen, elixir-format
+msgid "Frequency"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Fullname"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Impossible to delete index"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/configuration_live/show.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Index"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Index Configurations"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Index created successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Index updated successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Indexes"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "J.R.R"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Listing Index"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Min word length to accept one typo"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Min word length to accept two typos"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Model"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Name"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "New Index"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "New file"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "New password"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "No Config"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "No config"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Non Separator Tokens"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "None"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Oban"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Objectives"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Oops no result for that search...."
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
+#, elixir-autogen, elixir-format
+msgid "Popular search terms"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
+#, elixir-autogen, elixir-format
+msgid "Popular words"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
+#, elixir-autogen, elixir-format
+msgid "Popular words with no result"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Preview"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Primary key"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Proximity_precision"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Ranking Rules"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Reading preview not supported"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Restore file"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Restore objective"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Save index"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#: lib/teacher_coop_web/live/document_live/form.ex
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Saving..."
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_graphs_live.ex
+#, elixir-autogen, elixir-format
+msgid "Search counts"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Searchable Attributes"
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "Searching..."
+msgstr ""
+
+#: lib/teacher_coop_web/live/search_live/search.ex
+#, elixir-autogen, elixir-format
+msgid "See more"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Separator Tokens"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Show"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Sortable Attributes"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "State"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Stop Words"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Task uid"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Template"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Type"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Typo Tolerance"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Unknown"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "Update user information"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Upload files"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/settings.ex
+#, elixir-autogen, elixir-format
+msgid "User information updated succesfully"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/document_count_live.ex
+#, elixir-autogen, elixir-format
+msgid "Users"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/search_graphs_live.ex
+#, elixir-autogen, elixir-format
+msgid "Zero results"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "default"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "grade"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "la le li"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "objectives"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "remove file"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "remove objective"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "{{document.title}} for {{document.grade}} students"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "|"
+msgstr ""
+
+#: lib/teacher_coop/accounts/user_notifier.ex
+#, elixir-autogen, elixir-format
+msgid "\n==============================\n\nHi %{email},\n\nYou can change your email by visiting the URL below:\n\n%{url}\n\nIf you didn't request this change, please ignore this.\n\n==============================\n"
+msgstr ""
+
+#: lib/teacher_coop/accounts/user_notifier.ex
+#, elixir-autogen, elixir-format
+msgid "\n==============================\n\nHi %{email},\n\nYou can confirm your account by visiting the URL below:\n\n%{url}\n\nIf you didn't create an account with us, please ignore this.\n\n==============================\n"
+msgstr ""
+
+#: lib/teacher_coop/accounts/user_notifier.ex
+#, elixir-autogen, elixir-format
+msgid "\n==============================\n\nHi %{email},\n\nYou can log into your account by visiting the URL below:\n\n%{url}\n\nIf you didn't request this email, please ignore this.\n\n==============================\n"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/registration.ex
+#, elixir-autogen, elixir-format
+msgid "An email was sent to %{email}, please access it to confirm your account."
+msgstr ""
+
+#: lib/teacher_coop/accounts/user_notifier.ex
+#, elixir-autogen, elixir-format
+msgid "Confirmation instructions"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
+#, elixir-autogen, elixir-format
+msgid "Confirming..."
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/registration.ex
+#, elixir-autogen, elixir-format
+msgid "Creating account..."
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Edit Document"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/login.ex
+#, elixir-autogen, elixir-format
+msgid "If your email is in our system, you will receive instructions for logging in shortly."
+msgstr ""
+
+#: lib/teacher_coop_web/controllers/user_session_controller.ex
+#, elixir-autogen, elixir-format
+msgid "Invalid email or password"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Listing Documents"
+msgstr ""
+
+#: lib/teacher_coop/accounts/user_notifier.ex
+#, elixir-autogen, elixir-format
+msgid "Log in instructions"
+msgstr ""
+
+#: lib/teacher_coop_web/controllers/user_session_controller.ex
+#, elixir-autogen, elixir-format
+msgid "Logged out successfully."
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
+#, elixir-autogen, elixir-format
+msgid "Logging in..."
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/confirmation.ex
+#, elixir-autogen, elixir-format
+msgid "Magic link is invalid or it has expired."
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "New Document"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "New objectives"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/login.ex
+#, elixir-autogen, elixir-format
+msgid "Password"
+msgstr ""
+
+#: lib/teacher_coop_web/controllers/user_session_controller.ex
+#, elixir-autogen, elixir-format
+msgid "Password updated successfully!"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "Show Document"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/show.ex
+#, elixir-autogen, elixir-format
+msgid "The current document was deleted."
+msgstr ""
+
+#: lib/teacher_coop_web/controllers/user_session_controller.ex
+#, elixir-autogen, elixir-format
+msgid "The link is invalid or it has expired."
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Title"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/login.ex
+#, elixir-autogen, elixir-format
+msgid "To see sent emails, visit"
+msgstr ""
+
+#: lib/teacher_coop/accounts/user_notifier.ex
+#, elixir-autogen, elixir-format
+msgid "Update email instructions"
+msgstr ""
+
+#: lib/teacher_coop_web/controllers/user_session_controller.ex
+#, elixir-autogen, elixir-format
+msgid "User confirmed successfully."
+msgstr ""
+
+#: lib/teacher_coop_web/controllers/user_session_controller.ex
+#, elixir-autogen, elixir-format
+msgid "Welcome back!"
+msgstr ""
+
+#: lib/teacher_coop_web/user_auth.ex
+#, elixir-autogen, elixir-format
+msgid "You are not allowed to access this page."
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/login.ex
+#, elixir-autogen, elixir-format
+msgid "You are running the local mail adapter."
+msgstr ""
+
+#: lib/teacher_coop_web/user_auth.ex
+#, elixir-autogen, elixir-format
+msgid "You must log in to access this page."
+msgstr ""
+
+#: lib/teacher_coop_web/user_auth.ex
+#, elixir-autogen, elixir-format
+msgid "You must re-authenticate to access this page."
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/registration.ex
+#, elixir-autogen, elixir-format
+msgid "Your email address is used to create and secure your account (confirmation, login, password reset). See our "
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/login.ex
+#, elixir-autogen, elixir-format
+msgid "or"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/login.ex
+#, elixir-autogen, elixir-format
+msgid "the mailbox page"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/document_count_live.ex
+#, elixir-autogen, elixir-format
+msgid "%{count} new document in the past 7 days"
+msgid_plural "%{count} new documents in the past 7 days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/document_count_live.ex
+#, elixir-autogen, elixir-format
+msgid "%{count} new user in the past 7 days"
+msgid_plural "%{count} new users in the past 7 days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Too many files. Maximum is %{max}."
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Wrong format, must be one of %{formats}"
+msgstr ""
+
+#: lib/teacher_coop_web/live/document_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "title"
+msgstr ""
+
+#: lib/teacher_coop_web/live/user_live/registration.ex
+#, elixir-autogen, elixir-format
+msgid " for details and your rights."
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Legal Mentions"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#: lib/teacher_coop_web/live/user_live/registration.ex
+#, elixir-autogen, elixir-format
+msgid "privacy policy"
 msgstr ""

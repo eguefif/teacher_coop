@@ -100,3 +100,18 @@ msgstr "doit être supérieur ou égale à"
 
 msgid "must be equal to %{number}"
 msgstr "doit être égale à"
+
+#: lib/teacher_coop/accounts/user.ex
+#, elixir-autogen, elixir-format
+msgid "did not change"
+msgstr "n'a pas changé"
+
+#: lib/teacher_coop/accounts/user.ex
+#, elixir-autogen, elixir-format
+msgid "does not match password"
+msgstr "ne correspond pas au mot de passe"
+
+#: lib/teacher_coop/accounts/user.ex
+#, elixir-autogen, elixir-format
+msgid "must have the @ sign and no spaces"
+msgstr "doit contenir le symbole @ et aucun espace"

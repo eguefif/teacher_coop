@@ -20,7 +20,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
         <.input
           field={@form[:title]}
           type="text"
-          label={gettext("titre") |> String.capitalize()}
+          label={gettext("title") |> String.capitalize()}
           phx-debounce="blur"
         />
         <.input
@@ -74,7 +74,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
               :if={Enum.any?(@uploads.files.errors, &(elem(&1, 1) == :too_many_files)) == true}
               class="text-error"
             >
-              {gettext("Too many files. Maximum is ")} {"#{@max_files}"}
+              {gettext("Too many files. Maximum is %{max}.", max: @max_files)}
             </div>
           </label>
           <.live_file_input upload={@uploads.files} />
@@ -197,7 +197,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     </div>
 
     <div :if={@selected_objectives != []}>
-      <div class="text-lg">New objectives</div>
+      <div class="text-lg">{gettext("New objectives")}</div>
       <div
         :for={objective <- @selected_objectives}
         class="px-4 py-3 rounded mb-4 flex flex-row justify-between content-successline bg-info/30 border border-info/70 text-info/100"
@@ -344,7 +344,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     document = Library.get_document!(id)
 
     socket
-    |> assign(:page_title, "Edit Document")
+    |> assign(:page_title, gettext("Edit Document"))
     |> assign(:document, document)
     |> assign(:current_document_files, document.files)
     |> assign(:selected_objectives, [])
@@ -356,7 +356,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     document = %Document{user_id: socket.assigns.current_scope.user.id, files: [], objectives: []}
 
     socket
-    |> assign(:page_title, "New Document")
+    |> assign(:page_title, gettext("New Document"))
     |> assign(:objective_results, [])
     |> assign(:current_document_files, [])
     |> assign(:selected_objectives, [])
@@ -612,9 +612,14 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
 
   defp error_to_string(error) when is_atom(error) do
     case error do
-      :too_large -> gettext("File too large")
-      :not_accepted -> gettext("Wrong format, must be one of ") <> Enum.join(@formats)
-      value -> Atom.to_string(value)
+      :too_large ->
+        gettext("File too large")
+
+      :not_accepted ->
+        gettext("Wrong format, must be one of %{formats}", formats: Enum.join(@formats, ", "))
+
+      value ->
+        Atom.to_string(value)
     end
   end
 

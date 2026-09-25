@@ -25,12 +25,15 @@ defmodule TeacherCoopWeb.UserLive.Confirmation do
           <.button
             name={@form[:remember_me].name}
             value="true"
-            phx-disable-with="Confirming..."
+            phx-disable-with={gettext("Confirming...")}
             class="btn btn-primary w-full"
           >
             {gettext("Confirm and stay logged in")}
           </.button>
-          <.button phx-disable-with="Confirming..." class="btn btn-primary btn-soft w-full mt-2">
+          <.button
+            phx-disable-with={gettext("Confirming...")}
+            class="btn btn-primary btn-soft w-full mt-2"
+          >
             {gettext("Confirm and log in only this time")}
           </.button>
         </.form>
@@ -46,19 +49,22 @@ defmodule TeacherCoopWeb.UserLive.Confirmation do
         >
           <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
           <%= if @current_scope do %>
-            <.button phx-disable-with="Logging in..." class="btn btn-primary w-full">
+            <.button phx-disable-with={gettext("Logging in...")} class="btn btn-primary w-full">
               {gettext("Log in")}
             </.button>
           <% else %>
             <.button
               name={@form[:remember_me].name}
               value="true"
-              phx-disable-with="Logging in..."
+              phx-disable-with={gettext("Logging in...")}
               class="btn btn-primary w-full"
             >
               {gettext("Keep me logged in on this device")}
             </.button>
-            <.button phx-disable-with="Logging in..." class="btn btn-primary btn-soft w-full mt-2">
+            <.button
+              phx-disable-with={gettext("Logging in...")}
+              class="btn btn-primary btn-soft w-full mt-2"
+            >
               {gettext("Log me in only this time")}
             </.button>
           <% end %>
@@ -82,7 +88,7 @@ defmodule TeacherCoopWeb.UserLive.Confirmation do
     else
       {:ok,
        socket
-       |> put_flash(:error, "Magic link is invalid or it has expired.")
+       |> put_flash(:error, gettext("Magic link is invalid or it has expired."))
        |> push_navigate(to: ~p"/users/log-in")}
     end
   end
