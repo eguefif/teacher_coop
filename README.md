@@ -1,5 +1,10 @@
 # TeacherCoop
 
+[![Test](https://github.com/eguefif/teacher_coop/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/test.yml)
+[![Lint](https://github.com/eguefif/teacher_coop/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/lint.yml)
+[![Dialyzer](https://github.com/eguefif/teacher_coop/actions/workflows/dialyzer.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/dialyzer.yml)
+[![Gettext](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml)
+
 https://www.teachercoop.org
 
 This project is an Elixir learning project. It's also a project that I might one day put in production.

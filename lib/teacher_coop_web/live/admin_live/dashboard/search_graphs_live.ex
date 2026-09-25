@@ -101,7 +101,6 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
           click_position_data:
             Dashboard.click_position(7)
             |> Enum.sort(&(&1 >= &2))
-            |> IO.inspect()
             |> Enum.map(fn elem ->
               {elem.position, elem.count}
             end)
