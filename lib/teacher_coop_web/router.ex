@@ -98,6 +98,8 @@ defmodule TeacherCoopWeb.Router do
       live "/users/register", UserLive.Registration, :new
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
+
+      live "/privacy-policy", PrivacyPolicyLive, :show
     end
 
     get "/files/:id", FileController, :show

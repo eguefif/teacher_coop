@@ -26,14 +26,23 @@ defmodule TeacherCoopWeb.UserLive.Registration do
           <.input
             field={@form[:email]}
             type="email"
-            label="Email"
+            label={gettext("Email")}
             autocomplete="username"
             spellcheck="false"
             required
             phx-mounted={JS.focus()}
           />
+          <div class="text-sm my-4">
+            {gettext(
+              "Your email address is used to create and secure your account (confirmation, login, password reset). See our "
+            )}
+            <.link navigate={~p"/privacy-policy/"} class="font-semibold text-brand hover:underline">{gettext(
+              "privacy policy "
+            )}</.link>
+            {gettext("for details and your rights.")}
+          </div>
 
-          <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
+          <.button phx-disable-with={gettext("Creating account...")} class="btn btn-primary w-full">
             {gettext("Create an account")}
           </.button>
         </.form>
@@ -68,7 +77,10 @@ defmodule TeacherCoopWeb.UserLive.Registration do
          socket
          |> put_flash(
            :info,
-           "An email was sent to #{user.email}, please access it to confirm your account."
+           gettext(
+             "An email was sent to %{email}, please access it to confirm your account.",
+             email: user.email
+           )
          )
          |> push_navigate(to: ~p"/users/log-in")}
 
