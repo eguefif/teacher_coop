@@ -5,10 +5,7 @@
 [![Dialyzer](https://github.com/eguefif/teacher_coop/actions/workflows/dialyzer.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/dialyzer.yml)
 [![Gettext](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml)
 
-https://www.teachercoop.org
-
-This project is an Elixir learning project. It's also a project that I might one day put in production.
-
+[https://www.teachercoop.org](https://www.teachercoop.org)
 
 This repository is linked to the [infra repo](https://github.com/eguefif/infra_teacher_coop). The CI/CD is automated.
 Any pull request goes through GitHub Actions to check: tests, test coverage and Dialyzer.
