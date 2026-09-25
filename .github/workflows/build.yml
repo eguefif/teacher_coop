@@ -33,4 +33,4 @@ jobs:
           docker push "eguefif/teacher_coop:${TAG}"
 
       - name: Deploy to Portainer using Webhook
-        run: curl -sS --fail-with-body -X POST "https://portainer.teachercoop.org/api/webhooks/${{secrets.PORTAINER_APP_WEBHOOK}}?IMAGE_TAG=${TAG}"
+        run: curl -fsS -X POST "https://portainer.teachercoop.org/api/stacks/webhooks/${{secrets.PORTAINER_APP_WEBHOOK}}?IMAGE_TAG=${TAG}"
