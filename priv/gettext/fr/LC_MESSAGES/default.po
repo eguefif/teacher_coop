@@ -1071,3 +1071,8 @@ msgstr "Mentions légales"
 #, elixir-autogen, elixir-format
 msgid "privacy policy"
 msgstr "politique de confidentialité"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Terms of Service"
+msgstr "Conditions d'utilisation"

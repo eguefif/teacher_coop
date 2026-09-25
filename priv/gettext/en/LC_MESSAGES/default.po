@@ -1035,3 +1035,8 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "privacy policy"
 msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Terms of Service"
+msgstr ""
