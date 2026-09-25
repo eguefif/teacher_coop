@@ -4,6 +4,7 @@
 [![Lint](https://github.com/eguefif/teacher_coop/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/lint.yml)
 [![Dialyzer](https://github.com/eguefif/teacher_coop/actions/workflows/dialyzer.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/dialyzer.yml)
 [![Gettext](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml)
+[![Coverage](https://github.com/eguefif/teacher_coop/actions/workflows/coverage.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/coverage.yml)
 
 [https://www.teachercoop.org](https://www.teachercoop.org)
 
