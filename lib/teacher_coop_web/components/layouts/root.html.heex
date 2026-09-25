@@ -42,7 +42,7 @@
       })();
     </script>
   </head>
-  <body>
+  <body class="flex flex-col min-h-screen">
     <div class="flex flex-row gap-8 space-between m-4 max-w-250 mx-auto items-baseline">
       <div class="text-xl min-w-50">
         <.link href={~p"/"}>
@@ -107,6 +107,14 @@
         </li>
       </ul>
     </div>
-    {@inner_content}
+    <div class="flex-1">
+      {@inner_content}
+    </div>
+    <footer class="flex-0 footer sm:footer-horizontal bg-neutral text-neutral-content p-10 footer-center">
+      <nav class="flex flex-row gap-8">
+        <.link navigate={~p"/legal-mentions/"} class="link link-hover">{gettext("Legal Mentions")}</.link>
+        <.link navigate={~p"/privacy-policy/"} class="link link-hover">{gettext("privacy policy")}</.link>
+      </nav>
+    </footer>
   </body>
 </html>
