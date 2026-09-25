@@ -33,4 +33,12 @@ jobs:
           docker push "eguefif/teacher_coop:${TAG}"
 
       - name: Deploy to Portainer using Webhook
-        run: curl -fsS -X POST "https://portainer.teachercoop.org/api/stacks/webhooks/${{secrets.PORTAINER_APP_WEBHOOK}}?IMAGE_TAG=${TAG}"
+        run: |
+          # Make sure the tag is resolvable on Docker Hub before triggering
+          for i in 1 2 3 4 5; do
+            docker manifest inspect "eguefif/teacher_coop:${TAG}" >/dev/null && break
+            sleep 5
+          done
+          curl -fsS -X POST \
+            --retry 5 --retry-delay 10 --retry-all-errors --max-time 120 \
+            "https://portainer.teachercoop.org/api/stacks/webhooks/${{ secrets.PORTAINER_APP_WEBHOOK }}?IMAGE_TAG=${TAG}"
