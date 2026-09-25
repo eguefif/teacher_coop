@@ -108,6 +108,7 @@ defmodule TeacherCoopWeb.Router do
       live "/users/log-in/:token", UserLive.Confirmation, :new
 
       live "/privacy-policy", PrivacyPolicyLive, :show
+      live "/legal-mentions", LegalMentionsLive, :show
     end
 
     get "/files/:id", FileController, :show
