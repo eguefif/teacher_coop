@@ -143,10 +143,12 @@ defmodule TeacherCoopWeb.UserAuth do
   #
   defp renew_session(conn, _user) do
     delete_csrf_token()
+    locale = get_session(conn, "locale")
 
     conn
     |> configure_session(renew: true)
     |> clear_session()
+    |> then(fn conn -> if locale, do: put_session(conn, "locale", locale), else: conn end)
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}, _),

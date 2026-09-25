@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang={Gettext.get_locale()}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -49,7 +49,7 @@
           Teacher Coop
         </.link>
       </div>
-      <ul class="menu menu-horizontal w-full relative z-10 flex items-baseline gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+      <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
         <%= if @current_scope do %>
           <li>
             {@current_scope.user.email}
@@ -89,6 +89,22 @@
             <.link href={~p"/users/log-in"}>{gettext("Log in")}</.link>
           </li>
         <% end %>
+        <li>
+          <details id="locale-switcher">
+            <summary>
+              <.icon name="hero-language" class="size-4" />
+              {String.upcase(Gettext.get_locale())}
+            </summary>
+            <ul class="right-0">
+              <li>
+                <.link id="locale-fr" href={~p"/locale/fr"} lang="fr">Français</.link>
+              </li>
+              <li>
+                <.link id="locale-en" href={~p"/locale/en"} lang="en">English</.link>
+              </li>
+            </ul>
+          </details>
+        </li>
       </ul>
     </div>
     {@inner_content}

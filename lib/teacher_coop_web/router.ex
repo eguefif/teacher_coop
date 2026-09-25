@@ -12,6 +12,7 @@ defmodule TeacherCoopWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_scope_for_user
+    plug TeacherCoopWeb.Locale
   end
 
   pipeline :api do
@@ -54,7 +55,10 @@ defmodule TeacherCoopWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{TeacherCoopWeb.UserAuth, :require_authenticated}] do
+      on_mount: [
+        {TeacherCoopWeb.Locale, :set_locale},
+        {TeacherCoopWeb.UserAuth, :require_authenticated}
+      ] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
 
@@ -70,7 +74,8 @@ defmodule TeacherCoopWeb.Router do
     pipe_through [:browser, :require_admin]
     oban_dashboard("/oban")
 
-    live_session :require_admin, on_mount: [{TeacherCoopWeb.UserAuth, :require_admin}] do
+    live_session :require_admin,
+      on_mount: [{TeacherCoopWeb.Locale, :set_locale}, {TeacherCoopWeb.UserAuth, :require_admin}] do
       live "/", AdminLive.DashboardLive, :index
       live "/configurations", AdminLive.ConfigurationLive.Index, :index
       live "/configurations/new", AdminLive.ConfigurationLive.Form, :new
@@ -89,7 +94,10 @@ defmodule TeacherCoopWeb.Router do
     pipe_through [:browser]
 
     live_session :current_user,
-      on_mount: [{TeacherCoopWeb.UserAuth, :mount_current_scope}] do
+      on_mount: [
+        {TeacherCoopWeb.Locale, :set_locale},
+        {TeacherCoopWeb.UserAuth, :mount_current_scope}
+      ] do
       live "/", SearchLive.Search, :new
       live "/search", SearchLive.Search, :new
 
@@ -102,6 +110,7 @@ defmodule TeacherCoopWeb.Router do
 
     get "/files/:id", FileController, :show
     get "/documents/download/:id", DocumentController, :show
+    get "/locale/:locale", LocaleController, :update
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end
