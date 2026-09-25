@@ -16,7 +16,7 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
         </:actions>
       </.header>
 
-      <div class="flex flex-wrap flex-row gap-8 justify-start w-[740px] mx-auto">
+      <div class="flex flex-wrap flex-col gap-4 lg:flex-row lg:gap-8 items-center lg:justify-start lg:w-[740px] lg:mx-auto">
         <div
           :for={{id, document} <- @streams.documents}
           id={id}

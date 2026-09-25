@@ -7,7 +7,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchTermsStatsLive do
   def render(assigns) do
     ~H"""
     <div class="flex flex-col gap-4">
-      <div class="flex flex-row gap-4 justify-around">
+      <div class="flex flex-col lg:flex-row gap-4 justify-around">
         <.async_result
           :let={top_search_terms_with_no_result}
           assign={@top_search_terms_with_no_result}

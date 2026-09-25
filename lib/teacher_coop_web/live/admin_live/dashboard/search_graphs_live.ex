@@ -6,8 +6,8 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col gap-4">
-      <div class="flex flex-row gap-4 justify-around">
+    <div class="flex flex-col lg:flex-col gap-4">
+      <div class="flex flex-col lg:flex-row gap-4 justify-around">
         <.async_result :let={searches_count_data} assign={@searches_count_data}>
           <:loading><div class="skeleton" /></:loading>
           <:failed>{gettext("Failed to retrieve data")}</:failed>
@@ -31,7 +31,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
           />
         </.async_result>
       </div>
-      <div class="flex flex-row gap-4 justify-around">
+      <div class="flex flex-col lg:flex-row gap-4 justify-around">
         <.async_result :let={zero_results_data} assign={@zero_results_data}>
           <:loading><div class="skeleton" /></:loading>
           <:failed>{gettext("Failed to retrieve data")}</:failed>
