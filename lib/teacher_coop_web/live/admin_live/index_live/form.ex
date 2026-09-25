@@ -12,7 +12,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
         {@page_title}
       </.header>
       <.form for={@form} id="index-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:uid]} type="text" label="Title" />
+        <.input field={@form[:uid]} type="text" label={gettext("Title")} />
         <.input
           type="select"
           field={@form[:engine_configuration_id]}

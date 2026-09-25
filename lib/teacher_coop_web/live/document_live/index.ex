@@ -51,7 +51,7 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Documents")
+     |> assign(:page_title, gettext("Listing Documents"))
      |> stream(:documents, list_documents(socket.assigns.current_scope))}
   end
 

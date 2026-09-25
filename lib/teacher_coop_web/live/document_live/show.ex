@@ -117,7 +117,7 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
   def mount(%{"id" => id, "return_to" => "search"}, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, "Show Document")
+     |> assign(:page_title, gettext("Show Document"))
      |> assign(:document, Library.get_document!(id))
      |> assign(:return_to, ~p"/search")}
   end
@@ -126,7 +126,7 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
   def mount(%{"id" => id}, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, "Show Document")
+     |> assign(:page_title, gettext("Show Document"))
      |> assign(:document, Library.get_document!(id))
      |> assign(:return_to, ~p"/documents")}
   end
@@ -145,7 +145,7 @@ defmodule TeacherCoopWeb.DocumentLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current document was deleted.")
+     |> put_flash(:error, gettext("The current document was deleted."))
      |> push_navigate(to: ~p"/documents")}
   end
 

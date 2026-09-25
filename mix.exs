@@ -11,6 +11,9 @@ defmodule TeacherCoop.MixProject do
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
+      # Without line numbers, references don't change on unrelated edits,
+      # so the Gettext CI check only fails when messages actually change.
+      gettext: [write_reference_line_numbers: false],
       listeners: [Phoenix.CodeReloader],
       name: "Teacher Coop",
       source_url: "https://github.com/eguefif/teacher_coop",
@@ -37,6 +40,7 @@ defmodule TeacherCoop.MixProject do
           TeacherCoop.DashboardFixtures,
           TeacherCoop.DiscoveryFixtures,
           # Skip the following Phoenix Modules
+          Mix.Tasks.Gettext.CheckTranslations,
           TeacherCoopWeb.CoreComponents,
           TeacherCoopWeb.ErrorHTML,
           TeacherCoopWeb.Telemetry,

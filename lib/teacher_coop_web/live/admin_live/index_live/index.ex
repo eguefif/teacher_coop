@@ -46,9 +46,9 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Index do
           <.link
             id={"delete-#{index.id}"}
             phx-click={JS.push("delete", value: %{id: index.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm={gettext("Are you sure?")}
           >
-            Delete
+            {gettext("Delete")}
           </.link>
         </:action>
       </.table>

@@ -27,7 +27,11 @@ defmodule TeacherCoopWeb.AdminLive.DocumentsCountLive do
             <div class="text-md">{gettext("Document")}</div>
             <div class="text-4xl">{stat.total}</div>
             <div if={stat.sub > 0}>
-              <span class="text-md">{stat.sub} {gettext(" new documents in the past 7 days")}</span>
+              <span class="text-md">{ngettext(
+                "%{count} new document in the past 7 days",
+                "%{count} new documents in the past 7 days",
+                stat.sub
+              )}</span>
             </div>
           </div>
           <div class="flex-1">
@@ -54,7 +58,11 @@ defmodule TeacherCoopWeb.AdminLive.DocumentsCountLive do
             <div class="text-md">{gettext("Users")}</div>
             <div class="text-4xl">{stat.total}</div>
             <div if={stat.sub > 0}>
-              <span class="text-md">{stat.sub} {gettext("new users in the past 7 days.")}</span>
+              <span class="text-md">{ngettext(
+                "%{count} new user in the past 7 days",
+                "%{count} new users in the past 7 days",
+                stat.sub
+              )}</span>
             </div>
           </div>
           <div class="flex-1">

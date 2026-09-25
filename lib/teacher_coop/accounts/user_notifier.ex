@@ -1,5 +1,6 @@
 defmodule TeacherCoop.Accounts.UserNotifier do
   import Swoosh.Email
+  use Gettext, backend: TeacherCoopWeb.Gettext
 
   alias TeacherCoop.Mailer
   alias TeacherCoop.Accounts.User
@@ -22,20 +23,28 @@ defmodule TeacherCoop.Accounts.UserNotifier do
   Deliver instructions to update a user email.
   """
   def deliver_update_email_instructions(user, url) do
-    deliver(user.email, "Update email instructions", """
+    deliver(
+      user.email,
+      gettext("Update email instructions"),
+      gettext(
+        """
 
-    ==============================
+        ==============================
 
-    Hi #{user.email},
+        Hi %{email},
 
-    You can change your email by visiting the URL below:
+        You can change your email by visiting the URL below:
 
-    #{url}
+        %{url}
 
-    If you didn't request this change, please ignore this.
+        If you didn't request this change, please ignore this.
 
-    ==============================
-    """)
+        ==============================
+        """,
+        email: user.email,
+        url: url
+      )
+    )
   end
 
   @doc """
@@ -49,36 +58,52 @@ defmodule TeacherCoop.Accounts.UserNotifier do
   end
 
   defp deliver_magic_link_instructions(user, url) do
-    deliver(user.email, "Log in instructions", """
+    deliver(
+      user.email,
+      gettext("Log in instructions"),
+      gettext(
+        """
 
-    ==============================
+        ==============================
 
-    Hi #{user.email},
+        Hi %{email},
 
-    You can log into your account by visiting the URL below:
+        You can log into your account by visiting the URL below:
 
-    #{url}
+        %{url}
 
-    If you didn't request this email, please ignore this.
+        If you didn't request this email, please ignore this.
 
-    ==============================
-    """)
+        ==============================
+        """,
+        email: user.email,
+        url: url
+      )
+    )
   end
 
   defp deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instructions", """
+    deliver(
+      user.email,
+      gettext("Confirmation instructions"),
+      gettext(
+        """
 
-    ==============================
+        ==============================
 
-    Hi #{user.email},
+        Hi %{email},
 
-    You can confirm your account by visiting the URL below:
+        You can confirm your account by visiting the URL below:
 
-    #{url}
+        %{url}
 
-    If you didn't create an account with us, please ignore this.
+        If you didn't create an account with us, please ignore this.
 
-    ==============================
-    """)
+        ==============================
+        """,
+        email: user.email,
+        url: url
+      )
+    )
   end
 end
