@@ -1044,3 +1044,13 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Privacy Policy"
 msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "AGPL-3.0 licence"
+msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Source code"
+msgstr ""

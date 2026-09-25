@@ -1080,3 +1080,13 @@ msgstr "Conditions d'utilisation"
 #, elixir-autogen, elixir-format
 msgid "Privacy Policy"
 msgstr "Politique de confidentialité"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "AGPL-3.0 licence"
+msgstr "Licence AGPL-3.0"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Source code"
+msgstr "Code source"

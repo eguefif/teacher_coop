@@ -110,14 +110,40 @@
     <div class="flex-1">
       {@inner_content}
     </div>
-    <footer class="flex-0 footer sm:footer-horizontal bg-neutral text-neutral-content p-10 footer-center">
-      <nav class="flex flex-row gap-8">
+    <footer class="flex-0 flex flex-col sm:flex-row items-center sm:justify-between gap-2 px-6 py-3 text-sm bg-neutral text-neutral-content">
+      <nav class="flex flex-row flex-wrap justify-center gap-x-6 gap-y-1">
         <.link navigate={~p"/legal-mentions/"} class="link link-hover">{gettext("Legal Mentions")}</.link>
         <.link navigate={~p"/privacy-policy/"} class="link link-hover">{gettext("Privacy Policy")}</.link>
         <.link navigate={~p"/terms-of-service"} class="link link-hover">{gettext(
           "Terms of Service"
         )}</.link>
       </nav>
+      <aside
+        id="footer-copyright"
+        class="flex flex-row flex-wrap justify-center gap-2 opacity-70"
+      >
+        <span>© 2026 Emmanuel Guefif</span>
+        <span aria-hidden="true">·</span>
+        <a
+          id="footer-source-code"
+          href="https://github.com/eguefif/teacher_coop"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link link-hover"
+        >
+          {gettext("Source code")}
+        </a>
+        <span aria-hidden="true">·</span>
+        <a
+          id="footer-licence"
+          href="https://www.gnu.org/licenses/agpl-3.0.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link link-hover"
+        >
+          {gettext("AGPL-3.0 licence")}
+        </a>
+      </aside>
     </footer>
   </body>
 </html>
