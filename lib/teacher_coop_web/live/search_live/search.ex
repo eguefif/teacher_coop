@@ -7,12 +7,12 @@ defmodule TeacherCoopWeb.SearchLive.Search do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="flex flex-col items-center gap-[64px]">
+      <div class="flex flex-col items-center gap-[32px] lg:gap-[64px]">
         <.form
           id="search-form"
           for={@form}
           phx-submit="trigger-search"
-          class="flex flex-row gap-[48px] items-baseline"
+          class="flex flex-col lg:flex-row gap-[16px] lg:gap-[48px] items-center lg:items-baseline"
         >
           <.input
             id="search_terms"
@@ -20,7 +20,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
             type="text"
             field={@form[:search_terms]}
             placeholder="Un petit prince..."
-            class="input w-150 h-14 rounded-4xl"
+            class="input w-[256px] lg:w-[384px] h-14 rounded-4xl"
           />
           <footer>
             <.button
@@ -47,7 +47,6 @@ defmodule TeacherCoopWeb.SearchLive.Search do
           {gettext("Oops no result for that search....")}
         </div>
       </div>
-      <pre><%= inspect @results, pretty: true %></pre>
     </Layouts.app>
     """
   end

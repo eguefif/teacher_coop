@@ -43,70 +43,121 @@
     </script>
   </head>
   <body class="flex flex-col min-h-screen">
-    <div class="flex flex-row gap-8 space-between m-4 max-w-250 mx-auto items-baseline">
-      <div class="text-xl min-w-50">
-        <.link href={~p"/"}>
-          Teacher Coop
-        </.link>
+    <header class="navbar bg-base-100 shadow-sm px-4 lg:px-8 relative z-10">
+      <div class="navbar-start">
+        <div class="dropdown">
+          <div
+            id="mobile-menu-toggle"
+            tabindex="0"
+            role="button"
+            aria-label={gettext("Menu")}
+            class="btn btn-ghost lg:hidden"
+          >
+            <.icon name="hero-bars-3" class="size-5" />
+          </div>
+          <ul
+            id="mobile-menu"
+            tabindex="-1"
+            class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-60 p-2 shadow"
+          >
+            <%= if @current_scope do %>
+              <li class="menu-title truncate">{@current_scope.user.email}</li>
+              <li><.link href={~p"/documents"}>{gettext("Documents")}</.link></li>
+              <%= if TeacherCoop.Accounts.Scope.is_admin?(@current_scope) do %>
+                <li>
+                  <.link href={~p"/admin/"}>{gettext("Admin")}</.link>
+                  <ul class="p-2">
+                    <li>
+                      <.link href={~p"/admin/configurations"}>
+                        {gettext("Engine Configurations")}
+                      </.link>
+                    </li>
+                    <li><.link href={~p"/admin/indexes"}>{gettext("Indexes")}</.link></li>
+                    <li><.link href={~p"/admin/oban"}>{gettext("Oban")}</.link></li>
+                  </ul>
+                </li>
+              <% end %>
+              <li><.link href={~p"/users/settings"}>{gettext("Settings")}</.link></li>
+              <li>
+                <.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link>
+              </li>
+            <% else %>
+              <li><.link href={~p"/users/register"}>{gettext("Register")}</.link></li>
+              <li><.link href={~p"/users/log-in"}>{gettext("Log in")}</.link></li>
+            <% end %>
+          </ul>
+        </div>
+        <.link href={~p"/"} class="btn btn-ghost text-xl">Teacher Coop</.link>
       </div>
-      <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
-        <%= if @current_scope do %>
-          <li>
-            {@current_scope.user.email}
-          </li>
-          <%= if TeacherCoop.Accounts.Scope.is_admin?(@current_scope) do %>
-            <li>
-              <details>
-                <summary><.link href={~p"/admin/"}>{gettext("Admin")}</.link></summary>
-                <ul>
-                  <li>
-                    <.link href={~p"/admin/configurations"}>{gettext("Engine Configurations")}</.link>
-                  </li>
-                  <li>
-                    <.link href={~p"/admin/indexes"}>{gettext("Indexes")}</.link>
-                  </li>
-                  <li>
-                    <.link href={~p"/admin/oban"}>{gettext("Oban")}</.link>
-                  </li>
-                </ul>
-              </details>
-            </li>
+
+      <nav class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+          <%= if @current_scope do %>
+            <%= if TeacherCoop.Accounts.Scope.is_admin?(@current_scope) do %>
+              <li>
+                <details>
+                  <summary>{gettext("Admin")}</summary>
+                  <ul class="p-2 bg-base-100 w-56 z-10 shadow">
+                    <li><.link href={~p"/admin/"}>{gettext("Dashboard")}</.link></li>
+                    <li>
+                      <.link href={~p"/admin/configurations"}>
+                        {gettext("Engine Configurations")}
+                      </.link>
+                    </li>
+                    <li><.link href={~p"/admin/indexes"}>{gettext("Indexes")}</.link></li>
+                    <li><.link href={~p"/admin/oban"}>{gettext("Oban")}</.link></li>
+                  </ul>
+                </details>
+              </li>
+            <% end %>
+            <li><.link href={~p"/documents"}>{gettext("Documents")}</.link></li>
           <% end %>
-          <li>
-            <.link href={~p"/documents"}>{gettext("Documents")}</.link>
-          </li>
-          <li>
-            <.link href={~p"/users/settings"}>{gettext("Settings")}</.link>
-          </li>
-          <li>
-            <.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link>
-          </li>
+        </ul>
+      </nav>
+
+      <div class="navbar-end gap-2">
+        <%= if @current_scope do %>
+          <span class="hidden lg:inline text-sm opacity-70 truncate max-w-56">
+            {@current_scope.user.email}
+          </span>
+          <.link href={~p"/users/settings"} class="btn btn-ghost btn-sm hidden lg:inline-flex">
+            {gettext("Settings")}
+          </.link>
+          <.link
+            href={~p"/users/log-out"}
+            method="delete"
+            class="btn btn-ghost btn-sm hidden lg:inline-flex"
+          >
+            {gettext("Log out")}
+          </.link>
         <% else %>
-          <li>
-            <.link href={~p"/users/register"}>{gettext("Register")}</.link>
-          </li>
-          <li>
-            <.link href={~p"/users/log-in"}>{gettext("Log in")}</.link>
-          </li>
+          <.link href={~p"/users/log-in"} class="btn btn-ghost btn-sm hidden lg:inline-flex">
+            {gettext("Log in")}
+          </.link>
+          <.link href={~p"/users/register"} class="btn btn-primary btn-sm hidden lg:inline-flex">
+            {gettext("Register")}
+          </.link>
         <% end %>
-        <li>
-          <details id="locale-switcher">
-            <summary>
-              <.icon name="hero-language" class="size-4" />
-              {String.upcase(Gettext.get_locale())}
-            </summary>
-            <ul class="right-0">
-              <li>
-                <.link id="locale-fr" href={~p"/locale/fr"} lang="fr">Français</.link>
-              </li>
-              <li>
-                <.link id="locale-en" href={~p"/locale/en"} lang="en">English</.link>
-              </li>
-            </ul>
-          </details>
-        </li>
-      </ul>
-    </div>
+        <ul class="menu menu-horizontal px-1">
+          <li>
+            <details id="locale-switcher">
+              <summary>
+                <.icon name="hero-language" class="size-4" />
+                {String.upcase(Gettext.get_locale())}
+              </summary>
+              <ul class="right-0 p-2 bg-base-100 w-36 z-10 shadow">
+                <li>
+                  <.link id="locale-fr" href={~p"/locale/fr"} lang="fr">Français</.link>
+                </li>
+                <li>
+                  <.link id="locale-en" href={~p"/locale/en"} lang="en">English</.link>
+                </li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </div>
+    </header>
     <div class="flex-1">
       {@inner_content}
     </div>
