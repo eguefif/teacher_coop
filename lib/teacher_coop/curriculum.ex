@@ -11,8 +11,20 @@ defmodule TeacherCoop.Curriculum do
 
   alias TeacherCoop.Curriculum.Objective
 
+  @doc """
+  Returns all the objectives from the Curriculum. 
+  """
+  @spec list_objectives!() :: [Objective.t() | term()]
   def list_objectives!() do
     Repo.all(Objective)
+  end
+
+  @doc """
+  Returns all the objectives from the Curriculum by a key.
+  """
+  @spec list_objectives_by(keyword() | map()) :: [Objective.t() | term()]
+  def list_objectives_by(clauses) do
+    Repo.all_by(Objective, clauses)
   end
 
   def search_objectives(input) when is_bitstring(input) do
@@ -33,8 +45,19 @@ defmodule TeacherCoop.Curriculum do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_objective!(integer()) :: Objective.t() | term()
   def get_objective!(id) do
     Repo.get_by!(Objective, id: id)
+  end
+
+  @doc """
+  Gets a single objective by a key.
+
+
+  """
+  @spec get_objective_by!(keyword() | map()) :: Objective.t() | term()
+  def get_objective_by!(clause) do
+    Repo.get_by!(Objective, clause)
   end
 
   @doc """
@@ -49,6 +72,7 @@ defmodule TeacherCoop.Curriculum do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec create_objective(map()) :: {:ok, Objective.t()} | {:error, Ecto.Changeset.t()}
   def create_objective(attrs) do
     with {:ok, objective = %Objective{}} <-
            %Objective{}
@@ -70,6 +94,8 @@ defmodule TeacherCoop.Curriculum do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_objective(Objective.t(), map()) ::
+          {:ok, Objective.t()} | {:error, Ecto.Changeset.t()}
   def update_objective(%Objective{} = objective, attrs) do
     with {:ok, objective = %Objective{}} <-
            objective
@@ -91,6 +117,8 @@ defmodule TeacherCoop.Curriculum do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec delete_objective(Objective.t()) ::
+          {:ok, Objective.t()} | {:error, Ecto.Changeset.t()}
   def delete_objective(%Objective{} = objective) do
     with {:ok, objective = %Objective{}} <-
            Repo.delete(objective) do
@@ -109,5 +137,16 @@ defmodule TeacherCoop.Curriculum do
   """
   def change_objective(%Objective{} = objective, attrs \\ %{}) do
     Objective.changeset(objective, attrs)
+  end
+
+  @doc """
+  Bulk add a list of objectives from a file and metadata"
+  """
+  @spec bulk_add_objective_from_file(integer(), String.t(), binary()) :: :ok | :error
+  def bulk_add_objective_from_file(year, subject, file_content) do
+    %{year: year, subject: subject, file_content: file_content}
+
+    Workers.IngestCurriculumFile.new()
+    |> Oban.insert()
   end
 end
