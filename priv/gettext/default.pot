@@ -1060,3 +1060,8 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Menu"
 msgstr ""
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Toggle dark mode"
+msgstr ""
