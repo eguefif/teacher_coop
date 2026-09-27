@@ -72,6 +72,15 @@ config :phoenix_live_view,
 # at the `config/runtime.exs`.
 config :teacher_coop, TeacherCoop.Mailer, adapter: Swoosh.Adapters.Local
 
+# Configure FileStorage handler, for production, modify `runtime.exs` and use
+# the S3 adapter
+config :teacher_coop, TeacherCoop.FileStore,
+  endpoint: "http://localhost:9090",
+  access_key_id: "accesskey",
+  secret_access_key: "secret",
+  bucket: "teachercoop",
+  region: "fr-par"
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.25.4",
