@@ -49,10 +49,13 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
       Library.subscribe_documents(socket.assigns.current_scope)
     end
 
+    current_scope = socket.assigns.current_scope
+
     {:ok,
      socket
      |> assign(:page_title, gettext("Listing Documents"))
-     |> stream(:documents, list_documents(socket.assigns.current_scope))}
+     |> assign(:current_scope, current_scope)
+     |> stream(:documents, list_documents(current_scope))}
   end
 
   @impl true
