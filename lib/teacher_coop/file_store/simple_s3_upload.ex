@@ -74,7 +74,7 @@ defmodule TeacherCoop.SimpleS3Upload do
 
     fields = %{
       "key" => key,
-      "acl" => "public-read",
+      "acl" => "private-read",
       "content-type" => content_type,
       "x-amz-server-side-encryption" => "AES256",
       "x-amz-credential" => credential,

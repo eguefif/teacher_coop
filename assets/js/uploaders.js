@@ -1,3 +1,4 @@
+// See: https://phoenix-live-view.hexdocs.pm/external-uploads.html
 let Uploaders = {}
 
 Uploaders.S3 = function(entries, onViewError){

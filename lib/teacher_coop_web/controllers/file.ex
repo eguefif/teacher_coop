@@ -21,10 +21,10 @@ defmodule TeacherCoopWeb.FileController do
   defp get_file_content(:compressed, file_path) do
     compressed_file_path = file_path <> "-compressed"
 
-    FileStore.get_file(compressed_file_path, "", expires_in: 600)
+    FileStore.get_file_url(compressed_file_path, expires_in: 600)
   end
 
   defp get_file_content(:regular, file_path) do
-    FileStore.get_file(file_path, "", expires_in: 600)
+    FileStore.get_file_url(file_path, expires_in: 600)
   end
 end

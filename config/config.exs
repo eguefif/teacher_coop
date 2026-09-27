@@ -72,8 +72,7 @@ config :phoenix_live_view,
 # at the `config/runtime.exs`.
 config :teacher_coop, TeacherCoop.Mailer, adapter: Swoosh.Adapters.Local
 
-# Configure FileStorage handler, for production, modify `runtime.exs` and use
-# the S3 adapter
+# Configure FileStorage handler to work locally with dummy credentials
 config :teacher_coop, TeacherCoop.FileStore,
   endpoint: "http://localhost:9090",
   access_key_id: "accesskey",
@@ -110,6 +109,8 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :teacher_coop, TeacherCoop.SearchRepo, masterkey: "masterkey"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
