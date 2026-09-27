@@ -344,7 +344,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
     uploads = socket.assigns.uploads
 
     {:ok, meta} =
-      FileStore.create_file(entry.client_name, "",
+      FileStore.create_file_url(entry.client_name, "",
         content_type: entry.client_type,
         max_file_size: uploads[entry.upload_config].max_file_size,
         expires_in: :timer.hours(1)

@@ -3,7 +3,7 @@ defmodule TeacherCoop.FileStore do
   File storage backed by an S3-compatible object store.
 
   Files never transit through the application: uploads go straight from the
-  browser to the bucket through a presigned form (see `create_file/3`, meant
+  browser to the bucket through a presigned form (see `create_file_url/3`, meant
   for LiveView external uploads), and downloads are served through presigned
   URLs (see `get_file_url/2`).
 
@@ -41,8 +41,8 @@ defmodule TeacherCoop.FileStore do
   Returns a `{:ok, map()}` with metadata.
 
   """
-  @spec create_file(String.t(), String.t(), keyword()) :: {:ok, map()}
-  def create_file(filename, fileprefix, opts) do
+  @spec create_file_url(String.t(), String.t(), keyword()) :: {:ok, map()}
+  def create_file_url(filename, fileprefix, opts) do
     %{
       endpoint: endpoint,
       bucket: bucket,

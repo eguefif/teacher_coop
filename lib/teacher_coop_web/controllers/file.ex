@@ -13,7 +13,6 @@ defmodule TeacherCoopWeb.FileController do
   def show(conn, %{"id" => id}) do
     file = Library.get_file!(id)
 
-    IO.inspect(file)
     url = get_file_content(:regular, file.filename)
     redirect(conn, external: url)
   end
