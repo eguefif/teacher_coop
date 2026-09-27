@@ -1,7 +1,8 @@
-defmodule TeacherCoop.CurriculumTest.FileIngestionTest do
+defmodule TeacherCoop.CurriculumTest.FileIngestionWorkerTest do
   use TeacherCoop.DataCase
 
-  alias TeacherCoop.Curriculum.FileIngestion, as: FI
+  alias TeacherCoop.Curriculum.FileIngestionWorker
+  alias TeacherCoop.Curriculum
 
   @file_content """
   lecture - CP
@@ -59,16 +60,23 @@ defmodule TeacherCoop.CurriculumTest.FileIngestionTest do
   @goal_ce1_check "Développer des stratégies pour élucider le sens des mots et des expressions inconnus."
   @goal_cp_check "Fréquenter régulièrement des lieux de lecture et se familiariser avec eux, rencontrer des acteurs du livre."
 
-  test "parse_file/3" do
-    year = 2024
-    subject = "français"
-    objectives = FI.parse_file(year, subject, @file_content)
+  @total_objectives 47
+  @year 2022
+  @subject "français"
 
-    assert length(objectives) == 47
+  test "perform_job/1" do
+    attrs = %{year: @year, subject: @subject, file_content: @file_content}
+    assert :ok = perform_job(FileIngestionWorker, attrs)
 
-    assert Enum.find(objectives, fn entry -> entry.goal == @goal_ce1_check end)
-    assert Enum.find(objectives, fn entry -> entry.goal == @goal_cp_check end)
+    objectives = Curriculum.list_objectives_by(year: @year)
+    assert length(objectives) == @total_objectives
 
-    assert Enum.all?(objectives, fn entry -> entry.year == year && entry.subject == subject end)
+    assert objective = Curriculum.get_objective_by!(goal: @goal_ce1_check, year: @year)
+    assert objective.subject == @subject
+    assert objective.year == @year
+
+    assert objective = Curriculum.get_objective_by!(goal: @goal_cp_check, year: @year)
+    assert objective.subject == @subject
+    assert objective.year == @year
   end
 end
