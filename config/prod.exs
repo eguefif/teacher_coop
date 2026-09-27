@@ -30,3 +30,11 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
+
+# Config Sentry
+config :sentry,
+  dsn:
+    "https://629fc4db2964c148852e29073af5edc4@o4512157781131264.ingest.de.sentry.io/4512160578273360",
+  environment_name: Mix.env(),
+  enable_source_code_context: true,
+  root_source_code_paths: [File.cwd!()]

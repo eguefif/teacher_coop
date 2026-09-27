@@ -121,7 +121,8 @@ defmodule TeacherCoop.MixProject do
       {:igniter, "~> 0.5", only: [:dev]},
       {:contex, "~> 0.5.0"},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:mox, "~> 1.3.2", only: [:test]}
+      {:mox, "~> 1.3.2", only: [:test]},
+      {:sentry, "~> 13.5.1"}
     ]
   end
 
