@@ -1,5 +1,4 @@
 defmodule TeacherCoop.Dashboard.PopulateWordsTableWorkerTest do
-  use ExUnit.Case, async: true
   use TeacherCoop.DataCase
 
   import TeacherCoop.DiscoveryFixtures, only: [search_fixture: 2]

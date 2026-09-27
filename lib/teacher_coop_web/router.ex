@@ -88,6 +88,7 @@ defmodule TeacherCoopWeb.Router do
 
       # Curriculum liveviews
       live "/curriculum", AdminLive.CurriculumLive.Index, :index
+      live "/curriculum/new", AdminLive.CurriculumLive.Form, :new
     end
   end
 
