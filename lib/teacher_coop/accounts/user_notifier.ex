@@ -1,4 +1,5 @@
 defmodule TeacherCoop.Accounts.UserNotifier do
+  require Logger
   import Swoosh.Email
   use Gettext, backend: TeacherCoopWeb.Gettext
 
@@ -16,6 +17,10 @@ defmodule TeacherCoop.Accounts.UserNotifier do
 
     with {:ok, _metadata} <- Mailer.deliver(email) do
       {:ok, email}
+    else
+      {:error, reason} ->
+        Logger.error("Failed to deliver email: #{inspect(reason)}")
+        {:error, reason}
     end
   end
 
