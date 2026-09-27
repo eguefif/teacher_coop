@@ -20,7 +20,21 @@ services:
     volumes:
       - meilisearch_data:/meili_data
 
+  s3mock:
+    image: adobe/s3mock:5.2.3
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_REGION: fr-par
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: teachercoop
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /s3mockroot
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
+    ports:
+      - "9090:9090"
+      - "9191:9191"
+    volumes:
+      - s3mock_data:/s3mockroot
+
 volumes:
   postgres_data:
   meilisearch_data:
   tei_data:
+  s3mock_data:

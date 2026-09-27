@@ -4,9 +4,11 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   alias TeacherCoop.Library
   alias TeacherCoop.Library.Document
   alias TeacherCoop.Curriculum
+  alias TeacherCoop.FileStore
 
   @max_files 2
   @formats ~w(.docx .pdf .txt .xlsx)
+  @max_file_size 15_000_000
 
   @impl true
   def render(assigns) do
@@ -331,10 +333,24 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
      |> allow_upload(:files,
        accept: @formats,
        max_entries: @max_files,
-       max_file_size: 15_000_000,
-       auto_upload: false
+       max_file_size: @max_file_size,
+       auto_upload: false,
+       external: &presign_upload/2
      )
      |> apply_action(socket.assigns.live_action, params)}
+  end
+
+  defp presign_upload(entry, socket) do
+    uploads = socket.assigns.uploads
+
+    {:ok, meta} =
+      FileStore.create_file(entry.client_name, "",
+        content_type: entry.client_type,
+        max_file_size: uploads[entry.upload_config].max_file_size,
+        expires_in: :timer.hours(1)
+      )
+
+    {:ok, meta, socket}
   end
 
   defp return_to("show"), do: "show"
@@ -589,22 +605,18 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
       |> Enum.map(&Map.take(&1, [:id, :filename, :filepath, :format]))
 
     files =
-      socket
-      |> consume_uploaded_entries(:files, &upload_static_file/2)
-      |> Enum.map(fn %{filename: filename, filepath: filepath} ->
-        format = Path.extname(filename) |> String.slice(1..-1//1)
-        %{"filename" => filename, "filepath" => filepath, "format" => format}
+      socket.assigns.uploads.files.entries
+      |> Enum.map(fn entry ->
+        format = Path.extname(entry.client_name) |> String.slice(1..-1//1)
+
+        %{
+          filename: entry.client_name,
+          filepath: "#{socket.assigns.current_scope.user.id}",
+          format: format
+        }
       end)
 
     Map.put(document_params, "files", files ++ existing_files)
-  end
-
-  defp upload_static_file(%{path: path}, entry) do
-    filename = Path.basename(path)
-    filepath = Path.join("priv/static/files", filename)
-    File.cp!(path, filepath)
-
-    {:ok, %{filename: entry.client_name, filepath: "/files/#{filename}"}}
   end
 
   defp return_path(_scope, "index", _document), do: ~p"/documents"
