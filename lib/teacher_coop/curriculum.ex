@@ -10,6 +10,8 @@ defmodule TeacherCoop.Curriculum do
   alias TeacherCoop.Repo
 
   alias TeacherCoop.Curriculum.Objective
+  alias TeacherCoop.Curriculum.Query
+  alias TeacherCoop.Curriculum.FileIngestionWorker
 
   @doc """
   Returns all the objectives from the Curriculum. 
@@ -142,11 +144,25 @@ defmodule TeacherCoop.Curriculum do
   @doc """
   Bulk add a list of objectives from a file and metadata"
   """
-  @spec bulk_add_objective_from_file(integer(), String.t(), binary()) :: :ok | :error
+  @spec bulk_add_objective_from_file(integer(), String.t(), binary()) ::
+          {:ok, Oban.Job.t()} | {:error, Oban.Job.changeset() | term()}
   def bulk_add_objective_from_file(year, subject, file_content) do
-    %{year: year, subject: subject, file_content: file_content}
-
-    Workers.IngestCurriculumFile.new()
+    %{attr: %{year: year, subject: subject, file_content: file_content}}
+    |> FileIngestionWorker.new()
     |> Oban.insert()
+  end
+
+  @doc """
+  Return some statistics about the last curriculum.
+
+  The returns is `[map()]`:
+  level subject count of objectives
+  """
+  @spec get_stats(integer()) :: [map()]
+  def get_stats(year) do
+    Query.base()
+    |> Query.where_year(year)
+    |> Query.group_by_grade_and_subject()
+    |> Repo.all()
   end
 end

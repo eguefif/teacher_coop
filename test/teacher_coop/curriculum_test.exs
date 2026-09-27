@@ -66,6 +66,60 @@ defmodule TeacherCoop.CurriculumTest do
       objective = objective_fixture()
       assert %Ecto.Changeset{} = Curriculum.change_objective(objective)
     end
+
+    test "get_stats/1" do
+      year = 2022
+
+      objective_fixture(%{
+        year: year,
+        grade: "cp",
+        subject: "français",
+        goal: "A french goal",
+        strand: "lire"
+      })
+
+      objective_fixture(%{
+        year: year,
+        grade: "cp",
+        subject: "français",
+        goal: "A french goal for cp",
+        strand: "lire"
+      })
+
+      objective_fixture(%{
+        year: year,
+        grade: "ce1",
+        subject: "mathématiques",
+        goal: "A math goal for ce1",
+        strand: "compter"
+      })
+
+      objective_fixture(%{
+        year: year,
+        grade: "ce1",
+        subject: "histoire",
+        goal: "A history goal for ce1",
+        strand: "middle age"
+      })
+
+      result =
+        Curriculum.get_stats(year)
+        |> Enum.group_by(fn entry -> entry.grade end)
+
+      assert map_size(result) == 2
+      assert result["cp"] == [%{grade: "cp", subject: "français", count: 2}]
+
+      assert Enum.find(
+               result["ce1"],
+               &(&1 == %{grade: "ce1", subject: "mathématiques", count: 1})
+             )
+
+      assert Enum.find(
+               result["ce1"],
+               &(&1 ==
+                   %{grade: "ce1", subject: "histoire", count: 1})
+             )
+    end
   end
 
   describe "search_objectives/1" do
