@@ -1,36 +1,29 @@
 defmodule TeacherCoop.FileStore do
-  alias TeacherCoop.SimpleS3Upload, as: S3
-  alias TeacherCoop.SimpleS3Download, as: S3Download
-
   @moduledoc """
+  File storage backed by an S3-compatible object store.
+
+  Files never transit through the application: uploads go straight from the
+  browser to the bucket through a presigned form (see `create_file/3`, meant
+  for LiveView external uploads), and downloads are served through presigned
+  URLs (see `get_file_url/2`).
+
+  ## Configuration
+
+  The store is configured under the `TeacherCoop.FileStore` key:
+
+      config :teacher_coop, TeacherCoop.FileStore,
+        endpoint: "http://localhost:9090",
+        access_key_id: "accesskey",
+        secret_access_key: "secret",
+        bucket: "teachercoop",
+        region: "fr-par"
+
+  In development this points to a local adobe/S3mock instance ran by docker; in production the
+  credentials are read from Docker secrets in `config/runtime.exs`.
   """
-  @doc """
-  Get a file from the filestorage system using the adapter set in `config.exs`.
-  `filename`: string that contain the file name as defined by the user.
-  `prefix`: path to access the file in the filesystem.
 
-  Returns `{:ok, binary}` in case of success and `{:error, reason}` otherwise.
-  """
-  @spec get_file(String.t(), String.t(), map()) :: String.t()
-  def get_file(filename, fileprefix, opts) do
-    %{
-      endpoint: endpoint,
-      bucket: bucket,
-      access_key_id: access_key_id,
-      secret_access_key: secret_access_key,
-      region: region
-    } = config()
-
-    s3_config = %{
-      region: region,
-      access_key_id: access_key_id,
-      secret_access_key: secret_access_key
-    }
-
-    key = Path.join([fileprefix, filename])
-    opts = Keyword.put(opts, :key, key)
-    S3Download.sign_download_url(s3_config, endpoint, bucket, key, opts)
-  end
+  alias TeacherCoop.SimpleS3Upload, as: S3Upload
+  alias TeacherCoop.SimpleS3Download, as: S3Download
 
   @doc """
   Create metadata to be used by Phoenix Liviewer external uploader.
@@ -66,7 +59,7 @@ defmodule TeacherCoop.FileStore do
 
     key = Path.join([fileprefix, filename])
     opts = Keyword.put(opts, :key, key)
-    {:ok, fields} = S3.sign_form_upload(s3_config, bucket, opts)
+    {:ok, fields} = S3Upload.sign_form_upload(s3_config, bucket, opts)
 
     meta = %{
       uploader: "S3",

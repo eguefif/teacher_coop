@@ -23,16 +23,15 @@ end
 config :teacher_coop, TeacherCoopWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
-config :teacher_coop, TeacherCoop.SearchRepo,
-  masterkey: System.get_env("MEILISEARCH_MASTERKEY", "masterkey")
-
 if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") ||
-      raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
-      """
+  read_secret = fn name ->
+    "/run/secrets/#{name}" |> File.read!() |> String.trim()
+  end
+
+  config :teacher_coop, TeacherCoop.SearchRepo,
+    masterkey: File.read!("/run/secrets/meili_master_key")
+
+  database_url = read_secret.("database_url")
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
@@ -49,14 +48,9 @@ if config_env() == :prod do
   # want to use a different value for prod and you most likely don't want
   # to check this value into version control, so we use an environment
   # variable instead.
-  secret_key_base =
-    System.get_env("SECRET_KEY_BASE") ||
-      raise """
-      environment variable SECRET_KEY_BASE is missing.
-      You can generate one by calling: mix phx.gen.secret
-      """
+  secret_key_base = read_secret.("secret_key_base")
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || "teachercoop.org"
 
   config :teacher_coop, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
@@ -111,8 +105,16 @@ if config_env() == :prod do
   config :teacher_coop, TeacherCoop.Mailer,
     adapter: Swoosh.Adapters.Mailgun,
     base_url: System.get_env("MAILGUN_BASE_URL"),
-    api_key: System.get_env("MAILGUN_API_KEY"),
+    api_key: read_secret.("mailgun_sending_key"),
     domain: System.get_env("MAILGUN_DOMAIN")
 
   # See https://swoosh.hexdocs.pm/Swoosh.html#module-installation for details.
+
+  # Configure the S3 Filestore
+  config :teacher_coop, TeacherCoop.FileStore,
+    endpoint: "https://teachercoop.s3.fr-par.scw.cloud",
+    access_key_id: read_secret.("access_key_id"),
+    secret_access_key: read_secret.("secret_access_key"),
+    bucket: "teachercoop",
+    region: "fr-par"
 end
