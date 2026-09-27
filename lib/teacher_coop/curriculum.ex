@@ -12,6 +12,7 @@ defmodule TeacherCoop.Curriculum do
   alias TeacherCoop.Curriculum.Objective
   alias TeacherCoop.Curriculum.Query
   alias TeacherCoop.Curriculum.FileIngestionWorker
+  alias TeacherCoop.Curriculum.Ingestion
 
   @doc """
   Returns all the objectives from the Curriculum. 
@@ -144,12 +145,20 @@ defmodule TeacherCoop.Curriculum do
   @doc """
   Bulk add a list of objectives from a file and metadata"
   """
-  @spec bulk_add_objective_from_file(integer(), String.t(), binary()) ::
-          {:ok, Oban.Job.t()} | {:error, Oban.Job.changeset() | term()}
-  def bulk_add_objective_from_file(year, subject, file_content) do
-    %{attr: %{year: year, subject: subject, file_content: file_content}}
-    |> FileIngestionWorker.new()
-    |> Oban.insert()
+  @spec bulk_add_objectives_from_file(integer(), map()) ::
+          {:ok, Oban.Job.t()}
+          | {:error_changeset, Ecto.Changeset.t()}
+          | {:error, Oban.Job.changeset() | term()}
+  def bulk_add_objectives_from_file(year, attrs) do
+    changeset = Ingestion.changeset(%Ingestion{}, attrs)
+
+    if changeset.valid? do
+      %{attr: Map.put(changeset.changes, :year, year)}
+      |> FileIngestionWorker.new()
+      |> Oban.insert()
+    else
+      {:error_changeset, changeset}
+    end
   end
 
   @doc """

@@ -476,6 +476,7 @@ msgstr "Recherches sans résultat"
 
 #: lib/teacher_coop_web/live/admin_live/dashboard/search_graphs_live.ex
 #: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
+#: lib/teacher_coop_web/live/curriculum_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "Failed to retrieve data"
 msgstr "Impossible de récupérer les données"
@@ -1101,3 +1102,19 @@ msgstr "Menu"
 #, elixir-autogen, elixir-format
 msgid "Toggle dark mode"
 msgstr "Basculer le mode sombre"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#: lib/teacher_coop_web/live/curriculum_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Curriculum"
+msgstr "Programme"
+
+#: lib/teacher_coop_web/live/curriculum_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Ingest a new subject file."
+msgstr "Ingérer un nouvea fichier sujet"
+
+#: lib/teacher_coop_web/live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Ingest new subject"
+msgstr "Ingérer un nouveau sujet"
