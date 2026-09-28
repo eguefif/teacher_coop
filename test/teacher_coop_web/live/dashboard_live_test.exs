@@ -5,6 +5,7 @@ defmodule TeacherCoopWeb.DashboardTest do
   alias TeacherCoop.DiscoveryFixtures
   alias TeacherCoop.LibraryFixtures
   alias TeacherCoop.AccountsFixtures
+  import TeacherCoop.CurriculumFixtures
 
   setup :register_and_log_in_admin_user
 
@@ -58,14 +59,16 @@ defmodule TeacherCoopWeb.DashboardTest do
         %{
           title: "One document",
           description: "One doc description"
-        }
+        },
+        objective_fixture(%{goal: "goal1"})
       ),
       LibraryFixtures.document_fixture(
         AccountsFixtures.user_scope_fixture(user2),
         %{
           title: "Second document",
           description: "Second doc description"
-        }
+        },
+        objective_fixture(%{goal: "goal2"})
       )
     ]
   end

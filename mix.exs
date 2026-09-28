@@ -50,7 +50,8 @@ defmodule TeacherCoop.MixProject do
           TeacherCoopWeb.PageController,
           TeacherCoopWeb.Router,
           TeacherCoopWeb,
-          TeacherCoop.Release
+          TeacherCoop.Release,
+          TeacherCoopWeb.HealthController
         ]
       ]
     ]

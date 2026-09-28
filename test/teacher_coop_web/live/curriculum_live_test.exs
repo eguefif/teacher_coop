@@ -5,7 +5,7 @@ defmodule TeacherCoopWeb.CurriculumLiveTest do
   import Phoenix.LiveViewTest
   import TeacherCoop.CurriculumFixtures
 
-  @valid_attrs %{grade: "cp", subject: "français"}
+  @valid_attrs %{year: 2022}
 
   defp create_objectives(_context) do
     objectives = [
@@ -90,7 +90,7 @@ defmodule TeacherCoopWeb.CurriculumLiveTest do
     def file_input(view) do
       file_input(view, "#curriculum-form", :file_content, [
         %{
-          name: "curriculum.txt",
+          name: "français.txt",
           content: "Some curriculum content",
           type: "text/plain"
         }
@@ -107,23 +107,25 @@ defmodule TeacherCoopWeb.CurriculumLiveTest do
                |> follow_redirect(conn, ~p"/admin/curriculum/new")
 
       assert has_element?(view, "#curriculum-form")
-      assert has_element?(view, "#grade-input")
-      assert has_element?(view, "#subject-input")
+      assert has_element?(view, "#year-input")
 
-      render_upload(file_input(view), "curriculum.txt")
+      render_upload(file_input(view), "français.txt")
 
       assert view
-             |> form("#curriculum-form", ingestion: @valid_attrs)
+             |> form("#curriculum-form", curriculum_ingestion: @valid_attrs)
              |> render_submit()
              |> follow_redirect(conn, ~p"/admin/curriculum")
 
       oban_job_attrs =
-        Map.put(@valid_attrs, :year, 2024)
-        |> Map.put(:file_content, "Some curriculum content")
+        %{
+          "filecontent" => "Some curriculum content",
+          "year" => 2022,
+          "subject" => "français"
+        }
 
       assert_enqueued(
         worker: TeacherCoop.Curriculum.FileIngestionWorker,
-        args: %{attr: oban_job_attrs}
+        args: oban_job_attrs
       )
     end
   end

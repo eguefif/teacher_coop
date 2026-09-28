@@ -58,7 +58,7 @@ defmodule TeacherCoop.Library.DocumentObjectiveTest do
     setup do
       scope = user_scope_fixture()
       document = document_fixture(scope)
-      objective = objective_fixture()
+      objective = objective_fixture(%{goal: "goal1"})
 
       %{document: document, objective: objective}
     end

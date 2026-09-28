@@ -4,6 +4,7 @@ defmodule TeacherCoopWeb.SearchLiveTest do
   import Phoenix.LiveViewTest
   import TeacherCoop.LibraryFixtures
 
+  alias TeacherCoop.CurriculumFixtures
   alias TeacherCoop.Discovery
   alias TeacherCoop.SearchRepo.SearchDocuments
 
@@ -18,22 +19,25 @@ defmodule TeacherCoopWeb.SearchLiveTest do
 
     documents =
       [
-        %{
-          title: "Sequence sur les fractions",
-          description: "Ensemble d'exercices pratiques sur les fractions pour ce2",
-          files: [%{filename: "lesson.pdf", filepath: relative_path, format: "pdf"}]
-        },
-        %{
-          title: "Fractions en ligne",
-          description:
-            "Leçon + séance exploratoire pour enseigner le placement des fractions sur une bande graduée"
-        },
-        %{
-          title: "Opérations sur les fractions ",
-          description: "Révision des 4 opérations avec les fractions"
+        {%{
+           title: "Sequence sur les fractions",
+           description: "Ensemble d'exercices pratiques sur les fractions pour ce2",
+           files: [%{filename: "lesson.pdf", filepath: relative_path, format: "pdf"}]
+         }, CurriculumFixtures.objective_fixture(%{goal: "Pratiques de fractions"})},
+        {%{
+           title: "Fractions en ligne",
+           description:
+             "Leçon + séance exploratoire pour enseigner le placement des fractions sur une bande graduée"
+         }, CurriculumFixtures.objective_fixture(%{goal: "fraction sur bande graduée"})},
+        {
+          %{
+            title: "Opérations sur les fractions ",
+            description: "Révision des 4 opérations avec les fractions"
+          },
+          CurriculumFixtures.objective_fixture(%{goal: "opération sur les fractions"})
         }
       ]
-      |> Enum.map(&document_fixture(scope, &1))
+      |> Enum.map(&document_fixture(scope, elem(&1, 0), elem(&1, 1)))
 
     Oban.drain_queue(queue: :document_ingestion)
 

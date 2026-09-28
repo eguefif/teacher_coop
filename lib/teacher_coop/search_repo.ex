@@ -18,7 +18,7 @@ defmodule TeacherCoop.SearchRepo do
   @doc """
   Get all fields from an index: returns an array
   """
-  @spec list_fields_for(String.t()) :: {:ok, [String.t()]}
+  @spec list_fields_for(String.t()) :: {:ok, [String.t()]} | list()
   def list_fields_for(indexuid) do
     client = get_client()
 

@@ -65,6 +65,7 @@ msgid "Already registered?"
 msgstr ""
 
 #: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/form.ex
 #: lib/teacher_coop_web/live/document_live/form.ex
 #, elixir-autogen, elixir-format
@@ -339,6 +340,7 @@ msgid "Config"
 msgstr ""
 
 #: lib/teacher_coop_web/live/admin_live/configuration_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/show.ex
 #, elixir-autogen, elixir-format
 msgid "Configuration"
@@ -474,9 +476,9 @@ msgstr ""
 msgid "Failed results"
 msgstr ""
 
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/index.ex
 #: lib/teacher_coop_web/live/admin_live/dashboard/search_graphs_live.ex
 #: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
-#: lib/teacher_coop_web/live/curriculum_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "Failed to retrieve data"
 msgstr ""
@@ -512,7 +514,6 @@ msgstr ""
 msgid "Impossible to delete index"
 msgstr ""
 
-#: lib/teacher_coop_web/live/admin_live/configuration_live/index.ex
 #: lib/teacher_coop_web/live/admin_live/configuration_live/show.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/form.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/show.ex
@@ -1068,17 +1069,67 @@ msgid "Toggle dark mode"
 msgstr ""
 
 #: lib/teacher_coop_web/components/layouts/root.html.heex
-#: lib/teacher_coop_web/live/curriculum_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "Curriculum"
 msgstr ""
 
-#: lib/teacher_coop_web/live/curriculum_live/index.ex
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/index.ex
 #, elixir-autogen, elixir-format
 msgid "Ingest a new subject file."
 msgstr ""
 
-#: lib/teacher_coop_web/live/curriculum_live/form.ex
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
 #, elixir-autogen, elixir-format
 msgid "Ingest new subject"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Curriculum Year"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Currifulum file"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Error in your form"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Error while scheduling ingestion task: "
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Filename should be one of "
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Ingest"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Ingesting..."
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/index.ex
+#, elixir-autogen, elixir-format
+msgid "Last 5 ingestions"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Scheduled ingestion successfully"
+msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "text file (.txt), max 2 MB"
 msgstr ""
