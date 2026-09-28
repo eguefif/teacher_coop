@@ -21,7 +21,7 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
         />
         <footer>
           <.button phx-disable-with={gettext("Saving...")} variant="primary">{gettext("Save index")}</.button>
-          <.button navigate={return_path(@return_to, @index)}>{gettext("Cancel")}"</.button>
+          <.button navigate={return_path(@return_to, @index)}>{gettext("Cancel")}</.button>
         </footer>
       </.form>
     </Layouts.app>
