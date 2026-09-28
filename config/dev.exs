@@ -100,8 +100,9 @@ config :sentry,
   enable_source_code_context: true,
   root_source_code_paths: [File.cwd!()],
   enable_logs: true,
+  in_app_otp_apps: [:teacher_coop],
   logs: [
-    level: :info,
+    level: :error,
     excluded_domains: [],
     metadata: :all
   ]
