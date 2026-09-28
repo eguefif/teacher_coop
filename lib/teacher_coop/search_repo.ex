@@ -18,7 +18,7 @@ defmodule TeacherCoop.SearchRepo do
   @doc """
   Get all fields from an index: returns an array
   """
-  @spec list_fields_for(String.t()) :: {:ok, [String.t()]} | :error
+  @spec list_fields_for(String.t()) :: {:ok, [String.t()]}
   def list_fields_for(indexuid) do
     client = get_client()
 
@@ -30,7 +30,7 @@ defmodule TeacherCoop.SearchRepo do
         Enum.map(fields_map["results"], & &1["name"])
 
       _ ->
-        :error
+        []
     end
   end
 
