@@ -10,7 +10,7 @@ defmodule TeacherCoopWeb.AdminLive.ConfigurationLive.Index do
         {gettext("Index Configurations")}
         <:actions>
           <.button variant="primary" navigate={~p"/admin/configurations/new"}>
-            <.icon name="hero-plus" /> {gettext("New")} {gettext("Index")}
+            <.icon name="hero-plus" /> {gettext("New")} {gettext("Configuration")}
           </.button>
         </:actions>
       </.header>
