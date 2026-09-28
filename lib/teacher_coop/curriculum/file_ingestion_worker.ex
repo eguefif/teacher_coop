@@ -13,31 +13,79 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   ## Attrs
     * `"year"` - The year when the curriculum was published
     * `"subject"` - The subject (french, maths, ...)
-    * `"file_content"` - The file content
+    * `"filecontent"` - The file content
   """
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
-    %{"year" => year, "subject" => subject, "file_content" => file_content} = args
+    %{
+      "ingestion_id" => ingestion_id,
+      "year" => year,
+      "subject" => subject,
+      "filecontent" => filecontent
+    } = args
 
     result =
-      parse_file(year, subject, file_content)
+      parse_file(year, subject, filecontent)
 
-    result =
+    results =
       result
       |> Enum.map(&Curriculum.create_objective(&1))
+
+    is_success? =
+      results
       |> Enum.all?(&(elem(&1, 0) == :ok))
 
-    case result do
-      true -> :ok
-      false -> :error
+    ingestion = Curriculum.get_curriculum_ingestion(ingestion_id)
+
+    case is_success? do
+      true ->
+        {:ok, _} = Curriculum.update_curriculum_ingestion(ingestion, %{state: "finished"})
+        :ok
+
+      false ->
+        result =
+          Sentry.capture_message("Curriculum ingestion failed",
+            extra: %{
+              ingestion: ingestion_id,
+              errors: get_error(results) |> Enum.take(5)
+            }
+          )
+
+        sentry_id = if result != :ignored, do: elem(result, 1), else: nil
+
+        {:ok, _} =
+          Curriculum.update_curriculum_ingestion(ingestion, %{
+            state: "error",
+            sentry_id: sentry_id
+          })
+
+        {:error, sentry_id}
     end
   end
 
+  defp get_error(results) do
+    Enum.map(results, fn {status, changeset} ->
+      if status == :error do
+        Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+          Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+            opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+          end)
+        end)
+        |> Map.values()
+        |> Enum.at(0)
+      end
+    end)
+    |> Enum.filter(&(is_nil(&1) != true))
+    |> List.flatten()
+    |> Enum.uniq()
+    |> IO.inspect()
+  end
+
   @spec parse_file(integer(), String.t(), binary()) :: [map()]
-  defp parse_file(year, subject, file_content) do
+  defp parse_file(year, subject, filecontent) do
     common_data = %{year: year, subject: subject}
 
-    file_content
+    filecontent
     |> get_objectives()
     |> Enum.flat_map(& &1)
     |> Enum.map(&Map.merge(common_data, &1))

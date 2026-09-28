@@ -1,6 +1,7 @@
 defmodule TeacherCoop.LibraryTest do
   use TeacherCoop.DataCase
 
+  import TeacherCoop.CurriculumFixtures
   alias TeacherCoop.Library
 
   describe "documents" do
@@ -15,9 +16,9 @@ defmodule TeacherCoop.LibraryTest do
       scope = user_scope_fixture()
       other_scope = user_scope_fixture()
 
-      document = document_fixture(scope)
+      document = document_fixture(scope, %{}, objective_fixture(%{goal: "goal1"}))
 
-      other_document = document_fixture(other_scope)
+      other_document = document_fixture(other_scope, %{}, objective_fixture(%{goal: "goal2"}))
       assert Library.list_documents(scope) == [document]
       assert Library.list_documents(other_scope) == [other_document]
     end
@@ -170,9 +171,9 @@ defmodule TeacherCoop.LibraryTest do
 
     test "returns the documents matching the given ids" do
       scope = user_scope_fixture()
-      doc1 = document_fixture(scope)
-      doc2 = document_fixture(scope)
-      _doc3 = document_fixture(scope)
+      doc1 = document_fixture(scope, %{}, objective_fixture(%{goal: "goal1"}))
+      doc2 = document_fixture(scope, %{}, objective_fixture(%{goal: "goal2"}))
+      _doc3 = document_fixture(scope, %{}, objective_fixture(%{goal: "goal3"}))
 
       ids =
         Library.list_documents_by_ids([doc1.id, doc2.id])

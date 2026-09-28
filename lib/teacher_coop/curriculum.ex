@@ -12,7 +12,8 @@ defmodule TeacherCoop.Curriculum do
   alias TeacherCoop.Curriculum.Objective
   alias TeacherCoop.Curriculum.Query
   alias TeacherCoop.Curriculum.FileIngestionWorker
-  alias TeacherCoop.Curriculum.Ingestion
+  alias TeacherCoop.Curriculum.CurriculumIngestion
+  alias TeacherCoop.Curriculum.CurriculumIngestionQuery
 
   @doc """
   Returns all the objectives from the Curriculum. 
@@ -142,22 +143,82 @@ defmodule TeacherCoop.Curriculum do
     Objective.changeset(objective, attrs)
   end
 
+  # CurriculumIngestion related logic ************************************************
+
+  @doc """
+  Subscribes to scoped notifications about any curriculum_ingestions changes.
+
+  The broadcasted messages match the pattern:
+
+    * {:created, %curriculum_ingestions{}}
+    * {:updated, %curriculum_ingestions{}}
+    * {:deleted, %curriculum_ingestions{}}
+
+  """
+  def subscribe_curriculum_ingestions() do
+    Phoenix.PubSub.subscribe(TeacherCoop.PubSub, ":curriculum_ingestions")
+  end
+
+  defp broadcast_curriculum_ingestions(message) do
+    Phoenix.PubSub.broadcast(TeacherCoop.PubSub, ":curriculum_ingestions", message)
+  end
+
+  @spec get_curriculum_ingestion(integer()) :: CurriculumIngestion.t() | nil
+  def get_curriculum_ingestion(id) do
+    Repo.get(CurriculumIngestion, id)
+  end
+
+  @doc """
+  Create a curriculum ingestion.
+  """
+  @spec create_curriculum_ingestion(map()) ::
+          {:ok, CurriculumIngestion.t()} | {:error, Ecto.Changeset.t()}
+  def create_curriculum_ingestion(attrs) do
+    CurriculumIngestion.changeset(%CurriculumIngestion{}, attrs)
+    |> Repo.insert()
+  end
+
   @doc """
   Bulk add a list of objectives from a file and metadata"
   """
-  @spec bulk_add_objectives_from_file(integer(), map()) ::
+  @spec bulk_add_objectives_from_files(map(), String.t()) ::
           {:ok, Oban.Job.t()}
           | {:error_changeset, Ecto.Changeset.t()}
           | {:error, Oban.Job.changeset() | term()}
-  def bulk_add_objectives_from_file(year, attrs) do
-    changeset = Ingestion.changeset(%Ingestion{}, attrs)
+  def bulk_add_objectives_from_files(
+        attrs,
+        filecontent
+      ) do
+    result =
+      CurriculumIngestion.changeset(%CurriculumIngestion{}, attrs)
+      |> Repo.insert()
 
-    if changeset.valid? do
-      %{attr: Map.put(changeset.changes, :year, year)}
-      |> FileIngestionWorker.new()
-      |> Oban.insert()
-    else
-      {:error_changeset, changeset}
+    case result do
+      {:ok, curriculum_ingestion} ->
+        year = Map.fetch!(curriculum_ingestion, :year)
+        subject = Map.fetch!(curriculum_ingestion, :subject)
+        id = Map.fetch!(curriculum_ingestion, :id)
+
+        %{ingestion_id: id, year: year, subject: subject, filecontent: filecontent}
+        |> FileIngestionWorker.new()
+        |> Oban.insert()
+
+      {:error, changeset} ->
+        {:error_changeset, changeset}
+    end
+  end
+
+  @doc """
+  Update a curriculum ingestion. 
+  """
+  @spec update_curriculum_ingestion(CurriculumIngestion.t(), map()) ::
+          {:ok, CurriculumIngestion.t()} | {:error, Ecto.Changeset.t()}
+  def update_curriculum_ingestion(ingestion, attrs) do
+    with {:ok, ingestion} <-
+           CurriculumIngestion.changeset(ingestion, attrs)
+           |> Repo.update() do
+      broadcast_curriculum_ingestions(:ingestion_updated)
+      {:ok, ingestion}
     end
   end
 
@@ -172,6 +233,16 @@ defmodule TeacherCoop.Curriculum do
     Query.base()
     |> Query.where_year(year)
     |> Query.group_by_grade_and_subject()
+    |> Repo.all()
+  end
+
+  @doc """
+  Return the last n ingestions.
+  """
+  @spec list_last_ingestions(integer()) :: [CurriculumIngestion.t()]
+  def list_last_ingestions(n) do
+    CurriculumIngestionQuery.base()
+    |> CurriculumIngestionQuery.last_n_entries(n)
     |> Repo.all()
   end
 end

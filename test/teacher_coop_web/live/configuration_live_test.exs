@@ -31,7 +31,7 @@ defmodule TeacherCoopWeb.ConfigurationLiveTest do
 
       assert {:ok, form_live, _} =
                index_live
-               |> element("a", "New Index")
+               |> element("a", "New Configuration")
                |> render_click()
                |> follow_redirect(conn, ~p"/admin/configurations/new")
 

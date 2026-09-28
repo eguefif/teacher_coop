@@ -16,7 +16,9 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Index do
         </:actions>
       </.header>
 
-      <div class="w-full">
+      <div class="w-full flex flex-col gap-4">
+        <.index_ingestions ingestions={@streams.curriculum_ingestions} />
+
         <div class="mt-4 mx-auto w-fit">
           <.async_result :let={curriculum_stats} assign={@curriculum_stats}>
             <:loading><div class="skeleton" /></:loading>
@@ -56,11 +58,40 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Index do
     """
   end
 
+  attr :ingestions, :list
+
+  def index_ingestions(assigns) do
+    ~H"""
+    <ul class="list bg-base-200 rounded-box shadow-md w-fit mx-auto">
+      <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">{gettext("Last 5 ingestions")}</li>
+
+      <li :for={{_, ingestion} <- @ingestions} class="list-row">
+        <div>{ingestion.year}</div>
+        <div>{ingestion.subject}</div>
+        <div class={[
+          ingestion.state == "finished" && "badge badge-success",
+          ingestion.state == "error" && "badge badge-error",
+          ingestion.state == "created" && "badge badge-info",
+          ingestion.state == "processing" && "badge badge-warning"
+        ]}>
+          {ingestion.state}
+        </div>
+        <div :if={ingestion.sentry_id}>{ingestion.sentry_id}</div>
+      </li>
+    </ul>
+    """
+  end
+
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Curriculum.subscribe_curriculum_ingestions()
+    end
+
     {:ok,
      socket
      |> assign(:current_scope, socket.assigns.current_scope)
+     |> stream(:curriculum_ingestions, Curriculum.list_last_ingestions(5))
      |> assign_async(:curriculum_stats, fn ->
        {:ok,
         %{
@@ -70,5 +101,11 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Index do
             |> Map.to_list()
         }}
      end)}
+  end
+
+  @impl true
+  def handle_info(:ingestion_updated, socket) do
+    {:noreply,
+     stream(socket, :curriculum_ingestions, Curriculum.list_last_ingestions(5), reset: true)}
   end
 end

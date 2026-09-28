@@ -20,4 +20,19 @@ defmodule TeacherCoop.CurriculumFixtures do
     {:ok, objective} = TeacherCoop.Curriculum.create_objective(attrs)
     objective
   end
+
+  @doc """
+  Generate a curriculum_ingestion.
+  """
+  def curriculum_ingestion_fixture(attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
+        year: 2020,
+        subject: "français",
+        state: "created"
+      })
+
+    {:ok, curriculum_ingestion} = TeacherCoop.Curriculum.create_curriculum_ingestion(attrs)
+    curriculum_ingestion
+  end
 end

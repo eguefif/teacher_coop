@@ -9,8 +9,8 @@ defmodule TeacherCoop.LibraryFixtures do
   @doc """
   Generate a document.
   """
-  def document_fixture(scope, attrs \\ %{}) do
-    objective = CurriculumFixtures.objective_fixture()
+  def document_fixture(scope, attrs \\ %{}, objective \\ nil) do
+    objective = if is_nil(objective), do: CurriculumFixtures.objective_fixture(), else: objective
 
     attrs =
       Enum.into(attrs, %{
