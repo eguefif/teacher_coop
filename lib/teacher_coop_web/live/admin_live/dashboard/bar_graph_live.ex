@@ -5,8 +5,12 @@ defmodule TeacherCoopWeb.AdminLive.BarGraph do
   def render(assigns) do
     ~H"""
     <section id={@id} class="flex-1 w-full">
-      <div class="shadow-xl p-4 bg-base-200 rounded-xl text-center">
+      <div :if={@display_graph} class="shadow-xl p-4 bg-base-200 rounded-xl text-center">
         {@graph}
+      </div>
+
+      <div :if={!@display_graph} class="shadow-xl p-4 bg-base-200 rounded-xl text-center">
+        {gettext("No data")}
       </div>
     </section>
     """
@@ -17,6 +21,7 @@ defmodule TeacherCoopWeb.AdminLive.BarGraph do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:display_graph, assigns.data != [])
      |> assign(:graph, make_graph(assigns.data, assigns.title, assigns.orient))}
   end
 

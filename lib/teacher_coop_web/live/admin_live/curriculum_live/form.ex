@@ -36,14 +36,28 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Form do
             />
             <p class="label">{gettext("text file (.txt), max 2 MB")}</p>
           </fieldset>
-
-          <div :if={@form.errors != []} clas="text-error">
-            {gettext("Filename should be one of ") <> Enum.join(@subjects, ", ")}
+          <div :if={@uploads.file_content.entries != []} class="flex flex-col gap-4">
+            <div
+              :for={file <- @uploads.file_content.entries}
+              class={[
+                "w-[296px] rounded-md p-[8px] flex flex-col gap-2",
+                upload_errors(@uploads.file_content, file) == [] && "bg-info text-info-content",
+                upload_errors(@uploads.file_content, file) != [] && "bg-error text-error-content"
+              ]}
+            >
+              <div class="text-xl font-bold text-center">
+                {file.client_name}
+              </div>
+              <p
+                :for={err <- upload_errors(@uploads.file_content, file)}
+                class="p-2 text-md"
+              >
+                {err}
+              </p>
+            </div>
           </div>
+
           <footer class="mx-auto mt-[32px]">
-            <p :for={err <- upload_errors(@uploads.file_content)} class="alert alert-danger">
-              {err}
-            </p>
             <.button phx-disable-with={gettext("Ingesting...")} variant="primary">{gettext("Ingest")}</.button>
             <.button navigate={~p"/admin/curriculum"}>{gettext("Cancel")}</.button>
           </footer>
@@ -60,7 +74,27 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Form do
      |> assign(:current_scope, socket.assigns.current_scope)
      |> assign(:subjects, CurriculumIngestion.subjects())
      |> assign(:ingestion, %CurriculumIngestion{})
-     |> allow_upload(:file_content, accept: ~w(.txt), max_entries: 20, max_file_size: 2_000_000)
+     |> allow_upload(:file_content,
+       accept: ~w(.txt),
+       max_entries: 20,
+       max_file_size: 2_000_000,
+       validator: fn entry ->
+         IO.inspect(entry.client_name)
+         filename = Path.basename(entry.client_name) |> String.split(".") |> Enum.at(0)
+         subjects = CurriculumIngestion.subjects()
+
+         IO.inspect(filename)
+
+         if filename in subjects do
+           :ok
+         else
+           {:error,
+            gettext(
+              "Filename should be build on the model `subject.txt` where subject is one of the following word: "
+            ) <> Enum.join(subjects, ", ")}
+         end
+       end
+     )
      |> assign(:form, to_form(CurriculumIngestion.changeset(%CurriculumIngestion{}, %{})))}
   end
 

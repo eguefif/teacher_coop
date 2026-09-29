@@ -1142,11 +1142,6 @@ msgstr "Erreur lors de la planification de la tâche d'ingestion : "
 
 #: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
 #, elixir-autogen, elixir-format
-msgid "Filename should be one of "
-msgstr "Le nom du fichier doit être l'un des suivants : "
-
-#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
-#, elixir-autogen, elixir-format
 msgid "Ingest"
 msgstr "Ingérer"
 
@@ -1169,3 +1164,14 @@ msgstr "Ingestion planifiée avec succès"
 #, elixir-autogen, elixir-format
 msgid "text file (.txt), max 2 MB"
 msgstr "fichier texte (.txt), 2 Mo maximum"
+
+#: lib/teacher_coop_web/live/admin_live/dashboard/bar_graph_live.ex
+#: lib/teacher_coop_web/live/admin_live/dashboard/graph_live.ex
+#, elixir-autogen, elixir-format
+msgid "No data"
+msgstr "Pas de données."
+
+#: lib/teacher_coop_web/live/admin_live/curriculum_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Filename should be build on the model `subject.txt` where subject is one of the following word: "
+msgstr "Le fichier devrait être construit avec le sujet comme dans `sujet.txt`. Le sujet devrait être l'un des mots suivants:"
