@@ -36,6 +36,17 @@ defmodule TeacherCoop.SearchRepo.SearchObjectives do
     end
   end
 
+  def delete_all_objectives() do
+    case Meilisearch.Document.delete_all(get_client(), index_name("objectives")) do
+      {:ok, %Meilisearch.SummarizedTask{} = task} ->
+        wait_for_tasks([task])
+        :ok
+
+      {:error, _} ->
+        :error
+    end
+  end
+
   def reset_objectives_index() do
     case Meilisearch.Index.delete(get_client(), index_name("objectives")) do
       {:ok, %Meilisearch.SummarizedTask{} = task} ->

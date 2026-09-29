@@ -6,7 +6,7 @@
 [![Gettext](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/gettext.yml)
 [![Coverage](https://github.com/eguefif/teacher_coop/actions/workflows/coverage.yml/badge.svg?branch=main)](https://github.com/eguefif/teacher_coop/actions/workflows/coverage.yml)
 
-[https://www.teachercoop.org](https://www.teachercoop.org)
+Link to the project staging website: [https://www.teachercoop.org](https://www.teachercoop.org)
 
 This repository is linked to the [infra repo](https://github.com/eguefif/infra_teacher_coop). The CI/CD is automated.
 Any pull request goes through GitHub Actions to check: tests, test coverage and Dialyzer.
@@ -80,17 +80,7 @@ To do that, we might want to test different configuration on different instance.
 
 ## TODO
 ### Next
-- [ ] Have a complete CI/CD up and working with a DNS
-    - [x] Configure DB: user and password
-    - [x] Configure Meilisearch
-    - [x] Define secret
-    - [x] Make traefik redirect to the app
-    - [x] Create a domain name
-    - [x] Configure let's encrypt
-    - [ ] Need an email adapter to make it works: see mailgun.
-    - [ ] Create a GH that trigger something on the server and pull new repo
-        - [ ] It first should run a migration service wait for it
-        - [ ] Then update current teacher_coop containers
+- [ ] Move the following tasks to the [Linear team](https://linear.app)
 
 ### Testing
 

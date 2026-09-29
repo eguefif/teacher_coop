@@ -1,8 +1,13 @@
 defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   @moduledoc """
   Provide a Worker that will ingest a file to populate curriculum.
+
+  It populate objectives table.
+  Index objectives index in the search engine.
+  Update curriculum_ingestion depending on the result.
   """
   alias TeacherCoop.Curriculum
+  alias TeacherCoop.SearchRepo.SearchObjectives
 
   use Oban.Worker,
     unique: true
@@ -24,61 +29,82 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
       "filecontent" => filecontent
     } = args
 
-    result =
-      parse_file(year, subject, filecontent)
-
-    results =
-      result
-      |> Enum.map(&Curriculum.create_objective(&1))
-
-    is_success? =
-      results
-      |> Enum.all?(&(elem(&1, 0) == :ok))
-
     ingestion = Curriculum.get_curriculum_ingestion(ingestion_id)
 
-    case is_success? do
-      true ->
-        {:ok, _} = Curriculum.update_curriculum_ingestion(ingestion, %{state: "finished"})
-        :ok
+    with attrs <- parse_file(year, subject, filecontent),
+         {:ok, objectives} <- create_objectives(attrs),
+         :ok <- index_search_database(objectives),
+         {:ok, _} <- update_ingestion_to_finished(ingestion) do
+      :ok
+    else
+      {:error_db, changesets} ->
+        log_sentry(
+          "Error while inserting in DB objectives from ingestion",
+          changesets,
+          ingestion
+        )
 
-      false ->
-        result =
-          Sentry.capture_message("Curriculum ingestion failed",
-            extra: %{
-              ingestion: ingestion_id,
-              errors: get_error(results) |> Enum.take(5)
-            }
-          )
+        {:error, :db}
 
-        sentry_id = if result != :ignored, do: elem(result, 1), else: nil
+      {:error_ingestion, changeset} ->
+        log_sentry(
+          "Error while updating ingestion object",
+          changeset,
+          ingestion
+        )
 
-        {:ok, _} =
-          Curriculum.update_curriculum_ingestion(ingestion, %{
-            state: "error",
-            sentry_id: sentry_id
-          })
+        {:error, :update_ingestion}
 
-        {:error, sentry_id}
+      :error_indexing ->
+        log_sentry(
+          "Error while indexing objectives in search engine from ingestion.",
+          nil,
+          ingestion
+        )
+
+        {:error, :indexing}
     end
   end
 
-  defp get_error(results) do
-    Enum.map(results, fn {status, changeset} ->
-      if status == :error do
-        Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
-          Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
-            opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-          end)
-        end)
-        |> Map.values()
-        |> Enum.at(0)
-      end
-    end)
-    |> Enum.filter(&(is_nil(&1) != true))
-    |> List.flatten()
-    |> Enum.uniq()
-    |> IO.inspect()
+  @spec update_ingestion_to_finished(Curriculum.CurriculumIngestion.t()) ::
+          {:ok, Curriculum.CurriculumIngestion.t()} | {:error_ingestion, Ecto.Changeset.t()}
+  defp update_ingestion_to_finished(ingestion) do
+    case(Curriculum.update_curriculum_ingestion(ingestion, %{state: "finished"})) do
+      {:ok, ingestion} -> {:ok, ingestion}
+      {:error, changeset} -> {:error_ingestion, changeset}
+    end
+  end
+
+  @spec create_objectives([map()]) ::
+          {:ok, [Curriculum.CurriculumIngestion.t()]} | {:error_db, [Ecto.Changeset.t()]}
+  defp create_objectives(data) do
+    db_results =
+      data
+      |> Enum.map(&Curriculum.create_objective(&1))
+
+    case Enum.all?(db_results, &(elem(&1, 0) == :ok)) do
+      true -> {:ok, db_results}
+      false -> {:error_db, db_results}
+    end
+  end
+
+  @spec index_search_database([Curriculum.CurriculumIngestion.t()]) :: :ok | :error_indexing
+  defp index_search_database(attrs) do
+    with :ok <- SearchObjectives.reset_objectives_index(),
+         attrs <- preprocess_objectives(attrs),
+         :ok <-
+           SearchObjectives.populate_objectives_index(attrs) do
+      :ok
+    else
+      :error -> :error_indexing
+    end
+  end
+
+  @spec preprocess_objectives([Curriculum.CurriculumIngestion.t()]) :: [map()]
+  defp preprocess_objectives(attrs) do
+    attrs
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.map(&Map.take(&1, [:id, :year, :subject, :grade, :strand, :goal]))
   end
 
   @spec parse_file(integer(), String.t(), binary()) :: [map()]
@@ -113,5 +139,56 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   defp get_subject_and_grade(line) do
     String.split(line, "-", trim: true)
     |> Enum.map(&String.trim(&1))
+  end
+
+  @spec log_sentry(
+          String.t(),
+          list(map())
+          | list(Ecto.Changeset.t())
+          | Ecto.Changeset.t()
+          | nil,
+          Curriculum.CurriculumIngestion.t()
+        ) :: {:ok, Curriculum.CurriculumIngestion.t()}
+  defp(log_sentry(msg, changesets, ingestion)) do
+    result =
+      Sentry.capture_message(msg,
+        extra: %{
+          ingestion: ingestion.id,
+          errors: get_error(changesets)
+        }
+      )
+
+    sentry_id = if result != :ignored, do: elem(result, 1), else: nil
+
+    Curriculum.update_curriculum_ingestion(ingestion, %{
+      state: "error",
+      sentry_id: sentry_id
+    })
+  end
+
+  defp get_error(error) when is_nil(error) do
+    ""
+  end
+
+  defp get_error(result) when is_map(result) do
+    result
+  end
+
+  defp get_error(results) when is_list(results) do
+    Enum.map(results, fn {status, changeset} ->
+      if status == :error do
+        Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+          Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+            opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+          end)
+        end)
+        |> Map.values()
+        |> Enum.at(0)
+        |> Enum.take(5)
+      end
+    end)
+    |> Enum.filter(&(is_nil(&1) != true))
+    |> List.flatten()
+    |> Enum.uniq()
   end
 end
