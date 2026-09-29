@@ -87,6 +87,47 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
+  Creates a objectives from a list in a transaction.
+
+
+  ## Examples
+
+      iex> create_objective(scope, [%{field: value}])
+      {:ok, %Objective{}}
+
+  """
+  @spec create_objective([map()]) :: {:ok, [Objective.t()]} | {:error, [Ecto.Changeset.t()]}
+  def create_objectives(attrs) do
+    with {:ok, _} <- validates_list_of_objectives(attrs) do
+      attrs
+      |> Enum.map(fn objective ->
+        timestamp =
+          DateTime.utc_now()
+          |> DateTime.truncate(:second)
+
+        Map.put(objective, :inserted_at, timestamp)
+        |> Map.put(:updated_at, timestamp)
+      end)
+      |> then(
+        &Repo.insert_all(Objective, &1,
+          on_conflict: :nothing,
+          conflict_target: [:grade, :goal]
+        )
+      )
+
+      :ok
+    end
+  end
+
+  @spec validates_list_of_objectives([map()]) :: {:ok | :error, [Ecto.Changeset.t()]}
+  defp validates_list_of_objectives(attrs) do
+    changesets = attrs |> Enum.map(&Objective.changeset(%Objective{}, &1))
+    is_valid? = if Enum.all?(changesets, &(&1.valid? == true)), do: :ok, else: :error
+
+    {is_valid?, changesets}
+  end
+
+  @doc """
   Updates a objective.
 
   ## Examples

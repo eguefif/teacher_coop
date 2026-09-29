@@ -34,7 +34,7 @@ defmodule TeacherCoop.Curriculum.Objective do
   @doc false
   def changeset(objective, attrs) do
     objective
-    |> cast(attrs, [:id, :year, :subject, :grade, :goal])
+    |> cast(attrs, [:year, :subject, :grade, :goal, :strand])
     |> unique_constraint([:grade, :goal])
     |> validate_required([:year, :subject, :grade, :goal])
   end
