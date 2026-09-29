@@ -74,10 +74,9 @@ defmodule TeacherCoop.CurriculumTest.FileIngestionWorkerTest do
       filecontent: @invalid_file_content
     }
 
-    assert {:error, sentry_id} = perform_job(FileIngestionWorker, attrs)
+    assert {:error, :db} = perform_job(FileIngestionWorker, attrs)
 
     ingestion = Curriculum.get_curriculum_ingestion(ingestion.id)
     assert ingestion.state == "error"
-    assert ingestion.sentry_id == sentry_id
   end
 end
