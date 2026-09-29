@@ -29,7 +29,7 @@ defmodule TeacherCoop.Curriculum.CurriculumIngestion do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(%__MODULE__{} = ingestion, attrs \\ %{}) do
     ingestion
-    |> cast(attrs, [:year, :subject, :state])
+    |> cast(attrs, [:year, :subject, :state, :sentry_id])
     |> validate_required([:year, :subject, :state])
     |> valide_list(:subject, @subjects)
     |> valide_list(:state, @states)

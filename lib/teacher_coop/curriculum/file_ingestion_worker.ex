@@ -32,8 +32,8 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
     ingestion = Curriculum.get_curriculum_ingestion(ingestion_id)
 
     with attrs <- parse_file(year, subject, filecontent),
-         {:ok, objectives} <- create_objectives(attrs),
-         :ok <- index_search_database(objectives),
+         :ok <- create_objectives(attrs),
+         :ok <- index_search_database(),
          {:ok, _} <- update_ingestion_to_finished(ingestion) do
       :ok
     else
@@ -76,22 +76,21 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   end
 
   @spec create_objectives([map()]) ::
-          {:ok, [Curriculum.CurriculumIngestion.t()]} | {:error_db, [Ecto.Changeset.t()]}
+          :ok | {:error_db, [Ecto.Changeset.t()]}
   defp create_objectives(data) do
-    db_results =
-      data
-      |> Enum.map(&Curriculum.create_objective(&1))
+    db_results = Curriculum.create_objectives(data)
 
-    case Enum.all?(db_results, &(elem(&1, 0) == :ok)) do
-      true -> {:ok, db_results}
-      false -> {:error_db, db_results}
+    case db_results do
+      :ok -> :ok
+      {:error, changesets} -> {:error_db, changesets}
     end
   end
 
-  @spec index_search_database([Curriculum.CurriculumIngestion.t()]) :: :ok | :error_indexing
-  defp index_search_database(attrs) do
-    with :ok <- SearchObjectives.reset_objectives_index(),
-         attrs <- preprocess_objectives(attrs),
+  @spec index_search_database() :: :ok | :error_indexing
+  defp index_search_database() do
+    objectives = Curriculum.list_objectives!()
+
+    with attrs <- preprocess_objectives(objectives),
          :ok <-
            SearchObjectives.populate_objectives_index(attrs) do
       :ok
@@ -103,7 +102,6 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   @spec preprocess_objectives([Curriculum.CurriculumIngestion.t()]) :: [map()]
   defp preprocess_objectives(attrs) do
     attrs
-    |> Enum.map(&elem(&1, 1))
     |> Enum.map(&Map.take(&1, [:id, :year, :subject, :grade, :strand, :goal]))
   end
 
@@ -127,7 +125,7 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
     String.split(content, "\n\n", trim: true)
   end
 
-  def parse_blocks(block) do
+  defp parse_blocks(block) do
     [first_line | lines] = String.split(block, "\n", trim: true)
 
     [strand, grade] = get_subject_and_grade(first_line)
@@ -170,25 +168,42 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
     ""
   end
 
-  defp get_error(result) when is_map(result) do
-    result
+  defp get_error(changeset) when is_map(changeset) do
+    changeset_to_string(changeset)
   end
 
-  defp get_error(results) when is_list(results) do
-    Enum.map(results, fn {status, changeset} ->
-      if status == :error do
-        Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
-          Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
-            opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-          end)
-        end)
-        |> Map.values()
-        |> Enum.at(0)
-        |> Enum.take(5)
-      end
+  defp get_error(changesets) when is_list(changesets) do
+    Enum.map(changesets, fn changeset ->
+      changeset_to_string(changeset)
     end)
-    |> Enum.filter(&(is_nil(&1) != true))
-    |> List.flatten()
-    |> Enum.uniq()
+    |> Enum.filter(&(&1 != nil))
+    |> Enum.take(10)
+  end
+
+  defp changeset_to_string(%Ecto.Changeset{} = changeset) do
+    error_string = changeset_error_to_string(changeset)
+    changes_string = changeset_changes_to_string(changeset.changes)
+    error_string <> " for changes: " <> changes_string
+  end
+
+  defp changeset_error_to_string(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Ecto.Changeset.traverse_errors(fn {msg, opts} ->
+      Regex.replace(~r"%{(\w+)}", msg, fn _, key ->
+        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+      end)
+    end)
+    |> Enum.map_join("; ", fn {field, msgs} -> "#{field}: #{Enum.join(msgs, ", ")}" end)
+  end
+
+  defp changeset_changes_to_string(changes) do
+    changes
+    |> Map.to_list()
+    |> Enum.map(&tupple_to_string(&1))
+    |> Enum.join(" ")
+  end
+
+  defp tupple_to_string({key, value}) do
+    "{Key: " <> to_string(key) <> ": " <> to_string(value) <> "}"
   end
 end

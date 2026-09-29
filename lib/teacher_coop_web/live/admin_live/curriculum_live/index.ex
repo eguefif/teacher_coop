@@ -76,7 +76,10 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Index do
         ]}>
           {ingestion.state}
         </div>
-        <div :if={ingestion.sentry_id}>{ingestion.sentry_id}</div>
+        <.link
+          :if={ingestion.sentry_id}
+          navigate={"https://teachercoop.sentry.io/issues/" <> Integer.to_string(ingestion.sentry_id)}
+        >{ingestion.sentry_id}</.link>
       </li>
     </ul>
     """

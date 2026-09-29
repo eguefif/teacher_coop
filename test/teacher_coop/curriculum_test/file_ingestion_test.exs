@@ -17,17 +17,14 @@ defmodule TeacherCoop.CurriculumTest.FileIngestionWorkerTest do
   Repérer les sons dans la phrase.
   """
 
-  @invalid_file_content """
+  @invalid_data """
   lecture - CP
   Lire un livre tout seul.
-  Lire un livre tout seul.
   Lire en autonome.
-  Déchiffrer les sons simples.
 
-  lecture - CE1
+  lecture -\s
   Livre un livre en entier.
   Déchiffre tous les sons.
-  Repérer les sons dans la phrase.
   """
 
   @goal_ce1_check "Repérer les sons dans la phrase."
@@ -64,17 +61,19 @@ defmodule TeacherCoop.CurriculumTest.FileIngestionWorkerTest do
     assert ingestion.state == "finished"
   end
 
-  test "perform_job/1 failed to persist objectives" do
+  test "perform_job/1 with invalid data" do
     ingestion = curriculum_ingestion_fixture()
 
     attrs = %{
       ingestion_id: ingestion.id,
       year: @year,
       subject: @subject,
-      filecontent: @invalid_file_content
+      filecontent: @invalid_data
     }
 
     assert {:error, :db} = perform_job(FileIngestionWorker, attrs)
+
+    assert Curriculum.list_objectives_by(year: @year) == []
 
     ingestion = Curriculum.get_curriculum_ingestion(ingestion.id)
     assert ingestion.state == "error"

@@ -79,11 +79,8 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Form do
        max_entries: 20,
        max_file_size: 2_000_000,
        validator: fn entry ->
-         IO.inspect(entry.client_name)
          filename = Path.basename(entry.client_name) |> String.split(".") |> Enum.at(0)
          subjects = CurriculumIngestion.subjects()
-
-         IO.inspect(filename)
 
          if filename in subjects do
            :ok
