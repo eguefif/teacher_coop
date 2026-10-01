@@ -17,11 +17,7 @@ defmodule TeacherCoop.Application do
       {Phoenix.PubSub, name: TeacherCoop.PubSub},
       TeacherCoopWeb.Endpoint,
       {Finch, name: :search_finch},
-      {Meilisearch,
-       name: :meilisearch,
-       endpoint: "http://127.0.0.1:7700",
-       key: "masterkey",
-       finch: :search_finch}
+      get_meilisearch_client()
     ]
 
     # See https://elixir.hexdocs.pm/Supervisor.html
@@ -36,5 +32,12 @@ defmodule TeacherCoop.Application do
   def config_change(changed, _new, removed) do
     TeacherCoopWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp get_meilisearch_client() do
+    meilisearch_config = Application.fetch_env!(:teacher_coop, TeacherCoop.SearchRepo)
+    masterkey = meilisearch_config |> List.keyfind(:masterkey, 0) |> elem(1)
+    hostname = meilisearch_config |> List.keyfind(:hostname, 0) |> elem(1)
+    {Meilisearch, name: :meilisearch, endpoint: hostname, key: masterkey, finch: :search_finch}
   end
 end

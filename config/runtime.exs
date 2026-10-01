@@ -28,9 +28,6 @@ if config_env() == :prod do
     "/run/secrets/#{name}" |> File.read!() |> String.trim()
   end
 
-  config :teacher_coop, TeacherCoop.SearchRepo,
-    masterkey: File.read!("/run/secrets/meili_master_key")
-
   database_url = read_secret.("database_url")
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
@@ -117,4 +114,8 @@ if config_env() == :prod do
     secret_access_key: read_secret.("secret_access_key"),
     bucket: "teachercoop",
     region: "fr-par"
+
+  config :teacher_coop, TeacherCoop.SearchRepo,
+    hostname: "http://meilisearch:7700",
+    masterkey: read_secret.("meili_master_key")
 end

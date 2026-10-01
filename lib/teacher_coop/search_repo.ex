@@ -155,10 +155,8 @@ defmodule TeacherCoop.SearchRepo do
   def get_client() do
     meilisearch_config = Application.fetch_env!(:teacher_coop, TeacherCoop.SearchRepo)
     masterkey = meilisearch_config |> List.keyfind(:masterkey, 0) |> elem(1)
-    host = meilisearch_config |> List.keyfind(:hostname, 0) |> elem(1)
-    port = meilisearch_config |> List.keyfind(:port, 0) |> elem(1)
-    hostname = "#{host}:#{port}"
-    # Create a Meilisearch client whenever and wherever you need it.
+    hostname = meilisearch_config |> List.keyfind(:hostname, 0) |> elem(1)
+
     case Process.get(:meilisearch) do
       nil ->
         init_finch()
