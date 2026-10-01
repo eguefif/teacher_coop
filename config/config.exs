@@ -41,8 +41,8 @@ config :teacher_coop,
   generators: [timestamp_type: :utc_datetime]
 
 config :teacher_coop, TeacherCoop.SearchRepo,
-  hostname: "http://localhost",
-  port: 7700
+  hostname: "http://localhost:7700",
+  masterkey: "masterkey"
 
 config :teacher_coop, TeacherCoop.Gettext, locales: ~w(en fr)
 config :gettext, :default_locale, "fr"
