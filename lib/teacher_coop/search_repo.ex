@@ -85,10 +85,10 @@ defmodule TeacherCoop.SearchRepo do
   defp is_env_test() do
     app = Application.get_application(__MODULE__)
 
-    {:database, database} =
-      Application.get_env(app, TeacherCoop.Repo) |> List.keyfind(:database, 0)
-
-    String.contains?(database, "test")
+    case Application.get_env(app, TeacherCoop.Repo) |> List.keyfind(:database, 0) do
+      {:database, database} -> String.contains?(database, "test")
+      _ -> false
+    end
   end
 
   @doc """
