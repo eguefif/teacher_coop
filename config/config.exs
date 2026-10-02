@@ -78,7 +78,8 @@ config :teacher_coop, TeacherCoop.FileStore,
   access_key_id: "accesskey",
   secret_access_key: "secret",
   bucket: "teachercoop",
-  region: "fr-par"
+  region: "fr-par",
+  prefix: "teachercoop_documents"
 
 # Configure esbuild (the version is required)
 config :esbuild,

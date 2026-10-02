@@ -16,7 +16,11 @@ defmodule TeacherCoop.FileStore do
         access_key_id: "accesskey",
         secret_access_key: "secret",
         bucket: "teachercoop",
-        region: "fr-par"
+        region: "fr-par",
+        prefix: "teachercoop_documents"
+
+  Every key is stored under `:prefix`, the folder the bucket policy grants the
+  application access to. Callers pass keys relative to it.
 
   In development this points to a local adobe/S3mock instance ran by docker; in production the
   credentials are read from Docker secrets in `config/runtime.exs`.
@@ -48,7 +52,8 @@ defmodule TeacherCoop.FileStore do
       bucket: bucket,
       access_key_id: access_key_id,
       secret_access_key: secret_access_key,
-      region: region
+      region: region,
+      prefix: prefix
     } = config()
 
     s3_config = %{
@@ -57,7 +62,7 @@ defmodule TeacherCoop.FileStore do
       secret_access_key: secret_access_key
     }
 
-    key = Path.join([fileprefix, filename])
+    key = Path.join([prefix, fileprefix, filename])
     opts = Keyword.put(opts, :key, key)
     {:ok, fields} = S3Upload.sign_form_upload(s3_config, bucket, opts)
 
@@ -83,10 +88,10 @@ defmodule TeacherCoop.FileStore do
   """
   @spec get_file_url(String.t(), keyword()) :: String.t()
   def get_file_url(key, opts \\ []) do
-    %{endpoint: endpoint} = config = config()
+    %{endpoint: endpoint, prefix: prefix} = config = config()
     s3_config = Map.take(config, [:region, :access_key_id, :secret_access_key])
 
-    S3Download.sign_download_url(s3_config, endpoint, key, opts)
+    S3Download.sign_download_url(s3_config, endpoint, Path.join(prefix, key), opts)
   end
 
   defp config() do
