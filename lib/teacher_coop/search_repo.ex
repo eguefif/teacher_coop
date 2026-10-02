@@ -35,6 +35,59 @@ defmodule TeacherCoop.SearchRepo do
   end
 
   @doc """
+  Create index in Meilisearch
+  """
+  @spec create_index(String.t(), String.t() | nil) :: :ok | :error
+  def create_index(indexname, primary_key \\ nil) do
+    result =
+      get_client()
+      |> Meilisearch.Index.create(%{uid: indexname, primaryKey: primary_key})
+
+    require Logger
+    Logger.info("In create index")
+
+    case result do
+      {:ok, task} ->
+        wait_for_task(task)
+
+      {:error, reason} ->
+        Sentry.capture_message("Error creating index in Meilisearch",
+          extra: %{
+            indexname: indexname,
+            error: reason
+          }
+        )
+
+        :error
+    end
+  end
+
+  @doc """
+  delete index in Meilisearch.
+  """
+  @spec delete_index(String.t()) :: :ok | :error
+  def delete_index(indexuid) do
+    result =
+      get_client()
+      |> Meilisearch.Index.delete(indexuid)
+
+    case result do
+      {:ok, task} ->
+        wait_for_task(task)
+
+      {:error, reason} ->
+        Sentry.capture_message("Error deleting index in Meilisearch",
+          extra: %{
+            indexname: indexuid,
+            error: reason
+          }
+        )
+
+        :error
+    end
+  end
+
+  @doc """
   Configure an index with the settings.
   Settings should be a map. The function will camelCase all the keys.
   """
@@ -96,7 +149,7 @@ defmodule TeacherCoop.SearchRepo do
   Takes an array of `%Task{}`.
   Returns `:ok` or `:error`.
   """
-  @spec wait_for_tasks([Meilisearch.Task.t()]) :: :ok | :error
+  @spec wait_for_tasks([Meilisearch.SummarizedTask.t()]) :: :ok | :error
   def wait_for_tasks(tasks) when is_list(tasks) do
     result =
       tasks
@@ -111,7 +164,7 @@ defmodule TeacherCoop.SearchRepo do
   Takes a `%Task{}`
   Returns `:ok` or `:error`.
   """
-  @spec wait_for_tasks(map()) :: :ok | :error
+  @spec wait_for_task(map()) :: :ok | :error
   def wait_for_task(%{"taskUid" => uid} = _) do
     wait_for_task_loop(uid)
   end

@@ -2,7 +2,7 @@ defmodule TeacherCoop.ConfigurationTest do
   use TeacherCoop.DataCase
   alias TeacherCoop.Discovery.Configuration
   alias TeacherCoop.Discovery.Configuration.Index
-  alias TeacherCoop.Discovery.Configuration.Workers.UpdateConfig
+  alias TeacherCoop.Discovery.Configuration.Workers.CreateIndex
 
   describe "configuration" do
     import TeacherCoop.ConfigurationFixtures
@@ -118,7 +118,7 @@ defmodule TeacherCoop.ConfigurationTest do
 
       {:ok, index} = Configuration.create_index(attrs, scope)
 
-      assert_enqueued worker: UpdateConfig,
+      assert_enqueued worker: CreateIndex,
                       args: %{
                         "indexuid" => index.uid,
                         "config_id" => config.id
@@ -153,7 +153,7 @@ defmodule TeacherCoop.ConfigurationTest do
 
       {:ok, index} = Configuration.update_index(index, %{uid: "New uid"}, scope)
 
-      assert_enqueued worker: UpdateConfig,
+      assert_enqueued worker: CreateIndex,
                       args: %{
                         "indexuid" => index.uid,
                         "config_id" => config.id

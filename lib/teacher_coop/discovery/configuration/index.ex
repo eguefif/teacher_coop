@@ -50,7 +50,7 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   @doc false
   def changeset(index, attrs, user_scope) do
     index
-    |> cast(attrs, [:uid, :state, :task_uid, :type, :engine_configuration_id])
+    |> cast(attrs, [:uid, :state, :task_uid, :type, :engine_configuration_id, :primary_key])
     |> validate_required([:uid])
     |> put_change(:user_id, user_scope.user.id)
     |> foreign_key_constraint(:engine_configuration_id)
