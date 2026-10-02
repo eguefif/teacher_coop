@@ -50,9 +50,11 @@ defmodule TeacherCoop.SimpleS3Upload do
     content_type = Keyword.fetch!(opts, :content_type)
     expires_in = Keyword.fetch!(opts, :expires_in)
 
-    expires_at = DateTime.add(DateTime.utc_now(), expires_in, :millisecond)
-    amz_date = amz_date(expires_at)
-    credential = credential(config, expires_at)
+    # Sign with the current time; expires_at only bounds the policy validity
+    now = DateTime.utc_now()
+    expires_at = DateTime.add(now, expires_in, :millisecond)
+    amz_date = amz_date(now)
+    credential = credential(config, now)
 
     encoded_policy =
       Base.encode64("""
@@ -64,7 +66,6 @@ defmodule TeacherCoop.SimpleS3Upload do
           {"acl": "private"},
           ["eq", "$Content-Type", "#{content_type}"],
           ["content-length-range", 0, #{max_file_size}],
-          {"x-amz-server-side-encryption": "AES256"},
           {"x-amz-credential": "#{credential}"},
           {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
           {"x-amz-date": "#{amz_date}"}
@@ -76,12 +77,11 @@ defmodule TeacherCoop.SimpleS3Upload do
       "key" => key,
       "acl" => "private",
       "content-type" => content_type,
-      "x-amz-server-side-encryption" => "AES256",
       "x-amz-credential" => credential,
       "x-amz-algorithm" => "AWS4-HMAC-SHA256",
       "x-amz-date" => amz_date,
       "policy" => encoded_policy,
-      "x-amz-signature" => signature(config, expires_at, encoded_policy)
+      "x-amz-signature" => signature(config, now, encoded_policy)
     }
 
     {:ok, fields}
@@ -97,19 +97,19 @@ defmodule TeacherCoop.SimpleS3Upload do
     |> Kernel.<>("Z")
   end
 
-  defp credential(%{} = config, %DateTime{} = expires_at) do
-    "#{config.access_key_id}/#{short_date(expires_at)}/#{config.region}/s3/aws4_request"
+  defp credential(%{} = config, %DateTime{} = datetime) do
+    "#{config.access_key_id}/#{short_date(datetime)}/#{config.region}/s3/aws4_request"
   end
 
-  defp signature(config, %DateTime{} = expires_at, encoded_policy) do
+  defp signature(config, %DateTime{} = datetime, encoded_policy) do
     config
-    |> signing_key(expires_at, "s3")
+    |> signing_key(datetime, "s3")
     |> sha256(encoded_policy)
     |> Base.encode16(case: :lower)
   end
 
-  defp signing_key(%{} = config, %DateTime{} = expires_at, service) when service in ["s3"] do
-    amz_date = short_date(expires_at)
+  defp signing_key(%{} = config, %DateTime{} = datetime, service) when service in ["s3"] do
+    amz_date = short_date(datetime)
     %{secret_access_key: secret, region: region} = config
 
     ("AWS4" <> secret)
@@ -119,8 +119,8 @@ defmodule TeacherCoop.SimpleS3Upload do
     |> sha256("aws4_request")
   end
 
-  defp short_date(%DateTime{} = expires_at) do
-    expires_at
+  defp short_date(%DateTime{} = datetime) do
+    datetime
     |> amz_date()
     |> String.slice(0..7)
   end

@@ -113,7 +113,8 @@ if config_env() == :prod do
     access_key_id: read_secret.("access_key_id"),
     secret_access_key: read_secret.("secret_access_key"),
     bucket: "teachercoop",
-    region: "fr-par"
+    region: "fr-par",
+    prefix: "teachercoop_documents"
 
   config :teacher_coop, TeacherCoop.SearchRepo,
     hostname: "http://meilisearch:7700",
