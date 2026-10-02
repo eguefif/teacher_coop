@@ -110,11 +110,9 @@ defmodule TeacherCoop.Discovery.Configuration do
            %Index{}
            |> Index.changeset(attrs, current_scope)
            |> Repo.insert() do
-      if not is_nil(index.engine_configuration_id) do
-        %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
-        |> Workers.UpdateConfig.new()
-        |> Oban.insert()
-      end
+      %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
+      |> Workers.CreateIndex.new()
+      |> Oban.insert()
 
       {:ok, index}
     end
@@ -127,11 +125,9 @@ defmodule TeacherCoop.Discovery.Configuration do
            params
            |> Index.changeset(attrs, scope)
            |> Repo.update() do
-      if not is_nil(index.engine_configuration_id) do
-        %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
-        |> Workers.UpdateConfig.new()
-        |> Oban.insert()
-      end
+      %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
+      |> Workers.CreateIndex.new()
+      |> Oban.insert()
 
       {:ok, index}
     end

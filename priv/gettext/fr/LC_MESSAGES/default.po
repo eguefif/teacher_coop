@@ -1175,3 +1175,8 @@ msgstr "Pas de données."
 #, elixir-autogen, elixir-format
 msgid "Filename should be build on the model `subject.txt` where subject is one of the following word: "
 msgstr "Le fichier devrait être construit avec le sujet comme dans `sujet.txt`. Le sujet devrait être l'un des mots suivants:"
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Primary Key"
+msgstr "Clé primaire"

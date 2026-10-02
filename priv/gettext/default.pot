@@ -1139,3 +1139,8 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Filename should be build on the model `subject.txt` where subject is one of the following word: "
 msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "Primary Key"
+msgstr ""
