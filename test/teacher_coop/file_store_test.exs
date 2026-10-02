@@ -18,7 +18,7 @@ defmodule TeacherCoop.FileStoretest do
       )
 
     assert result == :ok
-    assert Map.get(meta.fields, "acl", nil) == "private-read"
+    assert Map.get(meta.fields, "acl", nil) == "private"
 
     assert meta.key == "my_file.pdf"
     assert meta.url == "http://localhost:9090/teachercoop"

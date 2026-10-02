@@ -74,7 +74,7 @@ config :teacher_coop, TeacherCoop.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure FileStorage handler to work locally with dummy credentials
 config :teacher_coop, TeacherCoop.FileStore,
-  endpoint: "http://localhost:9090",
+  endpoint: "http://localhost:9090/teachercoop",
   access_key_id: "accesskey",
   secret_access_key: "secret",
   bucket: "teachercoop",
