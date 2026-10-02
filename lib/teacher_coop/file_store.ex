@@ -64,7 +64,7 @@ defmodule TeacherCoop.FileStore do
     meta = %{
       uploader: "S3",
       key: key,
-      url: endpoint <> "/#{bucket}",
+      url: endpoint,
       fields: fields
     }
 
@@ -83,10 +83,10 @@ defmodule TeacherCoop.FileStore do
   """
   @spec get_file_url(String.t(), keyword()) :: String.t()
   def get_file_url(key, opts \\ []) do
-    %{endpoint: endpoint, bucket: bucket} = config = config()
+    %{endpoint: endpoint} = config = config()
     s3_config = Map.take(config, [:region, :access_key_id, :secret_access_key])
 
-    S3Download.sign_download_url(s3_config, endpoint, bucket, key, opts)
+    S3Download.sign_download_url(s3_config, endpoint, key, opts)
   end
 
   defp config() do

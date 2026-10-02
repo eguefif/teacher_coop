@@ -14,6 +14,10 @@ defmodule TeacherCoop.SimpleS3Download do
     * `:access_key_id` - The AWS access key id
     * `:secret_access_key` - The AWS secret access key
 
+  The endpoint must already address the bucket: either a virtual-hosted URL
+  (`https://my-bucket.s3.fr-par.scw.cloud`) or a path-style URL including the
+  bucket (`http://localhost:9090/my-bucket`). Its path is prefixed to the key.
+
   Returns a URL that can be used to GET the object until it expires.
 
   ## Options
@@ -32,21 +36,22 @@ defmodule TeacherCoop.SimpleS3Download do
 
       SimpleS3Download.sign_download_url(
         config,
-        "https://s3.us-east-1.amazonaws.com",
-        "my-bucket",
+        "https://my-bucket.s3.us-east-1.amazonaws.com",
         "public/my-file-name",
         expires_in: 3600
       )
 
   """
-  def sign_download_url(config, endpoint, bucket, key, opts \\ []) do
+  def sign_download_url(config, endpoint, key, opts \\ []) do
     expires_in = Keyword.get(opts, :expires_in, 3600)
     datetime = Keyword.get_lazy(opts, :datetime, &DateTime.utc_now/0)
 
     amz_date = amz_date(datetime)
     uri = URI.parse(endpoint)
     host = if uri.port in [80, 443], do: uri.host, else: "#{uri.host}:#{uri.port}"
-    path = "/#{bucket}/" <> (key |> String.split("/") |> Enum.map_join("/", &aws_encode/1))
+
+    path =
+      (uri.path || "") <> "/" <> (key |> String.split("/") |> Enum.map_join("/", &aws_encode/1))
 
     # Query parameters must be sorted alphabetically
     query =
