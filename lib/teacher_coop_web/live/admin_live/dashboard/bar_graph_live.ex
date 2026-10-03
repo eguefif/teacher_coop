@@ -25,6 +25,8 @@ defmodule TeacherCoopWeb.AdminLive.BarGraph do
      |> assign(:graph, make_graph(assigns.data, assigns.title, assigns.orient))}
   end
 
+  defp make_graph(data, _, _) when data == [], do: nil
+
   defp make_graph(data, title, _) do
     dataset = Contex.Dataset.new(data, ["x", "y"])
     chart = Contex.BarChart.new(dataset)
