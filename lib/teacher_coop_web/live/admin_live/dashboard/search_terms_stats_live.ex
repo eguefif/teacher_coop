@@ -63,20 +63,23 @@ defmodule TeacherCoopWeb.AdminLive.SearchTermsStatsLive do
   end
 
   @impl true
-  def update(_assigns, socket) do
+  def update(assigns, socket) do
+    scope = assigns.current_scope
+
     {:ok,
      socket
      |> assign(:click_position_id, "graph-click-position")
      |> assign_async(:top_search_terms_with_no_result, fn ->
        {:ok,
         %{
-          top_search_terms_with_no_result: Dashboard.WordStats.top_search_terms_with_no_result()
+          top_search_terms_with_no_result:
+            Dashboard.WordStats.top_search_terms_with_no_result(scope)
         }}
      end)
      |> assign_async(:popular_search_terms, fn ->
        {:ok,
         %{
-          popular_search_terms: Dashboard.WordStats.top_search_terms()
+          popular_search_terms: Dashboard.WordStats.top_search_terms(scope)
         }}
      end)}
   end
