@@ -63,6 +63,10 @@ defmodule TeacherCoop.Library do
     |> Repo.preload(:user)
   end
 
+  @doc """
+  Returns the list of documents by ids.
+  """
+  @spec list_documents_by_ids([integer()]) :: [Document.t()]
   def list_documents_by_ids(ids) when ids != [] do
     Document.Query.base()
     |> Document.Query.by_ids(ids)
@@ -71,6 +75,7 @@ defmodule TeacherCoop.Library do
     |> Repo.all()
   end
 
+  @spec list_documents_by_ids([]) :: []
   def list_documents_by_ids(ids) when ids == [] do
     ids
   end
