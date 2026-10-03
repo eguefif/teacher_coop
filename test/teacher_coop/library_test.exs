@@ -213,7 +213,7 @@ defmodule TeacherCoop.LibraryTest do
     test "delete_file_by_id/1 deletes the file and schedules index cleanup" do
       file = file_fixture()
 
-      assert {:ok, %Oban.Job{}} = Library.delete_file_by_id(file.id)
+      assert {:ok, %TeacherCoop.Library.File{}} = Library.delete_file_by_id(file.id)
       assert Library.get_file!(file.id) == nil
 
       assert_enqueued worker: TeacherCoop.Library.Workers.DeleteDocument,

@@ -25,6 +25,8 @@ defmodule TeacherCoop.Library do
   alias TeacherCoop.Curriculum
   alias TeacherCoop.Accounts.Scope
 
+  # Document ************************************************************************
+
   @doc """
   Subscribes to scoped notifications about any document changes.
 
@@ -35,12 +37,14 @@ defmodule TeacherCoop.Library do
     * {:deleted, %Document{}}
 
   """
+  @spec subscribe_documents(Scope.t()) :: :ok | {:error, term()}
   def subscribe_documents(%Scope{} = scope) do
     key = scope.user.id
 
     Phoenix.PubSub.subscribe(TeacherCoop.PubSub, "user:#{key}:documents")
   end
 
+  @spec broadcast_document(Scope.t(), term()) :: :ok | {:error, term()}
   defp broadcast_document(%Scope{} = scope, message) do
     key = scope.user.id
 
@@ -56,6 +60,7 @@ defmodule TeacherCoop.Library do
       [%Document{}, ...]
 
   """
+  @spec list_documents(Scope.t()) :: [Document.t()]
   def list_documents(%Scope{} = scope) do
     Repo.all_by(Document, user_id: scope.user.id)
     |> Repo.preload(:objectives)
@@ -63,6 +68,10 @@ defmodule TeacherCoop.Library do
     |> Repo.preload(:user)
   end
 
+  @doc """
+  Returns the list of documents by ids.
+  """
+  @spec list_documents_by_ids([integer()]) :: [Document.t()]
   def list_documents_by_ids(ids) when ids != [] do
     Document.Query.base()
     |> Document.Query.by_ids(ids)
@@ -71,6 +80,7 @@ defmodule TeacherCoop.Library do
     |> Repo.all()
   end
 
+  @spec list_documents_by_ids([]) :: []
   def list_documents_by_ids(ids) when ids == [] do
     ids
   end
@@ -89,6 +99,7 @@ defmodule TeacherCoop.Library do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_document!(integer()) :: Document.t()
   def get_document!(id) do
     Repo.get_by!(Document, id: id)
     |> Repo.preload(:user)
@@ -111,6 +122,8 @@ defmodule TeacherCoop.Library do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec create_document(Scope.t(), map(), [integer()] | nil) ::
+          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
   def create_document(%Scope{} = scope, attrs, objective_ids \\ []) do
     objectives = Repo.all(from c in Curriculum.Objective, where: c.id in ^objective_ids)
 
@@ -146,6 +159,10 @@ defmodule TeacherCoop.Library do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_document(Scope.t(), Document.t(), map()) ::
+          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
+  @spec update_document(Scope.t(), Document.t(), map(), [integer()]) ::
+          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
   def update_document(%Scope{} = scope, %Document{} = document, attrs, objective_ids \\ []) do
     true = document.user_id == scope.user.id
     objectives = Repo.all(from c in Curriculum.Objective, where: c.id in ^objective_ids)
@@ -172,6 +189,8 @@ defmodule TeacherCoop.Library do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec delete_document(Scope.t(), Document.t()) ::
+          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
   def delete_document(%Scope{} = scope, %Document{} = document) do
     true = document.user_id == scope.user.id
     files = Enum.map(document.files, fn file -> file.filepath end)
@@ -186,12 +205,34 @@ defmodule TeacherCoop.Library do
   end
 
   @doc """
+  Returns an `%Ecto.Changeset{}` for tracking document changes.
+
+  ## Examples
+
+      iex> change_document(scope, document)
+      %Ecto.Changeset{data: %Document{}}
+
+  """
+  @spec change_document(Scope.t(), Document.t()) :: Ecto.Changeset.t()
+  @spec change_document(Scope.t(), Document.t(), map()) :: Ecto.Changeset.t()
+  def change_document(%Scope{} = scope, %Document{} = document, attrs \\ %{}) do
+    true = document.user_id == scope.user.id
+
+    Document.changeset(document, attrs, scope)
+  end
+
+  # File ************************************************************************
+
+  @doc """
   Delete a `%File{}` by id, remove from disc and SearchRepo.
   """
+  @spec delete_file_by_id(integer()) :: {:ok, File.t()} | {:error, Ecto.Changeset.t()}
   def delete_file_by_id(id) do
-    file = Repo.get(File, id)
-    Repo.delete(file)
-    schedule_delete_document_from_index_job(id)
+    with file <- Repo.get(File, id),
+         {:ok, file} <- Repo.delete(file) do
+      schedule_delete_document_from_index_job(id)
+      {:ok, file}
+    end
   end
 
   defp schedule_delete_document_from_index_job(document_id) do
@@ -204,20 +245,5 @@ defmodule TeacherCoop.Library do
     %{files: files}
     |> Workers.DeleteFiles.new()
     |> Oban.insert()
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking document changes.
-
-  ## Examples
-
-      iex> change_document(scope, document)
-      %Ecto.Changeset{data: %Document{}}
-
-  """
-  def change_document(%Scope{} = scope, %Document{} = document, attrs \\ %{}) do
-    true = document.user_id == scope.user.id
-
-    Document.changeset(document, attrs, scope)
   end
 end

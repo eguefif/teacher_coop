@@ -10,6 +10,7 @@ defmodule TeacherCoop.Discovery.CreateIndexWorkerTest do
   setup do
     scope = admin_scope_fixture()
     index = index_fixture(scope)
+    SearchRepo.delete_index(index.uid)
 
     on_exit(:delete_index, fn ->
       SearchRepo.delete_index(index.uid)

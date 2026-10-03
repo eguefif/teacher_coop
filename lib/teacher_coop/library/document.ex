@@ -23,18 +23,18 @@ defmodule TeacherCoop.Library.Document do
 
   @type t :: %__MODULE__{
           id: integer() | nil,
-          title: String.t(),
-          description: String.t(),
-          institution_type: String.t(),
-          grade: String.t(),
+          title: String.t() | nil,
+          description: String.t() | nil,
+          institution_type: String.t() | nil,
+          grade: String.t() | nil,
           user_id: integer() | nil,
           user: TeacherCoop.Accounts.User.t() | Ecto.Association.NotLoaded.t() | nil,
           document_objectives:
             [TeacherCoop.Library.DocumentObjective.t()] | Ecto.Association.NotLoaded.t(),
           objectives: [TeacherCoop.Curriculum.Objective.t()] | Ecto.Association.NotLoaded.t(),
           files: [TeacherCoop.Library.File.t()] | Ecto.Association.NotLoaded.t(),
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t()
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
         }
 
   schema "documents" do
