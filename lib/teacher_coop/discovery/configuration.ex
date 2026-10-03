@@ -78,6 +78,7 @@ defmodule TeacherCoop.Discovery.Configuration do
   Get index changeset.
   """
   def change_index(%Scope{} = current_scope, %Index{} = index, attrs \\ %{}) do
+    true = Scope.is_admin?(current_scope)
     Index.changeset(index, attrs, current_scope)
   end
 
@@ -146,7 +147,7 @@ defmodule TeacherCoop.Discovery.Configuration do
     Repo.get!(EngineConfiguration, id)
   end
 
-  def get_configuration!(current_scope, id) do
+  def get_configuration!(%Scope{} = current_scope, id) do
     true = Scope.is_admin?(current_scope)
     Repo.get!(EngineConfiguration, id)
   end
@@ -162,7 +163,7 @@ defmodule TeacherCoop.Discovery.Configuration do
   @doc """
   Delete one configuration by id.
   """
-  def delete_configuration(user_scope, %EngineConfiguration{} = configuration) do
+  def delete_configuration(%Scope{} = user_scope, %EngineConfiguration{} = configuration) do
     true = Scope.is_admin?(user_scope)
     Repo.delete(configuration)
   end

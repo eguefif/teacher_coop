@@ -5,6 +5,7 @@ defmodule TeacherCoop.Dashboard.WordStats do
   """
   import Ecto.Query
   alias TeacherCoop.Repo
+  alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Dashboard.WordCount
   alias TeacherCoop.Discovery.Search
 
@@ -43,8 +44,10 @@ defmodule TeacherCoop.Dashboard.WordStats do
   @doc """
   Returns a list of the most popular words.
   """
-  @spec top_search_terms(integer()) :: [Ecto.Schema.t() | term()]
-  def top_search_terms(limit \\ 15) do
+  @spec top_search_terms(Scope.t(), integer()) :: [Ecto.Schema.t() | term()]
+  def top_search_terms(%Scope{} = scope, limit \\ 15) do
+    true = Scope.is_admin?(scope)
+
     WordCount.Query.base()
     |> WordCount.Query.top_search_words(limit)
     |> Repo.all()
@@ -53,8 +56,10 @@ defmodule TeacherCoop.Dashboard.WordStats do
   @doc """
   Returns a list of the most popular words that get no results from the search.
   """
-  @spec top_search_terms_with_no_result(integer()) :: [Ecto.Schema.t() | term()]
-  def top_search_terms_with_no_result(limit \\ 15) do
+  @spec top_search_terms_with_no_result(Scope.t(), integer()) :: [Ecto.Schema.t() | term()]
+  def top_search_terms_with_no_result(%Scope{} = scope, limit \\ 15) do
+    true = Scope.is_admin?(scope)
+
     WordCount.Query.base()
     |> WordCount.Query.top_search_words(limit)
     |> WordCount.Query.where_no_results()
