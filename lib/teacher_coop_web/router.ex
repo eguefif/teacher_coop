@@ -39,12 +39,10 @@ defmodule TeacherCoopWeb.Router do
     # If your application does not have an admins-only section yet,
     # you can use Plug.BasicAuth to set up some basic authentication
     # as long as you are also using SSL (which you should anyway).
-    import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: TeacherCoopWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
@@ -71,8 +69,10 @@ defmodule TeacherCoopWeb.Router do
   end
 
   scope "/admin", TeacherCoopWeb do
+    import Phoenix.LiveDashboard.Router
     pipe_through [:browser, :require_admin]
     oban_dashboard("/oban")
+    live_dashboard "/phoenix-dashboard", metrics: TeacherCoopWeb.Telemetry
 
     live_session :require_admin,
       on_mount: [{TeacherCoopWeb.Locale, :set_locale}, {TeacherCoopWeb.UserAuth, :require_admin}] do
