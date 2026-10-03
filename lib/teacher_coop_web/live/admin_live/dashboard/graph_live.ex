@@ -26,7 +26,9 @@ defmodule TeacherCoopWeb.AdminLive.Graph do
      |> assign(:graph, make_graph(assigns.data, assigns.title))}
   end
 
-  defp make_graph(data, title) do
+  defp make_graph(data, _) when data == [], do: nil
+
+  defp make_graph(data, title) when length(data) != 0 do
     dataset = Contex.Dataset.new(data, ["x", "y"])
     chart = Contex.LinePlot.new(dataset)
 
