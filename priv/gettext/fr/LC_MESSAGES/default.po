@@ -1180,3 +1180,8 @@ msgstr "Le fichier devrait être construit avec le sujet comme dans `sujet.txt`.
 #, elixir-autogen, elixir-format
 msgid "Primary Key"
 msgstr "Clé primaire"
+
+#: lib/teacher_coop_web/components/layouts/root.html.heex
+#, elixir-autogen, elixir-format
+msgid "Phoenix Dashboard"
+msgstr "Tableau de bord Phoenix"
