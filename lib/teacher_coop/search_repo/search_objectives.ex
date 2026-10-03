@@ -1,6 +1,8 @@
 defmodule TeacherCoop.SearchRepo.SearchObjectives do
   import TeacherCoop.SearchRepo
 
+  @spec search(String.t()) ::
+          [map()] | {:error, Meilisearch.Client.error()}
   def search(input) do
     case Meilisearch.Search.search(get_client(), index_name("objectives"), q: input) do
       {:ok, results} ->

@@ -34,8 +34,14 @@ defmodule TeacherCoop.CurriculumTest.FileIngestionWorkerTest do
   @year 2020
   @subject "français"
 
-  test "perform_job/1" do
-    ingestion = curriculum_ingestion_fixture()
+  alias TeacherCoop.AccountsFixtures
+
+  setup do
+    %{scope: AccountsFixtures.admin_scope_fixture()}
+  end
+
+  test "perform_job/1", %{scope: scope} do
+    ingestion = curriculum_ingestion_fixture(scope)
 
     attrs = %{
       ingestion_id: ingestion.id,
@@ -57,12 +63,12 @@ defmodule TeacherCoop.CurriculumTest.FileIngestionWorkerTest do
     assert objective.subject == @subject
     assert objective.year == @year
 
-    ingestion = Curriculum.get_curriculum_ingestion(ingestion.id)
+    ingestion = Curriculum.get_curriculum_ingestion(scope, ingestion.id)
     assert ingestion.state == "finished"
   end
 
-  test "perform_job/1 with invalid data" do
-    ingestion = curriculum_ingestion_fixture()
+  test "perform_job/1 with invalid data", %{scope: scope} do
+    ingestion = curriculum_ingestion_fixture(scope)
 
     attrs = %{
       ingestion_id: ingestion.id,
@@ -75,7 +81,7 @@ defmodule TeacherCoop.CurriculumTest.FileIngestionWorkerTest do
 
     assert Curriculum.list_objectives_by(year: @year) == []
 
-    ingestion = Curriculum.get_curriculum_ingestion(ingestion.id)
+    ingestion = Curriculum.get_curriculum_ingestion(scope, ingestion.id)
     assert ingestion.state == "error"
   end
 end
