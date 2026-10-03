@@ -18,12 +18,13 @@ defmodule TeacherCoop.Discovery.Configuration.EngineConfiguration do
 
   @type t() :: %__MODULE__{
           id: integer() | nil,
+          name: String.t() | nil,
           engine: String.t() | nil,
           user_id: integer() | nil,
           # user: TeacherCoop.Accounts.User.t() | Ecto.Association.NotLoaded.t() | nil,
           index: [Index.t()] | Ecto.Association.NotLoaded.t() | nil,
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t(),
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil,
           config: __MODULE__.Config.t() | nil
         }
 

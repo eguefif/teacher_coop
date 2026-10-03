@@ -14,17 +14,17 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
 
   @type t() :: %__MODULE__{
           id: integer() | nil,
-          uid: String.t(),
+          uid: String.t() | nil,
           primary_key: String.t() | nil,
           type: String.t() | nil,
           state: String.t() | nil,
           task_uid: String.t() | nil,
           engine_configuration_id: integer() | nil,
-          engine_configuration: EngineConfiguration.t() | nil,
+          engine_configuration: EngineConfiguration.t() | Ecto.Association.NotLoaded.t() | nil,
           user_id: integer() | nil,
-          user: User.t() | nil,
-          inserted_at: DateTime.t(),
-          updated_at: DateTime.t()
+          user: User.t() | Ecto.Association.NotLoaded.t() | nil,
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
         }
 
   @doc """
