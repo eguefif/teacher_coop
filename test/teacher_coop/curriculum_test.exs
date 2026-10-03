@@ -1,7 +1,12 @@
 defmodule TeacherCoop.CurriculumTest do
+  alias TeacherCoop.AccountsFixtures
   use TeacherCoop.DataCase
 
   alias TeacherCoop.Curriculum
+
+  setup do
+    %{scope: AccountsFixtures.admin_scope_fixture()}
+  end
 
   describe "objectives" do
     alias TeacherCoop.Curriculum.Objective
@@ -15,20 +20,20 @@ defmodule TeacherCoop.CurriculumTest do
       assert Curriculum.get_objective!(objective.id) == objective
     end
 
-    test "create_objective/2 with valid data creates a objective" do
+    test "create_objective/2 with valid data creates a objective", %{scope: scope} do
       valid_attrs = %{year: 42, subject: "some subject", grade: "some grade", goal: "some goal"}
-      assert {:ok, %Objective{} = objective} = Curriculum.create_objective(valid_attrs)
+      assert {:ok, %Objective{} = objective} = Curriculum.create_objective(scope, valid_attrs)
       assert objective.year == 42
       assert objective.subject == "some subject"
       assert objective.grade == "some grade"
       assert objective.goal == "some goal"
     end
 
-    test "create_objective/2 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Curriculum.create_objective(@invalid_attrs)
+    test "create_objective/2 with invalid data returns error changeset", %{scope: scope} do
+      assert {:error, %Ecto.Changeset{}} = Curriculum.create_objective(scope, @invalid_attrs)
     end
 
-    test "update_objective/3 with valid data updates the objective" do
+    test "update_objective/3 with valid data updates the objective", %{scope: scope} do
       objective = objective_fixture()
 
       update_attrs = %{
@@ -39,7 +44,7 @@ defmodule TeacherCoop.CurriculumTest do
       }
 
       assert {:ok, %Objective{} = objective} =
-               Curriculum.update_objective(objective, update_attrs)
+               Curriculum.update_objective(scope, objective, update_attrs)
 
       assert objective.year == 43
       assert objective.subject == "some updated subject"
@@ -47,18 +52,18 @@ defmodule TeacherCoop.CurriculumTest do
       assert objective.goal == "some updated goal"
     end
 
-    test "update_objective/3 with invalid data returns error changeset" do
+    test "update_objective/3 with invalid data returns error changeset", %{scope: scope} do
       objective = objective_fixture()
 
       assert {:error, %Ecto.Changeset{}} =
-               Curriculum.update_objective(objective, @invalid_attrs)
+               Curriculum.update_objective(scope, objective, @invalid_attrs)
 
       assert objective == Curriculum.get_objective!(objective.id)
     end
 
-    test "delete_objective/2 deletes the objective" do
+    test "delete_objective/2 deletes the objective", %{scope: scope} do
       objective = objective_fixture()
-      assert {:ok, %Objective{}} = Curriculum.delete_objective(objective)
+      assert {:ok, %Objective{}} = Curriculum.delete_objective(scope, objective)
       assert_raise Ecto.NoResultsError, fn -> Curriculum.get_objective!(objective.id) end
     end
 
@@ -67,7 +72,7 @@ defmodule TeacherCoop.CurriculumTest do
       assert %Ecto.Changeset{} = Curriculum.change_objective(objective)
     end
 
-    test "get_stats/1" do
+    test "get_stats/1", %{scope: scope} do
       year = 2022
 
       objective_fixture(%{
@@ -103,7 +108,7 @@ defmodule TeacherCoop.CurriculumTest do
       })
 
       result =
-        Curriculum.get_stats(year)
+        Curriculum.get_stats(scope, year)
         |> Enum.group_by(fn entry -> entry.grade end)
 
       assert map_size(result) == 2

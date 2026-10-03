@@ -1,22 +1,25 @@
 defmodule TeacherCoop.Curriculum do
   @moduledoc """
-  The curriculum is a set of learning objectives defines by a text.
+  The curriculum is a set of learning objectives defined by a text.
   In our project, we work with the curriculum defined by France's Education Ministry.
 
-  See [CurriculumScripts](../priv/curriculum/curriculum_populating.exs) for how we ingest the cuccirulum.
+  See `priv/curriculum/curriculum_populating.exs` for how we ingest the curriculum.
   """
 
   import Ecto.Query, warn: false
   alias TeacherCoop.Repo
 
+  alias TeacherCoop.Accounts.Scope
   alias TeacherCoop.Curriculum.Objective
   alias TeacherCoop.Curriculum.Query
   alias TeacherCoop.Curriculum.FileIngestionWorker
   alias TeacherCoop.Curriculum.CurriculumIngestion
   alias TeacherCoop.Curriculum.CurriculumIngestionQuery
 
+  # Objectives ******************************************************
+
   @doc """
-  Returns all the objectives from the Curriculum. 
+  Returns all the objectives from the Curriculum.
   """
   @spec list_objectives!() :: [Objective.t() | term()]
   def list_objectives!() do
@@ -24,13 +27,18 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Returns all the objectives from the Curriculum by a key.
+  Returns all the objectives from the Curriculum matching the given clauses.
   """
   @spec list_objectives_by(keyword() | map()) :: [Objective.t() | term()]
   def list_objectives_by(clauses) do
     Repo.all_by(Objective, clauses)
   end
 
+  @doc """
+  Search objectives using the Search Engine.
+  """
+  @spec search_objectives(String.t()) ::
+          [map()] | {:error, Meilisearch.Client.error()}
   def search_objectives(input) when is_bitstring(input) do
     TeacherCoop.SearchRepo.SearchObjectives.search(input)
   end
@@ -55,9 +63,9 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Gets a single objective by a key.
+  Gets a single objective matching the given clauses.
 
-
+  Raises `Ecto.NoResultsError` if the Objective does not exist.
   """
   @spec get_objective_by!(keyword() | map()) :: Objective.t() | term()
   def get_objective_by!(clause) do
@@ -65,7 +73,7 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Creates a objective.
+  Creates an objective.
 
   ## Examples
 
@@ -76,8 +84,11 @@ defmodule TeacherCoop.Curriculum do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_objective(map()) :: {:ok, Objective.t()} | {:error, Ecto.Changeset.t()}
-  def create_objective(attrs) do
+  @spec create_objective(Scope.t(), map()) ::
+          {:ok, Objective.t()} | {:error, Ecto.Changeset.t()}
+  def create_objective(%Scope{} = scope, attrs) do
+    true = Scope.is_admin?(scope)
+
     with {:ok, objective = %Objective{}} <-
            %Objective{}
            |> Objective.changeset(attrs)
@@ -87,17 +98,34 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Creates a objectives from a list in a transaction.
+  Creates objectives from a list in a single insert.
 
+  Use `:bypass_auth` only in cases where you are sure a user cannot corrupt data, typically
+  in a worker job scheduled by an admin user.
 
   ## Examples
 
-      iex> create_objective(scope, [%{field: value}])
-      {:ok, %Objective{}}
+      iex> create_objectives(scope, [%{field: value}])
+      :ok
+
+      iex> create_objectives(scope, [%{field: bad_value}])
+      {:error, [%Ecto.Changeset{}]}
 
   """
-  @spec create_objective([map()]) :: {:ok, [Objective.t()]} | {:error, [Ecto.Changeset.t()]}
-  def create_objectives(attrs) do
+  @spec create_objectives(Scope.t(), [map()]) ::
+          :ok | {:error, [Ecto.Changeset.t()]}
+  def create_objectives(%Scope{} = scope, attrs) do
+    true = Scope.is_admin?(scope)
+    do_create_objectives(attrs)
+  end
+
+  @spec create_objectives(:bypass_auth, [map()]) ::
+          :ok | {:error, [Ecto.Changeset.t()]}
+  def create_objectives(:bypass_auth, attrs) do
+    do_create_objectives(attrs)
+  end
+
+  defp do_create_objectives(attrs) do
     with {:ok, _} <- validates_list_of_objectives(attrs) do
       attrs
       |> Enum.map(fn objective ->
@@ -119,6 +147,37 @@ defmodule TeacherCoop.Curriculum do
     end
   end
 
+  @doc """
+  Bulk creates a list of objectives from a file and metadata.
+  """
+  @spec bulk_create_objectives_from_files(Scope.t(), map(), String.t()) ::
+          {:ok, Oban.Job.t()}
+          | {:error_changeset, Ecto.Changeset.t()}
+          | {:error, Oban.Job.changeset() | term()}
+  def bulk_create_objectives_from_files(
+        %Scope{} = scope,
+        attrs,
+        filecontent
+      ) do
+    true = Scope.is_admin?(scope)
+
+    result = create_curriculum_ingestion(scope, attrs)
+
+    case result do
+      {:ok, curriculum_ingestion} ->
+        year = curriculum_ingestion.year
+        subject = curriculum_ingestion.subject
+        id = curriculum_ingestion.id
+
+        %{ingestion_id: id, year: year, subject: subject, filecontent: filecontent}
+        |> FileIngestionWorker.new()
+        |> Oban.insert()
+
+      {:error, changeset} ->
+        {:error_changeset, changeset}
+    end
+  end
+
   @spec validates_list_of_objectives([map()]) :: {:ok | :error, [Ecto.Changeset.t()]}
   defp validates_list_of_objectives(attrs) do
     changesets = attrs |> Enum.map(&Objective.changeset(%Objective{}, &1))
@@ -128,20 +187,22 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Updates a objective.
+  Updates an objective.
 
   ## Examples
 
-      iex> update_objective(ope, objective, %{field: new_value})
+      iex> update_objective(scope, objective, %{field: new_value})
       {:ok, %Objective{}}
 
-      iex> update_objective(ope, objective, %{field: bad_value})
+      iex> update_objective(scope, objective, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_objective(Objective.t(), map()) ::
+  @spec update_objective(Scope.t(), Objective.t(), map()) ::
           {:ok, Objective.t()} | {:error, Ecto.Changeset.t()}
-  def update_objective(%Objective{} = objective, attrs) do
+  def update_objective(%Scope{} = scope, %Objective{} = objective, attrs) do
+    true = Scope.is_admin?(scope)
+
     with {:ok, objective = %Objective{}} <-
            objective
            |> Objective.changeset(attrs)
@@ -151,20 +212,22 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Deletes a objective.
+  Deletes an objective.
 
   ## Examples
 
-      iex> delete_objective(ope, objective)
+      iex> delete_objective(scope, objective)
       {:ok, %Objective{}}
 
       iex> delete_objective(scope, objective)
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_objective(Objective.t()) ::
+  @spec delete_objective(Scope.t(), Objective.t()) ::
           {:ok, Objective.t()} | {:error, Ecto.Changeset.t()}
-  def delete_objective(%Objective{} = objective) do
+  def delete_objective(%Scope{} = scope, %Objective{} = objective) do
+    true = Scope.is_admin?(scope)
+
     with {:ok, objective = %Objective{}} <-
            Repo.delete(objective) do
       {:ok, objective}
@@ -176,7 +239,7 @@ defmodule TeacherCoop.Curriculum do
 
   ## Examples
 
-      iex> change_objective(scope, objective)
+      iex> change_objective(objective)
       %Ecto.Changeset{data: %Objective{}}
 
   """
@@ -187,74 +250,72 @@ defmodule TeacherCoop.Curriculum do
   # CurriculumIngestion related logic ************************************************
 
   @doc """
-  Subscribes to scoped notifications about any curriculum_ingestions changes.
+  Subscribes to notifications about any curriculum ingestion changes.
 
   The broadcasted messages match the pattern:
 
-    * {:created, %curriculum_ingestions{}}
-    * {:updated, %curriculum_ingestions{}}
-    * {:deleted, %curriculum_ingestions{}}
+    * :ingestion_updated
 
   """
+  @spec subscribe_curriculum_ingestions() :: :ok | {:error, term()}
   def subscribe_curriculum_ingestions() do
     Phoenix.PubSub.subscribe(TeacherCoop.PubSub, ":curriculum_ingestions")
   end
 
+  @spec broadcast_curriculum_ingestions(:ingestion_updated) :: :ok | {:error, term()}
   defp broadcast_curriculum_ingestions(message) do
     Phoenix.PubSub.broadcast(TeacherCoop.PubSub, ":curriculum_ingestions", message)
   end
 
-  @spec get_curriculum_ingestion(integer()) :: CurriculumIngestion.t() | nil
-  def get_curriculum_ingestion(id) do
+  @doc """
+  Gets a curriculum ingestion.
+
+  Use `:bypass_auth` only in cases where you are sure a user cannot corrupt data, typically
+  in a worker job scheduled by an admin user.
+  """
+  @spec get_curriculum_ingestion(Scope.t(), integer()) :: CurriculumIngestion.t() | nil
+  def get_curriculum_ingestion(%Scope{} = scope, id) do
+    true = Scope.is_admin?(scope)
+    Repo.get(CurriculumIngestion, id)
+  end
+
+  @spec get_curriculum_ingestion(:bypass_auth, integer()) :: CurriculumIngestion.t() | nil
+  def get_curriculum_ingestion(:bypass_auth, id) do
     Repo.get(CurriculumIngestion, id)
   end
 
   @doc """
-  Create a curriculum ingestion.
+  Creates a curriculum ingestion.
   """
-  @spec create_curriculum_ingestion(map()) ::
+  @spec create_curriculum_ingestion(Scope.t(), map()) ::
           {:ok, CurriculumIngestion.t()} | {:error, Ecto.Changeset.t()}
-  def create_curriculum_ingestion(attrs) do
+  def create_curriculum_ingestion(%Scope{} = scope, attrs) do
+    true = Scope.is_admin?(scope)
+
     CurriculumIngestion.changeset(%CurriculumIngestion{}, attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Bulk add a list of objectives from a file and metadata"
+  Updates a curriculum ingestion.
+
+  Use `:bypass_auth` only in cases where you are sure a user cannot corrupt data, typically
+  in a worker job scheduled by an admin user.
   """
-  @spec bulk_add_objectives_from_files(map(), String.t()) ::
-          {:ok, Oban.Job.t()}
-          | {:error_changeset, Ecto.Changeset.t()}
-          | {:error, Oban.Job.changeset() | term()}
-  def bulk_add_objectives_from_files(
-        attrs,
-        filecontent
-      ) do
-    result =
-      CurriculumIngestion.changeset(%CurriculumIngestion{}, attrs)
-      |> Repo.insert()
-
-    case result do
-      {:ok, curriculum_ingestion} ->
-        year = Map.fetch!(curriculum_ingestion, :year)
-        subject = Map.fetch!(curriculum_ingestion, :subject)
-        id = Map.fetch!(curriculum_ingestion, :id)
-
-        %{ingestion_id: id, year: year, subject: subject, filecontent: filecontent}
-        |> FileIngestionWorker.new()
-        |> Oban.insert()
-
-      {:error, changeset} ->
-        {:error_changeset, changeset}
-    end
+  @spec update_curriculum_ingestion(Scope.t(), CurriculumIngestion.t(), map()) ::
+          {:ok, CurriculumIngestion.t()} | {:error, Ecto.Changeset.t()}
+  def update_curriculum_ingestion(%Scope{} = scope, ingestion, attrs) do
+    true = Scope.is_admin?(scope)
+    do_update_curriculum_ingestion(ingestion, attrs)
   end
 
-  @doc """
-  Update a curriculum ingestion. 
-  """
-  @spec update_curriculum_ingestion(CurriculumIngestion.t(), map()) ::
+  @spec update_curriculum_ingestion(:bypass_auth, CurriculumIngestion.t(), map()) ::
           {:ok, CurriculumIngestion.t()} | {:error, Ecto.Changeset.t()}
-  def update_curriculum_ingestion(ingestion, attrs) do
+  def update_curriculum_ingestion(:bypass_auth, ingestion, attrs) do
+    do_update_curriculum_ingestion(ingestion, attrs)
+  end
+
+  defp do_update_curriculum_ingestion(ingestion, attrs) do
     with {:ok, ingestion} <-
            CurriculumIngestion.changeset(ingestion, attrs)
            |> Repo.update() do
@@ -264,13 +325,14 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Return some statistics about the last curriculum.
+  Returns the number of objectives per grade and subject for the given year.
 
-  The returns is `[map()]`:
-  level subject count of objectives
+  Each entry is a map like `%{grade: "cp", subject: "français", count: 42}`.
   """
-  @spec get_stats(integer()) :: [map()]
-  def get_stats(year) do
+  @spec get_stats(Scope.t(), integer()) :: [map()]
+  def get_stats(%Scope{} = scope, year) do
+    true = Scope.is_admin?(scope)
+
     Query.base()
     |> Query.where_year(year)
     |> Query.group_by_grade_and_subject()
@@ -278,10 +340,12 @@ defmodule TeacherCoop.Curriculum do
   end
 
   @doc """
-  Return the last n ingestions.
+  Returns the last n ingestions.
   """
-  @spec list_last_ingestions(integer()) :: [CurriculumIngestion.t()]
-  def list_last_ingestions(n) do
+  @spec list_last_ingestions(Scope.t(), integer()) :: [CurriculumIngestion.t()]
+  def list_last_ingestions(%Scope{} = scope, n) do
+    true = Scope.is_admin?(scope)
+
     CurriculumIngestionQuery.base()
     |> CurriculumIngestionQuery.last_n_entries(n)
     |> Repo.all()

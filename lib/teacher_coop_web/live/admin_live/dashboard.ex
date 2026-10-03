@@ -16,11 +16,13 @@ defmodule TeacherCoopWeb.AdminLive.DashboardLive do
         <div class="divider"></div>
         <.live_component
           module={TeacherCoopWeb.AdminLive.SearchGraphsLive}
+          current_scope={@current_scope}
           id={@search_graphs_id}
         />
         <div class="divider"></div>
         <.live_component
           module={TeacherCoopWeb.AdminLive.SearchTermsStatsLive}
+          current_scope={@current_scope}
           id={@search_terms_stats_id}
         />
       </div>

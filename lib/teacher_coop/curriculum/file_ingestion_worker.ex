@@ -29,7 +29,7 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
       "filecontent" => filecontent
     } = args
 
-    ingestion = Curriculum.get_curriculum_ingestion(ingestion_id)
+    ingestion = Curriculum.get_curriculum_ingestion(:bypass_auth, ingestion_id)
 
     with attrs <- parse_file(year, subject, filecontent),
          :ok <- create_objectives(attrs),
@@ -69,7 +69,7 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   @spec update_ingestion_to_finished(Curriculum.CurriculumIngestion.t()) ::
           {:ok, Curriculum.CurriculumIngestion.t()} | {:error_ingestion, Ecto.Changeset.t()}
   defp update_ingestion_to_finished(ingestion) do
-    case(Curriculum.update_curriculum_ingestion(ingestion, %{state: "finished"})) do
+    case(Curriculum.update_curriculum_ingestion(:bypass_auth, ingestion, %{state: "finished"})) do
       {:ok, ingestion} -> {:ok, ingestion}
       {:error, changeset} -> {:error_ingestion, changeset}
     end
@@ -78,7 +78,8 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   @spec create_objectives([map()]) ::
           :ok | {:error_db, [Ecto.Changeset.t()]}
   defp create_objectives(data) do
-    db_results = Curriculum.create_objectives(data)
+    # Safety: we can use bypass auth, the job is scheduled by an admin.
+    db_results = Curriculum.create_objectives(:bypass_auth, data)
 
     case db_results do
       :ok -> :ok
@@ -158,7 +159,7 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
 
     sentry_id = if result != :ignored, do: elem(result, 1), else: nil
 
-    Curriculum.update_curriculum_ingestion(ingestion, %{
+    Curriculum.update_curriculum_ingestion(:bypass_auth, ingestion, %{
       state: "error",
       sentry_id: sentry_id
     })

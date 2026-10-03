@@ -58,7 +58,9 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
   end
 
   @impl true
-  def update(_assigns, socket) do
+  def update(assigns, socket) do
+    scope = assigns.current_scope
+
     {:ok,
      socket
      |> assign(:graph_zero_result_id, "graph-zero-result")
@@ -69,7 +71,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
        {:ok,
         %{
           zero_results_data:
-            Dashboard.zero_results(7)
+            Dashboard.zero_results(scope, 7)
             |> Enum.map(fn elem ->
               {elem.date, elem.count}
             end)
@@ -79,7 +81,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
        {:ok,
         %{
           failed_results_data:
-            Dashboard.failed_results(7)
+            Dashboard.failed_results(scope, 7)
             |> Enum.map(fn elem ->
               {elem.date, elem.count}
             end)
@@ -89,7 +91,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
        {:ok,
         %{
           searches_count_data:
-            Dashboard.searches_count(7)
+            Dashboard.searches_count(scope, 7)
             |> Enum.map(fn elem ->
               {elem.date, elem.count}
             end)
@@ -99,7 +101,7 @@ defmodule TeacherCoopWeb.AdminLive.SearchGraphsLive do
        {:ok,
         %{
           click_position_data:
-            Dashboard.click_position(7)
+            Dashboard.click_position(scope, 7)
             |> Enum.sort(&(&1 >= &2))
             |> Enum.map(fn elem ->
               {elem.position, elem.count}

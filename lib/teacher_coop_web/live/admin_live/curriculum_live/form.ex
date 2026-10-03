@@ -111,8 +111,13 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Form do
   @impl true
   def handle_event("ingest", %{"curriculum_ingestion" => ingestion_params}, socket) do
     {ingestion_params, filecontent} = build_ingestion_params_from_files(ingestion_params, socket)
+    scope = socket.assigns.current_scope
 
-    case TeacherCoop.Curriculum.bulk_add_objectives_from_files(ingestion_params, filecontent) do
+    case TeacherCoop.Curriculum.bulk_create_objectives_from_files(
+           scope,
+           ingestion_params,
+           filecontent
+         ) do
       {:ok, _} ->
         {:noreply,
          socket

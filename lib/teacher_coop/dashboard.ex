@@ -52,8 +52,10 @@ defmodule TeacherCoop.Dashboard do
   @doc """
   Returns an array os `Search` that got zero_results in the past n days.
   """
-  @spec zero_results(integer()) :: [Search.t()]
-  def zero_results(n_days) do
+  @spec zero_results(Scope.t(), integer()) :: [Search.t()]
+  def zero_results(%Scope{} = scope, n_days) do
+    true = Scope.is_admin?(scope)
+
     Query.base()
     |> Query.group_by_last_n_days(n_days)
     |> Query.where_zero_results()
@@ -63,8 +65,10 @@ defmodule TeacherCoop.Dashboard do
   @doc """
   Returns an array of `Search` with failed state in the past `n` days.
   """
-  @spec failed_results(integer()) :: [Search.t()]
-  def failed_results(n_days) do
+  @spec failed_results(Scope.t(), integer()) :: [Search.t()]
+  def failed_results(%Scope{} = scope, n_days) do
+    true = Scope.is_admin?(scope)
+
     Query.base()
     |> Query.group_by_last_n_days(n_days)
     |> Query.where_failed_state()
@@ -74,8 +78,10 @@ defmodule TeacherCoop.Dashboard do
   @doc """
   Returns an array of `Search` in the past `n` days.
   """
-  @spec searches_count(integer()) :: [Search.t()]
-  def searches_count(n_days) do
+  @spec searches_count(Scope.t(), integer()) :: [Search.t()]
+  def searches_count(%Scope{} = scope, n_days) do
+    true = Scope.is_admin?(scope)
+
     Query.base()
     |> Query.group_by_last_n_days(n_days)
     |> Repo.all()
@@ -84,8 +90,10 @@ defmodule TeacherCoop.Dashboard do
   @doc """
   Returns an array of `Search` group by click_position in the past `n` days.
   """
-  @spec click_position(integer()) :: [Search.t()]
-  def click_position(n_days) do
+  @spec click_position(Scope.t(), integer()) :: [Search.t()]
+  def click_position(%Scope{} = scope, n_days) do
+    true = Scope.is_admin?(scope)
+
     Query.base()
     |> Query.last_n_days(n_days)
     |> Query.where_download_true()

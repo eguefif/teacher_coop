@@ -91,15 +91,17 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Index do
       Curriculum.subscribe_curriculum_ingestions()
     end
 
+    scope = socket.assigns.current_scope
+
     {:ok,
      socket
-     |> assign(:current_scope, socket.assigns.current_scope)
-     |> stream(:curriculum_ingestions, Curriculum.list_last_ingestions(5))
+     |> assign(:current_scope, scope)
+     |> stream(:curriculum_ingestions, Curriculum.list_last_ingestions(scope, 5))
      |> assign_async(:curriculum_stats, fn ->
        {:ok,
         %{
           curriculum_stats:
-            Curriculum.get_stats(2024)
+            Curriculum.get_stats(scope, 2024)
             |> Enum.group_by(fn entry -> entry.grade end)
             |> Map.to_list()
         }}
@@ -108,7 +110,11 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Index do
 
   @impl true
   def handle_info(:ingestion_updated, socket) do
+    scope = socket.assigns.current_scope
+
     {:noreply,
-     stream(socket, :curriculum_ingestions, Curriculum.list_last_ingestions(5), reset: true)}
+     stream(socket, :curriculum_ingestions, Curriculum.list_last_ingestions(scope, 5),
+       reset: true
+     )}
   end
 end
