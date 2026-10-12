@@ -3,7 +3,7 @@ defmodule TeacherCoopWeb.CurriculumController do
   alias TeacherCoop.Curriculum
 
   def index(conn, _params) do
-    curriculum = Curriculum.list_objectives!()
+    curriculum = Curriculum.list_objectives()
     render(conn, :index, curriculum: curriculum)
   end
 end
