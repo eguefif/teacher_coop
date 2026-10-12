@@ -21,8 +21,8 @@ defmodule TeacherCoop.Curriculum do
   @doc """
   Returns all the objectives from the Curriculum.
   """
-  @spec list_objectives!() :: [Objective.t() | term()]
-  def list_objectives!() do
+  @spec list_objectives() :: [Objective.t() | term()]
+  def list_objectives() do
     Repo.all(Objective)
   end
 
@@ -89,12 +89,9 @@ defmodule TeacherCoop.Curriculum do
   def create_objective(%Scope{} = scope, attrs) do
     true = Scope.is_admin?(scope)
 
-    with {:ok, objective = %Objective{}} <-
-           %Objective{}
-           |> Objective.changeset(attrs)
-           |> Repo.insert() do
-      {:ok, objective}
-    end
+    %Objective{}
+    |> Objective.changeset(attrs)
+    |> Repo.insert()
   end
 
   @doc """
@@ -125,17 +122,11 @@ defmodule TeacherCoop.Curriculum do
     do_create_objectives(attrs)
   end
 
+  @spec do_create_objectives([map()]) :: :ok
   defp do_create_objectives(attrs) do
     with {:ok, _} <- validates_list_of_objectives(attrs) do
       attrs
-      |> Enum.map(fn objective ->
-        timestamp =
-          DateTime.utc_now()
-          |> DateTime.truncate(:second)
-
-        Map.put(objective, :inserted_at, timestamp)
-        |> Map.put(:updated_at, timestamp)
-      end)
+      |> Enum.map(&add_timestamps/1)
       |> then(
         &Repo.insert_all(Objective, &1,
           on_conflict: :nothing,
@@ -145,6 +136,24 @@ defmodule TeacherCoop.Curriculum do
 
       :ok
     end
+  end
+
+  @spec add_timestamps(map()) :: map()
+  defp add_timestamps(objective) do
+    timestamp =
+      DateTime.utc_now()
+      |> DateTime.truncate(:second)
+
+    Map.put(objective, :inserted_at, timestamp)
+    |> Map.put(:updated_at, timestamp)
+  end
+
+  @spec validates_list_of_objectives([map()]) :: {:ok | :error, [Ecto.Changeset.t()]}
+  defp validates_list_of_objectives(attrs) do
+    changesets = attrs |> Enum.map(&Objective.changeset(%Objective{}, &1))
+    status = if Enum.all?(changesets, &(&1.valid? == true)), do: :ok, else: :error
+
+    {status, changesets}
   end
 
   @doc """
@@ -178,14 +187,6 @@ defmodule TeacherCoop.Curriculum do
     end
   end
 
-  @spec validates_list_of_objectives([map()]) :: {:ok | :error, [Ecto.Changeset.t()]}
-  defp validates_list_of_objectives(attrs) do
-    changesets = attrs |> Enum.map(&Objective.changeset(%Objective{}, &1))
-    is_valid? = if Enum.all?(changesets, &(&1.valid? == true)), do: :ok, else: :error
-
-    {is_valid?, changesets}
-  end
-
   @doc """
   Updates an objective.
 
@@ -203,12 +204,9 @@ defmodule TeacherCoop.Curriculum do
   def update_objective(%Scope{} = scope, %Objective{} = objective, attrs) do
     true = Scope.is_admin?(scope)
 
-    with {:ok, objective = %Objective{}} <-
-           objective
-           |> Objective.changeset(attrs)
-           |> Repo.update() do
-      {:ok, objective}
-    end
+    objective
+    |> Objective.changeset(attrs)
+    |> Repo.update()
   end
 
   @doc """
@@ -228,10 +226,7 @@ defmodule TeacherCoop.Curriculum do
   def delete_objective(%Scope{} = scope, %Objective{} = objective) do
     true = Scope.is_admin?(scope)
 
-    with {:ok, objective = %Objective{}} <-
-           Repo.delete(objective) do
-      {:ok, objective}
-    end
+    Repo.delete(objective)
   end
 
   @doc """

@@ -89,7 +89,7 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
 
   @spec index_search_database() :: :ok | :error_indexing
   defp index_search_database() do
-    objectives = Curriculum.list_objectives!()
+    objectives = Curriculum.list_objectives()
 
     with attrs <- preprocess_objectives(objectives),
          :ok <-

@@ -9,7 +9,7 @@ defmodule TeacherCoop.SearchRepo.SearchObjectives do
         results.hits
 
       {:error, error} ->
-        {:error, error}
+        raise(error)
     end
   end
 
