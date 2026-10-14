@@ -3,7 +3,7 @@ defmodule TeacherCoop.Discovery do
   The Discovery context handles user search operations and search evaluation.
   When a user do a search, it uses SearchRepo to make the search. It also uses
   Repo to register a new search and track performance and user satisfaction. 
-  We want to be able to improve our serach engine.
+  We want to be able to improve our search engine.
   """
 
   alias TeacherCoop.Repo
@@ -54,35 +54,41 @@ defmodule TeacherCoop.Discovery do
     |> Search.changeset(attrs, scope)
   end
 
+  @type search_session_id() :: String.t()
+
   @doc """
   Handle a search for the user.
   """
-  @spec handle_search(String.t(), Scope.t() | nil, String.t() | nil) ::
-          {:error, Ecto.Changeset.t(), list(), list()}
+  @spec handle_search(String.t(), Scope.t() | nil, search_session_id() | nil) ::
+          {:error, Ecto.Changeset.t()}
           | {:error, String.t()}
           | {:ok, Search.t(), [Document.t() | nil], TeacherCoop.Discovery.SearchResult.t()}
-  def handle_search(search_terms \\ "", scope \\ nil, search_session \\ nil)
+  def handle_search(search_terms \\ "", scope \\ nil, search_session_id \\ nil)
 
-  def handle_search(search_terms, scope, search_session) when search_terms == "" do
+  def handle_search(search_terms, scope, search_session_id) when search_terms == "" do
     {:error,
-     change_search(%{search_terms: search_terms, search_session_id: search_session}, scope), [],
-     []}
+     change_search(%{search_terms: search_terms, search_session_id: search_session_id}, scope)}
   end
 
   def handle_search(
         search_terms,
         scope,
-        search_session
+        search_session_id
       )
       when is_binary(search_terms) do
-    do_search(search_session, search_terms, scope)
+    do_search(search_session_id, search_terms, scope)
   end
 
-  defp do_search(search_session, search_terms, scope) do
+  @spec do_search(search_session_id(), String.t(), Scope.t()) ::
+          {:ok, Search.t(), [Document.t() | nil], TeacherCoop.Discovery.SearchResult.t()}
+          | {:error, Ecto.Changeset.t()}
+          | {:error, String.t()}
+  defp do_search(search_session_id, search_terms, scope) do
     with {:ok, engine_hits} <- SearchDocuments.search_documents(search_terms),
          {:ok, {db_hits, engine_hits}} <-
            get_db_document_from_engine_hits(engine_hits),
-         {:ok, search} <- do_create_search(search_terms, length(db_hits), search_session, scope) do
+         {:ok, search} <-
+           do_create_search(search_terms, length(db_hits), search_session_id, scope) do
       {:ok, search, db_hits, engine_hits}
     else
       :error ->
@@ -93,16 +99,20 @@ defmodule TeacherCoop.Discovery do
     end
   end
 
-  defp do_create_search(search_terms, db_hits_count, search_session, scope) do
+  @spec do_create_search(String.t(), integer(), search_session_id(), Scope.t()) ::
+          {:ok, Search.t()} | {:error, Ecto.Changeset.t()}
+  defp do_create_search(search_terms, db_hits_count, search_session_id, scope) do
     search_attrs = %{
       search_terms: search_terms,
       hits_count: db_hits_count,
-      search_session_id: search_session
+      search_session_id: search_session_id
     }
 
     create_search(search_attrs, scope)
   end
 
+  @spec get_db_document_from_engine_hits(TeacherCoop.Discovery.SearchResult.t()) ::
+          {:ok, {[Document.t()], TeacherCoop.Discovery.SearchResult.t()}}
   defp get_db_document_from_engine_hits(engine_hits) do
     db_hits =
       engine_hits.hits
@@ -113,6 +123,7 @@ defmodule TeacherCoop.Discovery do
     {:ok, {db_hits, engine_hits}}
   end
 
+  @spec reorder_db_hits([Document.t()], [map()]) :: [Document.t()]
   defp reorder_db_hits(db_hits, engine_hits) do
     engine_hits
     |> Enum.map(&Enum.find(db_hits, fn result -> result.id == &1["id"] end))
@@ -121,16 +132,16 @@ defmodule TeacherCoop.Discovery do
   @doc """
   Mark a search as successfull.
   """
-  @spec mark_search_as_succes(Search.t(), integer(), Scope.t(), String.t(), String.t()) ::
+  @spec mark_search_as_success(Search.t(), integer(), Scope.t(), String.t(), String.t()) ::
           {:ok, Search.t()} | {:error, Ecto.Changeset.t()}
-  def mark_search_as_succes(%Search{} = search, click_position, scope, search_session, reason) do
+  def mark_search_as_success(%Search{} = search, click_position, scope, search_session_id, reason) do
     search
     |> update_search(
       %{
         success_click_position: click_position,
         state: "success",
         reason: reason,
-        search_session_id: search_session
+        search_session_id: search_session_id
       },
       scope
     )

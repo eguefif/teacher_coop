@@ -5,7 +5,7 @@ defmodule TeacherCoop.DiscoveryTest do
   alias TeacherCoop.DiscoveryFixtures
 
   test "handle_search/4 default value" do
-    assert {:error, changeset, [], []} = TeacherCoop.Discovery.handle_search()
+    assert {:error, changeset} = TeacherCoop.Discovery.handle_search()
     assert changeset.valid? == false
   end
 

@@ -130,9 +130,9 @@ defmodule TeacherCoopWeb.AdminLive.CurriculumLive.Form do
          |> assign(:form, to_form(changeset))
          |> put_flash(:error, gettext("Error in your form"))}
 
-      {:error, reason} ->
+      {:error, _changeset} ->
         {:noreply,
-         socket |> put_flash(:error, gettext("Error while scheduling ingestion task: ") <> reason)}
+         socket |> put_flash(:error, gettext("Error while scheduling ingestion task: "))}
     end
   end
 
