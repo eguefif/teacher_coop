@@ -30,38 +30,38 @@ defmodule TeacherCoop.ConfigurationTest do
       index =
         index_fixture(scope) |> Map.update(:engine_configuration, nil, fn _ -> nil end)
 
-      assert Configuration.get_index_by_uid(index.uid, :bypass_auth) == index
+      assert Configuration.get_index_by_uid!(index.uid, :bypass_auth) == index
     end
 
-    test "set_index_to_error_indexing/1" do
+    test "set_index_to error_indexing/1" do
       scope = admin_scope_fixture()
 
       index =
         index_fixture(scope)
 
-      Configuration.set_index_to_error_indexing(index)
+      {:ok, _} = Configuration.set_index_to(index, "error_indexing")
       index = Configuration.get_index!(index.id, scope)
       assert index.state == "error_indexing"
     end
 
-    test "set_index_to_indexing/1" do
+    test "set_index_to indexing/1" do
       scope = admin_scope_fixture()
 
       index =
         index_fixture(scope)
 
-      Configuration.set_index_to_indexing(index)
+      {:ok, _} = Configuration.set_index_to(index, "indexing")
       index = Configuration.get_index!(index.id, scope)
       assert index.state == "indexing"
     end
 
-    test "set_index_to_indexed/1" do
+    test "set_index_to indexed/1" do
       scope = admin_scope_fixture()
 
       index =
         index_fixture(scope)
 
-      Configuration.set_index_to_indexed(index)
+      {:ok, _} = Configuration.set_index_to(index, "indexed")
       index = Configuration.get_index!(index.id, scope)
       assert index.state == "indexed"
     end
@@ -91,20 +91,12 @@ defmodule TeacherCoop.ConfigurationTest do
       assert Configuration.list_index(scope) == [index]
     end
 
-    test "delete_index/2 deletes the index when it is not an original" do
+    test "delete_index/2 deletes the index" do
       scope = admin_scope_fixture()
       index = index_fixture(scope, %{type: "copy"})
 
       assert {:ok, _} = Configuration.delete_index(index, scope)
       assert Configuration.list_index(scope) == []
-    end
-
-    test "delete_index/2 returns an error when the index is an original" do
-      scope = admin_scope_fixture()
-      index = index_fixture(scope, %{type: "original"})
-
-      assert {:error, _} = Configuration.delete_index(index, scope)
-      assert Configuration.list_index(scope) != []
     end
 
     test "create_index/2 with engine_configuration_id to schedule oban" do

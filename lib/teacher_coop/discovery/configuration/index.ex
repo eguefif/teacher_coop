@@ -5,6 +5,8 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
   alias TeacherCoop.Discovery.Configuration.EngineConfiguration
   alias TeacherCoop.Accounts.User
 
+  @states ["indexing", "indexed", "error_indexing"]
+
   @definitions [
     %{uid: "documents", primary_key: "id", type: "original", state: "indexed"},
     %{uid: "documents_test", primary_key: "id", type: "original", state: "indexed"},
@@ -61,5 +63,16 @@ defmodule TeacherCoop.Discovery.Configuration.Index do
     index
     |> cast(attrs, [:uid, :state, :task_uid, :type, :engine_configuration_id])
     |> validate_required([:state])
+    |> validate_state()
+  end
+
+  def validate_state(changeset) do
+    state = get_field(changeset, :state)
+
+    if state in @states do
+      changeset
+    else
+      add_error(changeset, :state, "State must be one of #{Enum.join(@states, ", ")}")
+    end
   end
 end

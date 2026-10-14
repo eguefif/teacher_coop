@@ -101,8 +101,13 @@ defmodule TeacherCoopWeb.AdminLive.IndexLive.Form do
          |> put_flash(:info, gettext("Index created successfully"))
          |> push_navigate(to: return_path(socket.assigns.return_to, index))}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error_changeset, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
+
+      {:error, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, gettext("An error occured, please try later"))}
     end
   end
 
