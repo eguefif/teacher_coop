@@ -5,7 +5,6 @@ defmodule TeacherCoop.Dashboard do
   alias TeacherCoop.Accounts.User
 
   alias TeacherCoop.Discovery.Search.Query
-  alias TeacherCoop.Discovery.Search
 
   @doc """
   Returns the number of documents in the database
@@ -20,7 +19,7 @@ defmodule TeacherCoop.Dashboard do
   Returns the number of documents in the database in the past n days.
   """
   @spec past_documents_count(Scope.t(), integer()) :: integer()
-  def past_documents_count(scope, number_days) do
+  def past_documents_count(%Scope{} = scope, number_days) do
     true = Scope.is_admin?(scope)
 
     Document.Query.base()
@@ -32,7 +31,7 @@ defmodule TeacherCoop.Dashboard do
   Returns the number of users in the database.
   """
   @spec users_count(Scope.t()) :: integer()
-  def users_count(scope) do
+  def users_count(%Scope{} = scope) do
     true = Scope.is_admin?(scope)
     Repo.aggregate(User, :count)
   end
@@ -41,7 +40,7 @@ defmodule TeacherCoop.Dashboard do
   Returns the number of users in the database in the past n days.
   """
   @spec past_users_count(Scope.t(), integer()) :: integer()
-  def past_users_count(scope, number_days) do
+  def past_users_count(%Scope{} = scope, number_days) do
     true = Scope.is_admin?(scope)
 
     User.Query.base()
@@ -52,7 +51,7 @@ defmodule TeacherCoop.Dashboard do
   @doc """
   Returns an array os `Search` that got zero_results in the past n days.
   """
-  @spec zero_results(Scope.t(), integer()) :: [Search.t()]
+  @spec zero_results(Scope.t(), integer()) :: [Query.daily_count()]
   def zero_results(%Scope{} = scope, n_days) do
     true = Scope.is_admin?(scope)
 
@@ -65,7 +64,7 @@ defmodule TeacherCoop.Dashboard do
   @doc """
   Returns an array of `Search` with failed state in the past `n` days.
   """
-  @spec failed_results(Scope.t(), integer()) :: [Search.t()]
+  @spec failed_results(Scope.t(), integer()) :: [Query.daily_count()]
   def failed_results(%Scope{} = scope, n_days) do
     true = Scope.is_admin?(scope)
 
@@ -76,9 +75,9 @@ defmodule TeacherCoop.Dashboard do
   end
 
   @doc """
-  Returns an array of `Search` in the past `n` days.
+  Returns the count per day of searches.
   """
-  @spec searches_count(Scope.t(), integer()) :: [Search.t()]
+  @spec searches_count(Scope.t(), integer()) :: [Query.daily_count()]
   def searches_count(%Scope{} = scope, n_days) do
     true = Scope.is_admin?(scope)
 
@@ -90,7 +89,7 @@ defmodule TeacherCoop.Dashboard do
   @doc """
   Returns an array of `Search` group by click_position in the past `n` days.
   """
-  @spec click_position(Scope.t(), integer()) :: [Search.t()]
+  @spec click_position(Scope.t(), integer()) :: [Query.daily_count()]
   def click_position(%Scope{} = scope, n_days) do
     true = Scope.is_admin?(scope)
 
