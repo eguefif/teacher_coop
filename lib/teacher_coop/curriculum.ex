@@ -40,7 +40,16 @@ defmodule TeacherCoop.Curriculum do
   @spec search_objectives(String.t()) ::
           [map()] | {:error, Meilisearch.Client.error()}
   def search_objectives(input) when is_bitstring(input) do
-    TeacherCoop.SearchRepo.SearchObjectives.search(input)
+    with {:ok, results} <- TeacherCoop.SearchRepo.SearchObjectives.search(input) do
+      results
+    else
+      {:error, reason} ->
+        Sentry.capture_message("Curriculum.search_objectives error",
+          extra: %{reason: reason}
+        )
+
+        {:error, reason}
+    end
   end
 
   @doc """
@@ -163,6 +172,7 @@ defmodule TeacherCoop.Curriculum do
           {:ok, Oban.Job.t()}
           | {:error_changeset, Ecto.Changeset.t()}
           | {:error, Oban.Job.changeset() | term()}
+  @dialyzer {:no_opaque, bulk_create_objectives_from_files: 3}
   def bulk_create_objectives_from_files(
         %Scope{} = scope,
         attrs,
@@ -170,20 +180,26 @@ defmodule TeacherCoop.Curriculum do
       ) do
     true = Scope.is_admin?(scope)
 
-    result = create_curriculum_ingestion(scope, attrs)
-
-    case result do
-      {:ok, curriculum_ingestion} ->
+    result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(
+        :ingestion,
+        CurriculumIngestion.changeset(%CurriculumIngestion{}, attrs)
+      )
+      |> Oban.insert(:job, fn %{ingestion: curriculum_ingestion} ->
         year = curriculum_ingestion.year
         subject = curriculum_ingestion.subject
         id = curriculum_ingestion.id
 
         %{ingestion_id: id, year: year, subject: subject, filecontent: filecontent}
         |> FileIngestionWorker.new()
-        |> Oban.insert()
+      end)
+      |> Repo.transaction()
 
-      {:error, changeset} ->
-        {:error_changeset, changeset}
+    case result do
+      {:ok, %{ingestion: _ingestion, job: job}} -> {:ok, job}
+      {:error, :ingestion, changeset, _} -> {:error_changeset, changeset}
+      {:error, :error, oban, _} -> {:error, oban}
     end
   end
 

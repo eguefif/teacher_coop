@@ -230,16 +230,15 @@ defmodule TeacherCoopWeb.SearchLive.Search do
     scope = socket.assigns.current_scope
 
     case Discovery.handle_search(search_terms, scope, search_session_id) do
-      {:error, changeset, hits, _db_hits} ->
+      {:error, error_reason} when is_binary(error_reason) ->
+        {:noreply, socket}
+
+      {:error, changeset} ->
         {:noreply,
          socket
-         |> assign(:results, hits)
+         |> assign(:results, [])
          |> assign(:search, nil)
          |> assign(:form, to_form(changeset))}
-
-      {:error, error_reason} ->
-        IO.puts("Error: " <> error_reason)
-        {:noreply, socket}
 
       {:ok, search, hits, _} ->
         {:noreply,
@@ -265,7 +264,7 @@ defmodule TeacherCoopWeb.SearchLive.Search do
         socket
       ) do
     {:ok, search} =
-      Discovery.mark_search_as_succes(
+      Discovery.mark_search_as_success(
         socket.assigns.search,
         String.to_integer(click_position),
         socket.assigns.current_scope,
