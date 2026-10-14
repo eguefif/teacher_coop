@@ -62,6 +62,8 @@ defmodule TeacherCoop.Discovery.Search.Query do
     where(query, [s], s.state == "failed")
   end
 
+  @type daily_count() :: %{date: NaiveDateTime.t(), count: integer()}
+
   @doc """
   Selected truncated date, apply a where on last date and group by date.
   """
@@ -77,7 +79,7 @@ defmodule TeacherCoop.Discovery.Search.Query do
   Apply a where to select the last n days.
   """
   @spec last_n_days(Ecto.Query.t(), integer()) :: Ecto.Query.t()
-  def last_n_days(query, n) do
+  def last_n_days(query, n) when n > 0 do
     now = DateTime.utc_now()
     epoch = DateTime.to_unix(now)
     date = DateTime.from_unix!(epoch - n * 24 * 60 * 60)
