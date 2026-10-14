@@ -40,8 +40,8 @@ defmodule TeacherCoop.Discovery.Configuration do
   @doc """
   Get an index by names.
   """
-  @spec get_index_by_uid(String.t(), :bypass_auth) :: Index.t()
-  def get_index_by_uid(uid, :bypass_auth) do
+  @spec get_index_by_uid!(String.t(), :bypass_auth) :: Index.t()
+  def get_index_by_uid!(uid, :bypass_auth) do
     Repo.get_by!(Index, uid: uid) |> Repo.preload(:engine_configuration)
   end
 
@@ -49,41 +49,13 @@ defmodule TeacherCoop.Discovery.Configuration do
   Set the given index to state indexing.
   Broadcast the new index if successful
   """
-  @spec set_index_to_indexing(Index.t()) :: Index.t() | {:error, Ecto.Changeset.t()}
-  def set_index_to_indexing(index) do
+  @spec set_index_to(Index.t(), String.t()) :: {:ok, Index.t()} | {:error, Ecto.Changeset.t()}
+  def set_index_to(index, new_state) do
     with {:ok, index} <-
-           Index.changeset_state(index, %{state: "indexing"})
+           Index.changeset_state(index, %{state: new_state})
            |> Repo.update() do
       broadcast({:index_updated, index})
-      index
-    end
-  end
-
-  @doc """
-  Set the given index to state error_indexing.
-  Broadcast the new index if successful
-  """
-  @spec set_index_to_error_indexing(Index.t()) :: Index.t() | {:error, Ecto.Changeset.t()}
-  def set_index_to_error_indexing(index) do
-    with {:ok, index} <-
-           Index.changeset_state(index, %{state: "error_indexing"})
-           |> Repo.update() do
-      broadcast({:index_updated, index})
-      index
-    end
-  end
-
-  @doc """
-  Set the given index to state indexed.
-  Broadcast the new index if successful
-  """
-  @spec set_index_to_indexed(Index.t()) :: Index.t() | {:error, Ecto.Changeset.t()}
-  def set_index_to_indexed(index) do
-    with {:ok, index} <-
-           Index.changeset_state(index, %{state: "indexed"})
-           |> Repo.update() do
-      broadcast({:index_updated, index})
-      index
+      {:ok, index}
     end
   end
 
@@ -109,7 +81,7 @@ defmodule TeacherCoop.Discovery.Configuration do
   @doc """
   Returns the fields of the documents search index.
   """
-  @spec list_index_fields(Scope.t()) :: {:ok, [String.t()]} | list()
+  @spec list_index_fields(Scope.t()) :: [String.t()]
   def list_index_fields(%Scope{} = scope) do
     true = Scope.is_admin?(scope)
     SearchRepo.list_fields_for("documents")
@@ -123,28 +95,31 @@ defmodule TeacherCoop.Discovery.Configuration do
   def delete_index(%Index{} = index, %Scope{} = current_scope) do
     true = Scope.is_admin?(current_scope)
 
-    case index.type != "original" do
-      true -> Repo.delete(index)
-      false -> {:error, "Index is an original index"}
-    end
+    Repo.delete(index)
   end
 
   @doc """
   Inserts an index and enqueues its creation in the search engine.
   """
-  @spec create_index(map(), Scope.t()) :: {:ok, Index.t()} | {:error, Ecto.Changeset.t()}
+  @spec create_index(map(), Scope.t()) ::
+          {:ok, Index.t()} | {:error_changeset, Ecto.Changeset.t()} | {:error, :enqueue_failed}
+  @dialyzer {:no_opaque, create_index: 2}
   def create_index(attrs, %Scope{} = current_scope) do
     true = Scope.is_admin?(current_scope)
 
-    with {:ok, index} <-
-           %Index{}
-           |> Index.changeset(attrs, current_scope)
-           |> Repo.insert() do
-      %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
-      |> Workers.CreateIndex.new()
-      |> Oban.insert()
+    result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:create, Index.changeset(%Index{}, attrs, current_scope))
+      |> Oban.insert(:job, fn %{create: index} ->
+        %{"indexuid" => index.uid, "config_id" => index.engine_configuration_id}
+        |> Workers.CreateIndex.new()
+      end)
+      |> Repo.transaction()
 
-      {:ok, index}
+    case result do
+      {:ok, %{create: changeset, job: _job}} -> {:ok, changeset}
+      {:error, :create, changeset, _} -> {:error_changeset, changeset}
+      {:error, :job, _, _} -> {:error, :enqueue_failed}
     end
   end
 
@@ -242,8 +217,6 @@ defmodule TeacherCoop.Discovery.Configuration do
         %EngineConfiguration{} = configuration,
         attrs \\ %{}
       ) do
-    true = configuration.user_id == user_scope.user.id
-
     EngineConfiguration.changeset(configuration, attrs, user_scope)
   end
 end

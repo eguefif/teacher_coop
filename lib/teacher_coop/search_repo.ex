@@ -18,19 +18,29 @@ defmodule TeacherCoop.SearchRepo do
   @doc """
   Get all fields from an index: returns an array
   """
-  @spec list_fields_for(String.t()) :: {:ok, [String.t()]} | list()
+  @spec list_fields_for(String.t()) :: [String.t()]
   def list_fields_for(indexuid) do
     client = get_client()
 
     response =
       Tesla.post(client, "/indexes/#{indexuid}/fields", "{\"offset\": 0, \"limit\": 50}")
 
-    case Meilisearch.Client.handle_response(response) do
-      {:ok, fields_map} ->
-        Enum.map(fields_map["results"], & &1["name"])
+    with {:ok, fields_map} <- Meilisearch.Client.handle_response(response),
+         {:ok, fields} <- get_fields_from_map(fields_map) do
+      fields
+    else
+      {:error, reason} -> raise "Error fetching documents fields from Meilisearch: #{reason}"
+    end
+  end
 
-      _ ->
-        []
+  @spec get_fields_from_map(map()) :: {:ok, [String.t()]}
+  defp get_fields_from_map(fields_map) do
+    fields = Enum.map(fields_map["results"], & &1["name"])
+
+    if fields != [] do
+      {:ok, fields}
+    else
+      raise("There are no fields yet in documents index.")
     end
   end
 
