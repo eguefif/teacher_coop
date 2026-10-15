@@ -17,28 +17,26 @@ defmodule TeacherCoop.Dashboard.WordStats do
   language: 'french', 'english' to use in Postgres
   """
   @spec populate_words_count(pg_dictionnary_language(), DateTime.t(), DateTime.t()) ::
-          :error | :ok
+          :ok
   def populate_words_count(language, %DateTime{} = start, %DateTime{} = end_date) do
     search_query =
       Search.Query.base_with_tsvector(language)
       |> Search.Query.where_inserted_between(start, end_date)
-      |> Search.Query.group_by_lexeme_and_inserted_at_date()
 
-    {result, _} =
-      Repo.insert_all(WordCount, search_query,
-        conflict_target: [:word, :date],
-        on_conflict:
-          from(w in WordCount,
-            update: [
-              set: [
-                frequency: fragment("? + EXCLUDED.frequency", w.frequency),
-                zero_result_count: fragment("? + EXCLUDED.zero_result_count", w.zero_result_count)
-              ]
+    Repo.insert_all(WordCount, search_query,
+      conflict_target: [:word, :date],
+      on_conflict:
+        from(w in WordCount,
+          update: [
+            set: [
+              frequency: fragment("EXCLUDED.frequency"),
+              zero_result_count: fragment("EXCLUDED.zero_result_count")
             ]
-          )
-      )
+          ]
+        )
+    )
 
-    if is_nil(result), do: :error, else: :ok
+    :ok
   end
 
   @doc """
@@ -106,6 +104,7 @@ defmodule TeacherCoop.Dashboard.WordStats do
     WordCount.Query.base()
     |> select([w], w.date)
     |> order_by(desc: :date)
+    |> limit(1)
     |> Repo.one()
   end
 end

@@ -58,6 +58,6 @@ defmodule TeacherCoop.Dashboard.WordCount.Query do
   @spec where_no_results(Ecto.Query.t()) :: Ecto.Query.t()
   def where_no_results(query) do
     query
-    |> where([w], w.zero_result_count == 0)
+    |> where([w], w.zero_result_count > 0)
   end
 end

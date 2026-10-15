@@ -146,4 +146,13 @@ defmodule TeacherCoop.Discovery do
       scope
     )
   end
+
+  @doc """
+  Return the first search entry.
+  """
+  @spec get_first_search_date() :: Search.t() | nil
+  def get_first_search_date() do
+    TeacherCoop.Discovery.Search.Query.first_search_entry()
+    |> Repo.one()
+  end
 end

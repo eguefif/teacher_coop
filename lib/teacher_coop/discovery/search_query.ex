@@ -23,7 +23,8 @@ defmodule TeacherCoop.Discovery.Search.Query do
         frequency: count(),
         zero_result_count:
           fragment("SUM(CASE WHEN hits_count = 0 THEN 1 ELSE 0 END) as zero_result_count")
-      }
+      },
+      group_by: [w.lexeme, fragment("date_trunc('day', ?)", s.inserted_at)]
     )
   end
 
@@ -33,17 +34,6 @@ defmodule TeacherCoop.Discovery.Search.Query do
   @spec where_inserted_between(Ecto.Query.t(), DateTime.t(), DateTime.t()) :: Ecto.Query.t()
   def where_inserted_between(query, %DateTime{} = start, %DateTime{} = end_date) do
     where(query, [s], s.inserted_at >= ^start and s.inserted_at <= ^end_date)
-  end
-
-  @doc """
-  Group Searches results by lexeme and inserted_at.
-  """
-  @spec group_by_lexeme_and_inserted_at_date(Ecto.Query.t()) :: Ecto.Query.t()
-  def group_by_lexeme_and_inserted_at_date(query) do
-    group_by(query, [s, w], [
-      w.lexeme,
-      fragment("date_trunc('day',?)", s.inserted_at)
-    ])
   end
 
   @doc """
@@ -123,5 +113,16 @@ defmodule TeacherCoop.Discovery.Search.Query do
   @spec where_download_true(Ecto.Query.t()) :: Ecto.Query.t()
   def where_download_true(query) do
     where(query, [s], s.state == "success")
+  end
+
+  @doc """
+  Returns a query to get the first search in the table.
+  """
+  @spec first_search_entry() :: Ecto.Query.t()
+  def first_search_entry() do
+    base()
+    |> select([s], %{date: s.inserted_at})
+    |> order_by([s], asc: s.inserted_at)
+    |> limit(1)
   end
 end
