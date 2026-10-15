@@ -8,6 +8,10 @@ defmodule TeacherCoop.Library.Workers.DeleteFiles do
 
   @static_file_path "/priv/static/"
 
+  @doc """
+  Delete all the files passed to the job.
+    `args = %{files: list of }`
+  """
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
     base_path = File.cwd!() <> @static_file_path

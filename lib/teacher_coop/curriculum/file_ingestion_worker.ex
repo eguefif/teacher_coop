@@ -37,15 +37,6 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
          {:ok, _} <- update_ingestion_to_finished(ingestion) do
       :ok
     else
-      {:error_db, changesets} ->
-        log_sentry(
-          "Error while inserting in DB objectives from ingestion",
-          changesets,
-          ingestion
-        )
-
-        {:error, :db}
-
       {:error_ingestion, changeset} ->
         log_sentry(
           "Error while updating ingestion object",
@@ -54,6 +45,15 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
         )
 
         {:error, :update_ingestion}
+
+      {:error, changesets} ->
+        log_sentry(
+          "Error while creating objectives.",
+          changesets,
+          ingestion
+        )
+
+        {:error, :db}
 
       :error_indexing ->
         log_sentry(
@@ -76,15 +76,10 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
   end
 
   @spec create_objectives([map()]) ::
-          :ok | {:error_db, [Ecto.Changeset.t()]}
+          :ok | {:error, [Ecto.Changeset.t()]}
   defp create_objectives(data) do
     # Safety: we can use bypass auth, the job is scheduled by an admin.
-    db_results = Curriculum.create_objectives(:bypass_auth, data)
-
-    case db_results do
-      :ok -> :ok
-      {:error, changesets} -> {:error_db, changesets}
-    end
+    Curriculum.create_objectives(:bypass_auth, data)
   end
 
   @spec index_search_database() :: :ok | :error_indexing
@@ -142,9 +137,8 @@ defmodule TeacherCoop.Curriculum.FileIngestionWorker do
 
   @spec log_sentry(
           String.t(),
-          list(map())
-          | list(Ecto.Changeset.t())
-          | Ecto.Changeset.t()
+          Ecto.Changeset.t()
+          | [Ecto.Changeset.t()]
           | nil,
           Curriculum.CurriculumIngestion.t()
         ) :: {:ok, Curriculum.CurriculumIngestion.t()}

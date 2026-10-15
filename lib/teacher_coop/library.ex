@@ -107,10 +107,6 @@ defmodule TeacherCoop.Library do
     |> Repo.preload(:objectives)
   end
 
-  def get_file!(id) do
-    Repo.get_by(File, id: id)
-  end
-
   @doc """
   Creates a document in database, index to SearchRepo and save files on disc.
   ## Examples
@@ -123,28 +119,39 @@ defmodule TeacherCoop.Library do
 
   """
   @spec create_document(Scope.t(), map(), [integer()] | nil) ::
-          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
+          {:ok, Document.t()} | {:error, Ecto.Changeset.t() | Oban.Job.changeset()}
+  @dialyzer {:no_opaque, create_document: 3}
   def create_document(%Scope{} = scope, attrs, objective_ids \\ []) do
     objectives = Repo.all(from c in Curriculum.Objective, where: c.id in ^objective_ids)
 
-    with {:ok, document = %Document{}} <-
-           %Document{}
-           |> Document.changeset(attrs, scope, objectives)
-           |> Repo.insert() do
-      document = Repo.preload(document, :files)
-      schedule_indexing_document_job(scope, document)
-      broadcast_document(scope, {:created, document})
-      {:ok, document}
+    result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:create, Document.changeset(%Document{}, attrs, scope, objectives))
+      |> Oban.insert(:job, fn %{create: document} ->
+        document = document |> Repo.preload(:files)
+        create_indexing_document_job(scope, document)
+      end)
+      |> Repo.transaction()
+
+    case result do
+      {:ok, %{create: document, job: _job}} ->
+        broadcast_document(scope, {:created, document})
+        {:ok, document}
+
+      {:error, :create, changeset, _} ->
+        {:error, changeset}
+
+      {:error, :job, job, _} ->
+        {:error, job}
     end
   end
 
-  defp schedule_indexing_document_job(%Scope{} = scope, %Document{} = document) do
+  defp create_indexing_document_job(%Scope{} = scope, %Document{} = document) do
     attrs =
       TeacherCoop.SearchRepo.SearchDocuments.create_attributes_from_document(scope, document)
 
     %{attrs: attrs}
     |> Workers.IndexDocument.new()
-    |> Oban.insert()
   end
 
   @doc """
@@ -160,20 +167,31 @@ defmodule TeacherCoop.Library do
 
   """
   @spec update_document(Scope.t(), Document.t(), map()) ::
-          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
-  @spec update_document(Scope.t(), Document.t(), map(), [integer()]) ::
-          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
+          {:ok, Document.t()} | {:error, Ecto.Changeset.t() | Oban.Job.changeset()}
+  @dialyzer {:no_opaque, update_document: 4}
   def update_document(%Scope{} = scope, %Document{} = document, attrs, objective_ids \\ []) do
     true = document.user_id == scope.user.id
     objectives = Repo.all(from c in Curriculum.Objective, where: c.id in ^objective_ids)
 
-    with {:ok, document = %Document{}} <-
-           document
-           |> Document.changeset(attrs, scope, objectives)
-           |> Repo.insert_or_update() do
-      schedule_indexing_document_job(scope, document)
-      broadcast_document(scope, {:updated, document})
-      {:ok, document}
+    result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.update(:update, Document.changeset(document, attrs, scope, objectives))
+      |> Oban.insert(:job, fn %{update: document} ->
+        document = document |> Repo.preload(:files)
+        create_indexing_document_job(scope, document)
+      end)
+      |> Repo.transaction()
+
+    case result do
+      {:ok, %{update: document, job: _}} ->
+        broadcast_document(scope, {:updated, document})
+        {:ok, document}
+
+      {:error, :update, changeset, _} ->
+        {:error, changeset}
+
+      {:error, :job, job, _} ->
+        {:error, job}
     end
   end
 
@@ -190,17 +208,29 @@ defmodule TeacherCoop.Library do
 
   """
   @spec delete_document(Scope.t(), Document.t()) ::
-          {:ok, Document.t()} | {:error, Ecto.Changeset.t()}
+          {:ok, Document.t()} | {:error, Ecto.Changeset.t()} | {:error, Oban.Job.changeset()}
+  @dialyzer {:no_opaque, delete_document: 2}
   def delete_document(%Scope{} = scope, %Document{} = document) do
     true = document.user_id == scope.user.id
     files = Enum.map(document.files, fn file -> file.filepath end)
 
-    with {:ok, document = %Document{}} <-
-           Repo.delete(document) do
-      schedule_files_deleting(files)
-      schedule_delete_document_from_index_job(document.id)
-      broadcast_document(scope, {:deleted, document})
-      {:ok, document}
+    results =
+      Ecto.Multi.new()
+      |> Ecto.Multi.delete(:delete, document)
+      |> Oban.insert(:document_delete_job, fn %{delete: document} ->
+        %{document_id: document.id}
+        |> Workers.DeleteDocument.new()
+      end)
+      |> Oban.insert(:files_delete_job, fn _ ->
+        %{files: files}
+        |> Workers.DeleteFiles.new()
+      end)
+      |> Repo.transaction()
+
+    case results do
+      {:ok, %{delete: document}} -> {:ok, document}
+      {:error, :document_delete_job, job, _} -> {:error, job}
+      {:error, :files_delete_job, job, _} -> {:error, job}
     end
   end
 
@@ -224,26 +254,36 @@ defmodule TeacherCoop.Library do
   # File ************************************************************************
 
   @doc """
+  Get one file by id.
+  """
+  @spec get_file!(integer()) :: File.t()
+  def get_file!(id) do
+    Repo.get_by(File, id: id)
+  end
+
+  @doc """
   Delete a `%File{}` by id, remove from disc and SearchRepo.
   """
-  @spec delete_file_by_id(integer()) :: {:ok, File.t()} | {:error, Ecto.Changeset.t()}
+  @spec delete_file_by_id(integer()) ::
+          {:ok, File.t()} | {:error, Ecto.Changeset.t() | Oban.Job.changeset()}
+  @dialyzer {:no_opaque, delete_file_by_id: 1}
   def delete_file_by_id(id) do
-    with file <- Repo.get(File, id),
-         {:ok, file} <- Repo.delete(file) do
-      schedule_delete_document_from_index_job(id)
-      {:ok, file}
+    get_query = from f in File, where: f.id == ^id
+
+    result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.one(:get, get_query)
+      |> Ecto.Multi.delete(:delete, fn %{get: file} -> file end)
+      |> Oban.insert(:job, fn %{delete: file} ->
+        %{files: [file.filepath]}
+        |> Workers.DeleteFiles.new()
+      end)
+      |> Repo.transaction()
+
+    case result do
+      {:ok, %{get: _, delete: file, job: _}} -> {:ok, file}
+      {:error, :delete, file, _} -> {:error, file}
+      {:error, :job, job, _} -> {:error, job}
     end
-  end
-
-  defp schedule_delete_document_from_index_job(document_id) do
-    %{document_id: document_id}
-    |> Workers.DeleteDocument.new()
-    |> Oban.insert()
-  end
-
-  defp schedule_files_deleting(files) do
-    %{files: files}
-    |> Workers.DeleteFiles.new()
-    |> Oban.insert()
   end
 end

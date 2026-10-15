@@ -131,7 +131,7 @@ defmodule TeacherCoop.Curriculum do
     do_create_objectives(attrs)
   end
 
-  @spec do_create_objectives([map()]) :: :ok
+  @spec do_create_objectives([map()]) :: :ok | {:error, [Ecto.Changeset.t()]}
   defp do_create_objectives(attrs) do
     with {:ok, _} <- validates_list_of_objectives(attrs) do
       attrs
@@ -199,8 +199,7 @@ defmodule TeacherCoop.Curriculum do
     case result do
       {:ok, %{ingestion: _ingestion, job: job}} -> {:ok, job}
       {:error, :ingestion, changeset, _} -> {:error_changeset, changeset}
-      # TODO: Check if the second :error is valid, shoudn't it be :job?
-      {:error, :error, oban, _} -> {:error, oban}
+      {:error, :job, oban, _} -> {:error, oban}
     end
   end
 

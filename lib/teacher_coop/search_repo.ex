@@ -40,7 +40,8 @@ defmodule TeacherCoop.SearchRepo do
     if fields != [] do
       {:ok, fields}
     else
-      raise("There are no fields yet in documents index.")
+      Sentry.capture_message("There are no fields yet in documents index.")
+      {:ok, []}
     end
   end
 
