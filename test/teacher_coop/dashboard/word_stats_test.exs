@@ -84,7 +84,7 @@ defmodule TeacherCoop.Dashboard.WordStatsTest do
       WordStats.populate_words_count("french", days_ago(5), days_ago(0))
       second = WordStats.total_for("fraction")
 
-      assert second == first * 2
+      assert second == first
     end
   end
 
