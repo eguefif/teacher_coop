@@ -216,8 +216,8 @@ defmodule TeacherCoop.LibraryTest do
       assert {:ok, %TeacherCoop.Library.File{}} = Library.delete_file_by_id(file.id)
       assert Library.get_file!(file.id) == nil
 
-      assert_enqueued worker: TeacherCoop.Library.Workers.DeleteDocument,
-                      args: %{"document_id" => file.id}
+      assert_enqueued worker: TeacherCoop.Library.Workers.DeleteFiles,
+                      args: %{"files" => [file.filepath]}
     end
   end
 end

@@ -1149,3 +1149,8 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "Phoenix Dashboard"
 msgstr ""
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "An error occured, please try later"
+msgstr ""

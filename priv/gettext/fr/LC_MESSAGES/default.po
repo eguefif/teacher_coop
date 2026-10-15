@@ -1185,3 +1185,8 @@ msgstr "Clé primaire"
 #, elixir-autogen, elixir-format
 msgid "Phoenix Dashboard"
 msgstr "Tableau de bord Phoenix"
+
+#: lib/teacher_coop_web/live/admin_live/index_live/form.ex
+#, elixir-autogen, elixir-format
+msgid "An error occured, please try later"
+msgstr "Une erreur s'est produite, réessayez plus tard."
