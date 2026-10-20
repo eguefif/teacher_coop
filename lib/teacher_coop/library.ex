@@ -172,12 +172,15 @@ defmodule TeacherCoop.Library do
   def update_document(%Scope{} = scope, %Document{} = document, attrs, objective_ids \\ []) do
     true = document.user_id == scope.user.id
     objectives = Repo.all(from c in Curriculum.Objective, where: c.id in ^objective_ids)
+    IO.puts("HEYYYYYYYYYYYYYYYYYYYYYYYYYYY")
+    IO.inspect(objective_ids)
+    IO.puts("HEYYYYYYYYYYYYYYYYYYYYYYYYYYY")
 
     result =
       Ecto.Multi.new()
       |> Ecto.Multi.update(:update, Document.changeset(document, attrs, scope, objectives))
       |> Oban.insert(:job, fn %{update: document} ->
-        document = document |> Repo.preload(:files)
+        document = document |> Repo.preload(:files) |> Repo.preload(:objectives)
         create_indexing_document_job(scope, document)
       end)
       |> Repo.transaction()

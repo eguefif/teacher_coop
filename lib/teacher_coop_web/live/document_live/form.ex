@@ -381,6 +381,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   end
 
   # Keyboard events -----------------------------------------------
+
   def handle_event("user-presses-keyboard", %{"key" => "ArrowDown"}, socket)
       when socket.assigns.show_objective_results == true do
     arrow_navigation_index =
@@ -438,6 +439,7 @@ defmodule TeacherCoopWeb.DocumentLive.Form do
   def handle_event("user-presses-keyboard", _, socket), do: {:noreply, socket}
 
   # Objectives events ---------------------------------------------
+
   def handle_event("reset-objective-results", _, socket) do
     {:noreply,
      socket
