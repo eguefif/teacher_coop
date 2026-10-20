@@ -67,11 +67,17 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
     test "updates document in listing", %{conn: conn, document: document} do
       {:ok, index_live, _html} = live(conn, ~p"/documents")
 
-      assert {:ok, form_live, _html} =
+      assert {:ok, show_live, _html} =
                index_live
-               |> element("#documents-#{document.id} a", "Edit")
+               |> element("#document-#{document.id}")
                |> render_click()
-               |> follow_redirect(conn, ~p"/documents/#{document}/edit")
+               |> follow_redirect(conn, ~p"/documents/#{document}")
+
+      assert {:ok, form_live, _html} =
+               show_live
+               |> element("a", "Edit")
+               |> render_click()
+               |> follow_redirect(conn, ~p"/documents/#{document}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Document"
 
@@ -83,7 +89,7 @@ defmodule TeacherCoopWeb.DocumentLiveTest do
                form_live
                |> form("#document-form", document: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/documents")
+               |> follow_redirect(conn, ~p"/documents/#{document}")
 
       html = render(index_live)
       assert html =~ "Document updated successfully"
