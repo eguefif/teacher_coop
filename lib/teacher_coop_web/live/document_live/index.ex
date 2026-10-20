@@ -16,11 +16,11 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
         </:actions>
       </.header>
 
-      <div class="flex flex-wrap flex-col gap-4 lg:flex-row lg:gap-8 items-center lg:justify-start lg:w-[740px] lg:mx-auto">
+      <div class="flex flex-wrap flex-col gap-4 md:flex-row md:gap-[32px] items-start w-[384px] lg:justify-start md:w-[1024px] md:mx-auto">
         <div
           :for={{id, document} <- @streams.documents}
           id={id}
-          class="card card-xs shadow-sm w-[224px] bg-base-200 p-4 scale-100 hover:scale-101 transition-transform duration-100 ease-in-out relative"
+          class="card card-md shadow-sm w-[256px] h-[256px] bg-base-200 scale-100 hover:scale-101 transition-transform duration-100 ease-in-out relative p-4"
         >
           <a
             class="btn btn-neutral btn-circle absolute -top-2 -right-2"
@@ -28,14 +28,16 @@ defmodule TeacherCoopWeb.DocumentLive.Index do
             phx-value-id={document.id}
           ><.icon name="hero-x-mark" /></a>
           <div
+            id={"document-#{document.id}"}
             class="card-body hover:cursor-pointer"
             phx-click={JS.navigate(~p"/documents/#{document}")}
           >
-            <div class="card-title">{document.title}</div>
-            <div>{document.description}</div>
-          </div>
-          <div class="card-actions justify-end">
-            <.button variant="soft" navigate={~p"/documents/#{document}/edit"}>{gettext("Edit")}</.button>
+            <div class="card-title border-b border-b-[1px] border-base-content pb-[8px] mb-[16px] text-md">
+              {document.title}
+            </div>
+            <div class="text-base/7 line-clamp-4">
+              {document.description}
+            </div>
           </div>
         </div>
       </div>
