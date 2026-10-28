@@ -76,7 +76,8 @@ defmodule TeacherCoop.Accounts do
 
   """
   def register_user(attrs) do
-    if Mix.env() == :prod, do: Sentry.capture_message("New User", attrs: attrs)
+    if Application.fetch_env(:teacher_coop, :is_prod) == true,
+      do: Sentry.capture_message("New User", attrs: attrs)
 
     %User{}
     |> User.email_changeset(attrs)
