@@ -111,7 +111,6 @@ msgstr "Vous n'avez pas de compte?"
 #: lib/teacher_coop_web/live/admin_live/index_live/form.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/index.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/show.ex
-#: lib/teacher_coop_web/live/document_live/index.ex
 #: lib/teacher_coop_web/live/document_live/show.ex
 #, elixir-autogen, elixir-format
 msgid "Edit"
@@ -638,11 +637,6 @@ msgstr "Mots populaires"
 #, elixir-autogen, elixir-format
 msgid "Popular words with no result"
 msgstr "Mots populaires sans résultat"
-
-#: lib/teacher_coop_web/live/search_live/search.ex
-#, elixir-autogen, elixir-format
-msgid "Preview"
-msgstr "Aperçu"
 
 #: lib/teacher_coop_web/live/admin_live/index_live/show.ex
 #, elixir-autogen, elixir-format

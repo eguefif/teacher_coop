@@ -66,6 +66,9 @@ defmodule TeacherCoopWeb.UserLive.Registration do
   @impl true
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign_form(socket, changeset)}
+
       {:ok, user} ->
         {:ok, _} =
           Accounts.deliver_login_instructions(
@@ -83,9 +86,6 @@ defmodule TeacherCoopWeb.UserLive.Registration do
            )
          )
          |> push_navigate(to: ~p"/users/log-in")}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
     end
   end
 
