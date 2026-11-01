@@ -111,7 +111,6 @@ msgstr ""
 #: lib/teacher_coop_web/live/admin_live/index_live/form.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/index.ex
 #: lib/teacher_coop_web/live/admin_live/index_live/show.ex
-#: lib/teacher_coop_web/live/document_live/index.ex
 #: lib/teacher_coop_web/live/document_live/show.ex
 #, elixir-autogen, elixir-format
 msgid "Edit"
@@ -637,11 +636,6 @@ msgstr ""
 #: lib/teacher_coop_web/live/admin_live/dashboard/search_terms_stats_live.ex
 #, elixir-autogen, elixir-format
 msgid "Popular words with no result"
-msgstr ""
-
-#: lib/teacher_coop_web/live/search_live/search.ex
-#, elixir-autogen, elixir-format
-msgid "Preview"
 msgstr ""
 
 #: lib/teacher_coop_web/live/admin_live/index_live/show.ex

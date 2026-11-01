@@ -76,7 +76,7 @@ defmodule TeacherCoop.Accounts do
 
   """
   def register_user(attrs) do
-    if Application.fetch_env(:teacher_coop, :is_prod) == true,
+    if Application.fetch_env(:teacher_coop, :is_prod) == {:ok, true},
       do: Sentry.capture_message("New User", attrs: attrs)
 
     %User{}
